@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <SourceFile>/home/ark/Documents/game/projects/TestGame/Assets/maps/map.tmx</SourceFile>
+  <SourceTime>2024-02-24T14:11:51.8042056+08:00</SourceTime>
+  <DestFile>/home/ark/Documents/game/projects/TestGame/Assets/bin/DesktopGL/Content/maps/map.xnb</DestFile>
+  <DestTime>2024-02-24T14:11:59.1843048+08:00</DestTime>
+  <Importer>TiledMapImporter</Importer>
+  <ImporterTime>2020-08-30T01:17:30+08:00</ImporterTime>
+  <Processor>TiledMapProcessor</Processor>
+  <ProcessorTime>2020-08-30T01:17:30+08:00</ProcessorTime>
+  <Dependencies />
+  <BuildAsset />
+  <BuildOutput />
+</PipelineBuildEvent>

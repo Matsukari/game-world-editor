@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- <Nullable>False</Nullable> -->
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../Vendor/Nez/Nez.Portable/Nez.MG38.csproj" />
+    <ProjectReference Include="../../Vendor/Nez/Nez.ImGui/Nez.MG38.ImGui.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="8.0.2" /> 
+    <PackageReference Include="MonoGame.Extended" Version="3.8.0" />
+    <PackageReference Include="MonoGame.Extended.Content.Pipeline" Version="3.8.0" />
+    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.1.303">
+      <!-- <PrivateAssets>All</PrivateAssets> -->
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="ContentPathGenerator.cs">
+      <DependentUpon>ContentPathGenerator.tt</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <!-- Includes Content folder, Nez default effects and textures -->
+  <ItemGroup>
+    <Content Include="../../Vendor/Nez/DefaultContent/MG3.8Effects/**/*.mgfxo">
+      <Link>Content/nez/effects/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../Vendor/Nez/DefaultContent/textures/**/*.xnb">
+      <Link>Content/nez/textures/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="ContentPathGenerator.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ContentPathGenerator.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+</Project>

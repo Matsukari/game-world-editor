@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/bard.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/bat_idle_back.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/bat_idle_front.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/bat_idle_side.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/elder.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/ghost_back.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/ghost_front.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/ghost_king_hurl.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/ghost_king_idle.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/ghost_king_sentience.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/ghost_king.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/ghost_side.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/man.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_attack_back.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_attack_front.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_attack_side.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_idle_back.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_idle_front.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_idle_side.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_move_back.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_move_front.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/player_move_side.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/priest.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/woman.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/dark_halo.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/ghost_ball_explode.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/ghost_ball_idle.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/skill_1_strike_effect.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/skill_1_sustain_back.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/skill_1_sustain_front.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/skill_1_sustain_side.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/skill_1_sustain.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/skill_2_sustain.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/strike_effect.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/strike_overlay_back.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/strike_overlay_front.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/strike_overlay_side.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/teleport_from.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/teleport_to.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/effects/totem_buff.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/chest_idle.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/chest_open.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/collapsing_ground.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/corpse_1.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/corpse_2.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/corpse_3.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/corpse_4.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/door_big_idle.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/door_big.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/key_bronze.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/key_gold.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/key_silver.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/lamp_fire.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/lamp_stand.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/lamp.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/lever.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/magic_ore_mid.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/magic_ore_small.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/rock_1.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/rock_2.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/rock_3.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/spritesheet.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/stair_down.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/torch_stand.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/totem_1.png</File>
+    <File>/home/ark/Documents/game/projects/TestGame/Assets/Content/objects/totem_2.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

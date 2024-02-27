@@ -1,0 +1,3 @@
+[submodule "Vendor/Nez"]
+	path = Vendor/Nez
+	url = https://github.com/prime31/Nez

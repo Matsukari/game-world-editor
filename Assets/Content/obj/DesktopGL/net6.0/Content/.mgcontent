@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/chest_idle.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/chest_open.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/collapsing_ground.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/corpse_1.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/corpse_2.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/corpse_3.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/corpse_4.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/door_big_idle.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/door_big.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/key_bronze.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/key_gold.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/key_silver.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/lamp_fire.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/lamp_stand.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/lamp.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/lever.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/magic_ore_mid.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/magic_ore_small.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/rock_1.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/rock_2.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/rock_3.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/spritesheet.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/stair_down.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/torch_stand.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/totem_1.png</File>
+    <File>/home/ark/Documents/game/projects/SampleGame/SampleGame.Core/Content/objects/totem_2.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

@@ -1,0 +1,57 @@
+#!/bin/bash
+
+IN=$PWD
+arrIN=(${IN//'/'/ })
+NAME=${arrIN[-1]}
+ASSETS="Assets"
+CONTENT="Assets/Content"
+LEVEL_EDITOR="/home/ark/Documents/game/tools/ldtk"
+DESKTOP="Source/$NAME.Desktop"
+echo $NAME
+
+pkill dotnet
+
+if [[ $1 == "test" ]]; then
+	dotnet build -c Debug Source/$NAME.Desktop
+	dotnet run --project Source/$NAME.Desktop
+elif [[ $1 == "build" ]]; then
+  dotnet build Source/$NAME.${2^}
+elif [[ $1 == "run" ]]; then
+  dotnet run --project $DESKTOP
+elif [[ $1 == "content" ]]; then
+  echo "Content pipeline $DESKTOP"
+  cd $DESKTOP
+  dotnet mgcb-editor ../../$CONTENT/Content.mgcb
+  sleep 5
+elif [[ $1 == "level" ]]; then
+  echo "Level editor"
+  cd $LEVEL_EDITOR/app
+  npm run start
+elif [[ $1 == "restore" ]]; then
+  echo "Clear"
+  cd $DESKTOP
+  dotnet clean 
+  dotnet restore
+elif [[ $1 == "t4" ]]; then
+  source ~/.zshrc > /dev/null 2>&1
+  echo "Generating content paths..."
+  t4 -o Source/$NAME.Core/ContentPathGenerator.cs Source/$NAME.Core/ContentPathGenerator.tt
+
+  file_path=Source/$NAME.Core/ContentPathGenerator.cs
+  new_content="class $ASSETS"
+
+  sed -i 's/Nez/'"$NAME"'/g' "$file_path"
+  sed -i 's/class Content/'"$new_content"'/g' "$file_path"
+  sed -i "s|../../$ASSETS/||g" "$file_path"
+  sed -i "s|.png||g" "$file_path"
+  sed -i "s|.ttf||g" "$file_path"
+  sed -i "s|.txt||g" "$file_path"
+  sed -i "s|.json||g" "$file_path"
+  sed -i "s|.fnt||g" "$file_path"
+  sed -i "s|Raw/||g" "$file_path"
+else 
+  echo "Unrecognized"
+fi
+
+
+pkill dotnet
