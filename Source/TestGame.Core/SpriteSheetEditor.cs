@@ -35,6 +35,8 @@ namespace Tools
     bool isAutoRegioning = false;
     bool isDrag = false;
     Vector2 startDrag = new Vector2();
+    Vector2 startPos = new Vector2();
+
 
 		public SpriteSheetEditor()
 		{
@@ -54,6 +56,7 @@ namespace Tools
         
 				DrawMenuBar(); 
 				DrawSprites();
+        if (_spriteSheetData.TileWidth > 0) DrawGridLines(_spriteSheetData.TileWidth, _spriteSheetData.TileHeight);
         if (isAutoRegioning) DrawAutoRegionPopup(); 
         ImGui.End();
 			}
@@ -80,29 +83,36 @@ namespace Tools
         var maxZoom = 10f;
 
         var oldSize = _imageZoom * _textureSize;
-        var zoomSpeed = _imageZoom * 0.1f;
+        var zoomSpeed = _imageZoom * 0.2f;
         _imageZoom += Math.Min(maxZoom - _imageZoom, ImGui.GetIO().MouseWheel * zoomSpeed);
         _imageZoom = Mathf.Clamp(_imageZoom, minZoom, maxZoom);
+
 
         // zoom in, move up/left, zoom out the opposite
         var deltaSize = oldSize - (_imageZoom * _textureSize);
         _imagePosition += deltaSize * 0.5f;
-
-
-        var dragSpeed = 0.35f;
-        if (ImGui.GetIO().MouseDown[2])
-        {
-          isDrag = true;
-          startDrag = _imagePosition + ImGui.GetIO().MousePos * dragSpeed;
-        }
-        else isDrag = false; 
-        if (isDrag) 
-        {
-          _imagePosition.X = (startDrag.X - ImGui.GetIO().MousePos.X * dragSpeed);
-          _imagePosition.Y = (startDrag.Y - ImGui.GetIO().MousePos.Y * dragSpeed);
-        }
+      }
+      var dragSpeed = 0.9f;
+      if (ImGui.GetIO().MouseDown[2] && !isDrag)
+      {
+        isDrag = true;
+        startDrag = ImGui.GetIO().MousePos;
+        startPos = _imagePosition;
+        Console.WriteLine($"Start {startDrag}");
+      }
+      else if (ImGui.GetIO().MouseReleased[2]) {
+        isDrag = false; 
+        Console.WriteLine($"End {ImGui.GetIO().MousePos}");
 
       }
+      if (isDrag) 
+      {
+        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+        _imagePosition.X = startPos.X - (startDrag.X - ImGui.GetIO().MousePos.X) * dragSpeed;
+        _imagePosition.Y = startPos.Y - (startDrag.Y - ImGui.GetIO().MousePos.Y) * dragSpeed;
+      } 
+      else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
+
       ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
       if (ImGui.IsWindowFocused() && ImGui.IsMouseDown(0) && ImGui.GetIO().KeyAlt)
       {
@@ -147,11 +157,13 @@ namespace Tools
         {
 
         }
+        
 				ImGui.EndMenuBar();
 			}
 			if (newAtlas) ImGui.OpenPopup("new-atlas");
 			if (openFile) ImGui.OpenPopup("open-file");
 			OpenFilePopup();
+
 		}
 
 		void OpenFilePopup()
@@ -246,7 +258,7 @@ namespace Tools
         }
         ImGui.EndPopup();
       }
-    }	
+    }
 		void DoAutoRegion(int cellWidth, int cellHeight)
 		{
       _spriteSheetData.TileWidth = cellWidth;
@@ -266,6 +278,38 @@ namespace Tools
       
      
       isAutoRegioning = true;
+    }
+    (Num.Vector2, Num.Vector2) GetWindowArea() 
+    {
+      Num.Vector2 vMin = ImGui.GetWindowContentRegionMin();
+      Num.Vector2 vMax = ImGui.GetWindowContentRegionMax();
+      vMin += ImGui.GetWindowPos();
+      vMax += ImGui.GetWindowPos();
+      return (vMin, vMax);
+    }
+    void DrawGridLines(int tw, int th)
+    {
+      float w = tw * _imageZoom;
+      float h = th * _imageZoom;
+      var (min, max) = GetWindowArea();
+      var drawList = ImGui.GetWindowDrawList();
+      int cols = (int)(_textureSize.X / tw);
+      int rows = (int)(_textureSize.Y / th);
+      uint color = ImGui.ColorConvertFloat4ToU32(new Num.Vector4(0.3f, 0.3f, 0.3f, 0.3f));
+      for (int x = 0; x <= cols; x++) 
+      { 
+        float xx = x;
+        drawList.AddLine(
+            min + new Num.Vector2(_imagePosition.X + xx * w, _imagePosition.Y), 
+            min + new Num.Vector2(_imagePosition.X + xx * w, _imagePosition.Y + rows * h), color);
+        for (int y = 0; y <= rows; y++) 
+        {
+          float yy = y;
+          drawList.AddLine(
+              min + new Num.Vector2(_imagePosition.X, _imagePosition.Y + y * h), 
+              min + new Num.Vector2(_imagePosition.X + cols * w, _imagePosition.Y + y * h), color);
+        }
+      }
     }
 		void CenterImage()
 		{

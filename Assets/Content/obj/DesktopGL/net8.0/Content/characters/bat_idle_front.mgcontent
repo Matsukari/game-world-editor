@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PipelineBuildEvent xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <SourceFile>/home/ark/Documents/game/projects/TestGame/Assets/Content/characters/bat_idle_front.png</SourceFile>
+  <SourceFile>/home/ark/Documents/game/projects/WorldEditor/Assets/Content/characters/bat_idle_front.png</SourceFile>
   <SourceTime>2024-01-27T08:48:32.9738418+08:00</SourceTime>
-  <DestFile>/home/ark/Documents/game/projects/TestGame/Assets/Content/bin/DesktopGL/Content/characters/bat_idle_front.xnb</DestFile>
-  <DestTime>2024-02-24T14:36:21.7521411+08:00</DestTime>
+  <DestFile>/home/ark/Documents/game/projects/WorldEditor/Assets/Content/bin/DesktopGL/Content/characters/bat_idle_front.xnb</DestFile>
+  <DestTime>2024-02-27T20:05:06.3895415+08:00</DestTime>
   <Importer>TextureImporter</Importer>
   <ImporterTime>2022-07-26T19:44:56+08:00</ImporterTime>
   <Processor>TextureProcessor</Processor>
