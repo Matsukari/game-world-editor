@@ -57,10 +57,10 @@ namespace Tools
 			{ 
 				DrawMenuBar(); 
 				DrawSprites();
+        // DrawPopups();      
         if (_spriteSheetData.TileWidth > 0) DrawGridLines(_spriteSheetData.TileWidth, _spriteSheetData.TileHeight);
         ImGui.End();
 			}
-      DrawPopups();      
       if (isAutoRegioning) DrawAutoRegionPopup();  
       if (_spriteSheetData != null) DrawPropertiesPane(_spriteSheetData, _spriteSheetData.Name);
       if (_selSprite is ComplexSpriteData sel) DrawPropertiesPane(sel, sel.Name);
@@ -75,17 +75,17 @@ namespace Tools
     {
       if (ImGui.GetIO().MouseReleased[1] && _selSprite is TiledSpriteData) 
       {
-        ImGui.OpenPopup("sprite-editing");
+        ImGui.OpenPopup("sprite-editing", ImGuiPopupFlags.NoOpenOverExistingPopup);
         isSpriteOptions = true;
       }
       if (isSpriteOptions && _selSprite is TiledSpriteData tile)
       {
         ImGui.BeginPopup("sprite-editing");
         if (ImGui.MenuItem("Create ComplexSprite")) _spriteSheetData.AddSprite(tile);
+        // if (!ImGui.IsItemFocused()) _selSprite = null;
+        // if (ImGui.MenuItem("Close")) _selSprite = null;
         ImGui.EndPopup();
       }
-
-
     }
     void DrawSprites()
     {
@@ -93,7 +93,7 @@ namespace Tools
       ImGui.BeginChild("Spritesheet view", new Num.Vector2(ImGui.GetContentRegionAvail().X - 0, 0), false, 
           ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
       
-      if (ImUtils.IsMouseAt(ImUtils.GetWindowRect()) && !isAutoRegioning && !isSpriteOptions) ImGui.SetWindowFocus();
+      if (ImUtils.IsMouseAt(ImUtils.GetWindowRect()) && !isAutoRegioning && !isSpriteOptions && _selSprite == null) ImGui.SetWindowFocus();
       if (ImGui.IsWindowFocused())
       {
         var (windowMin, windowMax) = ImUtils.GetWindowArea();
@@ -245,6 +245,9 @@ namespace Tools
       ImGui.SeparatorText("Sprite Properties");
       ImGui.LabelText("Name", name);
       ImGui.LabelText("Region", RectangleString(sprite.Region));
+      ImGui.Spacing();
+      if (ImGui.MenuItem("Create ComplexSprite")) _spriteSheetData.AddSprite(sprite);
+      ImGui.Spacing();
       ImGui.SeparatorText("Custom Properties");
       foreach (var (customName, customProp) in sprite.Properties) 
       {
@@ -274,10 +277,9 @@ namespace Tools
       ImGui.SeparatorText($"Sprites ({_spriteSheetData.Sprites.Count})");
       foreach (var (name, sprite) in _spriteSheetData.Sprites)
       {
-        ImGui.Text($"{name}");
-        if (ImGui.IsItemClicked())
+        if (ImGui.MenuItem($"{name}")) 
         {
-          
+
         }
       }
       ImGui.End();
