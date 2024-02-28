@@ -5,6 +5,51 @@ using Nez;
 
 namespace ImGuiNET 
 {
+  public class SelectionRect 
+  {
+    enum SelectionAreaPoint
+    {
+      TopLeft,
+      BottomLeft,
+      Left,
+      TopRight,
+      BottomRight,
+      Right,
+      Top,
+      Bottom,
+    }
+    public SelectionRect(Rectangle rect) 
+    { 
+      int radius = 5;
+      
+      Content = rect; 
+        Points.Add(new Rectangle(Content.Left , Content.Top         , radius, radius));
+        Points.Add(new Rectangle(Content.Left , Content.Bottom      , radius, radius));
+        Points.Add(new Rectangle(Content.Left , Content.Center.Y    , radius, radius));
+        Points.Add(new Rectangle(Content.Right , Content.Top        , radius, radius));
+        Points.Add(new Rectangle(Content.Right , Content.Bottom     , radius, radius));
+        Points.Add(new Rectangle(Content.Right , Content.Center.Y   , radius, radius));
+        Points.Add(new Rectangle(Content.Center.X , Content.Top     , radius, radius));
+        Points.Add(new Rectangle(Content.Center.X , Content.Bottom  , radius, radius)); 
+
+    }
+    public Rectangle Content;
+    public List<Rectangle> Points = new List<Rectangle>();
+    public List<Action> PointDragAction = new List<Action>();
+    public int Draw(ImDrawListPtr drawList, float radius, Color outline, Num.Vector2 offset, float zoom)
+    {
+      var (windowMin, windowMax) = ImUtils.GetWindowArea();
+      int i = 0, p = -1;
+      foreach (var point in Points)
+      {
+        if (ImUtils.IsMouseAt(point)) p = i;
+        drawList.AddCircleFilled(new Num.Vector2(windowMin.X + point.X * zoom, windowMin.Y + point.Y * zoom), radius, ImUtils.GetColor(outline));
+        i++;
+      }
+      ImUtils.DrawRect(drawList, Content, outline, offset, zoom);
+      return p;
+    }
+  }
   public static partial class ImUtils 
   {
     public static uint GetColor(Color color) 

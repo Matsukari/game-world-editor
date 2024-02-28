@@ -53,6 +53,7 @@ namespace Tools
 		public void Show()
 		{
       bool isOpen = true;
+      CheckShortcuts();
 			if (ImGui.Begin("Sprite Atlas Editor", ref isOpen, ImGuiWindowFlags.MenuBar))
 			{ 
 				DrawMenuBar(); 
@@ -71,6 +72,9 @@ namespace Tools
       DrawAnimationPane();
 
 		}
+    void CheckShortcuts()
+    {
+    }
     void DrawPopups()
     {
       if (ImGui.GetIO().MouseReleased[1] && _selSprite is TiledSpriteData) 
@@ -147,8 +151,10 @@ namespace Tools
         } 
         else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
       }
-      if (_selSprite is TiledSpriteData tiledSprite) 
-        ImUtils.DrawRect(ImGui.GetForegroundDrawList(), tiledSprite.Region, Color.WhiteSmoke, _imagePosition, _imageZoom);
+      if (_selSprite is TiledSpriteData tiledSprite)
+      {
+        SelectionRect.Draw(ImGui.GetForegroundDrawList(), tiledSprite.Region, 5, Color.WhiteSmoke, _imagePosition, _imageZoom);
+      }
       // else if (_selSprite is ComplexSpriteData complexSprite) ImUtils.DrawRect(ImGui.GetForegroundDrawList(), complexSprite., Color.WhiteSmoke, _imageZoom);
 
 
@@ -319,7 +325,6 @@ namespace Tools
  
       isAutoRegioning = true;
     }
-    
     void DrawGridLines(int tw, int th)
     {
       float w = tw * _imageZoom;
