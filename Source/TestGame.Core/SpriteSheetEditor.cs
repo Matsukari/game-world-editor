@@ -33,11 +33,12 @@ namespace Tools
     private Object _selSprite;
 
     bool isAutoRegioning = false;
+    bool isSpriteOptions = false;
     bool isDrag = false;
     Vector2 startDrag = new Vector2();
     Vector2 startPos = new Vector2();
 
-
+    ImFontPtr _font;
 		public SpriteSheetEditor()
 		{
       _imageFilename = "Assets/Raw/Unprocessed/export/test_canvas.png";
@@ -46,21 +47,21 @@ namespace Tools
     public override void OnAddedToEntity()
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Show);
+      _font = ImGui.GetIO().Fonts.AddFontFromFileTTF("Assets/Raw/Unprocessed/Roboto-Regular.ttf", 13.0f);
     }
             
 		public void Show()
 		{
       bool isOpen = true;
 			if (ImGui.Begin("Sprite Atlas Editor", ref isOpen, ImGuiWindowFlags.MenuBar))
-			{
-        
+			{ 
 				DrawMenuBar(); 
 				DrawSprites();
         if (_spriteSheetData.TileWidth > 0) DrawGridLines(_spriteSheetData.TileWidth, _spriteSheetData.TileHeight);
-        if (isAutoRegioning) DrawAutoRegionPopup(); 
         ImGui.End();
 			}
-      
+      DrawPopups();      
+      if (isAutoRegioning) DrawAutoRegionPopup();  
       if (_spriteSheetData != null) DrawPropertiesPane(_spriteSheetData, _spriteSheetData.Name);
       if (_selSprite is ComplexSpriteData sel) DrawPropertiesPane(sel, sel.Name);
       else if (_selSprite is TiledSpriteData tile) DrawPropertiesPane(tile, tile.Name);
@@ -70,48 +71,86 @@ namespace Tools
       DrawAnimationPane();
 
 		}
+    void DrawPopups()
+    {
+      if (ImGui.GetIO().MouseReleased[1] && _selSprite is TiledSpriteData) 
+      {
+        ImGui.OpenPopup("sprite-editing");
+        isSpriteOptions = true;
+      }
+      if (isSpriteOptions && _selSprite is TiledSpriteData tile)
+      {
+        ImGui.BeginPopup("sprite-editing");
+        if (ImGui.MenuItem("Create ComplexSprite")) _spriteSheetData.AddSprite(tile);
+        ImGui.EndPopup();
+      }
 
+
+    }
     void DrawSprites()
     {
       var frame = ImGui.GetStyle().FramePadding.X + ImGui.GetStyle().FrameBorderSize;
       ImGui.BeginChild("Spritesheet view", new Num.Vector2(ImGui.GetContentRegionAvail().X - 0, 0), false, 
           ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
- 
-      if (ImGui.IsWindowFocused() && ImGui.GetIO().MouseWheel != 0)
+      
+      if (ImUtils.IsMouseAt(ImUtils.GetWindowRect()) && !isAutoRegioning && !isSpriteOptions) ImGui.SetWindowFocus();
+      if (ImGui.IsWindowFocused())
       {
-        var minZoom = 0.2f;
-        var maxZoom = 10f;
+        var (windowMin, windowMax) = ImUtils.GetWindowArea();
+        ImGui.GetForegroundDrawList().AddRect(windowMin, windowMax, ImUtils.GetColor(Color.CadetBlue));
+        if (ImGui.GetIO().MouseWheel != 0) 
+        {
+          var minZoom = 0.2f;
+          var maxZoom = 10f;
 
-        var oldSize = _imageZoom * _textureSize;
-        var zoomSpeed = _imageZoom * 0.2f;
-        _imageZoom += Math.Min(maxZoom - _imageZoom, ImGui.GetIO().MouseWheel * zoomSpeed);
-        _imageZoom = Mathf.Clamp(_imageZoom, minZoom, maxZoom);
+          var oldSize = _imageZoom * _textureSize;
+          var zoomSpeed = _imageZoom * 0.2f;
+          _imageZoom += Math.Min(maxZoom - _imageZoom, ImGui.GetIO().MouseWheel * zoomSpeed);
+          _imageZoom = Mathf.Clamp(_imageZoom, minZoom, maxZoom);
 
+          // zoom in, move up/left, zoom out the opposite
+          var deltaSize = oldSize - (_imageZoom * _textureSize);
+          _imagePosition += deltaSize * 0.5f;
+        }
+        if (ImGui.GetIO().MouseClicked[0] || ImGui.GetIO().MouseClicked[1])
+        {
+          if (_selSprite == null) 
+          {
+            foreach (var (tileId, tileData) in _spriteSheetData.Tiles)
+            {
+              RectangleF editorTileRegion = new RectangleF(
+                  (float)tileData.Region.X, (float)tileData.Region.Y, 
+                  (float)tileData.Region.Width, (float)tileData.Region.Height);
+              if (ImUtils.HasMouseClickAt(editorTileRegion, _imageZoom, _imagePosition)) _selSprite = tileData;
+            }
+          }
+          else _selSprite = null;
+        }
+        var dragSpeed = 0.9f;
+        if (ImGui.GetIO().MouseDown[2] && !isDrag)
+        {
+          isDrag = true;
+          startDrag = ImGui.GetIO().MousePos;
+          startPos = _imagePosition;
+          Console.WriteLine($"Start {startDrag}");
+        }
+        else if (ImGui.GetIO().MouseReleased[2]) {
+          isDrag = false; 
+          Console.WriteLine($"End {ImGui.GetIO().MousePos}");
 
-        // zoom in, move up/left, zoom out the opposite
-        var deltaSize = oldSize - (_imageZoom * _textureSize);
-        _imagePosition += deltaSize * 0.5f;
+        }
+        if (isDrag) 
+        {
+          ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+          _imagePosition.X = startPos.X - (startDrag.X - ImGui.GetIO().MousePos.X) * dragSpeed;
+          _imagePosition.Y = startPos.Y - (startDrag.Y - ImGui.GetIO().MousePos.Y) * dragSpeed;
+        } 
+        else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
       }
-      var dragSpeed = 0.9f;
-      if (ImGui.GetIO().MouseDown[2] && !isDrag)
-      {
-        isDrag = true;
-        startDrag = ImGui.GetIO().MousePos;
-        startPos = _imagePosition;
-        Console.WriteLine($"Start {startDrag}");
-      }
-      else if (ImGui.GetIO().MouseReleased[2]) {
-        isDrag = false; 
-        Console.WriteLine($"End {ImGui.GetIO().MousePos}");
+      if (_selSprite is TiledSpriteData tiledSprite) 
+        ImUtils.DrawRect(ImGui.GetForegroundDrawList(), tiledSprite.Region, Color.WhiteSmoke, _imagePosition, _imageZoom);
+      // else if (_selSprite is ComplexSpriteData complexSprite) ImUtils.DrawRect(ImGui.GetForegroundDrawList(), complexSprite., Color.WhiteSmoke, _imageZoom);
 
-      }
-      if (isDrag) 
-      {
-        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-        _imagePosition.X = startPos.X - (startDrag.X - ImGui.GetIO().MousePos.X) * dragSpeed;
-        _imagePosition.Y = startPos.Y - (startDrag.Y - ImGui.GetIO().MousePos.Y) * dragSpeed;
-      } 
-      else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
 
       ImGui.GetIO().ConfigWindowsResizeFromEdges = true;
       if (ImGui.IsWindowFocused() && ImGui.IsMouseDown(0) && ImGui.GetIO().KeyAlt)
@@ -119,6 +158,7 @@ namespace Tools
         _imagePosition += ImGui.GetMouseDragDelta(0);
         ImGui.ResetMouseDragDelta(0);
       }
+
 
       // clamp in such a way that we keep some part of the image visible
       var min = -(_textureSize * _imageZoom) * 0.8f;
@@ -129,6 +169,9 @@ namespace Tools
       var cursorPosImageTopLeft = ImGui.GetCursorScreenPos();
       ImGui.Image(_texturePtr, _textureSize * _imageZoom);
       ImGui.EndChild();
+      
+
+    
 		}
 		void DrawMenuBar()
 		{
@@ -185,7 +228,7 @@ namespace Tools
 		}
 		void DrawPropertiesPane(ComplexSpriteData sprite, string name)
 		{
-      ImGui.Begin("Properties Pane");
+      ImGui.Begin("Complex Properties Pane");
       ImGui.SeparatorText("Sprite Properties");
       ImGui.LabelText("Name", name);
       ImGui.SeparatorText("Custom Properties");
@@ -197,9 +240,11 @@ namespace Tools
 		}
 		void DrawPropertiesPane(TiledSpriteData sprite, string name)
 		{
-      ImGui.Begin("Properties Pane");
+      // ImGui.PushFont(_font);
+      ImGui.Begin("Tile Properties Pane");
       ImGui.SeparatorText("Sprite Properties");
       ImGui.LabelText("Name", name);
+      ImGui.LabelText("Region", RectangleString(sprite.Region));
       ImGui.SeparatorText("Custom Properties");
       foreach (var (customName, customProp) in sprite.Properties) 
       {
@@ -230,10 +275,10 @@ namespace Tools
       foreach (var (name, sprite) in _spriteSheetData.Sprites)
       {
         ImGui.Text($"{name}");
-      }
-      if (ImGui.Button("Add")) 
-      {
-        
+        if (ImGui.IsItemClicked())
+        {
+          
+        }
       }
       ImGui.End();
     }
@@ -248,7 +293,7 @@ namespace Tools
         ImGui.InputInt("Tile Height", ref TileHeight);
         if (ImGui.Button("Generate")) 
         {
-          DoAutoRegion(TileWidth, TileHeight);
+          _spriteSheetData.Slice(TileWidth, TileHeight);
         }
         ImGui.SameLine();
         if (ImGui.Button("Done")) 
@@ -259,12 +304,6 @@ namespace Tools
         ImGui.EndPopup();
       }
     }
-		void DoAutoRegion(int cellWidth, int cellHeight)
-		{
-      _spriteSheetData.TileWidth = cellWidth;
-      _spriteSheetData.TileHeight = cellHeight;
-    }
-
     void LoadTexture()
     {
       if (_texturePtr != IntPtr.Zero) Core.GetGlobalManager<ImGuiManager>().UnbindTexture(_texturePtr);
@@ -275,23 +314,15 @@ namespace Tools
       _texturePtr = Core.GetGlobalManager<ImGuiManager>().BindTexture(_atlasTexture);
       
       _spriteSheetData = new SpriteSheetData(ref _atlasTexture);
-      
-     
+ 
       isAutoRegioning = true;
     }
-    (Num.Vector2, Num.Vector2) GetWindowArea() 
-    {
-      Num.Vector2 vMin = ImGui.GetWindowContentRegionMin();
-      Num.Vector2 vMax = ImGui.GetWindowContentRegionMax();
-      vMin += ImGui.GetWindowPos();
-      vMax += ImGui.GetWindowPos();
-      return (vMin, vMax);
-    }
+    
     void DrawGridLines(int tw, int th)
     {
       float w = tw * _imageZoom;
       float h = th * _imageZoom;
-      var (min, max) = GetWindowArea();
+      var (min, max) = ImUtils.GetWindowArea();
       var drawList = ImGui.GetWindowDrawList();
       int cols = (int)(_textureSize.X / tw);
       int rows = (int)(_textureSize.Y / th);
@@ -311,6 +342,7 @@ namespace Tools
         }
       }
     }
+    string RectangleString(Rectangle rect) => $"{rect.X}, {rect.Y}, {rect.Width}, {rect.Height}";
 		void CenterImage()
 		{
 			var size = _textureSize * _imageZoom;

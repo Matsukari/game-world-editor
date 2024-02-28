@@ -15,14 +15,6 @@ namespace Tools
        
       var editor = CreateEntity("editor");
       editor.AddComponent(new SpriteSheetEditor());
-      // imGuiManager.RegisterDrawCommand(im);
     }   
-    void im() {
-      ImGui.Begin("Sprite");
-      ImGui.Text("ASLDKJLAKSJDLKJSD");
-      ImGui.End();
-      Console.WriteLine("Im");
-
-    }
   }
 }
