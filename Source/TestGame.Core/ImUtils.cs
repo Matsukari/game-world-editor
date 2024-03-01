@@ -61,6 +61,11 @@ namespace Tools
       return (x >= worldRectangle.Left && x <= worldRectangle.Right && 
               y >= worldRectangle.Top && y <= worldRectangle.Bottom);
     }
+    public static Num.Vector2 Translate(Num.Vector2 point, float zoom, Num.Vector2 offset)
+    {
+       var (windowMin, windowMax) = GetWindowArea();
+       return new Num.Vector2(windowMin.X + point.X * zoom, windowMin.Y + point.Y * zoom) + offset;
+    }
     public static void DrawRealRect(ImDrawListPtr drawList, Rectangle rect, Color outline) 
     {
       drawList.AddRect(
@@ -83,6 +88,14 @@ namespace Tools
           new Num.Vector2(windowMin.X + rect.X * zoom, windowMin.Y + rect.Y * zoom) + offset, 
           new Num.Vector2(windowMin.X + rect.Right * zoom, windowMin.Y + rect.Bottom * zoom) + offset, 
           outline.ToImColor());
+    }
+    public static void DrawRectFilled(ImDrawListPtr drawList, Rectangle rect, Color fill, Num.Vector2 offset, float zoom) 
+    {
+      var (windowMin, windowMax) = GetWindowArea();
+      drawList.AddRectFilled(
+          new Num.Vector2(windowMin.X + rect.X * zoom, windowMin.Y + rect.Y * zoom) + offset, 
+          new Num.Vector2(windowMin.X + rect.Right * zoom, windowMin.Y + rect.Bottom * zoom) + offset, 
+          fill.ToImColor());
     }
     public static (Num.Vector2, Num.Vector2) GetWindowArea() 
     {

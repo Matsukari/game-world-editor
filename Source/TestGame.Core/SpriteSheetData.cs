@@ -1,6 +1,7 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Nez;
 
 namespace Tools
 {
@@ -47,9 +48,10 @@ namespace Tools
   }
   public struct TiledSpriteData 
   {  
-    public string Name;
-    public Rectangle Region;
-    public Dictionary<string, Object> Properties; 
+    public string Name = "";
+    public Rectangle Region = new Rectangle();
+    public Dictionary<string, Object> Properties = new Dictionary<string, object>();
+    public TiledSpriteData() {}
   }
   public enum CustomPropertyType 
   {
@@ -70,7 +72,7 @@ namespace Tools
     public int TileWidth;
     public int TileHeight;
     private Texture2D _texture;
-    private int _unnamedSpriteCounter = 0;
+    private int _counter = 0;
     public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
     public SpriteSheetData(Texture2D texture) 
     {
@@ -89,26 +91,60 @@ namespace Tools
         for (int row = 0; row <= _texture.Height; row += h) 
         {
           var tile = new TiledSpriteData();
-          tile.Properties = new Dictionary<string, object>();
-          tile.Name = "";
           tile.Region = new Rectangle(col, row, w, h);
-          Tiles.Add(GetTile(col, row), tile);
+          if (!IntersectTile(tile.Region)) Tiles.Add(GetTile(col, row), tile);
         }
       }
+    }
+    public TiledSpriteData CombineContains(TiledSpriteData select, RectangleF container)
+    {
+      var tiles = new List<int>();
+      var tilesRegion = new List<RectangleF>();
+      foreach (var (id, tile) in Tiles)
+      {
+        if (container.Contains(tile.Region.ToRectangleF())) 
+        { 
+          tilesRegion.Add(tile.Region.ToRectangleF());
+          tiles.Add(id);
+        }
+      }
+      // The tile emcompasses other tiles
+      if (tiles.Count != 0)
+      {
+        foreach (var tile in tiles) Tiles.Remove(tile);
+        Rectangle combined = RectangleExt.MinMax(tilesRegion); 
+        var newTile = new TiledSpriteData();
+        newTile.Region = combined;
+        Tiles.Add(tiles.First(), newTile);
+        return newTile;
+      }
+      // The tile's own region get smaller; other encompassed tiles are foreer lost 
+      else select.Region = container;
+      
+      return select;
     }
     public void AddSprite(TiledSpriteData tile, string name="unnamed")
     {
       var main = new ComplexSpriteData.PartSpriteData();
       main.Tile = tile;
       main.LocalState = new RenderState();
-      if (name == "unnamed") name = $"unnamed_{_unnamedSpriteCounter}"; 
+      if (name == "unnamed") name = $"unnamed_{_counter++}"; 
       var sprite = new ComplexSpriteData(name, main);
       Sprites.Add(name, sprite);
     }
-    public int GetTile(int x, int y) => y * _texture.Width + x;
 		public void SaveToFile(string filename)
 		{
 		}
+    public int GetTile(int x, int y) => y * _texture.Width + x;
+    bool IntersectTile(Rectangle rect) 
+    {
+      bool result = false;
+      foreach (var (_, tile) in Tiles)
+      {
+        if (rect.Intersects(tile.Region)) result = true;
+      }
+      return result;
+    }
 	}
 
 }

@@ -34,6 +34,7 @@ namespace Tools
           ImGui.EndChild();
 
           DrawSpritesRegion();
+          DrawMenubar();
           ImGui.End();
         }
       }     
@@ -42,7 +43,11 @@ namespace Tools
         // if (ImGui.IsWindowHovered() && Editor.EditState == EditingState.INACTIVE) Editor.Set(EditingState.ACTIVE);
         if (Gui.Selection == null) Gui.SelectionRect = new SelectionRectangle(new RectangleF(), Gui);  
         Gui.SelectionRect.DrawWithInput(Gui, Editor);
-        if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) Gui.SelectionRect.Update();
+        if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
+        {
+          Gui.SelectionRect.Snap(Editor.TileWidth, Editor.TileHeight);
+          Gui.SelectionRect.Update();
+        }
 
         if (ImUtils.HasMouseRealClickAt(ImUtils.GetWindowRect()) && Editor.EditState != EditingState.AutoRegion) 
         {
@@ -66,6 +71,12 @@ namespace Tools
         {
           ImUtils.DrawRect(ImGui.GetWindowDrawList(), tile.Region, Editor.ColorSet.SpriteRegionInactiveOutline, Gui.SheetPosition, Gui.ContentZoom);
         }
+        if (Gui.Selection is TiledSpriteData tiledSprite)
+        {
+          ImUtils.DrawRectFilled(ImGui.GetWindowDrawList(), tiledSprite.Region, Editor.ColorSet.SpriteRegionActiveFill, Gui.SheetPosition, Gui.ContentZoom);
+          ImUtils.DrawRect(ImGui.GetWindowDrawList(), tiledSprite.Region, Editor.ColorSet.SpriteRegionActiveOutline, Gui.SheetPosition, Gui.ContentZoom);
+        }
+
       }
       void ZoomInput()
       {
@@ -108,12 +119,7 @@ namespace Tools
           {
             foreach (var (tileId, tileData) in Editor.SpriteSheet.Tiles)
             {
-              if (ImUtils.HasMouseClickAt(tileData.Region.ToRectangleF(), Gui.ContentZoom, Gui.SheetPosition)) 
-              {
-                Gui.Selection = tileData;
-                Gui.SelectionRect = new SelectionRectangle(tileData.Region.ToRectangleF(), Gui);
-                Editor.Set(EditingState.SelectedSprite);
-              }
+              if (ImUtils.HasMouseClickAt(tileData.Region.ToRectangleF(), Gui.ContentZoom, Gui.SheetPosition)) Select(tileData);
             }
           }
           else if (!Gui.SelectionRect.IsEditingPoint) 
@@ -122,7 +128,19 @@ namespace Tools
             Editor.Set(EditingState.Default);
           }
         }
+      }
+      public void Select(object sel)
+      { 
+        Gui.Selection = sel;
+        if (Gui.Selection is TiledSpriteData tileData)
+        {
+          Gui.SelectionRect = new SelectionRectangle(tileData.Region.ToRectangleF(), Gui);
+        }
+        else if (Gui.Selection is ComplexSpriteData complex)
+        {
 
+        }
+        Editor.Set(EditingState.SelectedSprite);
       }
     }
   }

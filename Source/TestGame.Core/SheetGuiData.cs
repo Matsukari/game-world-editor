@@ -7,6 +7,7 @@ using Num = System.Numerics;
 
 namespace Tools 
 {
+  public enum ShapeType { Circle, Rectangle, Ellipse, Point, Polygon, None };
   public partial class SpriteSheetEditor 
   {
     public class GuiData 
@@ -18,6 +19,7 @@ namespace Tools
       public bool IsDrag = false;
       public bool IsDragFirst = false;
       public bool IsDragLast = false;
+      public ShapeType ShapeSelection = ShapeType.None;
       public int MouseDragButton = -1; 
       public RectangleF MouseDragArea = new RectangleF();
       public Num.Vector2 MouseDragStart = new Num.Vector2();

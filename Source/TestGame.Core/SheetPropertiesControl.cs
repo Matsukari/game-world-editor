@@ -1,4 +1,5 @@
 using ImGuiNET;
+using Nez;
 
 namespace Tools 
 {
@@ -18,38 +19,56 @@ namespace Tools
       }
       void DrawPropertiesPane(ComplexSpriteData sprite, string name)
       {
-        ImGui.Begin(Names.ObjectPropertiesPane);
+         ImGui.Begin(Names.ObjectPropertiesPane);
+        ImGui.Indent();
         ImUtils.LabelText("Name", name);
+        ImUtils.LabelText("Type", "Complex");
+        ImGui.Unindent();
+        ImGui.Separator();
         ImGui.SeparatorText("Custom Properties");
+        ImGui.Indent(); 
         foreach (var (customName, customProp) in sprite.Properties) 
         {
           ImUtils.LabelText(customName, "-");
         }
+        ImGui.Unindent();
         ImGui.End();
       }
       void DrawPropertiesPane(TiledSpriteData sprite, string name)
       {
         ImGui.Begin(Names.ObjectPropertiesPane);
-        // ImGui.PushFont(_font);
+        ImGui.Indent();
         ImUtils.LabelText("Name", name);
+        ImUtils.LabelText("Type", "Tiled");
         ImUtils.LabelText("Region", sprite.Region.RenderStringFormat());
-        if (ImGui.MenuItem("Create ComplexSprite")) Editor.SpriteSheet.AddSprite(sprite);
+        ImGui.Unindent();
+        ImGui.Separator();
+        ImGui.Indent();
+        if (ImGui.MenuItem("Complex")) Editor.SpriteSheet.AddSprite(sprite);
+        if (ImGui.MenuItem("Combine")) 
+        {
+          var newSprite = Editor.SpriteSheet.CombineContains(sprite, Gui.SelectionRect.Content);
+          // if (newSprite.Region != RectangleF.Empty) Editor.GetComponent<SheetImageControl>().Select(newSprite);
+          
+        }
+        ImGui.Unindent();
+        ImGui.Separator();
         ImGui.SeparatorText("Custom Properties");
+        ImGui.Indent(); 
         foreach (var (customName, customProp) in sprite.Properties) 
         {
           ImUtils.LabelText(customName, "-");
         }
+        ImGui.Unindent();
         ImGui.End();
       }
       void DrawSheetProps(SpriteSheetData spriteSheet, string name)
       {
         ImGui.Begin(Names.SheetPropertiesPane);
-        // ImGui.PushFont(Gui.NormalFont);
         ImUtils.LabelText("Name", name);
         ImUtils.LabelText("Tile width", $"{spriteSheet.TileWidth}");
         ImUtils.LabelText("Tile height", $"{spriteSheet.TileHeight}");
         ImUtils.LabelText("EditState", $"{Editor.EditState}");
-        // ImGui.PopFont();
         ImGui.End();
 
       }

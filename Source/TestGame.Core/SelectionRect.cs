@@ -74,6 +74,11 @@ namespace Tools
       Points.Add(new RectangleF(Content.Center.X , Content.Top     , Radius+SafeBuffer, Radius+SafeBuffer));
       Points.Add(new RectangleF(Content.Center.X , Content.Bottom  , Radius+SafeBuffer, Radius+SafeBuffer)); 
     }
+    public void Snap(int w, int h)
+    {
+      Content.Width = MathF.Floor(Content.Width / w) * w;
+      Content.Height = MathF.Floor(Content.Height / w) * w;
+    }
     RectangleF _selectionInitial = new RectangleF();
     public void DrawWithInput(SpriteSheetEditor.GuiData Gui, SpriteSheetEditor Editor)
     {

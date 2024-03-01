@@ -10,7 +10,7 @@ namespace Tools
   /// </summary>
 	public partial class SpriteSheetEditor : Component
 	{
-    public enum EditingState { AutoRegion, SelectedSprite, Inactive, Default };
+    public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default };
     public static class Names 
     {
       public static string ContentWindow = "Content Window";
@@ -22,10 +22,13 @@ namespace Tools
     public struct Colors 
     {
       public Color SelectionOutline = new Color(0.85f, 0.85f, 0.85f);
+      public Color SelectionFill = new Color(0.85f, 0.85f, 0.85f, 0.2f);
       public Color SpriteRegionInactiveOutline = new Color(0.3f, 0.3f, 0.3f);
       public Color SpriteRegionActiveOutline = new Color(0.5f, 0.5f, 0.5f);
+      public Color SpriteRegionActiveFill = new Color(0.5f, 0.5f, 0.5f, 0.3f);
       public Color SelectionPoint = new Color(0.9f, 0.9f, 0.9f);
       public Color ContentActiveOutline = Color.CadetBlue;
+      public Color AnnotatedShape = new Color(0.3f, 0.2f, 0.3f);
       public Colors() {}
     }
     public abstract class Control 
@@ -56,9 +59,9 @@ namespace Tools
       AddComponent(new SheetImageControl());
       AddComponent(new SheetPropertiesControl());
       AddComponent(new SheetSpritesControl());
-      AddComponent(new SheetMenubarControl());
       AddComponent(new SheetAutoRegionControl());
 		}
+    public T GetComponent<T>() => (T)_components.OfType<T>();
     public void Set(EditingState state) { EditState = state; ImGui.SetNextWindowFocus(); }
     public void AddComponent(Control control) { _components.Add(control); control.Init(this, _gui); }
     public override void OnAddedToEntity() => Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Render);    

@@ -5,12 +5,43 @@ namespace Tools
 {
   public partial class SpriteSheetEditor 
   {
-    public partial class SheetMenubarControl : Control
+    public partial class SheetImageControl : Control
     {
-      public override void Render()
+      void Annotate(ShapeType shape)
+      {
+        Gui.ShapeSelection = shape;
+        Editor.Set(EditingState.AnnotateShape);
+      }
+      void HandleShapeAnnotation()
+      {
+        var rect = Gui.MouseDragArea;
+        if (Gui.IsDrag)
+        {
+          switch (Gui.ShapeSelection)
+          {
+            case ShapeType.Circle: break;
+            case ShapeType.Rectangle: 
+              ImUtils.DrawRectFilled(ImGui.GetWindowDrawList(), rect, Editor.ColorSet.AnnotatedShape, Gui.SheetPosition, Gui.ContentZoom);
+              break;
+            case ShapeType.Ellipse: break;
+          }
+        }
+        else if (Gui.IsDragLast)
+        {
+          switch (Gui.ShapeSelection)
+          {
+            case ShapeType.Circle | ShapeType.Rectangle | ShapeType.Ellipse:
+              break;
+            case ShapeType.Polygon: break;
+          }
+        }
+      }
+      void DrawMenubar()
       {
         var newAtlas = false;
         var openFile = false;
+
+        HandleShapeAnnotation();
         if (ImGui.BeginMenuBar())
         {
           if (ImGui.BeginMenu("File"))
@@ -21,6 +52,7 @@ namespace Tools
           }
           if (ImGui.Button("Rectangle"))
           {
+            Annotate(ShapeType.Rectangle);
           }
           if (ImGui.Button("Circle")) 
           {

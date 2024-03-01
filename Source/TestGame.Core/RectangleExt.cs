@@ -23,6 +23,20 @@ namespace Tools
       max.Y = Math.Max(a.Bottom, b.Bottom);
       return RectangleF.FromMinMax(min, max);
     }
+    public static RectangleF MinMax(List<RectangleF> rects)
+    {
+      var min = new Vector2(10000, 10000);
+      var max = new Vector2(-10000, -10000);  
+      if (rects.Count == 0) return RectangleF.Empty;
+      foreach (var rect in rects)
+      {
+        min.X = Math.Min(min.X, rect.X);
+        min.Y = Math.Min(min.Y, rect.Y);
+        max.X = Math.Max(max.X, rect.Right);
+        max.Y = Math.Max(max.Y, rect.Bottom);
+      }
+      return RectangleF.FromMinMax(min, max);
+    }
     public static RectangleF ToRectangleF(this Rectangle rect) 
     {
       RectangleF result = new RectangleF(
