@@ -1,8 +1,6 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Nez.Textures;
-using Nez.Sprites;
 
 namespace Tools
 {
@@ -73,7 +71,8 @@ namespace Tools
     public int TileHeight;
     private Texture2D _texture;
     private int _unnamedSpriteCounter = 0;
-    public SpriteSheetData(ref Texture2D texture) 
+    public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
+    public SpriteSheetData(Texture2D texture) 
     {
       System.Diagnostics.Debug.Assert(texture != null);
       _texture = texture;
