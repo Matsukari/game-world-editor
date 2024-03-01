@@ -22,9 +22,11 @@ namespace Tools
       public RectangleF MouseDragArea = new RectangleF();
       public Num.Vector2 MouseDragStart = new Num.Vector2();
       public SelectionRectangle SelectionRect = null;
+      public ImFontPtr NormalFont;
       public GuiData() 
       {
         SelectionRect = new SelectionRectangle(new RectangleF(), this);
+        NormalFont = ImGui.GetIO().Fonts.AddFontFromFileTTF("RobotoCondensed-Regular.ttf", 16);
       }
       public Texture2D LoadTexture(string filename)
       {

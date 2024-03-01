@@ -10,7 +10,7 @@ namespace Tools
       int height = 16;
       public override void Render()
       {
-        if (Editor.EditState != EditingState.AUTO_REGION) return;
+        if (Editor.EditState != EditingState.AutoRegion) return;
         
         ImGui.OpenPopup(Names.AutoRegion);
         ImGui.SetNextWindowFocus();

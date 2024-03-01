@@ -39,20 +39,24 @@ namespace Tools
       }     
       void RenderUpdate()
       {
-        if (ImGui.IsWindowHovered() && Editor.EditState == EditingState.INACTIVE) Editor.Set(EditingState.ACTIVE);
+        // if (ImGui.IsWindowHovered() && Editor.EditState == EditingState.INACTIVE) Editor.Set(EditingState.ACTIVE);
+        if (Gui.Selection == null) Gui.SelectionRect = new SelectionRectangle(new RectangleF(), Gui);  
+        Gui.SelectionRect.DrawWithInput(Gui, Editor);
+        if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) Gui.SelectionRect.Update();
 
-        if (Editor.EditState == EditingState.ACTIVE)
+        if (ImUtils.HasMouseRealClickAt(ImUtils.GetWindowRect()) && Editor.EditState != EditingState.AutoRegion) 
+        {
+          Editor.Set(EditingState.Default);
+        }
+        if (Editor.EditState == EditingState.Default && ImGui.IsWindowHovered())
         {
           var (windowMin, windowMax) = ImUtils.GetWindowArea();
-          ImGui.GetForegroundDrawList().AddRect(windowMin, windowMax, Editor.ColorSet.ContentActiveOutline.ToImColor());
-          if (Gui.Selection == null) Gui.SelectionRect = new SelectionRectangle(new RectangleF(), Gui);  
-          Gui.SelectionRect.DrawWithInput(Gui, Editor);
-          
+          ImUtils.DrawRealRect(ImGui.GetWindowDrawList(), ImUtils.GetWindowRect(), Editor.ColorSet.ContentActiveOutline);
+
           ZoomInput();
           MoveInput();
           SelectInput();  
 
-          if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) Gui.SelectionRect.Update();
         }
       }
       void DrawSpritesRegion() 
@@ -108,10 +112,15 @@ namespace Tools
               {
                 Gui.Selection = tileData;
                 Gui.SelectionRect = new SelectionRectangle(tileData.Region.ToRectangleF(), Gui);
+                Editor.Set(EditingState.SelectedSprite);
               }
             }
           }
-          else if (!Gui.SelectionRect.IsEditingPoint) Gui.Selection = null;
+          else if (!Gui.SelectionRect.IsEditingPoint) 
+          {
+            Gui.Selection = null;
+            Editor.Set(EditingState.Default);
+          }
         }
 
       }

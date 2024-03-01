@@ -37,6 +37,16 @@ namespace Tools
       return (x >= worldRectangle.Left && x <= worldRectangle.Right && 
               y >= worldRectangle.Top && y <= worldRectangle.Bottom);
     }
+    public static bool HasMouseRealClickAt(Rectangle rectangle)
+    {
+      var x = ImGui.GetIO().MouseClickedPos[0].X;
+      var y = ImGui.GetIO().MouseClickedPos[0].Y;
+      RectangleF worldRectangle = rectangle.ToRectangleF();
+
+      return (x >= worldRectangle.Left && x <= worldRectangle.Right && 
+              y >= worldRectangle.Top && y <= worldRectangle.Bottom);
+    }
+    public static bool HasMouseClickAt(Rectangle rectangle) => HasMouseClickAt(rectangle, 1, new Num.Vector2());
     public static bool IsMouseAt(Rectangle rectangle, Num.Vector2 offset=new Num.Vector2(), float zoom=1f)
     {
        var (windowMin, windowMax) = GetWindowArea();
@@ -50,6 +60,13 @@ namespace Tools
 
       return (x >= worldRectangle.Left && x <= worldRectangle.Right && 
               y >= worldRectangle.Top && y <= worldRectangle.Bottom);
+    }
+    public static void DrawRealRect(ImDrawListPtr drawList, Rectangle rect, Color outline) 
+    {
+      drawList.AddRect(
+          new Num.Vector2(rect.X, rect.Y), 
+          new Num.Vector2(rect.Right, rect.Bottom), 
+          outline.ToImColor());
     }
     public static void DrawRect(ImDrawListPtr drawList, Rectangle rect, Color outline) 
     {
@@ -83,5 +100,6 @@ namespace Tools
       vMax += ImGui.GetWindowPos();
       return new Rectangle((int)vMin.X, (int)vMin.Y, (int)(vMax.X-vMin.X), (int)(vMax.Y-vMin.Y));
     }
+    public static void LabelText(string label, string value) => ImGui.LabelText(value, label);
   } 
 }

@@ -10,7 +10,7 @@ namespace Tools
   /// </summary>
 	public partial class SpriteSheetEditor : Component
 	{
-    public enum EditingState { AUTO_REGION, SPRITE, SELECT_EDIT, ACTIVE, INACTIVE };
+    public enum EditingState { AutoRegion, SelectedSprite, Inactive, Default };
     public static class Names 
     {
       public static string ContentWindow = "Content Window";
@@ -45,14 +45,14 @@ namespace Tools
     public int TileWidth => SpriteSheet.TileWidth;
     public int TileHeight => SpriteSheet.TileHeight;
 
-    public EditingState EditState = EditingState.INACTIVE; 
-    public EditingState PrevEditState = EditingState.INACTIVE; 
-    public SpriteSheetData SpriteSheet = null;  
-   
+    public EditingState EditState = EditingState.Default; 
+    public EditingState PrevEditState = EditingState.Default; 
+    public SpriteSheetData SpriteSheet = null; 
+    
 		public SpriteSheetEditor()
 		{
       SpriteSheet = new SpriteSheetData(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
-      EditState = EditingState.AUTO_REGION;
+      Set(EditingState.AutoRegion);
       AddComponent(new SheetImageControl());
       AddComponent(new SheetPropertiesControl());
       AddComponent(new SheetSpritesControl());
