@@ -15,6 +15,8 @@ namespace Tools
        
       var editor = CreateEntity("editor");
       editor.AddComponent(new SpriteSheetEditor());
+      ClearColor = editor.GetComponent<SpriteSheetEditor>().ColorSet.Background;
+
     }   
   }
 }

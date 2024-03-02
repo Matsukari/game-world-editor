@@ -21,9 +21,11 @@ namespace Tools
         ImGui.Indent();
         foreach (var (name, sprite) in Editor.SpriteSheet.Sprites)
         {
-          if (ImGui.CollapsingHeader($"{name}")) 
+          if (ImGui.Button($"{name}")) 
           {
             Editor.GetComponent<SheetImageControl>().Select(sprite);
+            var complex = Editor.Entity.Scene.FindEntity(Names.ComplexSprite) as ComplexSpriteEntity;
+            complex.Edit(sprite);
           }
         }
         ImGui.Unindent();

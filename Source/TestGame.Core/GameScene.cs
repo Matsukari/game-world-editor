@@ -162,7 +162,7 @@ namespace TestGame
       mapObjsRenderer.RenderLayer = 5;
 
 
-      Camera.SetZoom(4f);
+      Camera.SetZoom(4f); 
 
       var player = CreateEntity("player", new Vector2(Screen.Width / 2, Screen.Height / 2));
       player.AddComponent(new Player());

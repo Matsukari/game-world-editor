@@ -10,36 +10,47 @@ namespace Tools
   {
     public partial class SheetImageControl : Control 
     {
+      public bool IsCollapsed = false;
       public SheetImageControl()
       {
       }
       public override void Render() 
       {
-        if (ImGui.Begin(Names.ContentWindow, ImGuiWindowFlags.MenuBar))
-        { 
-          var frame = ImGui.GetStyle().FramePadding.X + ImGui.GetStyle().FrameBorderSize;
-          ImGui.BeginChild("spritesheet-view", new Num.Vector2(ImGui.GetContentRegionAvail().X - 0, 0), false, 
-              ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-        
-          RenderUpdate();
+        ImGui.SetNextWindowCollapsed(IsCollapsed);
+        ImGui.Begin(Names.ContentWindow, ImGuiWindowFlags.MenuBar);
+        var frame = ImGui.GetStyle().FramePadding.X + ImGui.GetStyle().FrameBorderSize;
+        ImGui.BeginChild("spritesheet-view", new Num.Vector2(ImGui.GetContentRegionAvail().X - 0, 0), false, 
+            ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
 
-          // clamp in such a way that we keep some part of the image visible
-          var min = -(Editor.SpriteSheet.Size.ToNumerics() * Gui.ContentZoom) * 0.8f;
-          var max = ImGui.GetContentRegionAvail() * 0.8f;
-          Gui.SheetPosition = Num.Vector2.Clamp(Gui.SheetPosition, min, max);
-          ImGui.SetCursorPos(Gui.SheetPosition);
-          
-          ImGui.Image(Gui.SheetTexture, Editor.SpriteSheet.Size.ToNumerics() * Gui.ContentZoom);
-          ImGui.EndChild();
+        RenderUpdate();
 
-          DrawSpritesRegion();
-          DrawOverlays();
-          DrawMenubar();
-          ImGui.End();
-        }
+        // clamp in such a way that we keep some part of the image visible
+        var min = -(Editor.SpriteSheet.Size.ToNumerics() * Gui.ContentZoom) * 0.8f;
+        var max = ImGui.GetContentRegionAvail() * 0.8f;
+        Gui.SheetPosition = Num.Vector2.Clamp(Gui.SheetPosition, min, max);
+        ImGui.SetCursorPos(Gui.SheetPosition);
+
+        ImGui.Image(Gui.SheetTexture, Editor.SpriteSheet.Size.ToNumerics() * Gui.ContentZoom);
+        ImGui.EndChild();
+
+        DrawSpritesRegion();
+        DrawOverlays();
+        DrawMenubar();
+        ImGui.End();
       }     
       void RenderUpdate()
       {
+        if (ImGui.IsKeyReleased(ImGuiKey.Escape) && IsCollapsed)
+        {
+          var complex = Editor.Entity.Scene.FindEntity(Names.ComplexSprite) as ComplexSpriteEntity;
+          complex.UnEdit();
+        }
+        else if (ImUtils.IsMouseAt(ImUtils.GetWindowRect()) && Editor.EditState != EditingState.AutoRegion && !IsCollapsed)
+        {
+          Editor.Set(EditingState.Default);
+        }
+        
+        if (IsCollapsed) return;
         // if (ImGui.IsWindowHovered() && Editor.EditState == EditingState.INACTIVE) Editor.Set(EditingState.ACTIVE);
         if (Gui.Selection == null) Gui.SelectionRect = new SelectionRectangle(new RectangleF(), Gui);  
         Gui.SelectionRect.DrawWithInput(Gui, Editor);
@@ -49,10 +60,6 @@ namespace Tools
           Gui.SelectionRect.Update();
         }
 
-        if (ImUtils.HasMouseRealClickAt(ImUtils.GetWindowRect()) && Editor.EditState != EditingState.AutoRegion) 
-        {
-          Editor.Set(EditingState.Default);
-        }
         if (Editor.EditState == EditingState.Default && ImGui.IsWindowHovered())
         {
           var (windowMin, windowMax) = ImUtils.GetWindowArea();

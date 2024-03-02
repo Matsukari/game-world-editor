@@ -2,6 +2,8 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Nez;
 using Nez.ImGuiTools;
+using Nez.Textures;
+using Nez.Sprites;
 
 namespace Tools
 {
@@ -11,32 +13,6 @@ namespace Tools
 	public partial class SpriteSheetEditor : Component
 	{
     public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default };
-    public static class Names 
-    {
-      public static string ContentWindow = "Content Window";
-      public static string ObjectPropertiesPane = "Object Properties";
-      public static string SheetPropertiesPane = "Sheet Properties";
-      public static string OpenFile = "Open file";
-      public static string AutoRegion = "Auto region";
-      public static string ComplexSprite = "Sprite: ";
-
-    }
-    public struct Colors 
-    {
-      public Color SelectionOutline = new Color(0.85f, 0.85f, 0.85f);
-      public Color SelectionFill = new Color(0.85f, 0.85f, 0.85f, 0.2f);
-      public Color SpriteRegionInactiveOutline = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-      public Color SpriteRegionActiveOutline = new Color(0.5f, 0.5f, 0.5f, 1f);
-      public Color SpriteRegionActiveFill = new Color(0.5f, 0.5f, 0.5f, 0.3f);
-      public Color SelectionPoint = new Color(0.9f, 0.9f, 0.9f);
-      public Color ContentActiveOutline = Color.CadetBlue;
-      public Color AnnotatedShapeActive = new Color(0.5f, 0.5f, 0.7f, 0.5f);
-      public Color AnnotatedShapeInactive = new Color(0.5f, 0.5f, 0.7f, 0.3f);
-      public Color AnnotatedName = new Color(0.5f, 0.5f, 0.7f, 1f);
-
-
-      public Colors() {}
-    }
     public abstract class Control 
     { 
       protected GuiData Gui;
@@ -58,6 +34,7 @@ namespace Tools
     public EditingState PrevEditState = EditingState.Default; 
     public SpriteSheetData SpriteSheet = null; 
     
+    ComplexSpriteEntity _selComplex;
 		public SpriteSheetEditor()
 		{
       SpriteSheet = new SpriteSheetData(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
@@ -67,16 +44,21 @@ namespace Tools
       AddComponent(new SheetPropertiesControl());
       AddComponent(new SheetSpritesControl());
       AddComponent(new SheetAutoRegionControl());
+      _selComplex = new ComplexSpriteEntity(_gui, this);
 		}
-    public T GetComponent<T>() => (T)_components.OfType<T>();
+    public T GetComponent<T>() => (T)_components.OfType<T>().First();
     public void Set(EditingState state) { EditState = state; ImGui.SetNextWindowFocus(); }
     public void AddComponent(Control control) { _components.Add(control); control.Init(this, _gui); }
-    public override void OnAddedToEntity() => Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Render);    
+    public override void OnAddedToEntity() 
+    {
+      Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Render);    
+      Entity.Scene.AddEntity(_selComplex);
+    }
 		public void Render()
 		{
       HandleGuiDrags();
       foreach (var component in _components) component.Render();
-
+      _selComplex.SheetUpdate();
 		}
     void HandleGuiDrags() 
     {
@@ -112,7 +94,8 @@ namespace Tools
     }
     ~SpriteSheetEditor()
 		{ 
-      ImUtils.UnbindLastTexture(); 
+      ImUtils.UnbindLastTexture();
+      _selComplex.Destroy();
 		}
 
 	}

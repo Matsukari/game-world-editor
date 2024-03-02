@@ -16,9 +16,10 @@ namespace Tools
   }
   public struct RenderState
   {
-    public Vector2 Position;
-    public Vector2 Scale;
-    public float Rotation;
+    public Vector2 Position = new Vector2();
+    public Vector2 Scale = new Vector2(1f, 1f);
+    public float Rotation = 0f;
+    public RenderState() {}
   }
   public struct SpriteKeyFramesData 
   {
@@ -75,13 +76,14 @@ namespace Tools
     }
     public List<Object> Animations = new List<object>();
     public SpriteBody Body = new SpriteBody();
-    public RenderState RenderState = new RenderState();
+    public PartSpriteData BodyOrigin = new PartSpriteData();
     public string Name { get; set; } = "";
     public CustomProperties Properties { get; set; } = new CustomProperties();
     public ComplexSpriteData(string name, PartSpriteData main) 
     {
       Name = name;
-      Body.Add("main", main);
+      BodyOrigin = main;
+      // Body.Add("main", BodyOrigin);
     }
   }
   public class TiledSpriteData : ProppedObject
@@ -113,6 +115,7 @@ namespace Tools
     public int TileHeight = 0;
     private int _counter = 0;
     private Texture2D _texture;
+    public Texture2D Texture { get => _texture; }
     public SpriteSheetData(Texture2D texture) 
     {
       System.Diagnostics.Debug.Assert(texture != null);
@@ -170,6 +173,7 @@ namespace Tools
       var main = new ComplexSpriteData.PartSpriteData();
       main.Tile = tile;
       main.LocalState = new RenderState();
+
       if (name == "unnamed") name = $"unnamed_{_counter++}"; 
       var sprite = new ComplexSpriteData(name, main);
       Sprites.Add(name, sprite);
