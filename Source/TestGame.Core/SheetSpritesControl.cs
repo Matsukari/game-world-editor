@@ -14,14 +14,14 @@ namespace Tools
       {
         if (Editor.SpriteSheet == null) return;
         ImGui.Begin("Sprite List");
-        ImGui.Button($"Sheet ({Editor.SpriteSheet.Tiles.Count})");
+        ImGui.TextDisabled($"Sheet ({Editor.SpriteSheet.Tiles.Count})");
         ImGui.Separator();
-        ImGui.Button($"Sprites ({Editor.SpriteSheet.Sprites.Count})");
+        ImGui.TextDisabled($"Sprites ({Editor.SpriteSheet.Sprites.Count})");
         ImGui.Separator();
         ImGui.Indent();
         foreach (var (name, sprite) in Editor.SpriteSheet.Sprites)
         {
-          if (ImGui.MenuItem($"{name}")) 
+          if (ImGui.CollapsingHeader($"{name}")) 
           {
             Editor.GetComponent<SheetImageControl>().Select(sprite);
           }

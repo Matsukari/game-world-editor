@@ -1,5 +1,6 @@
 using ImGuiNET;
 using Nez;
+using Microsoft.Xna.Framework;
 
 namespace Tools 
 {
@@ -32,21 +33,23 @@ namespace Tools
       {
         ImGui.Begin(Names.ObjectPropertiesPane);
         ImGui.Indent();
-        ImUtils.LabelText("Name", name);
-        ImUtils.LabelText("Type", "Tiled");
-        ImUtils.LabelText("Region", sprite.Region.RenderStringFormat());
+        if (ImGui.InputText("Name", ref name, 12)) sprite.Name = name;
+        ImGui.LabelText("Type", "Tiled");
+        ImGui.LabelText("Region", sprite.Region.RenderStringFormat());
         ImGui.Unindent();
         ImGui.Separator();
+        ImGui.NewLine();
         ImGui.Indent();
         if (ImGui.MenuItem("Complex")) Editor.SpriteSheet.AddSprite(sprite);
-        if (ImGui.MenuItem("Delete")) Editor.SpriteSheet.Delete(sprite);
         if (ImGui.MenuItem("Combine")) 
         {
           var newSprite = Editor.SpriteSheet.CombineContains(sprite, Gui.SelectionRect.Content);
           // if (newSprite.Region != RectangleF.Empty) Editor.GetComponent<SheetImageControl>().Select(newSprite);
           
         }
+        if (ImGui.MenuItem("Delete")) Editor.SpriteSheet.Delete(sprite);
         ImGui.Unindent();
+        ImGui.NewLine();
         ImGui.Separator();
         DrawCustomProperties(sprite.Properties);
         ImGui.End();
@@ -55,30 +58,34 @@ namespace Tools
       {
         ImGui.Begin(Names.SheetPropertiesPane);
         ImGui.Indent();
-        ImUtils.LabelText("Name", name);
-        ImUtils.LabelText("Tile width", $"{spriteSheet.TileWidth}");
-        ImUtils.LabelText("Tile height", $"{spriteSheet.TileHeight}");
-        ImUtils.LabelText("EditState", $"{Editor.EditState}");
+        if (ImGui.InputText("Name", ref name, 12)) spriteSheet.Name = name;
+        ImGui.BeginDisabled();
+        ImGui.InputInt("Block_Width", ref spriteSheet.TileWidth);
+        ImGui.InputInt("Block_Height", ref spriteSheet.TileHeight);
+        ImGui.EndDisabled();
+        ImGui.TextDisabled($"EditState: {Editor.EditState}");
+        ImGui.NewLine();
         ImGui.Unindent(); 
         DrawCustomProperties(spriteSheet.Properties);
         ImGui.End();
       }
       void DrawCustomProperties(CustomProperties props)
       {
-        ImGui.SeparatorText("Custom Properties");
-        ImGui.Indent(); 
+        ImGui.SeparatorText("Properties");
         string deleteId = string.Empty;
         foreach (var (customName, customProp) in props) 
         {
-          if (ImGui.CollapsingHeader(customName))
+          if (ImGui.MenuItem(customName))
           {
-            if (customProp is Shape.Rectangle r) ImGui.Text(r.Bounds.RenderStringFormat());
-            if (ImGui.MenuItem("Delete")) deleteId = customName;
+            ImGui.Indent(); 
+            var bounds = new System.Numerics.Vector4();
+            if (customProp is Shape shape && ImGui.InputFloat4("Bounds", ref bounds)) shape.Bounds = bounds.ToRectangleF();
+            if (ImGui.ColorButton("Delete", Color.PaleVioletRed.ToVector4().ToNumerics())) deleteId = customName;
+            ImGui.Unindent();
           }
         }
         if (deleteId != string.Empty) props.Remove(deleteId);
 
-        ImGui.Unindent();
       }
     }
   }

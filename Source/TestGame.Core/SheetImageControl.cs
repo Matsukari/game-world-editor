@@ -28,8 +28,7 @@ namespace Tools
           var max = ImGui.GetContentRegionAvail() * 0.8f;
           Gui.SheetPosition = Num.Vector2.Clamp(Gui.SheetPosition, min, max);
           ImGui.SetCursorPos(Gui.SheetPosition);
-
-          var cursorPosImageTopLeft = ImGui.GetCursorScreenPos();
+          
           ImGui.Image(Gui.SheetTexture, Editor.SpriteSheet.Size.ToNumerics() * Gui.ContentZoom);
           ImGui.EndChild();
 
@@ -131,7 +130,8 @@ namespace Tools
         }
       }
       public void Select(object sel)
-      { 
+      {
+        if (Gui.ShapeSelection != null) return;
         Gui.Selection = sel;
         if (Gui.Selection is TiledSpriteData tileData)
         {

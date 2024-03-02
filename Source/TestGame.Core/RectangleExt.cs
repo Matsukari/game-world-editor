@@ -1,5 +1,6 @@
 using Nez;
 using Microsoft.Xna.Framework;
+using Num = System.Numerics;
 
 namespace Tools 
 {
@@ -42,6 +43,13 @@ namespace Tools
       RectangleF result = new RectangleF(
           (float)rect.X, (float)rect.Y, 
           (float)rect.Width, (float)rect.Height);
+      return result;
+    }
+    public static RectangleF ToRectangleF(this Num.Vector4 vec) 
+    {
+      RectangleF result = new RectangleF(
+          vec.X, vec.Y, 
+          vec.Z, vec.W);
       return result;
     }
     public static RectangleF GetCenterToStart(this RectangleF rectf) 

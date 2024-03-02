@@ -47,24 +47,44 @@ namespace Tools
     CustomProperties Properties { get; }
     string Name { get; set; }
   }
-  public struct ComplexSpriteData : ProppedObject
+  public class ComplexSpriteData : ProppedObject
   {  
     public struct PartSpriteData 
     {
       public TiledSpriteData Tile;
       public RenderState LocalState; 
     }
+    public struct SpriteBody
+    {
+      public Dictionary<string, PartSpriteData> Parts = new Dictionary<string, PartSpriteData>();
+      public void Add(string name, PartSpriteData part) {}
+      public RectangleF GetArea() 
+      {
+        var min = new Vector2(10000);
+        var max = new Vector2(-10000);
+        foreach (var part in Parts)
+        {
+          min.X = Math.Min(min.X, part.Value.LocalState.Position.X);
+          min.Y = Math.Min(min.Y, part.Value.LocalState.Position.Y);
+          max.X = Math.Max(max.X, part.Value.LocalState.Position.X);
+          max.Y = Math.Max(max.Y, part.Value.LocalState.Position.Y);
+        }
+        return RectangleF.FromMinMax(min, max);
+      }
+      public SpriteBody() {}
+    }
     public List<Object> Animations = new List<object>();
-    public Dictionary<String, PartSpriteData> Parts = new Dictionary<string, PartSpriteData>();
+    public SpriteBody Body = new SpriteBody();
+    public RenderState RenderState = new RenderState();
     public string Name { get; set; } = "";
     public CustomProperties Properties { get; set; } = new CustomProperties();
     public ComplexSpriteData(string name, PartSpriteData main) 
     {
       Name = name;
-      Parts.Add("main", main);
+      Body.Add("main", main);
     }
   }
-  public struct TiledSpriteData : ProppedObject
+  public class TiledSpriteData : ProppedObject
   {  
     public int Id = -1;
     public Rectangle Region = new Rectangle();

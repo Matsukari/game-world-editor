@@ -18,6 +18,8 @@ namespace Tools
       public static string SheetPropertiesPane = "Sheet Properties";
       public static string OpenFile = "Open file";
       public static string AutoRegion = "Auto region";
+      public static string ComplexSprite = "Sprite: ";
+
     }
     public struct Colors 
     {
@@ -30,7 +32,7 @@ namespace Tools
       public Color ContentActiveOutline = Color.CadetBlue;
       public Color AnnotatedShapeActive = new Color(0.5f, 0.5f, 0.7f, 0.5f);
       public Color AnnotatedShapeInactive = new Color(0.5f, 0.5f, 0.7f, 0.3f);
-      public Color AnnotatedName = new Color(0.5f, 0.5f, 0.7f, 0.3f);
+      public Color AnnotatedName = new Color(0.5f, 0.5f, 0.7f, 1f);
 
 
       public Colors() {}
