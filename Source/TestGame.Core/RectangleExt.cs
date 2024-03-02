@@ -57,5 +57,7 @@ namespace Tools
       rect.Y -= rect.Height/2;
     }
     public static string RenderStringFormat(this Rectangle rect) => $"{rect.X}, {rect.Y}, {rect.Width}, {rect.Height}";
+    public static string RenderStringFormat(this RectangleF rect) => $"{rect.X}, {rect.Y}, {rect.Width}, {rect.Height}";
+
   }
 }

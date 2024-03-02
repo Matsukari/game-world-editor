@@ -97,6 +97,29 @@ namespace Tools
           new Num.Vector2(windowMin.X + rect.Right * zoom, windowMin.Y + rect.Bottom * zoom) + offset, 
           fill.ToImColor());
     }
+    public static void DrawArrowDownFilled(ImDrawListPtr drawList, Num.Vector2 point, float size, Color fill, Num.Vector2 offset, float zoom) 
+    {
+      var circle = point;
+      circle.Y -= size + size*0.4f;
+      DrawCircleFilled(drawList, circle, size/2, fill, offset, zoom);
+      
+
+      var (windowMin, windowMax) = GetWindowArea();
+      drawList.AddTriangleFilled(
+          new Num.Vector2(windowMin.X + (circle.X - size/2) * zoom, windowMin.Y + (circle.Y) * zoom) + offset, //left 
+          new Num.Vector2(windowMin.X + (circle.X + size/2) * zoom, windowMin.Y + (circle.Y) * zoom) + offset, // right 
+          new Num.Vector2(windowMin.X + (circle.X) * zoom, windowMin.Y + (circle.Y + size + size*0.4f) * zoom) + offset, // bottom
+          fill.ToImColor());
+    }
+
+    public static void DrawCircleFilled(ImDrawListPtr drawList, Num.Vector2 center, float radius, Color fill, Num.Vector2 offset, float zoom) 
+    {
+      var (windowMin, windowMax) = GetWindowArea();
+      drawList.AddCircleFilled(
+          new Num.Vector2(windowMin.X + center.X * zoom, windowMin.Y + center.Y * zoom) + offset,
+          radius * zoom, fill.ToImColor());
+    }
+    
     public static (Num.Vector2, Num.Vector2) GetWindowArea() 
     {
       Num.Vector2 vMin = ImGui.GetWindowContentRegionMin();

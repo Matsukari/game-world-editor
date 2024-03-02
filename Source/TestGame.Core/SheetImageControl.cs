@@ -34,6 +34,7 @@ namespace Tools
           ImGui.EndChild();
 
           DrawSpritesRegion();
+          DrawOverlays();
           DrawMenubar();
           ImGui.End();
         }

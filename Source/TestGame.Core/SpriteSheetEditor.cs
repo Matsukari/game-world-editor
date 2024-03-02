@@ -23,12 +23,16 @@ namespace Tools
     {
       public Color SelectionOutline = new Color(0.85f, 0.85f, 0.85f);
       public Color SelectionFill = new Color(0.85f, 0.85f, 0.85f, 0.2f);
-      public Color SpriteRegionInactiveOutline = new Color(0.3f, 0.3f, 0.3f);
-      public Color SpriteRegionActiveOutline = new Color(0.5f, 0.5f, 0.5f);
+      public Color SpriteRegionInactiveOutline = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+      public Color SpriteRegionActiveOutline = new Color(0.5f, 0.5f, 0.5f, 1f);
       public Color SpriteRegionActiveFill = new Color(0.5f, 0.5f, 0.5f, 0.3f);
       public Color SelectionPoint = new Color(0.9f, 0.9f, 0.9f);
       public Color ContentActiveOutline = Color.CadetBlue;
-      public Color AnnotatedShape = new Color(0.3f, 0.2f, 0.3f);
+      public Color AnnotatedShapeActive = new Color(0.5f, 0.5f, 0.7f, 0.5f);
+      public Color AnnotatedShapeInactive = new Color(0.5f, 0.5f, 0.7f, 0.3f);
+      public Color AnnotatedName = new Color(0.5f, 0.5f, 0.7f, 0.3f);
+
+
       public Colors() {}
     }
     public abstract class Control 
@@ -55,6 +59,7 @@ namespace Tools
 		public SpriteSheetEditor()
 		{
       SpriteSheet = new SpriteSheetData(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
+      _gui.ShapeContext = SpriteSheet;
       Set(EditingState.AutoRegion);
       AddComponent(new SheetImageControl());
       AddComponent(new SheetPropertiesControl());

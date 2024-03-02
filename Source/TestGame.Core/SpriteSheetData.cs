@@ -26,31 +26,50 @@ namespace Tools
     public float Time;
     private List<RenderState> Frames;
   }
-  public struct ComplexSpriteData 
+  public class CustomProperties
+  {
+    Dictionary<string, object> _props = new Dictionary<string, object>();
+    int _counter = 0;
+    public void Add<T>(T obj)
+    {
+      string name = $"{obj.GetType().Name}.{_counter++}";
+      if (obj is ProppedObject prop) 
+      {
+        if (prop.Name != "") name = prop.Name;
+      }
+      _props.TryAdd(name, obj);
+    }
+    public void Remove(string name) => _props.Remove(name);
+    public Dictionary<string, object>.Enumerator GetEnumerator() { return _props.GetEnumerator(); }
+  }
+  public interface ProppedObject 
+  {
+    CustomProperties Properties { get; }
+    string Name { get; set; }
+  }
+  public struct ComplexSpriteData : ProppedObject
   {  
     public struct PartSpriteData 
     {
       public TiledSpriteData Tile;
       public RenderState LocalState; 
     }
-    public string Name;
-    public List<Object> Animations;
-    public Dictionary<String, PartSpriteData> Parts;
-    public Dictionary<String, Object> Properties;    
+    public List<Object> Animations = new List<object>();
+    public Dictionary<String, PartSpriteData> Parts = new Dictionary<string, PartSpriteData>();
+    public string Name { get; set; } = "";
+    public CustomProperties Properties { get; set; } = new CustomProperties();
     public ComplexSpriteData(string name, PartSpriteData main) 
     {
       Name = name;
-      Animations = new List<object>();
-      Parts = new Dictionary<string, PartSpriteData>();
-      Properties = new Dictionary<string, object>();
-      Parts.Add("mainn", main);
+      Parts.Add("main", main);
     }
   }
-  public struct TiledSpriteData 
+  public struct TiledSpriteData : ProppedObject
   {  
-    public string Name = "";
+    public int Id = -1;
     public Rectangle Region = new Rectangle();
-    public Dictionary<string, Object> Properties = new Dictionary<string, object>();
+    public string Name { get; set; } = "";
+    public CustomProperties Properties { get; set; } = new CustomProperties();
     public TiledSpriteData() {}
   }
   public enum CustomPropertyType 
@@ -63,24 +82,21 @@ namespace Tools
     BOOL,
     VECTOR2
   };
-	public class SpriteSheetData
+	public class SpriteSheetData : ProppedObject
 	{
-    public string Name = "";
-		public Dictionary<String, ComplexSpriteData> Sprites;
-    public Dictionary<int, TiledSpriteData> Tiles;
-    public Dictionary<String, Object> Properties;
-    public int TileWidth;
-    public int TileHeight;
-    private Texture2D _texture;
-    private int _counter = 0;
+    public string Name { get; set; } = "";
+    public CustomProperties Properties { get; set; } = new CustomProperties();
+		public Dictionary<String, ComplexSpriteData> Sprites = new Dictionary<string, ComplexSpriteData>();
+    public Dictionary<int, TiledSpriteData> Tiles = new Dictionary<int, TiledSpriteData>();
     public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
+    public int TileWidth = 0;
+    public int TileHeight = 0;
+    private int _counter = 0;
+    private Texture2D _texture;
     public SpriteSheetData(Texture2D texture) 
     {
       System.Diagnostics.Debug.Assert(texture != null);
       _texture = texture;
-      Sprites = new Dictionary<string, ComplexSpriteData>();
-      Tiles = new Dictionary<int, TiledSpriteData>();
-      Properties = new Dictionary<string, object>();
     }
     public void Slice(int w, int h) 
     {
@@ -92,9 +108,14 @@ namespace Tools
         {
           var tile = new TiledSpriteData();
           tile.Region = new Rectangle(col, row, w, h);
-          if (!IntersectTile(tile.Region)) Tiles.Add(GetTile(col, row), tile);
+          tile.Id = GetTile(col, row);
+          if (!IntersectTile(tile.Region)) Tiles.Add(tile.Id, tile);
         }
       }
+    }
+    public void Delete(TiledSpriteData tile)
+    {
+      Tiles.Remove(tile.Id);
     }
     public TiledSpriteData CombineContains(TiledSpriteData select, RectangleF container)
     {
@@ -115,7 +136,8 @@ namespace Tools
         Rectangle combined = RectangleExt.MinMax(tilesRegion); 
         var newTile = new TiledSpriteData();
         newTile.Region = combined;
-        Tiles.Add(tiles.First(), newTile);
+        newTile.Id = tiles.First();
+        Tiles.Add(newTile.Id, newTile);
         return newTile;
       }
       // The tile's own region get smaller; other encompassed tiles are foreer lost 

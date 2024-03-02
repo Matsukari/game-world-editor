@@ -25,13 +25,7 @@ namespace Tools
         ImUtils.LabelText("Type", "Complex");
         ImGui.Unindent();
         ImGui.Separator();
-        ImGui.SeparatorText("Custom Properties");
-        ImGui.Indent(); 
-        foreach (var (customName, customProp) in sprite.Properties) 
-        {
-          ImUtils.LabelText(customName, "-");
-        }
-        ImGui.Unindent();
+        DrawCustomProperties(sprite.Properties);
         ImGui.End();
       }
       void DrawPropertiesPane(TiledSpriteData sprite, string name)
@@ -45,6 +39,7 @@ namespace Tools
         ImGui.Separator();
         ImGui.Indent();
         if (ImGui.MenuItem("Complex")) Editor.SpriteSheet.AddSprite(sprite);
+        if (ImGui.MenuItem("Delete")) Editor.SpriteSheet.Delete(sprite);
         if (ImGui.MenuItem("Combine")) 
         {
           var newSprite = Editor.SpriteSheet.CombineContains(sprite, Gui.SelectionRect.Content);
@@ -53,24 +48,37 @@ namespace Tools
         }
         ImGui.Unindent();
         ImGui.Separator();
-        ImGui.SeparatorText("Custom Properties");
-        ImGui.Indent(); 
-        foreach (var (customName, customProp) in sprite.Properties) 
-        {
-          ImUtils.LabelText(customName, "-");
-        }
-        ImGui.Unindent();
+        DrawCustomProperties(sprite.Properties);
         ImGui.End();
       }
       void DrawSheetProps(SpriteSheetData spriteSheet, string name)
       {
         ImGui.Begin(Names.SheetPropertiesPane);
+        ImGui.Indent();
         ImUtils.LabelText("Name", name);
         ImUtils.LabelText("Tile width", $"{spriteSheet.TileWidth}");
         ImUtils.LabelText("Tile height", $"{spriteSheet.TileHeight}");
         ImUtils.LabelText("EditState", $"{Editor.EditState}");
+        ImGui.Unindent(); 
+        DrawCustomProperties(spriteSheet.Properties);
         ImGui.End();
+      }
+      void DrawCustomProperties(CustomProperties props)
+      {
+        ImGui.SeparatorText("Custom Properties");
+        ImGui.Indent(); 
+        string deleteId = string.Empty;
+        foreach (var (customName, customProp) in props) 
+        {
+          if (ImGui.CollapsingHeader(customName))
+          {
+            if (customProp is Shape.Rectangle r) ImGui.Text(r.Bounds.RenderStringFormat());
+            if (ImGui.MenuItem("Delete")) deleteId = customName;
+          }
+        }
+        if (deleteId != string.Empty) props.Remove(deleteId);
 
+        ImGui.Unindent();
       }
     }
   }

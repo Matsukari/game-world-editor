@@ -1,3 +1,5 @@
+              ImGui.GetWindowDrawList().AddRectFilled(rect, Editor.ColorSet.AnnotatedShape, Gui.);
+
 void DrawGridLines(int tw, int th)
     {
       float w = tw * ContentZoom;

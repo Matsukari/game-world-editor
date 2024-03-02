@@ -1,5 +1,6 @@
 
 using ImGuiNET;
+using Nez;
 
 namespace Tools 
 {
@@ -7,33 +8,39 @@ namespace Tools
   {
     public partial class SheetImageControl : Control
     {
-      void Annotate(ShapeType shape)
+      void Annotate(Shape shape)
       {
         Gui.ShapeSelection = shape;
         Editor.Set(EditingState.AnnotateShape);
       }
-      void HandleShapeAnnotation()
+      void HandleShapeAnnotation(ProppedObject context)
       {
         var rect = Gui.MouseDragArea;
-        if (Gui.IsDrag)
+        // rect.X /= Gui.ContentZoom;
+        // rect.Y /= Gui.ContentZoom;
+        if (Gui.IsDrag && Gui.ShapeSelection != null)
         {
-          switch (Gui.ShapeSelection)
-          {
-            case ShapeType.Circle: break;
-            case ShapeType.Rectangle: 
-              ImUtils.DrawRectFilled(ImGui.GetWindowDrawList(), rect, Editor.ColorSet.AnnotatedShape, Gui.SheetPosition, Gui.ContentZoom);
-              break;
-            case ShapeType.Ellipse: break;
-          }
+          if (Gui.ShapeSelection is Shape.Rectangle)
+              ImGui.GetWindowDrawList().AddRectFilled(rect.Location.ToNumerics(), rect.Max.ToNumerics(), Editor.ColorSet.AnnotatedShapeActive.ToImColor());
+          else if (Gui.ShapeSelection is Shape.Circle)
+              ImGui.GetWindowDrawList().AddCircleFilled(rect.Center.ToNumerics(), rect.Width/2, Editor.ColorSet.AnnotatedShapeActive.ToImColor());
         }
         else if (Gui.IsDragLast)
         {
-          switch (Gui.ShapeSelection)
+          if (Gui.ShapeSelection is Shape.Circle || Gui.ShapeSelection is Shape.Rectangle || Gui.ShapeSelection is Shape.Point)
           {
-            case ShapeType.Circle | ShapeType.Rectangle | ShapeType.Ellipse:
-              break;
-            case ShapeType.Polygon: break;
+            rect.X -= ImUtils.GetWindowRect().X;
+            rect.Y -= ImUtils.GetWindowRect().Y;
+            Console.WriteLine($"{Gui.SheetPosition} - {rect.Location}");
+            // rect.Location = Math.Abs(Gui.SheetPosition + rect.Location;
+            rect.X = Math.Abs(Gui.SheetPosition.X) + rect.X;
+            rect.Y = Math.Abs(Gui.SheetPosition.Y) + rect.Y;
+            rect.Location /= Gui.ContentZoom;
+            rect.Size /= Gui.ContentZoom;
+            Gui.ShapeSelection.Bounds = rect;
+            context.Properties.Add(Gui.ShapeSelection);
           }
+          Gui.ShapeSelection = null;
         }
       }
       void DrawMenubar()
@@ -41,7 +48,7 @@ namespace Tools
         var newAtlas = false;
         var openFile = false;
 
-        HandleShapeAnnotation();
+        HandleShapeAnnotation(Gui.ShapeContext);
         if (ImGui.BeginMenuBar())
         {
           if (ImGui.BeginMenu("File"))
@@ -52,20 +59,20 @@ namespace Tools
           }
           if (ImGui.Button("Rectangle"))
           {
-            Annotate(ShapeType.Rectangle);
+            Annotate(new Shape.Rectangle());
           }
-          if (ImGui.Button("Circle")) 
+          else if (ImGui.Button("Circle")) 
           {
-
+            Annotate(new Shape.Circle());
           }
-          if (ImGui.Button("Point"))
+          else if (ImGui.Button("Point"))
           {
-
+            Annotate(new Shape.Point());
           }
-          if (ImGui.Button("Polygon"))
-          {
-
-          }
+          // if (ImGui.Button("Polygon"))
+          // {
+          //   Annotate(new Shape.Rectangle());
+          // }
 
           ImGui.EndMenuBar();
         }
