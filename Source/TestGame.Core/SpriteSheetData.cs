@@ -59,19 +59,6 @@ namespace Tools
     {
       public Dictionary<string, PartSpriteData> Parts = new Dictionary<string, PartSpriteData>();
       public void Add(string name, PartSpriteData part) {}
-      public RectangleF GetArea() 
-      {
-        var min = new Vector2(10000);
-        var max = new Vector2(-10000);
-        foreach (var part in Parts)
-        {
-          min.X = Math.Min(min.X, part.Value.LocalState.Position.X);
-          min.Y = Math.Min(min.Y, part.Value.LocalState.Position.Y);
-          max.X = Math.Max(max.X, part.Value.LocalState.Position.X);
-          max.Y = Math.Max(max.Y, part.Value.LocalState.Position.Y);
-        }
-        return RectangleF.FromMinMax(min, max);
-      }
       public SpriteBody() {}
     }
     public List<Object> Animations = new List<object>();
@@ -84,6 +71,22 @@ namespace Tools
       Name = name;
       BodyOrigin = main;
       // Body.Add("main", BodyOrigin);
+    }
+    public RectangleF Bounds 
+    {
+      get 
+      {
+        var min = BodyOrigin.LocalState.Position;
+        var max = BodyOrigin.LocalState.Position + BodyOrigin.Tile.Region.Size.ToVector2();
+        foreach (var part in Body.Parts)
+        {
+          min.X = Math.Min(min.X, part.Value.LocalState.Position.X);
+          min.Y = Math.Min(min.Y, part.Value.LocalState.Position.Y);
+          max.X = Math.Max(max.X, part.Value.LocalState.Position.X + part.Value.Tile.Region.Size.ToVector2().X);
+          max.Y = Math.Max(max.Y, part.Value.LocalState.Position.Y + part.Value.Tile.Region.Size.ToVector2().Y);
+        }
+        return RectangleF.FromMinMax(min, max);
+      }
     }
   }
   public class TiledSpriteData : ProppedObject

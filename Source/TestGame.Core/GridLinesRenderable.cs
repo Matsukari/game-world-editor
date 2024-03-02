@@ -12,13 +12,13 @@ namespace Nez
     {  
       // Horizontal line 
       batcher.DrawLine(
-          new Vector2(camera.Position.X-Screen.Width, Screen.Center.Y), 
-          new Vector2(camera.Position.X+Screen.Width, Screen.Center.Y), 
+          new Vector2(Transform.Position.X-Screen.Width, Transform.Position.Y), 
+          new Vector2(Transform.Position.X+Screen.Width, Transform.Position.Y), 
           Color);
       // Vertival line
       batcher.DrawLine(
-          new Vector2(Screen.Center.X, camera.Position.Y-Screen.Height), 
-          new Vector2(Screen.Center.X, camera.Position.Y+Screen.Height) ,
+          new Vector2(Transform.Position.X, Transform.Position.Y-Screen.Height), 
+          new Vector2(Transform.Position.X, Transform.Position.Y+Screen.Height), 
           Color);
     }
 

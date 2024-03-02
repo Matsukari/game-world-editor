@@ -15,6 +15,8 @@ namespace Tools
       SpriteSheetEditor _editor;
       ComplexSpriteData _sprite;
       List<Entity> _entities = new List<Entity>();
+      float _zoom = 1;
+      public Entity _main;
       public ComplexSpriteEntity(GuiData gui, SpriteSheetEditor editor)
       {
         _gui = gui;
@@ -50,6 +52,7 @@ namespace Tools
           _entities.Add(partEntity);
         }
         mainEntity.SetParent(this);
+        _main = mainEntity;
         // mainEntity.Transform.Scale = new Vector2(2f, 2f); 
       }
       public void UnEdit()
@@ -79,23 +82,31 @@ namespace Tools
       {
         if (ImGui.GetIO().MouseWheel != 0)
         {
-          var minZoom = 0.2f;
-          var maxZoom = 10f;
-          var zoomSpeed = Scene.Camera.Zoom * 0.2f;
-          Scene.Camera.Zoom -= Math.Min(maxZoom - Scene.Camera.Zoom, ImGui.GetIO().MouseWheel * zoomSpeed);
-          Scene.Camera.Zoom = Mathf.Clamp(Scene.Camera.Zoom, minZoom, maxZoom);
+          var minZoom = 0.4f;
+          var maxZoom = 5f;
+
+          var zoomSpeed = 0.3f;
+          _zoom = Math.Clamp(_zoom + ImGui.GetIO().MouseWheel * zoomSpeed, minZoom, maxZoom);
+          
+          var delta = (ImGui.GetIO().MousePos - Position) * (_zoom - 1);
+          // delta.X = Math.Min(delta.X, _sprite.Bounds.X * _zoom); 
+          // delta.Y = Math.Min(delta.Y, _sprite.Bounds.Y * _zoom); 
+          Position -= delta;
+          Scale = new Vector2(_zoom, _zoom);
+
         }
       }
       Vector2 _initialCameraPosition = new Vector2();
       void MoveInput()
       {
+        Console.WriteLine($"{Scene.Camera.Zoom}");
         if (_gui.IsDragFirst)
         {
-          _initialCameraPosition = Scene.Camera.Position;
+          _initialCameraPosition = Position;
         }
         if (_gui.IsDrag && _gui.MouseDragButton == 2) 
-        { 
-          Scene.Camera.Position = _initialCameraPosition - (ImGui.GetIO().MousePos - _gui.MouseDragStart) / Scene.Camera.Zoom;
+        {
+          Position = _initialCameraPosition - (_gui.MouseDragStart - ImGui.GetIO().MousePos);
         } 
       }
       void SelectInput()
