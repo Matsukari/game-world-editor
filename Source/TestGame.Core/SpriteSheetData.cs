@@ -19,7 +19,14 @@ namespace Tools
     public Vector2 Position = new Vector2();
     public Vector2 Scale = new Vector2(1f, 1f);
     public float Rotation = 0f;
+    public Vector2 Skew = new Vector2();
     public RenderState() {}
+    public void Apply(Transform transform)
+    {
+      transform.LocalPosition = Position;
+      transform.LocalScale = Scale;
+      transform.LocalRotationDegrees = Rotation;
+    }
   }
   public struct SpriteKeyFramesData 
   {
@@ -50,10 +57,12 @@ namespace Tools
   }
   public class ComplexSpriteData : ProppedObject
   {  
-    public struct PartSpriteData 
+    public class PartSpriteData 
     {
       public TiledSpriteData Tile;
       public RenderState LocalState; 
+      public Vector2 Origin = new Vector2();
+      public PartSpriteData() {}
     }
     public struct SpriteBody
     {
@@ -78,15 +87,23 @@ namespace Tools
       {
         var min = BodyOrigin.LocalState.Position;
         var max = BodyOrigin.LocalState.Position + BodyOrigin.Tile.Region.Size.ToVector2();
-        foreach (var part in Body.Parts)
+        var parts = new List<PartSpriteData>(Body.Parts.Values);
+        parts.Add(BodyOrigin);
+        foreach (var part in parts)
         {
-          min.X = Math.Min(min.X, part.Value.LocalState.Position.X);
-          min.Y = Math.Min(min.Y, part.Value.LocalState.Position.Y);
-          max.X = Math.Max(max.X, part.Value.LocalState.Position.X + part.Value.Tile.Region.Size.ToVector2().X);
-          max.Y = Math.Max(max.Y, part.Value.LocalState.Position.Y + part.Value.Tile.Region.Size.ToVector2().Y);
+          min.X = Math.Min(min.X, part.LocalState.Position.X + part.Origin.X);
+          min.Y = Math.Min(min.Y, part.LocalState.Position.Y + part.Origin.Y);
+          max.X = Math.Max(max.X, part.LocalState.Position.X + part.Tile.Region.Size.ToVector2().X + part.Origin.X);
+          max.Y = Math.Max(max.Y, part.LocalState.Position.Y + part.Tile.Region.Size.ToVector2().Y + part.Origin.Y);
         }
         return RectangleF.FromMinMax(min, max);
       }
+    }
+    public List<PartSpriteData> GetFullBody()
+    {
+      var parts = new List<PartSpriteData>(Body.Parts.Values);
+      parts.Add(BodyOrigin);
+      return parts;
     }
   }
   public class TiledSpriteData : ProppedObject

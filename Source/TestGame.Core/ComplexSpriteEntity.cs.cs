@@ -36,18 +36,11 @@ namespace Tools
         origin.Color = _editor.ColorSet.SpriteRegionActiveOutline;
 
         var mainEntity = Scene.CreateEntity(_sprite.Name);
-        mainEntity.AddComponent(new SpriteRenderer(new Sprite(_editor.SpriteSheet.Texture, _sprite.BodyOrigin.Tile.Region)));
-        mainEntity.Transform.Position = _sprite.BodyOrigin.LocalState.Position;
-        mainEntity.Transform.Scale = _sprite.BodyOrigin.LocalState.Scale;
-        mainEntity.Transform.RotationDegrees = _sprite.BodyOrigin.LocalState.Rotation;
-        _entities.Add(mainEntity);
-        foreach (var part in _sprite.Body.Parts)
+        foreach (var part in _sprite.GetFullBody())
         {
-          var partEntity = Scene.CreateEntity(_sprite.Name + part.Value.Tile.Name);
-          partEntity.AddComponent(new SpriteRenderer(new Sprite(_editor.SpriteSheet.Texture, part.Value.Tile.Region)));
-          partEntity.Transform.Position = part.Value.LocalState.Position;
-          partEntity.Transform.Scale = part.Value.LocalState.Scale;
-          partEntity.Transform.RotationDegrees = part.Value.LocalState.Rotation;
+          var partEntity = Scene.CreateEntity(_sprite.Name + part.Tile.Name);
+          partEntity.AddComponent(new SpriteRenderer(new Sprite(_editor.SpriteSheet.Texture, part.Tile.Region)));
+          part.LocalState.Apply(partEntity.Transform);
           partEntity.Transform.SetParent(mainEntity.Transform);
           _entities.Add(partEntity);
         }
@@ -85,14 +78,13 @@ namespace Tools
           var minZoom = 0.4f;
           var maxZoom = 5f;
 
-          var zoomSpeed = 0.3f;
-          _zoom = Math.Clamp(_zoom + ImGui.GetIO().MouseWheel * zoomSpeed, minZoom, maxZoom);
-          
-          var delta = (ImGui.GetIO().MousePos - Position) * (_zoom - 1);
-          // delta.X = Math.Min(delta.X, _sprite.Bounds.X * _zoom); 
-          // delta.Y = Math.Min(delta.Y, _sprite.Bounds.Y * _zoom); 
+          float zoomFactor = 1.2f;
+          if (ImGui.GetIO().MouseWheel < 0) zoomFactor = 1/zoomFactor;
+          var delta = (ImGui.GetIO().MousePos - Position) * (zoomFactor - 1);
+          _zoom = Math.Clamp(_zoom * zoomFactor, minZoom, maxZoom);
           Position -= delta;
           Scale = new Vector2(_zoom, _zoom);
+          Console.WriteLine($"delta: {delta}");
 
         }
       }
