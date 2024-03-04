@@ -1,156 +1,131 @@
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Nez;
-using Num = System.Numerics;
+using Nez.Sprites;
 
-
-namespace Tools 
+namespace Raven.Sheet
 {
-  public partial class SpriteSheetEditor 
+  public class SheetView : Editor.SubEntity
   {
-    public partial class SheetImageControl : Control 
+    public bool IsCollapsed = false;
+    public bool IsSpritesView = false;
+    SpriteRenderer _image;
+    public override void OnAddedToScene()
     {
-      public bool IsCollapsed = false;
-      public SheetImageControl()
-      {
-       
-      }
-      public override void Render() 
-      {
-        ImGui.SetNextWindowCollapsed(IsCollapsed);
-        ImGui.Begin(Names.ContentWindow, ImGuiWindowFlags.MenuBar);
-        var frame = ImGui.GetStyle().FramePadding.X + ImGui.GetStyle().FrameBorderSize;
-        ImGui.BeginChild("spritesheet-view", new Num.Vector2(ImGui.GetContentRegionAvail().X - 0, 0), false, 
-            ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-
-        RenderUpdate();
-
-        // clamp in such a way that we keep some part of the image visible
-        var min = -(Editor.SpriteSheet.Size.ToNumerics() * Gui.ContentZoom) * 0.8f;
-        var max = ImGui.GetContentRegionAvail() * 0.8f;
-        Gui.SheetPosition = Num.Vector2.Clamp(Gui.SheetPosition, min, max);
-        ImGui.SetCursorPos(Gui.SheetPosition);
-
-        ImGui.Image(Gui.SheetTexture, Editor.SpriteSheet.Size.ToNumerics() * Gui.ContentZoom);
-        ImGui.EndChild();
-
-        DrawSpritesRegion();
-        DrawOverlays();
-        DrawMenubar();
-        ImGui.End();
-      }     
-      void RenderUpdate()
-      {
-        if (ImGui.IsKeyReleased(ImGuiKey.Escape) && IsCollapsed)
-        {
-          var complex = Editor.Entity.Scene.FindEntity(Names.ComplexSprite) as ComplexSpriteEntity;
-          complex.UnEdit();
-        }
-        else if (ImUtils.IsMouseAt(ImUtils.GetWindowRect()) && Editor.EditState != EditingState.AutoRegion && !IsCollapsed)
-        {
-          Editor.Set(EditingState.Default);
-        }
-        
-        if (IsCollapsed) return;
-        // if (ImGui.IsWindowHovered() && Editor.EditState == EditingState.INACTIVE) Editor.Set(EditingState.ACTIVE);
-        if (Gui.Selection == null) Gui.SelectionRect = new SelectionRectangle(new RectangleF(), Gui);  
-        Gui.SelectionRect.DrawWithInput(Gui, Editor);
-        if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
-        {
-          Gui.SelectionRect.Snap(Editor.TileWidth, Editor.TileHeight);
-          Gui.SelectionRect.Update();
-        }
-
-        if (Editor.EditState == EditingState.Default && ImGui.IsWindowHovered())
-        {
-          var (windowMin, windowMax) = ImUtils.GetWindowArea();
-          ImUtils.DrawRealRect(ImGui.GetWindowDrawList(), ImUtils.GetWindowRect(), Editor.ColorSet.ContentActiveOutline);
-
-          ZoomInput();
-          MoveInput();
-          SelectInput();  
-
-        }
-      }
-      void DrawSpritesRegion() 
+      _image = AddComponent(new SpriteRenderer(Gui.SheetTexture));
+      LocalScale = Screen.Size / Gui.SheetTexture.GetSize();
+      var min = Math.Min(LocalScale.X, LocalScale.Y);
+      LocalScale = new Vector2(min, min);
+      AddComponent(new Renderable());
+    }    
+    public class Renderable : Editor.SubEntity.RenderableComponent<SheetView>
+    {
+      public override void Render(Batcher batcher, Camera camera)
       {
         if (Editor.SpriteSheet == null) return;
-        foreach (var (id, tile) in Editor.SpriteSheet.Tiles)
+        if (Gui.Selection is Sprites.Sprite sprite)
         {
-          ImUtils.DrawRect(ImGui.GetWindowDrawList(), tile.Region, Editor.ColorSet.SpriteRegionInactiveOutline, Gui.SheetPosition, Gui.ContentZoom);
+          batcher.DrawRect(Entity.Position+sprite.Region.Location.ToVector2(), 
+              sprite.Region.Size.X * Entity.Scale.X, 
+              sprite.Region.Size.Y * Entity.Scale.Y, 
+              Editor.ColorSet.SpriteRegionActiveFill);
         }
-        if (Gui.Selection is TiledSpriteData tiledSprite)
-        {
-          ImUtils.DrawRectFilled(ImGui.GetWindowDrawList(), tiledSprite.Region, Editor.ColorSet.SpriteRegionActiveFill, Gui.SheetPosition, Gui.ContentZoom);
-          ImUtils.DrawRect(ImGui.GetWindowDrawList(), tiledSprite.Region, Editor.ColorSet.SpriteRegionActiveOutline, Gui.SheetPosition, Gui.ContentZoom);
-        }
+      }
+    }
+        
+    public override void OnEditorUpdate()
+    {
+      if (ImGui.IsKeyReleased(ImGuiKey.Escape) && IsCollapsed)
+      {
+        Editor.GetSubEntity<SpritexView>().UnEdit();
+      }
+      else if (ImUtils.IsMouseAt(ImUtils.GetWindowRect()) && Editor.EditState != Editor.EditingState.AutoRegion && !IsCollapsed)
+      {
+        Editor.Set(Editor.EditingState.Default);
+      }
+
+      if (IsCollapsed) return;
+      // if (ImGui.IsWindowHovered() && Editor.EditState == EditingState.INACTIVE) Editor.Set(EditingState.ACTIVE);
+      if (Gui.Selection == null) Gui.SelectionRect.Enabled = false;
+      if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
+      {
+        Gui.SelectionRect.Enabled = true;
+        Gui.SelectionRect.Ren.Snap(Editor.TileWidth, Editor.TileHeight);
+        Gui.SelectionRect.Update();
+      }
+
+      if (Editor.EditState == Editor.EditingState.Default )
+      {
+        var (windowMin, windowMax) = ImUtils.GetWindowArea();
+        ImUtils.DrawRealRect(ImGui.GetWindowDrawList(), ImUtils.GetWindowRect(), Editor.ColorSet.ContentActiveOutline);
+
+        ZoomInput();
+        MoveInput();
+        SelectInput();  
 
       }
-      void ZoomInput()
+    }
+    void ZoomInput()
+    {
+      if (ImGui.GetIO().MouseWheel != 0) 
       {
-        if (ImGui.GetIO().MouseWheel != 0) 
-        {
-          var minZoom = 0.2f;
-          var maxZoom = 10f;
-
-          var oldSize = Gui.ContentZoom * Editor.SpriteSheet.Size;
-          var zoomSpeed = Gui.ContentZoom * 0.2f;
-          Gui.ContentZoom += Math.Min(maxZoom - Gui.ContentZoom, ImGui.GetIO().MouseWheel * zoomSpeed);
-          Gui.ContentZoom = Mathf.Clamp(Gui.ContentZoom, minZoom, maxZoom);
-
-          // zoom in, move up/left, zoom out the opposite
-          var deltaSize = oldSize - (Gui.ContentZoom * Editor.SpriteSheet.Size);
-          Gui.SheetPosition += deltaSize.ToNumerics() * 0.5f;
-        }
-
+        var minZoom = 0.4f;
+        var maxZoom = 5f;
+        float zoomFactor = 1.2f;
+        if (ImGui.GetIO().MouseWheel < 0) zoomFactor = 1/zoomFactor;
+        var zoom = Scene.Camera.RawZoom;
+        var delta = (ImGui.GetIO().MousePos - Scene.Camera.Position) * (zoomFactor - 1);
+        zoom = Math.Clamp(zoom * zoomFactor, minZoom, maxZoom);
+        Position -= delta;
+        Scene.Camera.RawZoom = zoom;
       }
-      Vector2 _initialSheetPosition = new Vector2();
-      void MoveInput()
+    }
+    Vector2 _initialSheetPosition = new Vector2();
+    void MoveInput()
+    {
+      if (Gui.IsDragFirst)
       {
-        if (Gui.IsDragFirst)
-        {
-          _initialSheetPosition = Gui.SheetPosition;
-        }
-        if (Gui.IsDrag && Gui.MouseDragButton == 2) 
-        {
-          ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-          Gui.SheetPosition.X = _initialSheetPosition.X - (Gui.MouseDragStart.X - ImGui.GetIO().MousePos.X);
-          Gui.SheetPosition.Y = _initialSheetPosition.Y - (Gui.MouseDragStart.Y - ImGui.GetIO().MousePos.Y);
-        } 
-        else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
+        _initialSheetPosition = Scene.Camera.Position;
       }
-      void SelectInput()
+      if (Gui.IsDrag && Gui.MouseDragButton == 2) 
       {
-        if (ImGui.GetIO().MouseClicked[0] || ImGui.GetIO().MouseClicked[1])
+        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+        Scene.Camera.Position = _initialSheetPosition + (Gui.MouseDragStart - ImGui.GetIO().MousePos);
+      } 
+      else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
+    }
+    void SelectInput()
+    {
+      if (ImGui.GetIO().MouseClicked[0] || ImGui.GetIO().MouseClicked[1])
+      {
+        if (Gui.Selection == null && IsSpritesView) 
         {
-          if (Gui.Selection == null) 
+          foreach (var sprite in Editor.SpriteSheet.Sprites)
           {
-            foreach (var (tileId, tileData) in Editor.SpriteSheet.Tiles)
-            {
-              if (ImUtils.HasMouseClickAt(tileData.Region.ToRectangleF(), Gui.ContentZoom, Gui.SheetPosition)) Select(tileData);
-            }
-          }
-          else if (!Gui.SelectionRect.IsEditingPoint) 
-          {
-            Gui.Selection = null;
-            Editor.Set(EditingState.Default);
+            if (ImUtils.HasMouseClickAt(sprite.Value.Region.ToRectangleF())) Select(sprite);
           }
         }
+        else if (!Gui.SelectionRect.IsEditingPoint) 
+        {
+          Gui.Selection = null;
+          Editor.Set(Editor.EditingState.Default);
+        }
       }
-      public void Select(object sel)
+    }
+    public void Select(object sel)
+    {
+      if (Gui.ShapeSelection != null) return;
+      Gui.Selection = sel;
+      if (Gui.Selection is Sprites.Sprite sprite)
       {
-        if (Gui.ShapeSelection != null) return;
-        Gui.Selection = sel;
-        if (Gui.Selection is TiledSpriteData tileData)
-        {
-          Gui.SelectionRect = new SelectionRectangle(tileData.Region.ToRectangleF(), Gui);
-        }
-        else if (Gui.Selection is ComplexSpriteData complex)
-        {
-
-        }
-        Editor.Set(EditingState.SelectedSprite);
+        Gui.SelectionRect = new Selection(Gui);
+        Gui.SelectionRect.Ren.SetBounds(sprite.Region.ToRectangleF()); 
       }
+      else if (Gui.Selection is Sprites.Spritex spritex)
+      {
+
+      }
+      Editor.Set(Editor.EditingState.SelectedSprite);
     }
   }
 }

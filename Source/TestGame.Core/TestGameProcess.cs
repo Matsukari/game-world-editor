@@ -16,7 +16,7 @@ public class TestGameProcess : Core
         Core.RegisterGlobalManager( imGuiManager );
         NezImGuiThemes.HighContrast();
         ImGuiNET.ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
-        Scene = new Tools.SpriteSheetEditorScene();
+        Scene = new SpriteSheetEditorScene();
 
     }
 

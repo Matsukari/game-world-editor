@@ -1,14 +1,11 @@
 
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Nez;
 
 namespace Raven.Sheet.Sprites 
 {
-
   public class Sprite : Propertied
   {  
-    public int Id = -1;
     public Rectangle Region = new Rectangle();
     public Sprite() {}
   }

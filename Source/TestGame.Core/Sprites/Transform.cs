@@ -10,6 +10,9 @@ namespace Raven.Sheet.Sprites
     public float Rotation;
     public void Apply(Nez.Transform transform)
     {
+      transform.Position = Position;
+      transform.Scale = Scale;
+      transform.Rotation = Rotation;
     }
   }
 }

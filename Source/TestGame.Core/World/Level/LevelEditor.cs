@@ -1,6 +1,6 @@
 
 
-namespace Tools {
+namespace Raven {
 
   public class WorldRenderable 
   {
@@ -23,7 +23,7 @@ namespace Tools {
   public class WorldLevel 
   {
     public List<WorldLevelLayer> Layers;
-    public List<SpriteSheetData> SpriteSheets;
+    public List<Sheet.Sheet> SpriteSheets;
     public Dictionary<String, Object> Properties;
     public int Width; 
     public int Height;

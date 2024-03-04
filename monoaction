@@ -16,6 +16,8 @@ elif [[ $1 == "build" ]]; then
   dotnet build Source/$NAME.${2^}
 elif [[ $1 == "run" ]]; then
   dotnet run --project $DESKTOP
+elif [[ $1 == "runlog" ]]; then
+  dotnet run --project $DESKTOP > ./Logs/stdout.txt 2> ./Logs/stderr.txt
 elif [[ $1 == "content" ]]; then
   echo "Content pipeline $DESKTOP"
   cd $DESKTOP

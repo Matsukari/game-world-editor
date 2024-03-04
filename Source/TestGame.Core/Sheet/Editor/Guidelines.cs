@@ -1,9 +1,10 @@
 
 using Microsoft.Xna.Framework;
+using Nez;
 
-namespace Nez
+namespace Raven.Guidelines
 {
-  public class OriginLinesRenderable : RenderableComponent
+  public class OriginLines : RenderableComponent
   {
     public override float Width => Screen.Width;
     public override float Height => Screen.Height;
@@ -23,14 +24,14 @@ namespace Nez
     }
 
   }
-  public class GridLinesRenderable : RenderableComponent
+  public class GridLines : RenderableComponent
   {
     public override float Width => Screen.Width;
     public override float Height => Screen.Height;
 
     int _size = 0;
     public int Size { set => _size = value; }
-    public GridLinesRenderable(int size)
+    public GridLines(int size)
     {
       _size = size;
     }

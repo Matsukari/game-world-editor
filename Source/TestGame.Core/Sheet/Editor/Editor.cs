@@ -1,70 +1,77 @@
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Nez;
-using Nez.ImGuiTools;
 
 namespace Raven.Sheet
 {
-  public abstract class ImGuiWindow : Entity 
-  {
-    public abstract void RenderImGui();
-  }
-  /// <summary>
-  /// Operates on a single spritesheet 
-  /// </summary>
-	public class Editor
+	public class Editor : Nez.Entity
 	{
     public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default };
-    public interface Component 
+    public class SubEntity : Nez.Entity 
     {
-      public void OnEditorUpdate();
-    }
-    public abstract class Renderable : RenderableComponent, Editor.Component
-    {
-      public void OnEditorUpdate() {}
-    } 
-    public abstract class Window : ImGuiWindow
-    { 
-      protected GuiData Gui;
-      protected Editor Editor;
-      public void Init(Editor editor, GuiData gui) 
+      protected GuiData Gui { get; private set; }
+      protected Editor Editor { get; private set; }
+      public void Init(Editor editor)
       {
         Editor = editor;
-        Gui = gui; 
+        Gui = editor._gui; // Such a thing
+      } 
+      public virtual void OnEditorUpdate() {}
+      public abstract class RenderableComponent<T> : Nez.RenderableComponent where T : SubEntity 
+      { 
+        protected T Parent { get => Entity as T; }
+        protected GuiData Gui { get => Parent.Gui; }
+        protected Editor Editor { get => Parent.Editor; }
+        public override RectangleF Bounds 
+        {
+          get
+          {
+            if (_areBoundsDirty)
+            {
+              _bounds.CalculateBounds(Entity.Position, _localOffset, new Vector2(_bounds.Width, _bounds.Height)/2, 
+                  Entity.Scale, Entity.Rotation, _bounds.Width, _bounds.Height); 
+              _areBoundsDirty = false;
+            }
+            return _bounds;
+          }
+        }       
+        public void SetBounds(RectangleF bounds) => _bounds = bounds;
       }
-      public virtual void Render() {} 
     }
-    private List<Component> _components = new List<Component>();
+    private List<SubEntity> _children = new List<SubEntity>();
 
     private GuiData _gui = new GuiData();
     public GuiColors ColorSet = new GuiColors();
-    public int TileWidth => SpriteSheet.TileWidth;
+    public int TileWidth => SpriteSheet.TileHeight;
     public int TileHeight => SpriteSheet.TileHeight;
 
     public EditingState EditState = EditingState.Default; 
     public EditingState PrevEditState = EditingState.Default; 
-    public SpriteSheet SpriteSheet = null; 
+    public Sheet SpriteSheet = null; 
     
-		public SpriteSheetEditor()
-		{
-      SpriteSheet = new SpriteSheetData(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
-      _gui.ShapeContext = SpriteSheet;
-      Set(EditingState.AutoRegion);
-		}
-    public T GetComponent<T>() => (T)_components.OfType<T>().First();
-    public void Set(EditingState state) { EditState = state; ImGui.SetNextWindowFocus(); }
-    public void AddComponent(Control control) { _components.Add(control); control.Init(this, _gui); }
-    public override void OnAddedToEntity() 
+    public override void OnAddedToScene()
     {
-      Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Render);    
-      Entity.Scene.AddEntity(_selComplex);
+      Name = "SpriteSheet Editor";
+      Set(EditingState.Default);
+      SpriteSheet = new Sheet(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
+      _gui.ShapeContext = SpriteSheet;
+      Position = Screen.Center;
+      AddSubEntity(new SheetView());
     }
-		public void Render()
-		{
+    public void AddSubEntity(SubEntity entity) 
+    {
+      entity.Init(this);
+      entity.SetParent(this);
+      _children.AddIfNotPresent(entity);        
+      Scene.AddEntity(entity);
+    }
+    public T GetSubEntity<T>() => (T)_children.OfType<T>().First();
+    public void Set(EditingState state) { EditState = state; ImGui.SetNextWindowFocus(); }
+    public override void Update()
+    {
       HandleGuiDrags();
-      foreach (var component in _components) component.Render();
-      _selComplex.SheetUpdate();
-		}
+      foreach (var child in _children) child.OnEditorUpdate();
+    }
     void HandleGuiDrags() 
     {
       var pos = ImGui.GetIO().MousePos;
@@ -97,10 +104,9 @@ namespace Raven.Sheet
         _gui.IsDragLast = true;
       }
     }
-    ~SpriteSheetEditor()
+    ~Editor()
 		{ 
       ImUtils.UnbindLastTexture();
-      _selComplex.Destroy();
 		}
 
 	}

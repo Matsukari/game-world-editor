@@ -1,36 +1,42 @@
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.ImGuiTools;
 using Num = System.Numerics;
 
 
-namespace Tools 
+namespace Raven.Sheet
 {
-  public partial class SpriteSheetEditor 
+  public class SpritexLister : Editor.SubEntity
   {
-    public partial class SheetSpritesControl : Control 
+    public override void OnAddedToScene() => Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
+    public void RenderImGui() 
     {
-      public override void Render() 
+      if (Editor.SpriteSheet == null) return;
+      ImGui.Begin(Names.SpriteListing);
+      if (ImGui.MenuItem($"Tiles ({Editor.SpriteSheet.Tiles.X * Editor.SpriteSheet.Tiles.Y})"))
       {
-        if (Editor.SpriteSheet == null) return;
-        ImGui.Begin("Sprite List");
-        ImGui.TextDisabled($"Sheet ({Editor.SpriteSheet.Tiles.Count})");
+      }
+      if (ImGui.CollapsingHeader($"Sprites ({Editor.SpriteSheet.Sprites.Count()})"))
+      { 
         ImGui.Separator();
-        ImGui.TextDisabled($"Sprites ({Editor.SpriteSheet.Sprites.Count})");
-        ImGui.Separator();
+      }
+      if (ImGui.CollapsingHeader($"Spritexes ({Editor.SpriteSheet.Spritexes.Count})"))
+      {
         ImGui.Indent();
-        foreach (var (name, sprite) in Editor.SpriteSheet.Sprites)
+        foreach (var (name, spritex) in Editor.SpriteSheet.Spritexes)
         {
-          if (ImGui.Button($"{name}")) 
+          if (ImGui.MenuItem($"{name}")) 
           {
-            Editor.GetComponent<SheetImageControl>().Select(sprite);
-            var complex = Editor.Entity.Scene.FindEntity(Names.ComplexSprite) as ComplexSpriteEntity;
-            complex.Edit(sprite);
+            Editor.GetComponent<SheetView>().Select(spritex);
+            var spritexView = Editor.Scene.FindEntity(Names.SpritexView) as SpritexView;
+            spritexView.Edit(spritex);
           }
         }
         ImGui.Unindent();
-        ImGui.End();
+        ImGui.Separator();
       }
+      ImGui.End();
     }
   }
 }

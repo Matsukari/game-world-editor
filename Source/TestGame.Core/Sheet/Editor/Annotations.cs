@@ -1,49 +1,48 @@
 
-using ImGuiNET;
-using Num = System.Numerics;
 using Nez;
 
-namespace Tools 
+namespace Raven.Sheet
 {
-  public partial class SpriteSheetEditor 
+  public class Annotator : Editor.SubEntity
   {
-    public partial class SheetImageControl : Control
+    public void Annotate(Shape shape)
     {
-      void DrawOverlays()
+      Gui.ShapeSelection = shape;
+      Editor.Set(Editor.EditingState.AnnotateShape);
+    }
+    public override void OnAddedToScene()
+    {
+      AddComponent(new Renderable());
+    }
+
+    public class Renderable : Editor.SubEntity.RenderableComponent<Annotator>
+    {
+      public override void Render(Batcher batcher, Camera camera)
       {
         foreach (var prop in Gui.ShapeContext.Properties)
         {
-          DrawObject(prop.Value);
-          var (min, max) = ImUtils.GetWindowArea();
-          var pos = new Num.Vector2();
-          if (prop.Value is Shape shape) 
+          if (prop.Value is Shape shape) shape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
+          var rect = Gui.MouseDragArea;
+          // rect.X /= Gui.ContentZoom;
+          // rect.Y /= Gui.ContentZoom;
+          if (Gui.IsDrag && Gui.ShapeSelection is Shape dragShape) dragShape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
+          else if (Gui.IsDragLast)
           {
-            pos = shape.Bounds.Location.ToNumerics() * Gui.ContentZoom;
-            ImGui.GetWindowDrawList().AddText(pos + Gui.SheetPosition + min, Editor.ColorSet.AnnotatedName.ToImColor(), shape.Name);
+            if (Gui.ShapeSelection is Shape.Circle || Gui.ShapeSelection is Shape.Rectangle || Gui.ShapeSelection is Shape.Point)
+            {
+              rect.X -= ImUtils.GetWindowRect().X;
+              rect.Y -= ImUtils.GetWindowRect().Y;
+              Console.WriteLine($"{Gui.SheetPosition} - {rect.Location}");
+              // rect.Location = Math.Abs(Gui.SheetPosition + rect.Location;
+              rect.X = Math.Abs(Gui.SheetPosition.X) + rect.X;
+              rect.Y = Math.Abs(Gui.SheetPosition.Y) + rect.Y;
+              rect.Location /= Gui.Zoom;
+              rect.Size /= Gui.Zoom;
+              Gui.ShapeSelection.Bounds = rect;
+              Gui.ShapeContext.Properties.Add(Gui.ShapeSelection);
+            }
+            Gui.ShapeSelection = null;
           }
-        }
-      }
-      void DrawObject(object obj)
-      {
-        switch (obj)
-        {
-          case Shape.Rectangle rectangle: 
-            ImUtils.DrawRectFilled(ImGui.GetWindowDrawList(), 
-                rectangle.Bounds, Editor.ColorSet.AnnotatedShapeInactive, Gui.SheetPosition, Gui.ContentZoom); 
-            break;                 
-
-          case Shape.Circle circle: 
-            ImUtils.DrawCircleFilled(ImGui.GetWindowDrawList(), 
-                circle.Bounds.Center.ToNumerics(), 
-                circle.Bounds.Width/2, 
-                Editor.ColorSet.AnnotatedShapeInactive, Gui.SheetPosition, Gui.ContentZoom); 
-            break;  
-
-          case Shape.Point point: 
-            ImUtils.DrawArrowDownFilled(ImGui.GetWindowDrawList(), 
-                point.Bounds.Location.ToNumerics(), 30, 
-                Editor.ColorSet.AnnotatedShapeInactive, Gui.SheetPosition, Gui.ContentZoom); 
-            break;                                        
         }
       }
     }

@@ -1,14 +1,17 @@
 
 using Nez;
+using Microsoft.Xna.Framework;
 
-namespace Raven.Sheet
+namespace Raven
 {
   // public enum ShapeType { Circle, Rectangle, Ellipse, Point, Polygon, None };
-  public abstract class Shape : IPropertied
+  public abstract class Shape 
   {
     public string Name { get; set; } = "";
-    public PropertyList Properties { get; set; } = new PropertyList();
     public RectangleF Bounds { get; set; } = new RectangleF();
+    public virtual void Render(Batcher batcher, Camera camera, Color color) {}
+    
+
     public Shape() {}
 
     public class Circle : Shape

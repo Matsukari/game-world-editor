@@ -5,81 +5,68 @@ using Nez;
 
 namespace Raven.Sheet
 { 
-	public class SpriteSheet : IPropertied
+  /// <summary>
+  /// Tree layers:spritexes, sprites, both which is dynamic, and a virtual 
+  /// non-immutable in-there tiles of uniform size across the spritesheet image
+  /// </summary>
+	public class Sheet : Propertied
 	{
-    public string Name { get; set; } = "";
-    public PropertyList Properties { get; set; } = new PropertyList();
-		public Dictionary<String, Sprites.Spritex> Spritexes = new Dictionary<string, Sprites.Spritex>();
-    public Dictionary<int, Sprites.Sprite> Sprites = new Dictionary<int, Sprites.Sprite>();
-    public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
-    public int TileWidth = 0;
-    public int TileHeight = 0;
-    private int _counter = 0;
-    private Texture2D _texture;
     public Texture2D Texture { get => _texture; }
-    public SpriteSheet(Texture2D texture) 
+		public Dictionary<String, Sprites.Spritex> Spritexes = new Dictionary<string, Sprites.Spritex>();
+		public Dictionary<int, Sprites.Sprite> Sprites = new Dictionary<int, Sprites.Sprite>();
+
+    public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
+    public int TileWidth { get; private set; }
+    public int TileHeight { get; private set; }
+    public Point Tiles { get => new Point(_texture.Width/TileWidth, _texture.Height/TileHeight); }
+
+    private Texture2D _texture;
+    public Sheet(Texture2D texture) 
     {
-      System.Diagnostics.Debug.Assert(texture != null);
+      Insist.IsNotNull(texture);
       _texture = texture;
     }
-    public void Slice(int w, int h) 
+    public void SetTileSize(int w, int h) 
     {
       TileWidth = w;
       TileHeight = h;
-      for (int col = 0; col <= _texture.Width; col += w)
-      {
-        for (int row = 0; row <= _texture.Height; row += h) 
-        {
-          var tile = new Sprites.Sprite();
-          tile.Region = new Rectangle(col, row, w, h);
-          tile.Id = GetTile(col, row);
-          if (!IntersectTile(tile.Region)) Sprites.Add(tile.Id, tile);
-        }
-      }
+      Insist.IsTrue(_texture.Width%TileWidth == 0);
+      Insist.IsTrue(_texture.Height%TileHeight == 0);
     }
-    public void Delete(Sprites.Sprite sprite)
+    public Rectangle GetTile(int x, int y) => new Rectangle(x*TileWidth, y*TileHeight, TileWidth, TileHeight);
+    public Rectangle GetTile(int index) => GetTile(index / Tiles.X, (index / Tiles.X) * Tiles.Y);
+
+    public Sprites.Sprite CreateSprite(string name, params int[] tiles)
     {
-      Sprites.Remove(sprite.Id);
+      var list = new List<Rectangle>(); 
+      foreach (var tile in tiles)
+      {
+        list.Add(GetTile(tile));
+      }
+      var newTile = new Sprites.Sprite();
+      newTile.Region = RectangleExt.MinMax(list);
+      return newTile;
     }
-    public Sprites.Sprite CombineContains(Sprites.Sprite select, RectangleF container)
+    public Sprites.Spritex CreateSpritex(string name, Sprites.Sprite sprite)
+    {
+      var main = new Sprites.Spritex.Sprite();
+      main.SourceSprite = sprite;
+      main.Transform = new Sprites.Transform();
+
+      return new Sprites.Spritex(name, main);
+    }
+    public List<int> GetTiles(RectangleF container)
     {
       var tiles = new List<int>();
-      var tilesRegion = new List<RectangleF>();
       foreach (var (id, tile) in Sprites)
       {
         if (container.Contains(tile.Region.ToRectangleF())) 
         { 
-          tilesRegion.Add(tile.Region.ToRectangleF());
           tiles.Add(id);
         }
       }
-      // The tile emcompasses other tiles
-      if (tiles.Count != 0)
-      {
-        foreach (var tile in tiles) Sprites.Remove(tile);
-        Rectangle combined = RectangleExt.MinMax(tilesRegion); 
-        var newTile = new Sprites.Sprite();
-        newTile.Region = combined;
-        newTile.Id = tiles.First();
-        Sprites.Add(newTile.Id, newTile);
-        return newTile;
-      }
-      // The tile's own region get smaller; other encompassed tiles are foreer lost 
-      else select.Region = container;
-      
-      return select;
+      return tiles;
     }
-    public void AddSprite(Sprites.Sprite tile, string name="unnamed")
-    {
-      var main = new Sprites.Spritex.Sprite();
-      main.SourceSprite= tile;
-      main.Transform = new Sprites.Transform();
-
-      if (name == "unnamed") name = $"unnamed_{_counter++}"; 
-      var sprite = new Sprites.Spritex(name, main);
-      Spritexes.Add(name, sprite);
-    }
-    public int GetTile(int x, int y) => y * _texture.Width + x;
     bool IntersectTile(Rectangle rect) 
     {
       bool result = false;

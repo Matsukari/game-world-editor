@@ -1,5 +1,5 @@
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class PropertyList
   {
@@ -21,11 +21,16 @@ namespace Raven.Sheet
   {
     PropertyList Properties { get; }
     string Name { get; set; }
+    void RenderImGui();
   }
   public class Propertied : IPropertied
   {
     public PropertyList Properties { get; set; }
     public string Name { get; set; }
+    public void RenderImGui()
+    {
+
+    }
 
   }
   public enum CustomPropertyType 

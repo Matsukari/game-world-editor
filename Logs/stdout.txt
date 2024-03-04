@@ -1,3 +1,2 @@
-TestGame
 /home/ark/Documents/game/projects/WorldEditor/Vendor/Nez/Nez.Portable/Nez.MG38.csproj : warning NU1904: Package 'System.Drawing.Common' 5.0.2 has a known critical severity vulnerability, https://github.com/advisories/GHSA-rxg9-xrhp-64gj [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Desktop/TestGame.Desktop.csproj]
 /home/ark/Documents/game/projects/WorldEditor/Vendor/Nez/Nez.Portable/Nez.MG38.csproj : warning NU1904: Package 'System.Drawing.Common' 5.0.2 has a known critical severity vulnerability, https://github.com/advisories/GHSA-rxg9-xrhp-64gj [TargetFramework=netstandard2.0]

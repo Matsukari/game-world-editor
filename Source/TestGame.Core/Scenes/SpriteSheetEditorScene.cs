@@ -2,7 +2,7 @@ using Nez;
 using Nez.ImGuiTools;
 using ImGuiNET;
 
-namespace Tools
+namespace TestGame
 {
   public class SpriteSheetEditorScene : Scene
   {
@@ -13,9 +13,8 @@ namespace Tools
 			Screen.SetSize(1280, 720);
       Content.RootDirectory = "Assets";
        
-      var editor = CreateEntity("editor");
-      editor.AddComponent(new SpriteSheetEditor());
-      ClearColor = editor.GetComponent<SpriteSheetEditor>().ColorSet.Background;
+      var editor = AddEntity(new Raven.Sheet.Editor());
+      ClearColor = editor.ColorSet.Background;
 
     }   
   }

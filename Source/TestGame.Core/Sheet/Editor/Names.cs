@@ -9,7 +9,8 @@ namespace Raven.Sheet
     public static string SheetPropertiesPane = "Sheet Properties";
     public static string OpenFile = "Open file";
     public static string AutoRegion = "Auto region";
-    public static string ComplexSprite = "Sprite ";
+    public static string SpritexView = "Spritex View";
+    public static string SpriteListing = "Sprite Listing";
   }
 
 }

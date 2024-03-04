@@ -3,158 +3,97 @@ using ImGuiNET;
 using Nez.Sprites;
 using Nez.Textures;
 using Microsoft.Xna.Framework;
-using Nez.ImGuiTools;
 
 
-namespace Tools 
+namespace Raven.Sheet
 {
-  public partial class SpriteSheetEditor : Component
+  public class SpritexView : Editor.SubEntity
   {
-    public class ComplexSpriteEntity : Entity
+    Entity _main;
+    GuiData _gui;
+    Editor _editor;
+    Sprites.Spritex _spritex;
+    float _zoom = 1;
+    List<Entity> _entities = new List<Entity>();
+    public SpritexView(GuiData gui, Editor editor)
     {
-      GuiData _gui;
-      SpriteSheetEditor _editor;
-      ComplexSpriteData _sprite;
-      List<Entity> _entities = new List<Entity>();
-      float _zoom = 1;
-      public Entity _main;
-      public ComplexSpriteEntity(GuiData gui, SpriteSheetEditor editor)
-      {
-        _gui = gui;
-        _editor = editor;
-        Name = Names.ComplexSprite;;
-      }
-      void Show()
-      {
-        ImGui.Begin("Startrts");
-        ImGui.Text("Sample");
-        ImGui.End();
-      }
-      public override void OnAddedToScene()
-      {
-        Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Show);
-      }
-            
-      public void Edit(ComplexSpriteData sprite)
-      {
-        Position = Screen.Center;
-        UnEdit();
-        _sprite = sprite;
-        _editor.GetComponent<SheetImageControl>().IsCollapsed = true;
-        _editor.Set(EditingState.SelectedSprite);
-        // var background = AddComponent(new PrototypeSpriteRenderer());
-        // background.Color = _editor.ColorSet.Background * 0.5f;
-        var origin = AddComponent(new OriginLinesRenderable());
-        origin.Color = _editor.ColorSet.SpriteRegionActiveOutline;
+      _gui = gui;
+      _editor = editor;
+      Name = Names.SpritexView;
+    }
+    public void Edit(Sprites.Spritex spritex)
+    {
+      Position = Screen.Center;
+      UnEdit();
+      _spritex = spritex;
+      _editor.GetComponent<SheetView>().IsCollapsed = true;
+      _editor.Set(Editor.EditingState.SelectedSprite);
+      var origin = AddComponent(new Guidelines.OriginLines());
+      origin.Color = _editor.ColorSet.SpriteRegionActiveOutline;
 
-        var mainEntity = Scene.CreateEntity(_sprite.Name);
-        foreach (var part in _sprite.GetFullBody())
-        {
-          var partEntity = Scene.CreateEntity(_sprite.Name + part.Tile.Name);
-          partEntity.AddComponent(new SpriteRenderer(new Sprite(_editor.SpriteSheet.Texture, part.Tile.Region)));
-          part.LocalState.Apply(partEntity.Transform);
-          partEntity.Transform.SetParent(mainEntity.Transform);
-          _entities.Add(partEntity);
-        }
-        mainEntity.SetParent(this);
-        _main = mainEntity;
-        // mainEntity.Transform.Scale = new Vector2(2f, 2f); 
-      }
-      public void UnEdit()
+      var mainEntity = Scene.CreateEntity(_spritex.Name);
+      foreach (var part in _spritex.Body)
       {
-        RemoveAllComponents();
-        foreach (var entity in _entities) entity.Destroy();
-        _editor.Set(EditingState.Default);
-        _editor.GetComponent<SheetImageControl>().IsCollapsed = false;
+        var partEntity = Scene.CreateEntity(_spritex.Name + part.SourceSprite.Name);
+        partEntity.AddComponent(new SpriteRenderer(new Sprite(_editor.SpriteSheet.Texture, part.SourceSprite.Region)));
+        part.Transform.Apply(partEntity.Transform);
+        partEntity.Transform.SetParent(mainEntity.Transform);
+        _entities.Add(partEntity);
       }
-      public void SheetUpdate()
+      mainEntity.SetParent(this);
+      _main = mainEntity;
+      // mainEntity.Transform.Scale = new Vector2(2f, 2f); 
+    }
+    public void UnEdit()
+    {
+      RemoveAllComponents();
+      foreach (var entity in _entities) entity.Destroy();
+      _editor.Set(Editor.EditingState.Default);
+      _editor.GetComponent<SheetView>().IsCollapsed = false;
+    }
+    public override void OnEditorUpdate()
+    {
+      if (_entities.Count == 0) return;
+      if (_gui.Selection is Sprites.Spritex complex)
+      {     
+      }
+      ZoomInput();
+      MoveInput();
+      SelectInput();
+    }
+    void ZoomInput()
+    {
+      if (ImGui.GetIO().MouseWheel != 0)
       {
-        // Console.WriteLine(Scene.Camera.Bounds.ToString());
-        if (_entities.Count == 0) return;
-        // _entities.First().LocalPosition = _sprite.BodyOrigin.LocalState.Position;
-        // _entities.First().LocalRotationDegrees = _sprite.BodyOrigin.LocalState.Rotation;
-        // _entities.First().LocalScale = _sprite.BodyOrigin.LocalState.Scale;
+        var minZoom = 0.4f;
+        var maxZoom = 5f;
 
-        if (_gui.Selection is ComplexSpriteData complex)
-        {     
-        }
-        ZoomInput();
-        MoveInput();
-        SelectInput();
-        DrawPropertiesPane();
-      }
-      void ZoomInput()
-      {
-        if (ImGui.GetIO().MouseWheel != 0)
-        {
-          var minZoom = 0.4f;
-          var maxZoom = 5f;
-
-          float zoomFactor = 1.2f;
-          if (ImGui.GetIO().MouseWheel < 0) zoomFactor = 1/zoomFactor;
-          var delta = (ImGui.GetIO().MousePos - Position) * (zoomFactor - 1);
-          _zoom = Math.Clamp(_zoom * zoomFactor, minZoom, maxZoom);
-          Position -= delta;
-          Scale = new Vector2(_zoom, _zoom);
-          Console.WriteLine($"delta: {delta}");
-
-        }
-      }
-      Vector2 _initialCameraPosition = new Vector2();
-      void MoveInput()
-      {
-        Console.WriteLine($"{Scene.Camera.Zoom}");
-        if (_gui.IsDragFirst)
-        {
-          _initialCameraPosition = Position;
-        }
-        if (_gui.IsDrag && _gui.MouseDragButton == 2) 
-        {
-          Position = _initialCameraPosition - (_gui.MouseDragStart - ImGui.GetIO().MousePos);
-        } 
-      }
-      void SelectInput()
-      {
+        float zoomFactor = 1.2f;
+        if (ImGui.GetIO().MouseWheel < 0) zoomFactor = 1/zoomFactor;
+        var delta = (ImGui.GetIO().MousePos - Position) * (zoomFactor - 1);
+        _zoom = Math.Clamp(_zoom * zoomFactor, minZoom, maxZoom);
+        Position -= delta;
+        Scale = new Vector2(_zoom, _zoom);
+        Console.WriteLine($"delta: {delta}");
 
       }
-      void DrawPropertiesPane()
+    }
+    Vector2 _initialCameraPosition = new Vector2();
+    void MoveInput()
+    {
+      Console.WriteLine($"{Scene.Camera.Zoom}");
+      if (_gui.IsDragFirst)
       {
-        ImGui.Begin(Names.ObjectPropertiesPane);
-        ImGui.Indent();
-        var name = _sprite.Name; 
-        if (ImGui.InputText("Name", ref name, 12)) _sprite.Name = name;
-        ImGui.NewLine();
-        if (ImGui.MenuItem("Animation")) 
-        {
-
-        }
-        ImGui.NewLine();
-        ImGui.SeparatorText("Parts");
-        ImGui.NewLine();
-        ImGui.Indent();
-        if (ImGui.MenuItem(_sprite.BodyOrigin.Tile.Name))
-        {
-        }
-        foreach (var part in _sprite.Body.Parts)
-        {
-          if (ImGui.MenuItem(part.Key))
-          {
-          }
-        }
-        ImGui.Unindent();
-        ImGui.NewLine();
-        ImGui.PushStyleColor(ImGuiCol.Button, _editor.ColorSet.DeleteButton.ToImColor());
-        if (ImGui.Button("Delete")) 
-        {
-        }
-        ImGui.PopStyleColor();
-        ImGui.Unindent();
-        ImGui.NewLine();
-        ImGui.Separator();
-        ImGui.NewLine();
-        SheetPropertiesControl.DrawCustomProperties(_sprite.Properties, _editor);
-        ImGui.End();
+        _initialCameraPosition = Position;
       }
+      if (_gui.IsDrag && _gui.MouseDragButton == 2) 
+      {
+        Position = _initialCameraPosition - (_gui.MouseDragStart - ImGui.GetIO().MousePos);
+      } 
+    }
+    void SelectInput()
+    {
+
     }
   }
 }
