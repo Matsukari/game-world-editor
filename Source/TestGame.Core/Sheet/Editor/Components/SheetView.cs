@@ -13,6 +13,7 @@ namespace Tools
       public bool IsCollapsed = false;
       public SheetImageControl()
       {
+       
       }
       public override void Render() 
       {

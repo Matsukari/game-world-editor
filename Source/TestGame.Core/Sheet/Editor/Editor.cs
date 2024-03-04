@@ -2,49 +2,54 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Nez;
 using Nez.ImGuiTools;
-using Nez.Textures;
-using Nez.Sprites;
 
-namespace Tools
+namespace Raven.Sheet
 {
+  public abstract class ImGuiWindow : Entity 
+  {
+    public abstract void RenderImGui();
+  }
   /// <summary>
   /// Operates on a single spritesheet 
   /// </summary>
-	public partial class SpriteSheetEditor : Component
+	public class Editor
 	{
     public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default };
-    public abstract class Control 
+    public interface Component 
+    {
+      public void OnEditorUpdate();
+    }
+    public abstract class Renderable : RenderableComponent, Editor.Component
+    {
+      public void OnEditorUpdate() {}
+    } 
+    public abstract class Window : ImGuiWindow
     { 
       protected GuiData Gui;
-      protected SpriteSheetEditor Editor;
-      public void Init(SpriteSheetEditor editor, GuiData gui) 
+      protected Editor Editor;
+      public void Init(Editor editor, GuiData gui) 
       {
         Editor = editor;
         Gui = gui; 
       }
       public virtual void Render() {} 
     }
-    private List<Control> _components = new List<Control>();
+    private List<Component> _components = new List<Component>();
+
     private GuiData _gui = new GuiData();
-    public Colors ColorSet = new Colors();
+    public GuiColors ColorSet = new GuiColors();
     public int TileWidth => SpriteSheet.TileWidth;
     public int TileHeight => SpriteSheet.TileHeight;
 
     public EditingState EditState = EditingState.Default; 
     public EditingState PrevEditState = EditingState.Default; 
-    public SpriteSheetData SpriteSheet = null; 
+    public SpriteSheet SpriteSheet = null; 
     
-    ComplexSpriteEntity _selComplex;
 		public SpriteSheetEditor()
 		{
       SpriteSheet = new SpriteSheetData(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
       _gui.ShapeContext = SpriteSheet;
       Set(EditingState.AutoRegion);
-      AddComponent(new SheetImageControl());
-      AddComponent(new SheetPropertiesControl());
-      AddComponent(new SheetSpritesControl());
-      AddComponent(new SheetAutoRegionControl());
-      _selComplex = new ComplexSpriteEntity(_gui, this);
 		}
     public T GetComponent<T>() => (T)_components.OfType<T>().First();
     public void Set(EditingState state) { EditState = state; ImGui.SetNextWindowFocus(); }

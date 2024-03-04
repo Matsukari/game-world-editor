@@ -3,6 +3,7 @@ using ImGuiNET;
 using Nez.Sprites;
 using Nez.Textures;
 using Microsoft.Xna.Framework;
+using Nez.ImGuiTools;
 
 
 namespace Tools 
@@ -23,6 +24,17 @@ namespace Tools
         _editor = editor;
         Name = Names.ComplexSprite;;
       }
+      void Show()
+      {
+        ImGui.Begin("Startrts");
+        ImGui.Text("Sample");
+        ImGui.End();
+      }
+      public override void OnAddedToScene()
+      {
+        Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(Show);
+      }
+            
       public void Edit(ComplexSpriteData sprite)
       {
         Position = Screen.Center;

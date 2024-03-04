@@ -3,9 +3,9 @@ using Nez;
 using Microsoft.Xna.Framework;
 using Num = System.Numerics;
 
-namespace Tools 
+namespace Raven.Sheet 
 {
-  public enum SelectionAreaPoint
+  public enum SelectionAxis
   {
     TopLeft,
     BottomLeft,
@@ -17,24 +17,24 @@ namespace Tools
     Bottom,
     None,
   }
-  public class SelectionRectangle 
+  internal class SelectionRectangle : RenderableComponent
   {
-    SpriteSheetEditor.GuiData _gui;
+    GuiData _gui;
     public int Radius = 4;
     public int SafeBuffer = 3;
     public int MouseButton = 0;
     public bool IsEditingPoint = false;
     public RectangleF Content;
     public List<RectangleF> Points = new List<RectangleF>();
-    public SelectionAreaPoint SelectionPoint = SelectionAreaPoint.None;
-    public SelectionRectangle(RectangleF rect, SpriteSheetEditor.GuiData gui) 
+    public SelectionAxis SelectionPoint = SelectionAxis.None;
+    public SelectionRectangle(RectangleF rect, GuiData gui) 
     { 
       Content = rect; 
       Update();
     }
-    public SelectionAreaPoint Draw(ImDrawListPtr drawList, Color outline, Num.Vector2 offset, float zoom)
+    
+    public SelectionAxis Draw(Color color)
     {
-      var (windowMin, windowMax) = ImUtils.GetWindowArea();
       int i = 0, p = -1;
       // float delta = 0;
       foreach (var point in Points)
@@ -49,13 +49,13 @@ namespace Tools
       }
       DrawHighlight((int)SelectionPoint, outline, offset, zoom, drawList);
       ImUtils.DrawRect(drawList, Content, outline, offset, zoom);
-      return p != -1 ? (SelectionAreaPoint)p : SelectionAreaPoint.None;
+      return p != -1 ? (SelectionAxis)p : SelectionAxis.None;
     }
-    void DrawHighlight(int point, Color outline, Num.Vector2 offset, float zoom, ImDrawListPtr drawList)
+    void DrawHighlight(int point, Color color)
     {
-      var (windowMin, windowMax) = ImUtils.GetWindowArea();
-      if (point >= 0 && point < (int)SelectionAreaPoint.None) 
+      if (point >= 0 && point < (int)SelectionAxis.None) 
       {  
+
         drawList.AddCircleFilled(new Num.Vector2(
               windowMin.X + Points[point].X * zoom, 
               windowMin.Y + Points[point].Y * zoom) + offset, 
@@ -86,10 +86,10 @@ namespace Tools
       {
         _selectionInitial = Content;
       }
-      SelectionAreaPoint selectionPoint = Gui.SelectionRect.Draw(ImGui.GetForegroundDrawList(), 
+      SelectionAxis selectionPoint = Gui.SelectionRect.Draw(ImGui.GetForegroundDrawList(), 
           Editor.ColorSet.SelectionOutline, Gui.SheetPosition, Gui.ContentZoom);
 
-      if (selectionPoint != SelectionAreaPoint.None && SelectionPoint == SelectionAreaPoint.None && ImGui.GetIO().MouseDown[0])
+      if (selectionPoint != SelectionAxis.None && SelectionPoint == SelectionAxis.None && ImGui.GetIO().MouseDown[0])
       {
         SelectionPoint = selectionPoint;
         IsEditingPoint = true;
@@ -97,7 +97,7 @@ namespace Tools
       else if (IsEditingPoint && !Gui.IsDrag)
       {
         IsEditingPoint = false;
-        SelectionPoint = SelectionAreaPoint.None;
+        SelectionPoint = SelectionAxis.None;
       }
       // if (!IsEditingPoint) Console.WriteLine("Not editing");
       if (IsEditingPoint)
@@ -109,43 +109,43 @@ namespace Tools
         // Gui.SelectionRect.Content = RectangleExt.MinMax(_selectionInitial, Gui.MouseDragArea);
         switch (SelectionPoint)
         {
-          case SelectionAreaPoint.TopLeft:
+          case SelectionAxis.TopLeft:
             Gui.SelectionRect.Content.X = _selectionInitial.X + delta.X;
             Gui.SelectionRect.Content.Y = _selectionInitial.Y + delta.Y;
             Gui.SelectionRect.Content.Size = _selectionInitial.Size - delta;
             break;
 
-          case SelectionAreaPoint.TopRight:
+          case SelectionAxis.TopRight:
             Gui.SelectionRect.Content.Y = _selectionInitial.Y + delta.Y;
             Gui.SelectionRect.Content.Height = _selectionInitial.Height - delta.Y;
             Gui.SelectionRect.Content.Width = _selectionInitial.Width + delta.X;
             break;
 
-          case SelectionAreaPoint.BottomLeft:
+          case SelectionAxis.BottomLeft:
             Gui.SelectionRect.Content.X = _selectionInitial.X + delta.X;
             Gui.SelectionRect.Content.Width = _selectionInitial.Width - delta.X;
             Gui.SelectionRect.Content.Height = _selectionInitial.Height + delta.Y; 
             break;
 
-          case SelectionAreaPoint.BottomRight: 
+          case SelectionAxis.BottomRight: 
             Gui.SelectionRect.Content.Size = _selectionInitial.Size + delta; 
             break;
 
-          case SelectionAreaPoint.Right: 
+          case SelectionAxis.Right: 
             Gui.SelectionRect.Content.Width = _selectionInitial.Width + delta.X; 
             break;
 
-          case SelectionAreaPoint.Left: 
+          case SelectionAxis.Left: 
             Gui.SelectionRect.Content.X = _selectionInitial.X + delta.X; 
             Gui.SelectionRect.Content.Width = _selectionInitial.Width - delta.X; 
             break;
 
-          case SelectionAreaPoint.Top: 
+          case SelectionAxis.Top: 
             Gui.SelectionRect.Content.Y = _selectionInitial.Y + delta.Y; 
             Gui.SelectionRect.Content.Height = _selectionInitial.Height - delta.Y; 
             break;
 
-          case SelectionAreaPoint.Bottom: 
+          case SelectionAxis.Bottom: 
             Gui.SelectionRect.Content.Height = _selectionInitial.Height + delta.Y; 
             break;
         }

@@ -2,7 +2,7 @@ using Nez;
 using Microsoft.Xna.Framework;
 using Num = System.Numerics;
 
-namespace Tools 
+namespace Raven
 {
   public static class RectangleExt 
   {
