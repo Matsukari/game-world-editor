@@ -19,14 +19,15 @@ namespace Raven.Sheet
     {
       public override void Render(Batcher batcher, Camera camera)
       {
+        var input = Core.GetGlobalManager<Raven.Input.InputManager>();
         foreach (var prop in Gui.ShapeContext.Properties)
         {
           if (prop.Value is Shape shape) shape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
-          var rect = Gui.MouseDragArea;
+          var rect = input.MouseDragArea;
           // rect.X /= Gui.ContentZoom;
           // rect.Y /= Gui.ContentZoom;
-          if (Gui.IsDrag && Gui.ShapeSelection is Shape dragShape) dragShape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
-          else if (Gui.IsDragLast)
+          if (input.IsDrag && Gui.ShapeSelection is Shape dragShape) dragShape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
+          else if (input.IsDragLast)
           {
             if (Gui.ShapeSelection is Shape.Circle || Gui.ShapeSelection is Shape.Rectangle || Gui.ShapeSelection is Shape.Point)
             {

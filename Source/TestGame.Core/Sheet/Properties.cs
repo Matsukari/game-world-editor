@@ -1,3 +1,4 @@
+using ImGuiNET;
 
 namespace Raven
 {
@@ -29,9 +30,17 @@ namespace Raven
     public string Name { get; set; }
     public void RenderImGui()
     {
-
+      var name = "";
+      ImGui.Begin(GetType().Name);
+      if (ImGui.InputText("Name", ref name, 10)) Name = name;
+      RenderProperties();
+      ImGui.End();
     }
-
+    protected virtual void OnCreateProperty(string name) {}
+    protected void RenderProperties()
+    {
+      
+    }
   }
   public enum CustomPropertyType 
   {

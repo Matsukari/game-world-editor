@@ -13,7 +13,27 @@ namespace Raven.Sheet
 	{
     public Texture2D Texture { get => _texture; }
 		public Dictionary<String, Sprites.Spritex> Spritexes = new Dictionary<string, Sprites.Spritex>();
-		public Dictionary<int, Sprites.Sprite> Sprites = new Dictionary<int, Sprites.Sprite>();
+		public Dictionary<String, Sprites.Sprite> Sprites = new Dictionary<String, Sprites.Sprite>();
+
+    public class Tile : Sprites.Tile
+    {
+      Sprites.Tile _tile;
+      Sheet _sheet;
+      public Tile(Point coord, Sheet sheet)
+      {
+        _sheet = sheet;
+        _tile = new Sprites.Tile();
+        _tile.Coordinates = coord;
+        Insist.IsTrue(_sheet.IsTileValid(_sheet.GetTileId(coord.X, coord.Y)));
+      }
+      protected override void OnCreateProperty(string name)
+      {
+        _sheet._tiles.TryAdd(_sheet.GetTileId(Coordinates.X, Coordinates.Y), _tile);
+      } 
+    }
+
+    // Only instanciated when a tile (primarily a rectangle) is assigned a property or anme
+		Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
 
     public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
     public int TileWidth { get; private set; }
@@ -30,11 +50,13 @@ namespace Raven.Sheet
     {
       TileWidth = w;
       TileHeight = h;
-      Insist.IsTrue(_texture.Width%TileWidth == 0);
-      Insist.IsTrue(_texture.Height%TileHeight == 0);
+      // Insist.IsTrue(_texture.Width%TileWidth == 0);
+      // Insist.IsTrue(_texture.Height%TileHeight == 0);
     }
     public Rectangle GetTile(int x, int y) => new Rectangle(x*TileWidth, y*TileHeight, TileWidth, TileHeight);
     public Rectangle GetTile(int index) => GetTile(index / Tiles.X, (index / Tiles.X) * Tiles.Y);
+    public int GetTileId(int x, int y) => y * Tiles.X + x;
+    public bool IsTileValid(int index) => index >= 0 && index < Tiles.X * Tiles.Y;
 
     public Sprites.Sprite CreateSprite(string name, params int[] tiles)
     {
@@ -55,9 +77,9 @@ namespace Raven.Sheet
 
       return new Sprites.Spritex(name, main);
     }
-    public List<int> GetTiles(RectangleF container)
+    public List<string> GetSprites(RectangleF container)
     {
-      var tiles = new List<int>();
+      var tiles = new List<string>();
       foreach (var (id, tile) in Sprites)
       {
         if (container.Contains(tile.Region.ToRectangleF())) 
@@ -67,7 +89,22 @@ namespace Raven.Sheet
       }
       return tiles;
     }
-    bool IntersectTile(Rectangle rect) 
+    public List<int> GetTiles(RectangleF container)
+    {
+      var tiles = new List<int>();
+      for (int x = 0; x < Tiles.X; x++)
+      {
+        for (int y = 0; y < Tiles.Y; y++)
+        {
+          if (container.Contains(GetTile(x, y).ToRectangleF()))
+          {
+            tiles.Add(GetTileId(x, y));
+          }
+        }
+      }
+      return tiles;
+    }
+    bool IntersectSprite(Rectangle rect) 
     {
       bool result = false;
       foreach (var (_, tile) in Sprites)

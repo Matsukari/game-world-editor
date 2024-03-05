@@ -16,7 +16,6 @@ namespace Raven.Sheet
         Editor = editor;
         Gui = editor._gui; // Such a thing
       } 
-      public virtual void OnEditorUpdate() {}
       public abstract class RenderableComponent<T> : Nez.RenderableComponent where T : SubEntity 
       { 
         protected T Parent { get => Entity as T; }
@@ -48,15 +47,22 @@ namespace Raven.Sheet
     public EditingState EditState = EditingState.Default; 
     public EditingState PrevEditState = EditingState.Default; 
     public Sheet SpriteSheet = null; 
+    public static int ScreenRenderLayer = -1;
+    public static int WorldRenderLayer = 0;
     
     public override void OnAddedToScene()
     {
       Name = "SpriteSheet Editor";
       Set(EditingState.Default);
       SpriteSheet = new Sheet(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
+      SpriteSheet.SetTileSize(16, 16);
       _gui.ShapeContext = SpriteSheet;
+      Scene.AddRenderer(new ScreenSpaceRenderer(-1, ScreenRenderLayer));
+      Scene.AddRenderer(new RenderLayerRenderer(0, WorldRenderLayer));
+        
       Position = Screen.Center;
       AddSubEntity(new SheetView());
+      // AddSubEntity(new PropertiesRenderer());
     }
     public void AddSubEntity(SubEntity entity) 
     {
@@ -66,44 +72,7 @@ namespace Raven.Sheet
       Scene.AddEntity(entity);
     }
     public T GetSubEntity<T>() => (T)_children.OfType<T>().First();
-    public void Set(EditingState state) { EditState = state; ImGui.SetNextWindowFocus(); }
-    public override void Update()
-    {
-      HandleGuiDrags();
-      foreach (var child in _children) child.OnEditorUpdate();
-    }
-    void HandleGuiDrags() 
-    {
-      var pos = ImGui.GetIO().MousePos;
-      if (_gui.IsDrag) 
-      {
-        _gui.IsDragFirst = false;
-        _gui.MouseDragArea.Size = new Vector2(
-            pos.X - _gui.MouseDragArea.X, 
-            pos.Y - _gui.MouseDragArea.Y);
-        _gui.MouseDragArea = _gui.MouseDragArea.ConsumePoint(pos);
-      }
-      for (int i = 0; i < 3; i++)
-      {
-        if (ImGui.GetIO().MouseDown[i] && !_gui.IsDrag)
-        {
-          _gui.IsDrag = true;
-          _gui.IsDragFirst = true;
-          _gui.MouseDragButton = i;
-          _gui.MouseDragArea.X = pos.X;
-          _gui.MouseDragArea.Y = pos.Y;
-          _gui.MouseDragStart.X = pos.X;
-          _gui.MouseDragStart.Y = pos.Y;
-          break;
-        }
-      }
-      _gui.IsDragLast = false;
-      if (_gui.IsDrag && ImGui.GetIO().MouseReleased[_gui.MouseDragButton]) 
-      {
-        _gui.IsDrag = false;
-        _gui.IsDragLast = true;
-      }
-    }
+    public void Set(EditingState state) { EditState = state;  }
     ~Editor()
 		{ 
       ImUtils.UnbindLastTexture();

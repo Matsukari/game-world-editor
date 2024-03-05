@@ -8,7 +8,7 @@ public class TestGameProcess : Core
     protected override void Initialize()
     {
         base.Initialize();
-        // TODO: Add your initialization logic here
+        RegisterGlobalManager(new Raven.Input.InputManager());
         Window.IsBorderless = true; 
         IsFixedTimeStep = true;
         ExitOnEscapeKeypress = false;

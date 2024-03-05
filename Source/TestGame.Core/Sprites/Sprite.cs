@@ -4,6 +4,10 @@ using Nez;
 
 namespace Raven.Sheet.Sprites 
 {
+  public class Tile : Propertied 
+  {
+    public Point Coordinates;
+  }
   public class Sprite : Propertied
   {  
     public Rectangle Region = new Rectangle();

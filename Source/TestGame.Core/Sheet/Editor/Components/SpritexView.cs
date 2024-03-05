@@ -51,45 +51,14 @@ namespace Raven.Sheet
       _editor.Set(Editor.EditingState.Default);
       _editor.GetComponent<SheetView>().IsCollapsed = false;
     }
-    public override void OnEditorUpdate()
+    public override void Update()
     {
+      base.Update();
       if (_entities.Count == 0) return;
       if (_gui.Selection is Sprites.Spritex complex)
       {     
       }
-      ZoomInput();
-      MoveInput();
       SelectInput();
-    }
-    void ZoomInput()
-    {
-      if (ImGui.GetIO().MouseWheel != 0)
-      {
-        var minZoom = 0.4f;
-        var maxZoom = 5f;
-
-        float zoomFactor = 1.2f;
-        if (ImGui.GetIO().MouseWheel < 0) zoomFactor = 1/zoomFactor;
-        var delta = (ImGui.GetIO().MousePos - Position) * (zoomFactor - 1);
-        _zoom = Math.Clamp(_zoom * zoomFactor, minZoom, maxZoom);
-        Position -= delta;
-        Scale = new Vector2(_zoom, _zoom);
-        Console.WriteLine($"delta: {delta}");
-
-      }
-    }
-    Vector2 _initialCameraPosition = new Vector2();
-    void MoveInput()
-    {
-      Console.WriteLine($"{Scene.Camera.Zoom}");
-      if (_gui.IsDragFirst)
-      {
-        _initialCameraPosition = Position;
-      }
-      if (_gui.IsDrag && _gui.MouseDragButton == 2) 
-      {
-        Position = _initialCameraPosition - (_gui.MouseDragStart - ImGui.GetIO().MousePos);
-      } 
     }
     void SelectInput()
     {

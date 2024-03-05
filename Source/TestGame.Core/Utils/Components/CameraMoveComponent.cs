@@ -1,0 +1,25 @@
+using Nez;
+using ImGuiNET;
+using Microsoft.Xna.Framework;
+
+namespace Raven.Utils.Components
+{
+  public class CameraMoveComponent : Component, IUpdatable
+  {
+    Vector2 _initialSheetPosition = new Vector2();
+    void IUpdatable.Update()
+    {
+      var input = Core.GetGlobalManager<Raven.Input.InputManager>();
+      if (input.IsDragFirst)
+      {
+        _initialSheetPosition = Entity.Scene.Camera.Position;
+      }
+      if (input.IsDrag && input.MouseDragButton == 2) 
+      {
+        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
+        Entity.Scene.Camera.Position = _initialSheetPosition + (input.MouseDragStart - ImGui.GetIO().MousePos);
+      } 
+      else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
+    }
+  }
+}

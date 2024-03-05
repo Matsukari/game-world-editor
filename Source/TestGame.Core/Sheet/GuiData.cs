@@ -14,16 +14,9 @@ namespace Raven.Sheet
     public Object Selection = null; 
     public float Zoom = 1;
 
-    public bool IsDrag = false;
-    public bool IsDragFirst = false;
-    public bool IsDragLast = false; 
-
     public Shape ShapeSelection = null;
     public IPropertied ShapeContext = null;
 
-    public int MouseDragButton = -1; 
-    public RectangleF MouseDragArea = new RectangleF();
-    public Num.Vector2 MouseDragStart = new Num.Vector2();
     public Selection SelectionRect = null;
     public ImFontPtr NormalFont;
 

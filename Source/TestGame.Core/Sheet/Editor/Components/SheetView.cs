@@ -1,5 +1,5 @@
-using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.Sprites;
 
@@ -17,6 +17,8 @@ namespace Raven.Sheet
       var min = Math.Min(LocalScale.X, LocalScale.Y);
       LocalScale = new Vector2(min, min);
       AddComponent(new Renderable());
+      AddComponent(new Utils.Components.CameraMoveComponent());
+      AddComponent(new Utils.Components.CameraZoomComponent());
     }    
     public class Renderable : Editor.SubEntity.RenderableComponent<SheetView>
     {
@@ -25,27 +27,37 @@ namespace Raven.Sheet
         if (Editor.SpriteSheet == null) return;
         if (Gui.Selection is Sprites.Sprite sprite)
         {
+          RenderLayer = Editor.WorldRenderLayer;
           batcher.DrawRect(Entity.Position+sprite.Region.Location.ToVector2(), 
               sprite.Region.Size.X * Entity.Scale.X, 
               sprite.Region.Size.Y * Entity.Scale.Y, 
               Editor.ColorSet.SpriteRegionActiveFill);
         }
+        if (Editor.EditState == Editor.EditingState.Default ) 
+        {
+          var pos = Parent._image.Bounds.Location; 
+          var size = Parent._image.Bounds.Size;
+          var rect = new RectangleF(pos.X, pos.Y, size.X, size.Y); 
+          // batcher.DrawRectOutline(rect, Editor.ColorSet.ContentActiveOutline); 
+          // Console.WriteLine($"pos: {pos}\n size: {size}\n camera: {camera.Position}\n camera zoom: {camera.RawZoom}\n Transform: {Entity.Transform.Position}");
+        }
+
       }
     }
         
-    public override void OnEditorUpdate()
+    public override void Update()
     {
-      if (ImGui.IsKeyReleased(ImGuiKey.Escape) && IsCollapsed)
+      base.Update();
+      if (Nez.Input.IsKeyReleased(Keys.Escape) && IsCollapsed)
       {
         Editor.GetSubEntity<SpritexView>().UnEdit();
       }
-      else if (ImUtils.IsMouseAt(ImUtils.GetWindowRect()) && Editor.EditState != Editor.EditingState.AutoRegion && !IsCollapsed)
-      {
-        Editor.Set(Editor.EditingState.Default);
-      }
+      // else if (Collider) && Editor.EditState != Editor.EditingState.AutoRegion && !IsCollapsed)
+      // {
+      //   Editor.Set(Editor.EditingState.Default);
+      // }
 
       if (IsCollapsed) return;
-      // if (ImGui.IsWindowHovered() && Editor.EditState == EditingState.INACTIVE) Editor.Set(EditingState.ACTIVE);
       if (Gui.Selection == null) Gui.SelectionRect.Enabled = false;
       if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
       {
@@ -56,56 +68,34 @@ namespace Raven.Sheet
 
       if (Editor.EditState == Editor.EditingState.Default )
       {
-        var (windowMin, windowMax) = ImUtils.GetWindowArea();
-        ImUtils.DrawRealRect(ImGui.GetWindowDrawList(), ImUtils.GetWindowRect(), Editor.ColorSet.ContentActiveOutline);
-
-        ZoomInput();
-        MoveInput();
-        SelectInput();  
-
+        SelectInput(); 
       }
-    }
-    void ZoomInput()
-    {
-      if (ImGui.GetIO().MouseWheel != 0) 
-      {
-        var minZoom = 0.4f;
-        var maxZoom = 5f;
-        float zoomFactor = 1.2f;
-        if (ImGui.GetIO().MouseWheel < 0) zoomFactor = 1/zoomFactor;
-        var zoom = Scene.Camera.RawZoom;
-        var delta = (ImGui.GetIO().MousePos - Scene.Camera.Position) * (zoomFactor - 1);
-        zoom = Math.Clamp(zoom * zoomFactor, minZoom, maxZoom);
-        Position -= delta;
-        Scene.Camera.RawZoom = zoom;
-      }
-    }
-    Vector2 _initialSheetPosition = new Vector2();
-    void MoveInput()
-    {
-      if (Gui.IsDragFirst)
-      {
-        _initialSheetPosition = Scene.Camera.Position;
-      }
-      if (Gui.IsDrag && Gui.MouseDragButton == 2) 
-      {
-        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-        Scene.Camera.Position = _initialSheetPosition + (Gui.MouseDragStart - ImGui.GetIO().MousePos);
-      } 
-      else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
     }
     void SelectInput()
     {
-      if (ImGui.GetIO().MouseClicked[0] || ImGui.GetIO().MouseClicked[1])
+      if (Nez.Input.CurrentMouseState.LeftButton == ButtonState.Released || Nez.Input.CurrentMouseState.RightButton == ButtonState.Released)
       {
         if (Gui.Selection == null && IsSpritesView) 
         {
           foreach (var sprite in Editor.SpriteSheet.Sprites)
           {
-            if (ImUtils.HasMouseClickAt(sprite.Value.Region.ToRectangleF())) Select(sprite);
+            // if (ImUtils.HasMouseClickAt(sprite.Value.Region.ToRectangleF())) Select(sprite);
           }
         }
-        else if (!Gui.SelectionRect.IsEditingPoint) 
+        else if (!IsSpritesView) 
+        {
+          for (int x = 0; x < Editor.SpriteSheet.Tiles.X; x++)
+          {
+            for (int y = 0; y < Editor.SpriteSheet.Tiles.Y; y++)
+            {
+              if (Editor.SpriteSheet.GetTile(x, y).Contains(Nez.Input.MousePosition))
+              {
+                Select(new Sheet.Tile(new Point(x,  y), Editor.SpriteSheet));
+              }
+            }
+          }
+        }
+        if (!Gui.SelectionRect.IsEditingPoint && Gui.Selection != null) 
         {
           Gui.Selection = null;
           Editor.Set(Editor.EditingState.Default);
@@ -121,9 +111,11 @@ namespace Raven.Sheet
         Gui.SelectionRect = new Selection(Gui);
         Gui.SelectionRect.Ren.SetBounds(sprite.Region.ToRectangleF()); 
       }
+      else if (Gui.Selection is Sheet.Tile)
+      {
+      }
       else if (Gui.Selection is Sprites.Spritex spritex)
       {
-
       }
       Editor.Set(Editor.EditingState.SelectedSprite);
     }

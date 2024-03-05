@@ -6,6 +6,22 @@ namespace Raven
 {
   public static class RectangleExt 
   {
+    public static Vector2 TopRight(this RectangleF rect)
+    {
+      rect.X = rect.Right;
+      return rect.Location;
+    }
+    public static Vector2 BottomRight(this RectangleF rect)
+    {
+      rect.X = rect.Right;
+      rect.Y = rect.Bottom;
+      return rect.Location;
+    }
+    public static Vector2 BottomLeft(this RectangleF rect)
+    {
+      rect.Y = rect.Bottom;
+      return rect.Location;
+    }
     public static RectangleF ConsumePoint(this RectangleF rectangle, System.Numerics.Vector2 pos)
     {
       rectangle.X = Math.Min(rectangle.X, pos.X);

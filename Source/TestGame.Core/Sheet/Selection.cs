@@ -83,13 +83,15 @@ namespace Raven.Sheet
       }
     }
     RectangleF _selectionInitial = new RectangleF();
-    public override void OnEditorUpdate()
+    public override void Update()
     {
-      if (_gui.IsDragFirst)
+      base.Update();
+      var input = Core.GetGlobalManager<Raven.Input.InputManager>();
+      if (input.IsDragFirst)
       {
         _selectionInitial = Ren.Bounds;
       }
-      else if (IsEditingPoint && !_gui.IsDrag)
+      else if (IsEditingPoint && !input.IsDrag)
       {
         IsEditingPoint = false;
         SelAxis = SelectionAxis.None;
@@ -97,7 +99,7 @@ namespace Raven.Sheet
       if (IsEditingPoint)
       {
         var mouse = ImGui.GetIO().MousePos;
-        var delta = mouse - _gui.MouseDragStart;
+        var delta = mouse - input.MouseDragStart;
         delta /= _gui.Zoom;
         var _bounds = Ren.Bounds;
         switch (SelAxis)
