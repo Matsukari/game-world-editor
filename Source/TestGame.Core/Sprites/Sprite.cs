@@ -7,6 +7,20 @@ namespace Raven.Sheet.Sprites
   public class Tile : Propertied 
   {
     public Point Coordinates;
+    public Rectangle Region { get=>_sheet.GetTile(Id); }
+    public int Id { get=>_sheet.GetTileId(Coordinates.X, Coordinates.Y); }
+    Sheet _sheet;
+    public Tile(Point coord, Sheet sheet)
+    {
+      Coordinates = coord;
+      _sheet = sheet;
+      Insist.IsTrue(_sheet.IsTileValid(_sheet.GetTileId(coord.X, coord.Y)));
+    }
+    protected override void OnCreateProperty(string name)
+    {
+      if (_sheet.CreateTile(this))
+        Console.WriteLine("Created ");
+    } 
   }
   public class Sprite : Propertied
   {  

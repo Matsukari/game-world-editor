@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Nez;
 using Nez.Sprites;
+using ImGuiNET;
 
 namespace Raven.Sheet
 {
@@ -32,15 +33,14 @@ namespace Raven.Sheet
       public override void Render(Batcher batcher, Camera camera)
       {
         if (Editor.SpriteSheet == null) return;
-
-        if (Gui.Selection is Sprites.Sprite sprite)
-        {
-          RenderLayer = Editor.WorldRenderLayer;
-          batcher.DrawRect(Entity.Position+sprite.Region.Location.ToVector2(), 
-              sprite.Region.Size.X * Entity.Scale.X, 
-              sprite.Region.Size.Y * Entity.Scale.Y, 
-              Editor.ColorSet.SpriteRegionActiveFill);
-        }
+        DrawArtifacts(batcher, camera);
+        RectangleF region = RectangleF.Empty;
+        if (Gui.Selection is Sprites.Sprite sprite) region = sprite.Region.ToRectangleF();
+        else if (Gui.Selection is Sprites.Tile tile) region = tile.Region.ToRectangleF();
+        if (region != RectangleF.Empty) batcher.DrawRect(Parent.GetRegionInSheet(region), Editor.ColorSet.SpriteRegionActiveFill);
+      }
+      void DrawArtifacts(Batcher batcher, Camera camera)
+      {
         if (Editor.EditState == Editor.EditingState.Default) 
         {
           foreach (var tile in _tiles) 
@@ -50,21 +50,20 @@ namespace Raven.Sheet
             if (worldTile.Contains(camera.MouseToWorldPoint())) Parent._tileInMouse = tile;
             batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
           }
-          // batcher.FlushBatch();
-          // batcher.SetIgnoreRoundingDestinations(true);
-          var worldTileInMouse = Parent._tileInMouse.ToRectangleF();
-          if (worldTileInMouse != null) 
+          if (!Parent.IsSpritesView)
           {
-            worldTileInMouse.Location += Parent._image.Bounds.Location;
-            batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
+            var worldTileInMouse = Parent._tileInMouse.ToRectangleF();
+            if (worldTileInMouse != null) 
+            {
+              worldTileInMouse.Location += Parent._image.Bounds.Location;
+              batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
+            }
           }
         }
         else 
         {
           batcher.DrawRect(Parent._image.Bounds, Editor.ColorSet.SpriteRegionInactiveOutline); 
-          // Console.WriteLine($"pos: {pos}\n size: {size}\n camera: {camera.Position}\n camera zoom: {camera.RawZoom}\n Transform: {Entity.Transform.Position}");
         }
-
       }
     }
         
@@ -75,10 +74,10 @@ namespace Raven.Sheet
       {
         Editor.GetSubEntity<SpritexView>().UnEdit();
       }
-      // else if (Collider) && Editor.EditState != Editor.EditingState.AutoRegion && !IsCollapsed)
-      // {
-      //   Editor.Set(Editor.EditingState.Default);
-      // }
+      else if (_image.Bounds.Contains(Scene.Camera.MouseToWorldPoint()) && HasNoObstruction())
+      {
+        Editor.Set(Editor.EditingState.Default);
+      }
 
       if (IsCollapsed) return;
       if (Gui.Selection == null) Gui.SelectionRect.Enabled = false;
@@ -89,43 +88,38 @@ namespace Raven.Sheet
         Gui.SelectionRect.Update();
       }
 
-      if (Editor.EditState == Editor.EditingState.Default )
+      if (Editor.EditState == Editor.EditingState.Default && HasNoObstruction())
       {
         SelectInput(); 
       }
     }
     void SelectInput()
     {
-      if (Nez.Input.CurrentMouseState.LeftButton == ButtonState.Released || Nez.Input.CurrentMouseState.RightButton == ButtonState.Released)
+      if (Nez.Input.LeftMouseButtonReleased || Nez.Input.RightMouseButtonReleased)
       {
-        if (Gui.Selection == null && IsSpritesView) 
+        if (IsSpritesView) 
         {
           foreach (var sprite in Editor.SpriteSheet.Sprites)
           {
-            // if (ImUtils.HasMouseClickAt(sprite.Value.Region.ToRectangleF())) Select(sprite);
+            if (GetRegionInSheet(sprite.Value.Region.ToRectangleF()).Contains(Scene.Camera.MouseToWorldPoint())) 
+              Select(sprite.Value);
           }
         }
-        else if (!IsSpritesView) 
+        else if (!IsSpritesView && _tileInMouse != null) 
         {
-          for (int x = 0; x < Editor.SpriteSheet.Tiles.X; x++)
-          {
-            for (int y = 0; y < Editor.SpriteSheet.Tiles.Y; y++)
-            {
-              if (Editor.SpriteSheet.GetTile(x, y).Contains(Nez.Input.MousePosition))
-              {
-                Select(new Sheet.Tile(new Point(x,  y), Editor.SpriteSheet));
-              }
-            }
-          }
+          var coord = Editor.SpriteSheet.GetTile(_tileInMouse);
+          var tileInCoord = Editor.SpriteSheet.CustomTileExists(coord.X, coord.Y);
+          if (tileInCoord != null) Select(tileInCoord);
+          else Select(new Sprites.Tile(coord, Editor.SpriteSheet));
         }
-        if (!Gui.SelectionRect.IsEditingPoint && Gui.Selection != null) 
+        else if (!Gui.SelectionRect.IsEditingPoint && Gui.Selection != null) 
         {
           Gui.Selection = null;
           Editor.Set(Editor.EditingState.Default);
         }
       }
     }
-    public void Select(object sel)
+    public void Select(IPropertied sel)
     {
       if (Gui.ShapeSelection != null) return;
       Gui.Selection = sel;
@@ -134,13 +128,24 @@ namespace Raven.Sheet
         Gui.SelectionRect = new Selection(Gui);
         Gui.SelectionRect.Ren.SetBounds(sprite.Region.ToRectangleF()); 
       }
-      else if (Gui.Selection is Sheet.Tile)
+      else if (Gui.Selection is Sprites.Tile tile)
       {
       }
       else if (Gui.Selection is Sprites.Spritex spritex)
       {
       }
-      Editor.Set(Editor.EditingState.SelectedSprite);
+      else throw new TypeAccessException();
+      Console.WriteLine($"Selected {Gui.Selection.GetType().Name}");
+      // Editor.Set(Editor.EditingState.SelectedSprite);
+    }
+    RectangleF GetRegionInSheet(RectangleF rectangle)
+    {
+      rectangle.Location += _image.Bounds.Location;
+      return rectangle;
+    }
+    bool HasNoObstruction()
+    {
+      return !IsCollapsed && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow);
     }
   }
 }

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nez;
+using ImGuiNET;
 
 namespace Raven.Sheet
 { 
@@ -14,24 +15,6 @@ namespace Raven.Sheet
     public Texture2D Texture { get => _texture; }
 		public Dictionary<String, Sprites.Spritex> Spritexes = new Dictionary<string, Sprites.Spritex>();
 		public Dictionary<String, Sprites.Sprite> Sprites = new Dictionary<String, Sprites.Sprite>();
-
-    public class Tile : Sprites.Tile
-    {
-      Sprites.Tile _tile;
-      Sheet _sheet;
-      public Tile(Point coord, Sheet sheet)
-      {
-        _sheet = sheet;
-        _tile = new Sprites.Tile();
-        _tile.Coordinates = coord;
-        Insist.IsTrue(_sheet.IsTileValid(_sheet.GetTileId(coord.X, coord.Y)));
-      }
-      protected override void OnCreateProperty(string name)
-      {
-        _sheet._tiles.TryAdd(_sheet.GetTileId(Coordinates.X, Coordinates.Y), _tile);
-      } 
-    }
-
     // Only instanciated when a tile (primarily a rectangle) is assigned a property or anme
 		Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
 
@@ -51,16 +34,28 @@ namespace Raven.Sheet
     {
       TileWidth = w;
       TileHeight = h;
-      // Insist.IsTrue(_texture.Width%TileWidth == 0);
-      // Insist.IsTrue(_texture.Height%TileHeight == 0);
     }
+    public Sprites.Tile GetCreatedTile(int coord) => _tiles[coord];
     public Rectangle GetTile(int x, int y) => new Rectangle(x*TileWidth, y*TileHeight, TileWidth, TileHeight);
     public Rectangle GetTile(int index) => GetTile(index % Tiles.X, index / Tiles.X);
     public Point GetTile(Rectangle rect) => new Point(rect.X/TileWidth, rect.Y/TileHeight);
 
     public int GetTileId(int x, int y) => y * Tiles.X + x;
+    public Point GetTileCoord(int index) => new Point(index % Tiles.X, index / Tiles.X); 
+
     public bool IsTileValid(int index) => index >= 0 && index < Tiles.X * Tiles.Y;
 
+    
+    public Sprites.Tile CustomTileExists(int x, int y) 
+    {
+      Sprites.Tile tile = null;
+      _tiles.TryGetValue(GetTileId(x, y), out tile);
+      return tile;
+    }
+    public bool CreateTile(Sprites.Tile tile) 
+    { 
+      return _tiles.TryAdd(tile.Id, tile);
+    }
     public Sprites.Sprite CreateSprite(string name, params int[] tiles)
     {
       var list = new List<Rectangle>(); 
@@ -123,6 +118,9 @@ namespace Raven.Sheet
       }
       return result;
     }
+    public override void RenderImGui()
+    {
+    }    
 	}
 
 }

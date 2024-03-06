@@ -5,6 +5,8 @@ ASSETS="Assets"
 CONTENT="Assets/Content"
 LEVEL_EDITOR="/home/ark/Documents/game/tools/ldtk"
 DESKTOP="Source/$NAME.Desktop"
+CORE="Source/$NAME.Core"
+NEZ="Vendor/Nez"
 echo $NAME
 
 pkill dotnet
@@ -27,8 +29,20 @@ elif [[ $1 == "level" ]]; then
   echo "Level editor"
   cd $LEVEL_EDITOR/app
   npm run start
-elif [[ $1 == "restore" ]]; then
+elif [[ $1 == "clean" ]]; then
   echo "Clear"
+  rm -r $DESKTOP/bin
+  rm -r $DESKTOP/obj
+  rm -r $CORE/bin
+  rm -r $CORE/obj
+  rm -r $NEZ/Nez.ImGui/bin
+  rm -r $NEZ/Nez.ImGui/obj
+  rm -r $NEZ/Nez.Portable/bin
+  rm -r $NEZ/Nez.Portable/obj
+  rm -r $NEZ/Nez.Persistence/bin
+  rm -r $NEZ/Nez.Persistence/obj
+  rm -r $NEZ/Nez.FarseerPhysics/bin
+  rm -r $NEZ/Nez.FarseerPhysics/obj
   cd $DESKTOP
   dotnet clean 
   dotnet restore

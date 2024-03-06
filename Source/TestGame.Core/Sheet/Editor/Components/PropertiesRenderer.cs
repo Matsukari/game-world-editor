@@ -10,8 +10,11 @@ namespace Raven.Sheet
     public void RenderImGui() 
     {  
       if (Editor.SpriteSheet == null) return;
-      Editor.SpriteSheet.RenderImGui();
-      if (Gui.Selection is IPropertied propertied) propertied.RenderImGui(); 
+      Editor.RenderImGui();
+      if (Gui.Selection is IPropertied propertied) 
+      {
+        propertied.RenderImGui(); 
+      }
     }
   }
 }

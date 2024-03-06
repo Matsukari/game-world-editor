@@ -12,6 +12,9 @@ namespace Raven.Sheet
       var newAtlas = false;
       var openFile = false;
 
+      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove);
+      ImGui.SetWindowPos((Screen.Center/4).ToNumerics());
+      ImGui.SetWindowSize((Screen.Size/2).ToNumerics());
       if (ImGui.BeginMenuBar())
       {
         if (ImGui.BeginMenu("File"))

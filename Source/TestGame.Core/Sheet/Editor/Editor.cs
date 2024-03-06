@@ -4,8 +4,10 @@ using Nez;
 
 namespace Raven.Sheet
 {
-	public class Editor : Nez.Entity
+	public class Editor : Nez.Entity, IPropertied
 	{
+    public PropertyList Properties { get; set; }
+    string IPropertied.Name { get; set; }
     public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default };
     public class SubEntity : Nez.Entity 
     {
@@ -62,7 +64,8 @@ namespace Raven.Sheet
         
       Position = Screen.Center;
       AddSubEntity(new SheetView());
-      // AddSubEntity(new PropertiesRenderer());
+      AddSubEntity(new PropertiesRenderer());
+
     }
     public void AddSubEntity(SubEntity entity) 
     {
@@ -71,11 +74,20 @@ namespace Raven.Sheet
       _children.AddIfNotPresent(entity);        
       Scene.AddEntity(entity);
     }
+    public void RenderImGui()
+    {
+      var name = "";
+      int w = 0, h = 0;
+      ImGui.Begin(GetType().Name);
+      if (ImGui.InputText("Name", ref name, 10)) SpriteSheet.Name = name;
+      if (ImGui.InputInt("TileWidth", ref w)) SpriteSheet.SetTileSize(w, TileHeight);
+      if (ImGui.InputInt("TileHeight", ref h)) SpriteSheet.SetTileSize(TileWidth, h);
+      ImGui.TextDisabled($"Editing: {EditState}");
+      IPropertied.RenderProperties(this);
+      ImGui.End();
+    }
     public T GetSubEntity<T>() => (T)_children.OfType<T>().First();
     public void Set(EditingState state) { EditState = state;  }
-    ~Editor()
-		{ 
-		}
 
 	}
 }
