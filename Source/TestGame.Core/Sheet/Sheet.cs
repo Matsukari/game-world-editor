@@ -36,6 +36,7 @@ namespace Raven.Sheet
 		Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
 
     public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
+    public Point TileSize { get => new Point(TileWidth, TileHeight); }
     public int TileWidth { get; private set; }
     public int TileHeight { get; private set; }
     public Point Tiles { get => new Point(_texture.Width/TileWidth, _texture.Height/TileHeight); }
@@ -54,7 +55,9 @@ namespace Raven.Sheet
       // Insist.IsTrue(_texture.Height%TileHeight == 0);
     }
     public Rectangle GetTile(int x, int y) => new Rectangle(x*TileWidth, y*TileHeight, TileWidth, TileHeight);
-    public Rectangle GetTile(int index) => GetTile(index / Tiles.X, (index / Tiles.X) * Tiles.Y);
+    public Rectangle GetTile(int index) => GetTile(index % Tiles.X, index / Tiles.X);
+    public Point GetTile(Rectangle rect) => new Point(rect.X/TileWidth, rect.Y/TileHeight);
+
     public int GetTileId(int x, int y) => y * Tiles.X + x;
     public bool IsTileValid(int index) => index >= 0 && index < Tiles.X * Tiles.Y;
 
@@ -103,6 +106,13 @@ namespace Raven.Sheet
         }
       }
       return tiles;
+    }
+    public List<Rectangle> GetTiles()
+    {
+      var list = new List<Rectangle>();
+      for (int i = 0; i < Tiles.X * Tiles.Y; i++)
+        list.Add(GetTile(i));
+      return list;
     }
     bool IntersectSprite(Rectangle rect) 
     {

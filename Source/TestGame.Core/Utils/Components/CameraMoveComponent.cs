@@ -16,10 +16,8 @@ namespace Raven.Utils.Components
       }
       if (input.IsDrag && input.MouseDragButton == 2) 
       {
-        ImGui.SetMouseCursor(ImGuiMouseCursor.Hand);
-        Entity.Scene.Camera.Position = _initialSheetPosition + (input.MouseDragStart - ImGui.GetIO().MousePos);
+        Entity.Scene.Camera.Position = _initialSheetPosition + (input.MouseDragStart - ImGui.GetIO().MousePos) / Entity.Scene.Camera.RawZoom;
       } 
-      else ImGui.SetMouseCursor(ImGuiMouseCursor.Arrow);
     }
   }
 }

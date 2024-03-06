@@ -1,5 +1,6 @@
 using Nez;
 using Nez.ImGuiTools;
+using ImGuiNET;
 
 namespace TestGame;
 
@@ -15,7 +16,7 @@ public class TestGameProcess : Core
         var imGuiManager = new ImGuiManager();
         Core.RegisterGlobalManager( imGuiManager );
         NezImGuiThemes.HighContrast();
-        ImGuiNET.ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
+        ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
         Scene = new SpriteSheetEditorScene();
 
     }

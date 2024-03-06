@@ -9,22 +9,30 @@ namespace Raven.Sheet
   {
     public bool IsCollapsed = false;
     public bool IsSpritesView = false;
+    Rectangle _tileInMouse;
     SpriteRenderer _image;
     public override void OnAddedToScene()
     {
       _image = AddComponent(new SpriteRenderer(Gui.SheetTexture));
-      LocalScale = Screen.Size / Gui.SheetTexture.GetSize();
-      var min = Math.Min(LocalScale.X, LocalScale.Y);
-      LocalScale = new Vector2(min, min);
+      // _image.Origin = new Vector2();
+      // LocalScale = Screen.Size / Gui.SheetTexture.GetSize();
+      // var min = Math.Min(LocalScale.X, LocalScale.Y);
+      // LocalScale = new Vector2(min, min);
       AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
     }    
     public class Renderable : Editor.SubEntity.RenderableComponent<SheetView>
     {
+      List<Rectangle> _tiles;
+      public override void OnAddedToEntity()
+      {
+        _tiles = Editor.SpriteSheet.GetTiles();
+      }      
       public override void Render(Batcher batcher, Camera camera)
       {
         if (Editor.SpriteSheet == null) return;
+
         if (Gui.Selection is Sprites.Sprite sprite)
         {
           RenderLayer = Editor.WorldRenderLayer;
@@ -33,12 +41,27 @@ namespace Raven.Sheet
               sprite.Region.Size.Y * Entity.Scale.Y, 
               Editor.ColorSet.SpriteRegionActiveFill);
         }
-        if (Editor.EditState == Editor.EditingState.Default ) 
+        if (Editor.EditState == Editor.EditingState.Default) 
         {
-          var pos = Parent._image.Bounds.Location; 
-          var size = Parent._image.Bounds.Size;
-          var rect = new RectangleF(pos.X, pos.Y, size.X, size.Y); 
-          // batcher.DrawRectOutline(rect, Editor.ColorSet.ContentActiveOutline); 
+          foreach (var tile in _tiles) 
+          {
+            var worldTile = tile.ToRectangleF();
+            worldTile.Location += Parent._image.Bounds.Location;
+            if (worldTile.Contains(camera.MouseToWorldPoint())) Parent._tileInMouse = tile;
+            batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
+          }
+          // batcher.FlushBatch();
+          // batcher.SetIgnoreRoundingDestinations(true);
+          var worldTileInMouse = Parent._tileInMouse.ToRectangleF();
+          if (worldTileInMouse != null) 
+          {
+            worldTileInMouse.Location += Parent._image.Bounds.Location;
+            batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
+          }
+        }
+        else 
+        {
+          batcher.DrawRect(Parent._image.Bounds, Editor.ColorSet.SpriteRegionInactiveOutline); 
           // Console.WriteLine($"pos: {pos}\n size: {size}\n camera: {camera.Position}\n camera zoom: {camera.RawZoom}\n Transform: {Entity.Transform.Position}");
         }
 

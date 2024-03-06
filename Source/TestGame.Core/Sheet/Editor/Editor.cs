@@ -75,7 +75,6 @@ namespace Raven.Sheet
     public void Set(EditingState state) { EditState = state;  }
     ~Editor()
 		{ 
-      ImUtils.UnbindLastTexture();
 		}
 
 	}
