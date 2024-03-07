@@ -21,6 +21,11 @@ namespace Raven.Sheet.Sprites
       if (_sheet.CreateTile(this))
         Console.WriteLine("Created ");
     } 
+    protected override void OnChangeProperty(string name)
+    {
+      if (_sheet.CreateTile(this))
+        Console.WriteLine("Created ");
+    } 
   }
   public class Sprite : Propertied
   {  

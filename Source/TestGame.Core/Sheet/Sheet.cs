@@ -122,9 +122,6 @@ namespace Raven.Sheet
       }
       return result;
     }
-    public override void RenderImGui()
-    {
-    }    
 	}
 
 }

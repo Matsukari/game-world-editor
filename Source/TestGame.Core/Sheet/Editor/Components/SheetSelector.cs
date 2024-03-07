@@ -12,7 +12,6 @@ namespace Raven.Sheet
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(HandleEditSprite);
     }
-    string _modalNaming = "";
     void HandleEditSprite()
     {
       if (!Editor.GetSubEntity<SheetView>().Enabled) return;
@@ -26,29 +25,19 @@ namespace Raven.Sheet
             ImGui.EndMenu();
             ImGui.EndPopup();
             ImGui.CloseCurrentPopup();
-            ImGui.OpenPopup("name-modal");
+            ImGui.OpenPopup("spritex-name");
             return;
           }
           ImGui.EndMenu();
         }
         ImGui.EndPopup();
       }
-      if (ImGui.BeginPopupModal("name-modal"))
+      ImGuiViews.NamePopupModal(Editor, "spritex-name", ()=>
       {
-        Editor.Set(Editor.EditingState.Modal);
-        if (ImGui.InputText("Name", ref _modalNaming, 10, ImGuiInputTextFlags.EnterReturnsTrue))
-        {
-          var spritex = Editor.SpriteSheet.CreateSpritex(_modalNaming, Gui.Selection as Sprites.Sprite);
-
-          Editor.SpriteSheet.Spritexes.TryAdd(spritex.Name, spritex);
-          Editor.Set(Editor.EditingState.Default);
-          Editor.GetSubEntity<SpritexView>().Edit(spritex);
-          _modalNaming = "";
-          ImGui.CloseCurrentPopup();
-          return;
-        }
-        ImGui.EndPopup();
-      }
+        var spritex = Editor.SpriteSheet.CreateSpritex(ImGuiViews.InputName, Gui.Selection as Sprites.Sprite);
+        Editor.SpriteSheet.Spritexes.TryAdd(spritex.Name, spritex);
+        Editor.GetSubEntity<SpritexView>().Edit(spritex);
+      });
     } 
     public override void Update()
     {

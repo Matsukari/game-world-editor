@@ -15,10 +15,10 @@ namespace Raven.Sheet
     public void RenderImGui() 
     {  
       if (Editor.SpriteSheet == null) return;
-      Editor.RenderImGui();
+      Editor.RenderImGui(this);
       if (Gui.Selection is IPropertied propertied) 
       {
-        propertied.RenderImGui(); 
+        propertied.RenderImGui(this); 
       }
     }
     public class Renderable : Editor.SubEntity.RenderableComponent<PropertiesRenderer>

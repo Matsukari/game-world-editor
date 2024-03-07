@@ -6,13 +6,13 @@ namespace Raven.Sheet
 {
 	public class Editor : Nez.Entity, IPropertied
 	{
-    public PropertyList Properties { get; set; }
-    string IPropertied.Name { get; set; }
+    public PropertyList Properties { get; set; } = new PropertyList();
+    string IPropertied.Name { get; set; } = "";
     public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default, Modal };
     public class SubEntity : Nez.Entity 
     {
-      protected GuiData Gui { get; private set; }
-      protected Editor Editor { get; private set; }
+      public GuiData Gui { get; private set; }
+      public Editor Editor { get; private set; }
       public void Init(Editor editor)
       {
         Editor = editor;
@@ -20,9 +20,9 @@ namespace Raven.Sheet
       } 
       public abstract class RenderableComponent<T> : Nez.RenderableComponent where T : SubEntity 
       { 
-        protected T Parent { get => Entity as T; }
-        protected GuiData Gui { get => Parent.Gui; }
-        protected Editor Editor { get => Parent.Editor; }
+        public T Parent { get => Entity as T; }
+        public GuiData Gui { get => Parent.Gui; }
+        public Editor Editor { get => Parent.Editor; }
         public override RectangleF Bounds 
         {
           get
@@ -78,15 +78,20 @@ namespace Raven.Sheet
       _children.AddIfNotPresent(entity);        
       Scene.AddEntity(entity);
     }
-    public void RenderImGui()
+    public void RenderImGui(PropertiesRenderer renderer)
     {
-      var name = "";
-      int w = 0, h = 0;
+      var name = SpriteSheet.Name;
+      int w = TileWidth, h = TileHeight;
       ImGui.Begin(GetType().Name);
       if (ImGui.InputText("Name", ref name, 10)) SpriteSheet.Name = name;
       if (ImGui.InputInt("TileWidth", ref w)) SpriteSheet.SetTileSize(w, TileHeight);
       if (ImGui.InputInt("TileHeight", ref h)) SpriteSheet.SetTileSize(TileWidth, h);
-      ImGui.TextDisabled($"Editing: {EditState}");
+      ImGui.BeginDisabled();
+      ImGui.LabelText("Editing", EditState.ToString());
+      ImGui.LabelText("Width", $"{SpriteSheet.Tiles.X} tiles");
+      ImGui.LabelText("Height", $"{SpriteSheet.Tiles.Y} tiles");
+      ImGui.EndDisabled();
+      IPropertied.HandleNewProperty(this, this);
       IPropertied.RenderProperties(this);
       ImGui.End();
     }

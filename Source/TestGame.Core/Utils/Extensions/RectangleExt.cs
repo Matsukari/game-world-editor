@@ -88,6 +88,10 @@ namespace Raven
           vec.Z, vec.W);
       return result;
     }
+    public static Num.Vector4 ToNumerics(this RectangleF rect)
+    {
+      return new Num.Vector4(rect.X, rect.Y, rect.Width, rect.Height);
+    }
     public static RectangleF GetCenterToStart(this RectangleF rectf) 
     {
       RectangleF rect = rectf;
