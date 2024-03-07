@@ -1,5 +1,6 @@
 
 using Nez;
+using Microsoft.Xna.Framework;
 
 namespace Raven.Sheet
 {
@@ -14,36 +15,44 @@ namespace Raven.Sheet
     {
       AddComponent(new Renderable());
     }
-
     public class Renderable : Editor.SubEntity.RenderableComponent<Annotator>
     {
+      Vector2 _initialMouse = Vector2.Zero;
       public override void Render(Batcher batcher, Camera camera)
       {
+        if (Gui.ShapeSelection == null || Gui.ShapeContext == null && Editor.EditState != Editor.EditingState.AnnotateShape) return;
         var input = Core.GetGlobalManager<Raven.Input.InputManager>();
-        foreach (var prop in Gui.ShapeContext.Properties)
+    
+        // Highlight context's shape proeprties
+        DrawPropertiesShapes(Gui.ShapeContext, batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
+
+        var rect = input.MouseDragArea;
+        rect.Location = _initialMouse;
+        rect.Size = camera.MouseToWorldPoint() - _initialMouse;
+        Gui.ShapeSelection.Bounds = rect;
+        if (input.IsDragFirst && _initialMouse == Vector2.Zero)
         {
-          if (prop.Value is Shape shape) shape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
-          var rect = input.MouseDragArea;
-          // rect.X /= Gui.ContentZoom;
-          // rect.Y /= Gui.ContentZoom;
-          if (input.IsDrag && Gui.ShapeSelection is Shape dragShape) dragShape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
-          else if (input.IsDragLast)
+          _initialMouse = camera.MouseToWorldPoint();
+        }
+        else if (input.IsDrag && Gui.ShapeSelection is Shape dragShape) dragShape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
+        else if (input.IsDragLast && _initialMouse != Vector2.Zero)
+        {
+          if (Gui.ShapeSelection is Shape.Point)
           {
-            if (Gui.ShapeSelection is Shape.Circle || Gui.ShapeSelection is Shape.Rectangle || Gui.ShapeSelection is Shape.Point)
-            {
-              rect.X -= ImUtils.GetWindowRect().X;
-              rect.Y -= ImUtils.GetWindowRect().Y;
-              Console.WriteLine($"{Gui.SheetPosition} - {rect.Location}");
-              // rect.Location = Math.Abs(Gui.SheetPosition + rect.Location;
-              rect.X = Math.Abs(Gui.SheetPosition.X) + rect.X;
-              rect.Y = Math.Abs(Gui.SheetPosition.Y) + rect.Y;
-              rect.Location /= Gui.Zoom;
-              rect.Size /= Gui.Zoom;
-              Gui.ShapeSelection.Bounds = rect;
-              Gui.ShapeContext.Properties.Add(Gui.ShapeSelection);
-            }
-            Gui.ShapeSelection = null;
+            rect.Size = new Vector2(20, 30);
+            Gui.ShapeSelection.Bounds = rect;
           }
+          Gui.ShapeContext.Properties.Add(Gui.ShapeSelection);
+          Editor.Set(Editor.EditingState.Default);
+          Gui.ShapeSelection = null;
+          _initialMouse = Vector2.Zero;
+        }
+      }
+      public static void DrawPropertiesShapes(IPropertied propertied, Batcher batcher, Camera camera, Color color)
+      {
+        foreach (var prop in propertied.Properties)
+        {
+          if (prop.Value is Shape shape) shape.Render(batcher, camera, color);
         }
       }
     }

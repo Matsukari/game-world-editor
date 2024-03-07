@@ -7,40 +7,40 @@ namespace Raven.Sheet
 {
   public class ViewMenubar : Editor.SubEntity
   {
-    public void RenderImGui()
+    public override void OnAddedToScene()
     {
-      var newAtlas = false;
-      var openFile = false;
-
-      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove);
-      ImGui.SetWindowPos((Screen.Center/4).ToNumerics());
-      ImGui.SetWindowSize((Screen.Size/2).ToNumerics());
-      if (ImGui.BeginMenuBar())
+      Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
+    }    
+    void RenderImGui()
+    {
+      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration);
+      var position = Screen.Size/4;
+      position.Y = 0f;
+      var size = Screen.Size/2;
+      size.Y = 15;
+      ImGui.SetWindowPos(position.ToNumerics());
+      ImGui.SetWindowSize(size.ToNumerics());
+      ImGui.SameLine();
+      if (ImGui.Button("Rectangle"))
       {
-        if (ImGui.BeginMenu("File"))
-        {
-          if (ImGui.MenuItem("New Atlas from Folder")) newAtlas = true;
-          if (ImGui.MenuItem("Load Atlas or PNG")) openFile = true;
-          ImGui.EndMenu();
-        }
-        if (ImGui.Button("Rectangle"))
-        {
-          Editor.GetSubEntity<Annotator>().Annotate(new Shape.Rectangle());
-        }
-        else if (ImGui.Button("Circle")) 
-        {
-          Editor.GetSubEntity<Annotator>().Annotate(new Shape.Circle());
-        }
-        else if (ImGui.Button("Point"))
-        {
-          Editor.GetSubEntity<Annotator>().Annotate(new Shape.Point());
-        }
-
-        ImGui.EndMenuBar();
+        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Rectangle());
       }
-      if (newAtlas) ImGui.OpenPopup("new-atlas");
-      if (openFile) ImGui.OpenPopup("open-file");
-      Gui.LoadTextureFromFilePopup();
+      ImGui.SameLine();
+      if (ImGui.Button("Circle")) 
+      {
+        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Circle());
+      }
+      ImGui.SameLine();
+      if (ImGui.Button("Point"))
+      {
+        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Point());
+      }
+      ImGui.SameLine();
+      if (ImGui.Button("Polygon"))
+      {
+        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Polygon());
+      }
+      ImGui.End();
     }
   }
 }

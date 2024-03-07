@@ -29,7 +29,7 @@ namespace Raven
   }
   public class Propertied : IPropertied
   {
-    public PropertyList Properties { get; set; }
+    public PropertyList Properties { get; set; } = new PropertyList();
     public string Name { get; set; } = "";
     public virtual void RenderImGui()
     {
@@ -40,7 +40,8 @@ namespace Raven
       if (ImGui.GetIO().MouseClicked[1] && ImGui.IsWindowFocused()) ImGui.OpenPopup("prop-popup");
       if (ImGui.BeginPopupContextItem("prop-popup"))
       {
-        ImGui.Text("New Property"); 
+        if (ImGui.BeginMenu("New Property"))
+        {
           ImGui.Separator();
           ImGui.Indent();
           if (ImGui.MenuItem("String")) Console.WriteLine("String");
@@ -49,6 +50,8 @@ namespace Raven
           if (ImGui.MenuItem("Float")) Console.WriteLine("String");
           if (ImGui.MenuItem("Vector2")) Console.WriteLine("String");
           ImGui.Unindent();
+          ImGui.EndMenu();
+        }
         ImGui.EndPopup();
       }
       IPropertied.RenderProperties(this);

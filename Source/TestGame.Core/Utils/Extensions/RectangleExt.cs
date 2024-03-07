@@ -22,6 +22,12 @@ namespace Raven
       rect.Y = rect.Bottom;
       return rect.Location;
     }
+    public static Vector2 BottomCenter(this RectangleF rect)
+    {
+      rect.Y = rect.Bottom;
+      rect.X = rect.Center.X;
+      return rect.Location;
+    }
     public static RectangleF ConsumePoint(this RectangleF rectangle, System.Numerics.Vector2 pos)
     {
       rectangle.X = Math.Min(rectangle.X, pos.X);

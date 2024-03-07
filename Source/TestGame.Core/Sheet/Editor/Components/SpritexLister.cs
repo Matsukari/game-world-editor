@@ -28,7 +28,7 @@ namespace Raven.Sheet
         {
           if (ImGui.MenuItem($"{name}")) 
           {
-            Editor.GetComponent<SheetView>().Select(spritex);
+            Editor.GetComponent<SheetSelector>().Select(spritex);
             var spritexView = Editor.Scene.FindEntity(Names.SpritexView) as SpritexView;
             spritexView.Edit(spritex);
           }

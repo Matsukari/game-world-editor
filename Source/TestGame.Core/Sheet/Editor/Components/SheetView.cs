@@ -10,15 +10,11 @@ namespace Raven.Sheet
   {
     public bool IsCollapsed = false;
     public bool IsSpritesView = false;
-    Rectangle _tileInMouse;
+    internal Rectangle TileInMouse;
     SpriteRenderer _image;
     public override void OnAddedToScene()
     {
       _image = AddComponent(new SpriteRenderer(Gui.SheetTexture));
-      // _image.Origin = new Vector2();
-      // LocalScale = Screen.Size / Gui.SheetTexture.GetSize();
-      // var min = Math.Min(LocalScale.X, LocalScale.Y);
-      // LocalScale = new Vector2(min, min);
       AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
@@ -34,25 +30,30 @@ namespace Raven.Sheet
       {
         if (Editor.SpriteSheet == null) return;
         DrawArtifacts(batcher, camera);
+
+        // Draw last selected sprite
         RectangleF region = RectangleF.Empty;
         if (Gui.Selection is Sprites.Sprite sprite) region = sprite.Region.ToRectangleF();
         else if (Gui.Selection is Sprites.Tile tile) region = tile.Region.ToRectangleF();
         if (region != RectangleF.Empty) batcher.DrawRect(Parent.GetRegionInSheet(region), Editor.ColorSet.SpriteRegionActiveFill);
       }
+      // Rectangles & highlights
       void DrawArtifacts(Batcher batcher, Camera camera)
       {
         if (Editor.EditState == Editor.EditingState.Default) 
         {
+          // Draw tiles' grid
           foreach (var tile in _tiles) 
           {
             var worldTile = tile.ToRectangleF();
             worldTile.Location += Parent._image.Bounds.Location;
-            if (worldTile.Contains(camera.MouseToWorldPoint())) Parent._tileInMouse = tile;
+            if (worldTile.Contains(camera.MouseToWorldPoint())) Parent.TileInMouse = tile;
             batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
           }
+          // Highlight the tile under mouse
           if (!Parent.IsSpritesView)
           {
-            var worldTileInMouse = Parent._tileInMouse.ToRectangleF();
+            var worldTileInMouse = Parent.TileInMouse.ToRectangleF();
             if (worldTileInMouse != null) 
             {
               worldTileInMouse.Location += Parent._image.Bounds.Location;
@@ -60,6 +61,7 @@ namespace Raven.Sheet
             }
           }
         }
+        // Darken the whole image when under different editing state
         else 
         {
           batcher.DrawRect(Parent._image.Bounds, Editor.ColorSet.SpriteRegionInactiveOutline); 
@@ -70,7 +72,7 @@ namespace Raven.Sheet
     public override void Update()
     {
       base.Update();
-      if (Nez.Input.IsKeyReleased(Keys.Escape) && IsCollapsed)
+      if (Nez.Input.IsKeyReleased(Keys.Escape) && IsSpritesView)
       {
         Editor.GetSubEntity<SpritexView>().UnEdit();
       }
@@ -79,7 +81,7 @@ namespace Raven.Sheet
         Editor.Set(Editor.EditingState.Default);
       }
 
-      if (IsCollapsed) return;
+      if (IsSpritesView) return;
       if (Gui.Selection == null) Gui.SelectionRect.Enabled = false;
       if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
       {
@@ -87,65 +89,16 @@ namespace Raven.Sheet
         Gui.SelectionRect.Ren.Snap(Editor.TileWidth, Editor.TileHeight);
         Gui.SelectionRect.Update();
       }
-
-      if (Editor.EditState == Editor.EditingState.Default && HasNoObstruction())
-      {
-        SelectInput(); 
-      }
     }
-    void SelectInput()
-    {
-      if (Nez.Input.LeftMouseButtonReleased || Nez.Input.RightMouseButtonReleased)
-      {
-        if (IsSpritesView) 
-        {
-          foreach (var sprite in Editor.SpriteSheet.Sprites)
-          {
-            if (GetRegionInSheet(sprite.Value.Region.ToRectangleF()).Contains(Scene.Camera.MouseToWorldPoint())) 
-              Select(sprite.Value);
-          }
-        }
-        else if (!IsSpritesView && _tileInMouse != null) 
-        {
-          var coord = Editor.SpriteSheet.GetTile(_tileInMouse);
-          var tileInCoord = Editor.SpriteSheet.CustomTileExists(coord.X, coord.Y);
-          if (tileInCoord != null) Select(tileInCoord);
-          else Select(new Sprites.Tile(coord, Editor.SpriteSheet));
-        }
-        else if (!Gui.SelectionRect.IsEditingPoint && Gui.Selection != null) 
-        {
-          Gui.Selection = null;
-          Editor.Set(Editor.EditingState.Default);
-        }
-      }
-    }
-    public void Select(IPropertied sel)
-    {
-      if (Gui.ShapeSelection != null) return;
-      Gui.Selection = sel;
-      if (Gui.Selection is Sprites.Sprite sprite)
-      {
-        Gui.SelectionRect = new Selection(Gui);
-        Gui.SelectionRect.Ren.SetBounds(sprite.Region.ToRectangleF()); 
-      }
-      else if (Gui.Selection is Sprites.Tile tile)
-      {
-      }
-      else if (Gui.Selection is Sprites.Spritex spritex)
-      {
-      }
-      else throw new TypeAccessException();
-      Console.WriteLine($"Selected {Gui.Selection.GetType().Name}");
-      // Editor.Set(Editor.EditingState.SelectedSprite);
-    }
-    RectangleF GetRegionInSheet(RectangleF rectangle)
+    public RectangleF GetRegionInSheet(RectangleF rectangle)
     {
       rectangle.Location += _image.Bounds.Location;
       return rectangle;
     }
-    bool HasNoObstruction()
+    internal bool HasNoObstruction()
     {
-      return !IsCollapsed && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow);
+      return !IsCollapsed && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow)
+        && Editor.EditState != Editor.EditingState.AnnotateShape;
     }
   }
 }

@@ -31,25 +31,25 @@ namespace Raven.Input
             pos.Y - MouseDragArea.Y);
         MouseDragArea = MouseDragArea.ConsumePoint(pos);
       }
-      for (int i = 0; i < 3; i++)
+      if (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed || Nez.Input.MiddleMouseButtonPressed && !IsDrag)
       {
-        if (ImGui.GetIO().MouseDown[i] && !IsDrag)
-        {
-          IsDrag = true;
-          IsDragFirst = true;
-          MouseDragButton = i;
-          MouseDragArea.X = pos.X;
-          MouseDragArea.Y = pos.Y;
-          MouseDragStart.X = pos.X;
-          MouseDragStart.Y = pos.Y;
-          break;
-        }
+        IsDrag = true;
+        IsDragFirst = true;
+        if (Nez.Input.LeftMouseButtonPressed) MouseDragButton = 0;
+        else if (Nez.Input.RightMouseButtonPressed) MouseDragButton = 1;
+        else MouseDragButton = 2;
+        MouseDragArea.X = pos.X;
+        MouseDragArea.Y = pos.Y;
+        MouseDragStart.X = pos.X;
+        MouseDragStart.Y = pos.Y;
+        Console.WriteLine("first");
       }
       IsDragLast = false;
-      if (IsDrag && ImGui.GetIO().MouseReleased[MouseDragButton]) 
+      if (IsDrag && (Nez.Input.LeftMouseButtonReleased || Nez.Input.RightMouseButtonReleased || Nez.Input.MiddleMouseButtonReleased))
       {
         IsDrag = false;
         IsDragLast = true;
+        Console.WriteLine("last");
       }
     }
   }

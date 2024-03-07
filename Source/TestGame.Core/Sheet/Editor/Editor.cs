@@ -64,8 +64,10 @@ namespace Raven.Sheet
         
       Position = Screen.Center;
       AddSubEntity(new SheetView());
+      AddSubEntity(new SheetSelector());
       AddSubEntity(new PropertiesRenderer());
-
+      AddSubEntity(new ViewMenubar());
+      AddSubEntity(new Annotator());
     }
     public void AddSubEntity(SubEntity entity) 
     {
