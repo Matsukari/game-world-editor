@@ -8,7 +8,7 @@ namespace Raven.Sheet
 	{
     public PropertyList Properties { get; set; }
     string IPropertied.Name { get; set; }
-    public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default };
+    public enum EditingState { AutoRegion, SelectedSprite, Inactive, AnnotateShape, Default, Modal };
     public class SubEntity : Nez.Entity 
     {
       protected GuiData Gui { get; private set; }
@@ -60,7 +60,6 @@ namespace Raven.Sheet
       SpriteSheet.SetTileSize(16, 16);
       _gui.ShapeContext = SpriteSheet;
       Scene.AddRenderer(new ScreenSpaceRenderer(-1, ScreenRenderLayer));
-      Scene.AddRenderer(new RenderLayerRenderer(0, WorldRenderLayer));
         
       Position = Screen.Center;
       AddSubEntity(new SheetView());
@@ -68,6 +67,9 @@ namespace Raven.Sheet
       AddSubEntity(new PropertiesRenderer());
       AddSubEntity(new ViewMenubar());
       AddSubEntity(new Annotator());
+      AddSubEntity(new SpritexView());
+      AddSubEntity(new SpritexLister());
+
     }
     public void AddSubEntity(SubEntity entity) 
     {

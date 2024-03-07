@@ -24,8 +24,40 @@ namespace Raven.Sheet.Sprites
   }
   public class Sprite : Propertied
   {  
-    public Rectangle Region = new Rectangle();
-    public Sprite() {}
+    public Rectangle Region { get; private set; } = new Rectangle();
+    List<int> _tiles = new List<int>();
+    List<Tile> _createdTiles = new List<Tile>();
+
+    Sheet _sheet;
+    public Sprite(Rectangle region, Sheet sheet)
+    {
+      Region = region;
+      _sheet = sheet;
+      _tiles = sheet.GetTiles(region.ToRectangleF());
+    }
+    protected override void OnChangeProperty(string name)
+    {
+      foreach (var tile in _createdTiles)
+      {
+        foreach (var prop in Properties)
+        {
+          tile.Properties.Data[prop.Key] = prop.Value;
+        }
+      }
+    } 
+    protected override void OnCreateProperty(string name)
+    {
+      foreach (var tile in _tiles)
+      {
+        var newTile = new Tile(_sheet.GetTileCoord(tile), _sheet);
+        newTile.Name = Name;
+        if (_sheet.CreateTile(newTile))
+        {
+          Console.WriteLine("Created ");
+          _createdTiles.Add(newTile);
+        }
+      }
+    } 
   }
   public class Spritex : Propertied
   {  

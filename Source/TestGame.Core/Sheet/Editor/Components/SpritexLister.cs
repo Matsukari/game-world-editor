@@ -13,13 +13,15 @@ namespace Raven.Sheet
     public void RenderImGui() 
     {
       if (Editor.SpriteSheet == null) return;
-      ImGui.Begin(Names.SpriteListing);
+      ImGui.Begin(GetType().Name);
       if (ImGui.MenuItem($"Tiles ({Editor.SpriteSheet.Tiles.X * Editor.SpriteSheet.Tiles.Y})"))
       {
       }
       if (ImGui.CollapsingHeader($"Sprites ({Editor.SpriteSheet.Sprites.Count()})"))
       { 
         ImGui.Separator();
+        ImGui.Indent();
+        ImGui.Unindent();
       }
       if (ImGui.CollapsingHeader($"Spritexes ({Editor.SpriteSheet.Spritexes.Count})"))
       {
@@ -28,8 +30,7 @@ namespace Raven.Sheet
         {
           if (ImGui.MenuItem($"{name}")) 
           {
-            Editor.GetComponent<SheetSelector>().Select(spritex);
-            var spritexView = Editor.Scene.FindEntity(Names.SpritexView) as SpritexView;
+            var spritexView = Editor.GetSubEntity<SpritexView>();
             spritexView.Edit(spritex);
           }
         }

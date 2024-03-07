@@ -8,6 +8,7 @@ namespace Raven.Sheet
   {
     public void Annotate(Shape shape)
     {
+      if (Gui.ShapeContext == null) throw new MissingFieldException();
       Gui.ShapeSelection = shape;
       Editor.Set(Editor.EditingState.AnnotateShape);
     }
@@ -20,7 +21,7 @@ namespace Raven.Sheet
       Vector2 _initialMouse = Vector2.Zero;
       public override void Render(Batcher batcher, Camera camera)
       {
-        if (Gui.ShapeSelection == null || Gui.ShapeContext == null && Editor.EditState != Editor.EditingState.AnnotateShape) return;
+        if (Editor.EditState != Editor.EditingState.AnnotateShape) return;
         var input = Core.GetGlobalManager<Raven.Input.InputManager>();
     
         // Highlight context's shape proeprties
@@ -34,7 +35,7 @@ namespace Raven.Sheet
         {
           _initialMouse = camera.MouseToWorldPoint();
         }
-        else if (input.IsDrag && Gui.ShapeSelection is Shape dragShape) dragShape.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
+        else if (input.IsDrag) Gui.ShapeSelection.Render(batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
         else if (input.IsDragLast && _initialMouse != Vector2.Zero)
         {
           if (Gui.ShapeSelection is Shape.Point)

@@ -8,8 +8,6 @@ namespace Raven.Sheet
 {
   public class SheetView : Editor.SubEntity
   {
-    public bool IsCollapsed = false;
-    public bool IsSpritesView = false;
     internal Rectangle TileInMouse;
     SpriteRenderer _image;
     public override void OnAddedToScene()
@@ -51,14 +49,11 @@ namespace Raven.Sheet
             batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
           }
           // Highlight the tile under mouse
-          if (!Parent.IsSpritesView)
+          var worldTileInMouse = Parent.TileInMouse.ToRectangleF();
+          if (worldTileInMouse != null) 
           {
-            var worldTileInMouse = Parent.TileInMouse.ToRectangleF();
-            if (worldTileInMouse != null) 
-            {
-              worldTileInMouse.Location += Parent._image.Bounds.Location;
-              batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
-            }
+            worldTileInMouse.Location += Parent._image.Bounds.Location;
+            batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
           }
         }
         // Darken the whole image when under different editing state
@@ -72,22 +67,9 @@ namespace Raven.Sheet
     public override void Update()
     {
       base.Update();
-      if (Nez.Input.IsKeyReleased(Keys.Escape) && IsSpritesView)
-      {
-        Editor.GetSubEntity<SpritexView>().UnEdit();
-      }
-      else if (_image.Bounds.Contains(Scene.Camera.MouseToWorldPoint()) && HasNoObstruction())
+      if (_image.Bounds.Contains(Scene.Camera.MouseToWorldPoint()) && HasNoObstruction())
       {
         Editor.Set(Editor.EditingState.Default);
-      }
-
-      if (IsSpritesView) return;
-      if (Gui.Selection == null) Gui.SelectionRect.Enabled = false;
-      if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
-      {
-        Gui.SelectionRect.Enabled = true;
-        Gui.SelectionRect.Ren.Snap(Editor.TileWidth, Editor.TileHeight);
-        Gui.SelectionRect.Update();
       }
     }
     public RectangleF GetRegionInSheet(RectangleF rectangle)
@@ -95,10 +77,19 @@ namespace Raven.Sheet
       rectangle.Location += _image.Bounds.Location;
       return rectangle;
     }
+    public Vector2 GetOffRegionInSheet(Vector2 vector)
+    {
+      vector -= _image.Bounds.Location;
+      return vector;
+    }
     internal bool HasNoObstruction()
     {
-      return !IsCollapsed && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) && !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow)
-        && Editor.EditState != Editor.EditingState.AnnotateShape;
+      return 
+        Enabled  
+        && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) 
+        && !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow)
+        && Editor.EditState != Editor.EditingState.AnnotateShape
+        && Editor.EditState != Editor.EditingState.Modal;
     }
   }
 }

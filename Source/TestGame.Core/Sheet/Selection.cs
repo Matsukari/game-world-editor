@@ -86,6 +86,14 @@ namespace Raven.Sheet
     public override void Update()
     {
       base.Update();
+      if (Gui.Selection == null) Gui.SelectionRect.Enabled = false;
+      if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
+      {
+        Gui.SelectionRect.Enabled = true;
+        Gui.SelectionRect.Ren.Snap(Editor.TileWidth, Editor.TileHeight);
+        Gui.SelectionRect.Update();
+      }
+
       var input = Core.GetGlobalManager<Raven.Input.InputManager>();
       if (input.IsDragFirst)
       {

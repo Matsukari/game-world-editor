@@ -5,13 +5,16 @@ using Microsoft.Xna.Framework;
 namespace Raven
 {
   // public enum ShapeType { Circle, Rectangle, Ellipse, Point, Polygon, None };
-  public abstract class Shape 
+  public abstract class Shape : ICloneable
   {
     public string Name { get; set; } = "";
     public RectangleF Bounds { get; set; } = new RectangleF();
     public virtual void Render(Batcher batcher, Camera camera, Color color) {}
+    public object Clone()
+    {
+      return System.Activator.CreateInstance(GetType());
+    }
     
-
     public Shape() {}
 
     public class Circle : Shape

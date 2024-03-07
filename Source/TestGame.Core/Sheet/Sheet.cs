@@ -64,10 +64,12 @@ namespace Raven.Sheet
       {
         list.Add(GetTile(tile));
       }
-      var newTile = new Sprites.Sprite();
-      newTile.Region = RectangleExt.MinMax(list);
+      var newTile = new Sprites.Sprite(RectangleExt.MinMax(list), this);
       return newTile;
     }
+    int _continousCounter = 0;
+    public Sprites.Sprite CreateSprite(params int[] tiles) => CreateSprite($"Sprite_{_continousCounter++}", tiles);
+    public Sprites.Spritex CreateSpritex(Sprites.Sprite sprite) => CreateSpritex($"Spritex_{_continousCounter++}", sprite);
     public Sprites.Spritex CreateSpritex(string name, Sprites.Sprite sprite)
     {
       var main = new Sprites.Spritex.Sprite();
@@ -95,7 +97,8 @@ namespace Raven.Sheet
       {
         for (int y = 0; y < Tiles.Y; y++)
         {
-          if (container.Contains(GetTile(x, y).ToRectangleF()))
+          var tile = GetTile(x, y).ToRectangleF();
+          if (container.Intersects(tile) || container.Contains(tile))
           {
             tiles.Add(GetTileId(x, y));
           }
