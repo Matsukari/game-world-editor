@@ -10,6 +10,7 @@ namespace Raven.Input
     public bool IsDrag = false;
     public bool IsDragFirst = false;
     public bool IsDragLast = false; 
+    public bool IsImGuiBlocking { get => ImGui.GetIO().WantCaptureMouse; }
 
     public int MouseDragButton = -1; 
     public RectangleF MouseDragArea = new RectangleF();

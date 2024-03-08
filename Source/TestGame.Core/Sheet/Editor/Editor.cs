@@ -80,19 +80,13 @@ namespace Raven.Sheet
     }
     public void RenderImGui(PropertiesRenderer renderer)
     {
-      var name = SpriteSheet.Name;
-      int w = TileWidth, h = TileHeight;
       ImGui.Begin(GetType().Name);
-      if (ImGui.InputText("Name", ref name, 10)) SpriteSheet.Name = name;
-      if (ImGui.InputInt("TileWidth", ref w)) SpriteSheet.SetTileSize(w, TileHeight);
-      if (ImGui.InputInt("TileHeight", ref h)) SpriteSheet.SetTileSize(TileWidth, h);
+      SpriteSheet.RenderImGui(renderer);
       ImGui.BeginDisabled();
       ImGui.LabelText("Editing", EditState.ToString());
-      ImGui.LabelText("Width", $"{SpriteSheet.Tiles.X} tiles");
-      ImGui.LabelText("Height", $"{SpriteSheet.Tiles.Y} tiles");
       ImGui.EndDisabled();
-      IPropertied.HandleNewProperty(this, this);
-      IPropertied.RenderProperties(this);
+      IPropertied.HandleNewProperty(SpriteSheet, this);
+      IPropertied.RenderProperties(SpriteSheet);
       ImGui.End();
     }
     public T GetSubEntity<T>() => (T)_children.OfType<T>().First();

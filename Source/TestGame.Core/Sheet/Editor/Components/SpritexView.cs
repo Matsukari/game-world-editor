@@ -18,6 +18,7 @@ namespace Raven.Sheet
       _spritex = spritex;
       Enabled = true;
       Gui.Selection = _spritex;
+      Gui.ShapeContext = _spritex;
       Editor.GetSubEntity<SheetView>().Enabled = false;
       Editor.Set(Editor.EditingState.SelectedSprite);
 
@@ -46,6 +47,7 @@ namespace Raven.Sheet
       Editor.GetSubEntity<SheetView>().Enabled = true;
       Editor.Set(Editor.EditingState.Default);
       Enabled = false;
+      Gui.ShapeContext = Editor.SpriteSheet;
     }
     public override void Update()
     {

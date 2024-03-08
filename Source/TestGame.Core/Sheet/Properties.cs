@@ -1,6 +1,7 @@
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Nez;
+using System.Reflection;
 
 namespace Raven
 {
@@ -20,8 +21,33 @@ namespace Raven
       }
       Data.TryAdd(name, obj);
     }
+    public PropertyList Copy() 
+    {
+      var copy = new Dictionary<string, object>();
+      foreach (var prop  in Data)
+      {
+        if (prop.Value.GetType().IsByRef && !(prop.Value is ICloneable))
+        {
+          throw new Exception("Err copy with a non clonable property");
+        }
+        copy.TryAdd(prop.Key, prop.Value);
+      }
+      var list = new PropertyList();
+      list.Data = copy;
+      list._counter = _counter;
+      return list;
+    }
     public void Remove(string name) => Data.Remove(name);
     public Dictionary<string, object>.Enumerator GetEnumerator() { return Data.GetEnumerator(); }
+  }
+  [System.AttributeUsage(System.AttributeTargets.Property)]
+  public class PropertiedInputAttribute : System.Attribute
+  {
+    public string Name;
+    public PropertiedInputAttribute(string name)
+    {
+      Name = name;
+    }
   }
   public interface IPropertied
   {
@@ -42,6 +68,7 @@ namespace Raven
       string changedName = null;
       object changedProperty = null;
       string changedNameOfProperty = null;
+      bool anyOtherChanges = false;
       if (propertied.Properties == null) return false;
       foreach (var (property, propertyData) in propertied.Properties)
       {
@@ -49,10 +76,11 @@ namespace Raven
         {
           var nameHolder = property;
           changedNameOfProperty = property;
-          if (ImGui.InputText("Name", ref nameHolder, 20, ImGuiInputTextFlags.EnterReturnsTrue))
+          if (ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue))
           {
             changedName = nameHolder;
           }
+
           // Property value itself is the data
           if (propertyData.GetType().IsPrimitive)
           {
@@ -89,24 +117,37 @@ namespace Raven
           // Property's value contains a set of data
           else 
           {
-            var fields = propertyData.GetType().GetFields(); 
-            if (fields.Count() > 1) ImGui.TreeNode(propertyData.GetType().Name);
-            foreach (var propertyFieldInfo in fields)
+            // Console.WriteLine($"Type of : {property} {propertyData.GetType().Name}");
+            var subProperties = 
+              propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy); 
+            var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
+            if (subPropertiesCount > 1) ImGui.TreeNode(propertyData.GetType().Name);
+
+            foreach (var subPropertyInfo in subProperties)
             {
-              var field = propertyFieldInfo.GetValue(propertyData);
-              var fieldName = propertyFieldInfo.Name;
-              // A duplicate, which is most likely a property describing the key of data
-              if (fieldName == "Name") continue;
-              switch (field)
+              // Attribute that must be present in the property to be queried and placed as renderable imgui component
+              var attr = (PropertiedInputAttribute)subPropertyInfo.GetCustomAttribute<PropertiedInputAttribute>(false);
+              if (attr == null) continue;
+              
+              var subProperty = subPropertyInfo.GetValue(propertyData);
+              var subPropertyName = subPropertyInfo.Name;
+              switch (subProperty)
               {
-                case RectangleF rectField: 
-                  var numerics = rectField.ToNumerics();
-                  if (ImGui.InputFloat4(fieldName, ref numerics))
-                    propertyFieldInfo.SetValue(fieldName, numerics.ToRectangleF()); 
-                  return true;
+                case RectangleF rectProperty: 
+                  var numerics = rectProperty.ToNumerics();
+                  if (ImGui.InputFloat4(subPropertyName, ref numerics))
+                    subPropertyInfo.SetValue(propertyData, numerics.ToRectangleF()); 
+                  anyOtherChanges = true;
+                  break;
+                case Vector2 vecProperty: 
+                  var vecNum = vecProperty.ToNumerics();
+                  if (ImGui.InputFloat2(subPropertyName, ref vecNum))
+                    subPropertyInfo.SetValue(propertyData, vecNum.ToVector2()); 
+                  anyOtherChanges = true;
+                  break;
               }
             }
-            if (fields.Count() > 1) ImGui.TreePop();
+            if (subPropertiesCount > 1) ImGui.TreePop();
           }
           ImGui.TreePop();
         }
@@ -121,7 +162,7 @@ namespace Raven
         propertied.Properties.Data[changedNameOfProperty] = changedProperty;
         return true;
       }
-      return false;
+      return anyOtherChanges;
     }
     static Type _pickedPropertyType = null;
     public static bool HandleNewProperty(IPropertied propertied, Sheet.Editor editor)
@@ -178,16 +219,18 @@ namespace Raven
       ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
       if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
 
-      if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) Name = name;
+      if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
+      {
+        OnChangeName(Name, name);
+        Name = name;
+      }
       if (IPropertied.RenderProperties(this)) OnChangeProperty(name);
       if (IPropertied.HandleNewProperty(this, renderer.Editor)) OnChangeProperty(name);
       ImGui.End();
-
-      if (HasName()) OnCreateProperty(Name);
     }
     bool HasName() => Name != null && Name != string.Empty;
-    protected virtual void OnCreateProperty(string name) {}
     protected virtual void OnChangeProperty(string name) {}
+    protected virtual void OnChangeName(string prev, string curr) {}
 
   }
 }

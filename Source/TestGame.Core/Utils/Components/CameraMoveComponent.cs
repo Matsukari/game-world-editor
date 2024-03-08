@@ -10,6 +10,7 @@ namespace Raven.Utils.Components
     void IUpdatable.Update()
     {
       var input = Core.GetGlobalManager<Raven.Input.InputManager>();
+      if (input.IsImGuiBlocking) return;
       if (input.IsDragFirst)
       {
         _initialSheetPosition = Entity.Scene.Camera.Position;

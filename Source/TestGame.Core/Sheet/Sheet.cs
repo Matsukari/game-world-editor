@@ -76,7 +76,7 @@ namespace Raven.Sheet
       main.SourceSprite = sprite;
       main.Transform = new Sprites.Transform();
 
-      return new Sprites.Spritex(name, main);
+      return new Sprites.Spritex(name, main, this);
     }
     public List<string> GetSprites(RectangleF container)
     {
@@ -122,6 +122,19 @@ namespace Raven.Sheet
       }
       return result;
     }
+    public override void RenderImGui(PropertiesRenderer renderer)
+    {
+      var name = Name;
+      int w = TileWidth, h = TileHeight;
+      if (ImGui.InputText("Name", ref name, 10)) Name = name;
+      if (ImGui.InputInt("TileWidth", ref w)) SetTileSize(w, TileHeight);
+      if (ImGui.InputInt("TileHeight", ref h)) SetTileSize(TileWidth, h);
+      ImGui.BeginDisabled();
+      ImGui.LabelText("Width", $"{Tiles.X} tiles");
+      ImGui.LabelText("Height", $"{Tiles.Y} tiles");
+      ImGui.EndDisabled();
+    }
+
 	}
 
 }

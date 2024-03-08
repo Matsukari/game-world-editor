@@ -16,11 +16,6 @@ namespace Raven.Sheet.Sprites
       _sheet = sheet;
       Insist.IsTrue(_sheet.IsTileValid(_sheet.GetTileId(coord.X, coord.Y)));
     }
-    protected override void OnCreateProperty(string name)
-    {
-      if (_sheet.CreateTile(this))
-        Console.WriteLine("Created ");
-    } 
     protected override void OnChangeProperty(string name)
     {
       if (_sheet.CreateTile(this))
@@ -42,25 +37,13 @@ namespace Raven.Sheet.Sprites
     }
     protected override void OnChangeProperty(string name)
     {
-      foreach (var tile in _createdTiles)
-      {
-        foreach (var prop in Properties)
-        {
-          tile.Properties.Data[prop.Key] = prop.Value;
-        }
-      }
-    } 
-    protected override void OnCreateProperty(string name)
-    {
       foreach (var tile in _tiles)
       {
-        var newTile = new Tile(_sheet.GetTileCoord(tile), _sheet);
-        newTile.Name = Name;
-        if (_sheet.CreateTile(newTile))
-        {
-          Console.WriteLine("Created ");
-          _createdTiles.Add(newTile);
-        }
+        // If not created yet
+        _sheet.CreateTile(new Tile(_sheet.GetTileCoord(tile), _sheet));
+        // Update
+        var instanced = _sheet.GetCreatedTile(tile);
+        instanced.Properties = Properties.Copy();
       }
     } 
   }
@@ -79,10 +62,12 @@ namespace Raven.Sheet.Sprites
       public void Add(string name, Spritex.Sprite part) {}
       public SpriteMap() { }
     }
+    Sheet _sheet;
     public SpriteMap Parts = new SpriteMap();
     public Spritex.Sprite MainPart = new Spritex.Sprite();
-    public Spritex(string name, Spritex.Sprite main) 
+    public Spritex(string name, Spritex.Sprite main, Sheet sheet) 
     {
+      _sheet = sheet;
       Name = name;
       MainPart = main;
       MainPart.Name = "Main";
@@ -112,5 +97,9 @@ namespace Raven.Sheet.Sprites
         return parts;
       }
     }
+    protected override void OnChangeName(string old, string now)
+    {
+      _sheet.Spritexes.ChangeKey(old, now);
+    } 
   }
 }
