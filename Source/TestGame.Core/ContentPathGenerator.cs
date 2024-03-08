@@ -201,8 +201,11 @@ namespace TestGame
 				public const string Woodlog2 = @"Unprocessed/export/woodlog2";
 			}
 
+			public const string FontAwesome = @"Unprocessed/FontAwesome.otf";
 			public const string Map = @"Unprocessed/map.tmx";
+			public const string RobotoRegular = @"Unprocessed/Roboto-Regular";
 			public const string Sample = @"Unprocessed/sample.ldtk";
+			public const string Theworld = @"Unprocessed/theworld.world";
 		}
 
 

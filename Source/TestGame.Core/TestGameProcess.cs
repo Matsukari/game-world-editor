@@ -22,5 +22,14 @@ public class TestGameProcess : Core
         Scene = new SpriteSheetEditorScene();
 
     }
+    [Nez.Console.Command( "show", "Shows something which would be otherwise hidden." )]
+    static void ShowCommand( string which = "imdemo" )
+    {
+      var imgui = Core.GetGlobalManager<ImGuiManager>();
+      if (which == "imdemo") imgui.ShowDemoWindow = !imgui.ShowDemoWindow;
+      else if (which == "scene") imgui.ShowSceneGraphWindow = !imgui.ShowSceneGraphWindow;
+
+    }
+
 
 }

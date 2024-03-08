@@ -1,6 +1,7 @@
 
 using Microsoft.Xna.Framework;
 using Nez;
+using ImGuiNET;
 
 namespace Raven.Sheet.Sprites 
 {
@@ -20,7 +21,15 @@ namespace Raven.Sheet.Sprites
     {
       if (_sheet.CreateTile(this))
         Console.WriteLine("Created ");
-    } 
+    }
+    protected override void OnRenderBeforeName()
+    {
+      ImGui.BeginDisabled();
+      ImGui.LabelText(Id.ToString(), "Id");
+      ImGui.LabelText($"{Coordinates.X} {Coordinates.Y}", "Tile");
+      ImGui.EndDisabled();
+    }
+      
   }
   public class Sprite : Propertied
   {  
@@ -45,7 +54,15 @@ namespace Raven.Sheet.Sprites
         var instanced = _sheet.GetCreatedTile(tile);
         instanced.Properties = Properties.Copy();
       }
-    } 
+    }
+    protected override void OnRenderAfterName()
+    {
+      ImGui.BeginDisabled();
+      ImGui.LabelText("Tiles", _tiles.Count.ToString());
+      ImGui.LabelText("Region", Region.RenderStringFormat());
+      ImGui.EndDisabled();
+    }
+
   }
   public class Spritex : Propertied
   {  

@@ -52,7 +52,7 @@ namespace Raven.Sheet
     public Sheet SpriteSheet = null; 
     public static int ScreenRenderLayer = -1;
     public static int WorldRenderLayer = 0;
-    
+
     public override void OnAddedToScene()
     {
       Name = "SpriteSheet Editor";
@@ -86,6 +86,16 @@ namespace Raven.Sheet
       ImGui.BeginDisabled();
       ImGui.LabelText("Editing", EditState.ToString());
       ImGui.EndDisabled();
+      ImGui.SeparatorText("Selection Modes");
+      ImGui.PushItemWidth(ImGui.GetWindowSize().X/2);
+      if (ImGui.Button(IconFonts.FontAwesome5.Box + " Tile")) 
+      {
+      }
+      ImGui.SameLine();
+      if (ImGui.Button("Shapes"))
+      {
+      }
+      ImGui.PopItemWidth();
       IPropertied.HandleNewProperty(SpriteSheet, this);
       IPropertied.RenderProperties(SpriteSheet);
       ImGui.End();

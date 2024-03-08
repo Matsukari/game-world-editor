@@ -2,6 +2,7 @@
 using ImGuiNET;
 using Nez;
 using Nez.ImGuiTools;
+using Microsoft.Xna.Framework;
 
 namespace Raven.Sheet
 {
@@ -14,31 +15,17 @@ namespace Raven.Sheet
     void RenderImGui()
     {
       ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration);
-      var position = Screen.Size/4;
-      position.Y = 0f;
-      var size = Screen.Size/2;
-      size.Y = 15;
+      var position = new Vector2();
+      var size = Screen.Size;
+      size.Y = 35;
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
-      ImGui.SameLine();
-      if (ImGui.Button("Rectangle"))
+
+      foreach (var shapeType in typeof(Shape).GetNestedTypes())
       {
-        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Rectangle());
-      }
-      ImGui.SameLine();
-      if (ImGui.Button("Circle")) 
-      {
-        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Circle());
-      }
-      ImGui.SameLine();
-      if (ImGui.Button("Point"))
-      {
-        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Point());
-      }
-      ImGui.SameLine();
-      if (ImGui.Button("Polygon"))
-      {
-        Editor.GetSubEntity<Annotator>().Annotate(new Shape.Polygon());
+        if (ImGui.Button(shapeType.Name)) 
+          Editor.GetSubEntity<Annotator>().Annotate(System.Convert.ChangeType(System.Activator.CreateInstance(shapeType), shapeType) as Shape);
+        ImGui.SameLine();
       }
       ImGui.End();
     }

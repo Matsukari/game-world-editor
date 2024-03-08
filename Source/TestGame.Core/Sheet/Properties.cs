@@ -70,6 +70,10 @@ namespace Raven
       string changedNameOfProperty = null;
       bool anyOtherChanges = false;
       if (propertied.Properties == null) return false;
+      if (propertied.Properties.Data.Count > 0)
+      {
+        ImGui.SeparatorText("Properties");
+      }
       foreach (var (property, propertyData) in propertied.Properties)
       {
         if (ImGui.TreeNode(property))
@@ -80,6 +84,7 @@ namespace Raven
           {
             changedName = nameHolder;
           }
+          ImGui.LabelText("Type", propertyData.GetType().Name);
 
           // Property value itself is the data
           if (propertyData.GetType().IsPrimitive)
@@ -121,33 +126,15 @@ namespace Raven
             var subProperties = 
               propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy); 
             var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
-            if (subPropertiesCount > 1) ImGui.TreeNode(propertyData.GetType().Name);
-
-            foreach (var subPropertyInfo in subProperties)
+            if (subPropertiesCount > 1)
             {
-              // Attribute that must be present in the property to be queried and placed as renderable imgui component
-              var attr = (PropertiedInputAttribute)subPropertyInfo.GetCustomAttribute<PropertiedInputAttribute>(false);
-              if (attr == null) continue;
-              
-              var subProperty = subPropertyInfo.GetValue(propertyData);
-              var subPropertyName = subPropertyInfo.Name;
-              switch (subProperty)
+              if (ImGui.TreeNode(propertyData.GetType().Name)) 
               {
-                case RectangleF rectProperty: 
-                  var numerics = rectProperty.ToNumerics();
-                  if (ImGui.InputFloat4(subPropertyName, ref numerics))
-                    subPropertyInfo.SetValue(propertyData, numerics.ToRectangleF()); 
-                  anyOtherChanges = true;
-                  break;
-                case Vector2 vecProperty: 
-                  var vecNum = vecProperty.ToNumerics();
-                  if (ImGui.InputFloat2(subPropertyName, ref vecNum))
-                    subPropertyInfo.SetValue(propertyData, vecNum.ToVector2()); 
-                  anyOtherChanges = true;
-                  break;
+                anyOtherChanges = RenderHardTypes(subProperties, propertyData);
+                ImGui.TreePop();
               }
             }
-            if (subPropertiesCount > 1) ImGui.TreePop();
+            else anyOtherChanges = RenderHardTypes(subProperties, propertyData);
           }
           ImGui.TreePop();
         }
@@ -163,6 +150,32 @@ namespace Raven
         return true;
       }
       return anyOtherChanges;
+    }
+    static bool RenderHardTypes(PropertyInfo[] subProperties, object propertyData)
+    {
+      foreach (var subPropertyInfo in subProperties)
+      {
+        // Attribute that must be present in the property to be queried and placed as renderable imgui component
+        var attr = (PropertiedInputAttribute)subPropertyInfo.GetCustomAttribute<PropertiedInputAttribute>(false);
+        if (attr == null) continue;
+
+        var subProperty = subPropertyInfo.GetValue(propertyData);
+        var subPropertyName = subPropertyInfo.Name;
+        switch (subProperty)
+        {
+          case RectangleF rectProperty: 
+            var numerics = rectProperty.ToNumerics();
+            if (ImGui.InputFloat4(subPropertyName, ref numerics))
+              subPropertyInfo.SetValue(propertyData, numerics.ToRectangleF()); 
+            return true;
+          case Vector2 vecProperty: 
+            var vecNum = vecProperty.ToNumerics();
+            if (ImGui.InputFloat2(subPropertyName, ref vecNum))
+              subPropertyInfo.SetValue(propertyData, vecNum.ToVector2()); 
+            return true;
+        }
+      }
+      return false;
     }
     static Type _pickedPropertyType = null;
     public static bool HandleNewProperty(IPropertied propertied, Sheet.Editor editor)
@@ -219,17 +232,21 @@ namespace Raven
       ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
       if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
 
+      OnRenderBeforeName();
       if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
       {
         OnChangeName(Name, name);
         Name = name;
       }
+      OnRenderAfterName();
       if (IPropertied.RenderProperties(this)) OnChangeProperty(name);
       if (IPropertied.HandleNewProperty(this, renderer.Editor)) OnChangeProperty(name);
       ImGui.End();
     }
     bool HasName() => Name != null && Name != string.Empty;
     protected virtual void OnChangeProperty(string name) {}
+    protected virtual void OnRenderBeforeName() {}
+    protected virtual void OnRenderAfterName() {}
     protected virtual void OnChangeName(string prev, string curr) {}
 
   }

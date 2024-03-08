@@ -14,14 +14,16 @@ namespace Raven.Sheet
     {
       if (Editor.SpriteSheet == null) return;
       ImGui.Begin(GetType().Name);
-      if (ImGui.MenuItem($"Tiles ({Editor.SpriteSheet.Tiles.X * Editor.SpriteSheet.Tiles.Y})"))
+      if (ImGui.CollapsingHeader($"Tiles ({Editor.SpriteSheet.Tiles.X * Editor.SpriteSheet.Tiles.Y})"))
       {
-      }
-      if (ImGui.CollapsingHeader($"Sprites ({Editor.SpriteSheet.Sprites.Count()})"))
-      { 
-        ImGui.Separator();
-        ImGui.Indent();
-        ImGui.Unindent();
+        foreach (var (name, tile) in Editor.SpriteSheet.TileMap)
+        {
+          ImGui.Indent();
+          if (ImGui.MenuItem($"{name}"))
+          {
+          }
+          ImGui.Unindent();
+        }
       }
       if (ImGui.CollapsingHeader($"Spritexes ({Editor.SpriteSheet.Spritexes.Count})"))
       {
