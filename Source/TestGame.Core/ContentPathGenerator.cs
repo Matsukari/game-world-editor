@@ -201,9 +201,15 @@ namespace TestGame
 				public const string Woodlog2 = @"Unprocessed/export/woodlog2";
 			}
 
-			public const string FontAwesome = @"Unprocessed/FontAwesome.otf";
+			public static class Fonts
+			{
+				public const string FontAwesome6BrandsRegular400 = @"Unprocessed/Fonts/Font Awesome 6 Brands-Regular-400.otf";
+				public const string FontAwesome6FreeRegular400 = @"Unprocessed/Fonts/Font Awesome 6 Free-Regular-400.otf";
+				public const string FontAwesome6FreeSolid900 = @"Unprocessed/Fonts/Font Awesome 6 Free-Solid-900.otf";
+				public const string RobotoCondensedRegular = @"Unprocessed/Fonts/RobotoCondensed-Regular.ttf";
+			}
+
 			public const string Map = @"Unprocessed/map.tmx";
-			public const string RobotoRegular = @"Unprocessed/Roboto-Regular";
 			public const string Sample = @"Unprocessed/sample.ldtk";
 			public const string Theworld = @"Unprocessed/theworld.world";
 		}

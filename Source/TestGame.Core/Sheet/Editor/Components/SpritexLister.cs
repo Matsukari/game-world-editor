@@ -13,8 +13,8 @@ namespace Raven.Sheet
     public void RenderImGui() 
     {
       if (Editor.SpriteSheet == null) return;
-      ImGui.Begin(GetType().Name);
-      if (ImGui.CollapsingHeader($"Tiles ({Editor.SpriteSheet.Tiles.X * Editor.SpriteSheet.Tiles.Y})"))
+      ImGui.Begin(IconFonts.FontAwesome5.List + " " + GetType().Name);
+      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Th} Tiles ({Editor.SpriteSheet.Tiles.X * Editor.SpriteSheet.Tiles.Y})"))
       {
         foreach (var (name, tile) in Editor.SpriteSheet.TileMap)
         {
@@ -25,12 +25,12 @@ namespace Raven.Sheet
           ImGui.Unindent();
         }
       }
-      if (ImGui.CollapsingHeader($"Spritexes ({Editor.SpriteSheet.Spritexes.Count})"))
+      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} Spritexes ({Editor.SpriteSheet.Spritexes.Count})"))
       {
         ImGui.Indent();
         foreach (var (name, spritex) in Editor.SpriteSheet.Spritexes)
         {
-          if (ImGui.MenuItem($"{name}")) 
+          if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {name}")) 
           {
             var spritexView = Editor.GetSubEntity<SpritexView>();
             spritexView.Edit(spritex);

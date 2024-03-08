@@ -81,18 +81,18 @@ namespace Raven.Sheet
     }
     public void RenderImGui(PropertiesRenderer renderer)
     {
-      ImGui.Begin(GetType().Name);
+      ImGui.Begin(IconFonts.FontAwesome5.ThLarge + " " + GetType().Name);
       SpriteSheet.RenderImGui(renderer);
       ImGui.BeginDisabled();
       ImGui.LabelText("Editing", EditState.ToString());
       ImGui.EndDisabled();
       ImGui.SeparatorText("Selection Modes");
       ImGui.PushItemWidth(ImGui.GetWindowSize().X/2);
-      if (ImGui.Button(IconFonts.FontAwesome5.Box + " Tile")) 
+      if (ImGui.Button(IconFonts.FontAwesome5.PaintBrush)) 
       {
       }
       ImGui.SameLine();
-      if (ImGui.Button("Shapes"))
+      if (ImGui.Button(IconFonts.FontAwesome5.DrawPolygon))
       {
       }
       ImGui.PopItemWidth();

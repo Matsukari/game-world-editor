@@ -24,9 +24,8 @@ namespace Raven.Sheet
         // Highlight context's shape proeprties
         DrawPropertiesShapes(Gui.ShapeContext, batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
 
-        if (Editor.EditState != Editor.EditingState.AnnotateShape) return;
         var input = Core.GetGlobalManager<Raven.Input.InputManager>();
-    
+        if (Editor.EditState != Editor.EditingState.AnnotateShape || input.IsImGuiBlocking) return;
 
         var rect = input.MouseDragArea;
         rect.Location = _initialMouse;

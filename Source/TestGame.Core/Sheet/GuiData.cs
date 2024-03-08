@@ -23,7 +23,22 @@ namespace Raven.Sheet
     public GuiData() 
     {
       SelectionRect = new Selection(this);
-      NormalFont = ImGui.GetIO().Fonts.AddFontFromFileTTF("RobotoCondensed-Regular.ttf", 16);
+      // NormalFont = ImGui.GetIO().Fonts.AddFontFromFileTTF("RobotoCondensed-Regular.ttf", 16);
+      // float baseFontSize = 13.0f; // 13.0f is the size of the default font. Change to the font size you use.
+      // float iconFontSize = baseFontSize * 2.0f / 3.0f; // FontAwesome fonts need to have their sizes reduced by 2.0f/3.0f in order to align correctly
+      // var icons_ranges = new ushort[]{ IconFonts.FontAwesome5.IconMin, IconFonts.FontAwesome5.IconMax, 0 };
+      // var font = new Tuple<string, int>("", 12);
+      // unsafe 
+      // {   
+      //   ImFontConfigPtr icons_config = ImGuiNative.ImFontConfig_ImFontConfig();
+      //   icons_config.MergeMode = true;
+      //   icons_config.PixelSnapH = true; 
+      //   icons_config.GlyphMinAdvanceX = iconFontSize;
+      //   fixed (ushort* icons_ranges_ptr = &icons_ranges[0])
+      //   {
+      //     ImGui.GetIO().Fonts.AddFontFromFileTTF(font.Item1, iconFontSize, icons_config, (IntPtr)icons_ranges_ptr);
+      //   }
+      // } 
     }
     public Texture2D LoadTexture(string filename)
     {

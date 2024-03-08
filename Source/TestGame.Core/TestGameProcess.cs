@@ -13,13 +13,19 @@ public class TestGameProcess : Core
         ExitOnEscapeKeypress = false;
         Window.IsBorderless = true; 
         IsFixedTimeStep = true;
-        var imGuiManager = new ImGuiManager();
+        var imGuiOptions = new ImGuiOptions();
+        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.RobotoCondensedRegular, 13);
+        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.FontAwesome6FreeSolid900, 13);
+        imGuiOptions.IncludeDefaultFont(false);
+        
+        var imGuiManager = new ImGuiManager(imGuiOptions);
         Core.RegisterGlobalManager( imGuiManager );
         NezImGuiThemes.HighContrast();
         Raven.Sheet.GuiStyles.StyleViridescent();
         ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
         imGuiManager.ShowMenuBar = false;
         Scene = new SpriteSheetEditorScene();
+
 
     }
     [Nez.Console.Command( "show", "Shows something which would be otherwise hidden." )]

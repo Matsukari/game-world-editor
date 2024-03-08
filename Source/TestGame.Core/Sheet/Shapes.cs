@@ -23,6 +23,7 @@ namespace Raven
 
     public class Circle : Shape
     {
+      public static string Icon = IconFonts.FontAwesome5.Circle;
       [PropertiedInput("Center")]
       public Vector2 Center 
       { 
@@ -37,13 +38,15 @@ namespace Raven
     }
     public class Ellipse : Shape
     { 
+      public static string Icon = IconFonts.FontAwesome5.CircleNotch;
       public override void Render(Batcher batcher, Camera camera, Color color)
       {
         batcher.DrawCircle(Bounds.Location+Bounds.Size/2, Bounds.Width/2, color);
       } 
     }
     public class Polygon : Shape
-    {  
+    { 
+      public static string Icon = IconFonts.FontAwesome5.DrawPolygon;
       public List<Vector2> Points = new List<Vector2>();
       public override void Render(Batcher batcher, Camera camera, Color color)
       {
@@ -52,6 +55,7 @@ namespace Raven
     }
     public class Rectangle : Shape
     {  
+      public static string Icon = IconFonts.FontAwesome5.SquareFull;
       public override void Render(Batcher batcher, Camera camera, Color color)
       {
         batcher.DrawRect(Bounds, color);
@@ -59,6 +63,7 @@ namespace Raven
     }
     public class Point : Shape
     {
+      public static string Icon = IconFonts.FontAwesome5.MapMarker;
       [PropertiedInput("Position")]
       public Vector2 Position 
       { 

@@ -3,6 +3,7 @@ using ImGuiNET;
 using Nez;
 using Nez.ImGuiTools;
 using Microsoft.Xna.Framework;
+using System.Reflection;
 
 namespace Raven.Sheet
 {
@@ -23,8 +24,14 @@ namespace Raven.Sheet
 
       foreach (var shapeType in typeof(Shape).GetNestedTypes())
       {
-        if (ImGui.Button(shapeType.Name)) 
-          Editor.GetSubEntity<Annotator>().Annotate(System.Convert.ChangeType(System.Activator.CreateInstance(shapeType), shapeType) as Shape);
+        var shapeInstance = System.Convert.ChangeType(System.Activator.CreateInstance(shapeType), shapeType) as Shape;
+        var icon = shapeType.GetField("Icon", BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly).GetValue(shapeInstance);
+        string label;
+        if (icon == null) label = shapeType.Name;
+        else label = icon as string;
+
+        if (ImGui.Button(label)) 
+          Editor.GetSubEntity<Annotator>().Annotate(shapeInstance);
         ImGui.SameLine();
       }
       ImGui.End();

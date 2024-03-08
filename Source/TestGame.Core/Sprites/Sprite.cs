@@ -7,6 +7,7 @@ namespace Raven.Sheet.Sprites
 {
   public class Tile : Propertied 
   {
+    
     public Point Coordinates;
     public Rectangle Region { get=>_sheet.GetTile(Id); }
     public int Id { get=>_sheet.GetTileId(Coordinates.X, Coordinates.Y); }
@@ -17,6 +18,11 @@ namespace Raven.Sheet.Sprites
       _sheet = sheet;
       Insist.IsTrue(_sheet.IsTileValid(_sheet.GetTileId(coord.X, coord.Y)));
     }
+    public override string GetIcon()
+    {
+      return IconFonts.FontAwesome5.BorderNone;
+    }
+
     protected override void OnChangeProperty(string name)
     {
       if (_sheet.CreateTile(this))
@@ -32,7 +38,7 @@ namespace Raven.Sheet.Sprites
       
   }
   public class Sprite : Propertied
-  {  
+  {
     public Rectangle Region { get; private set; } = new Rectangle();
     List<int> _tiles = new List<int>();
     List<Tile> _createdTiles = new List<Tile>();
@@ -44,6 +50,10 @@ namespace Raven.Sheet.Sprites
       _sheet = sheet;
       _tiles = sheet.GetTiles(region.ToRectangleF());
     }
+    public override string GetIcon()
+    {
+      return IconFonts.FontAwesome5.GripHorizontal;
+    } 
     protected override void OnChangeProperty(string name)
     {
       foreach (var tile in _tiles)
@@ -114,6 +124,10 @@ namespace Raven.Sheet.Sprites
         return parts;
       }
     }
+    public override string GetIcon()
+    {
+      return IconFonts.FontAwesome5.User;
+    } 
     protected override void OnChangeName(string old, string now)
     {
       _sheet.Spritexes.ChangeKey(old, now);

@@ -14,13 +14,12 @@ namespace Raven.Sheet
     }
     void HandleEditSprite()
     {
-      if (!Editor.GetSubEntity<SheetView>().Enabled) return;
       if (ImGui.GetIO().MouseClicked[1] && Editor.GetSubEntity<SheetView>().HasNoObstruction() && Gui.Selection != null) ImGui.OpenPopup("sprite-popup");
       if (Gui.Selection is Sprites.Sprite && ImGui.BeginPopupContextItem("sprite-popup"))
       {
-        if (ImGui.BeginMenu("Convert to"))
+        if (ImGui.BeginMenu(IconFonts.FontAwesome5.PlusSquare + " Convert to"))
         {
-          if (ImGui.MenuItem("Spritex")) 
+          if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " Spritex")) 
           {
             ImGui.EndMenu();
             ImGui.EndPopup();
@@ -54,7 +53,7 @@ namespace Raven.Sheet
     { 
       var sheetView = Editor.GetSubEntity<SheetView>();
       var input = Core.GetGlobalManager<Input.InputManager>();
-      var a = new VirtualAxis();
+      if (!Editor.GetSubEntity<SheetView>().Enabled || input.IsImGuiBlocking) return;
 
       if (input.IsDragFirst && _initialMouse == Vector2.Zero) 
       {

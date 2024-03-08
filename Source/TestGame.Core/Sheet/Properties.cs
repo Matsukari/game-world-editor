@@ -183,9 +183,8 @@ namespace Raven
       if (ImGui.GetIO().MouseClicked[1] && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
       if (ImGui.BeginPopupContextItem("prop-popup"))
       {
-        if (ImGui.BeginMenu("New Property"))
+        if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + " New Property"))
         {
-          ImGui.Indent();
           foreach (var (name, type) in _propertyTypes)
           {
             if (ImGui.MenuItem(name)) 
@@ -198,7 +197,6 @@ namespace Raven
               return false;
             }
           }
-          ImGui.Unindent();
           ImGui.EndMenu();
         }
         ImGui.EndPopup();
@@ -229,7 +227,7 @@ namespace Raven
     public virtual void RenderImGui(Sheet.PropertiesRenderer renderer)
     {
       var name = Name;
-      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
+      ImGui.Begin(GetIcon() + " " + GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
       if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
 
       OnRenderBeforeName();
@@ -244,6 +242,7 @@ namespace Raven
       ImGui.End();
     }
     bool HasName() => Name != null && Name != string.Empty;
+    public virtual string GetIcon() => "";
     protected virtual void OnChangeProperty(string name) {}
     protected virtual void OnRenderBeforeName() {}
     protected virtual void OnRenderAfterName() {}
