@@ -10,13 +10,15 @@ public class TestGameProcess : Core
     {
         base.Initialize();
         RegisterGlobalManager(new Raven.Input.InputManager());
+        ExitOnEscapeKeypress = false;
         Window.IsBorderless = true; 
         IsFixedTimeStep = true;
-        ExitOnEscapeKeypress = false;
         var imGuiManager = new ImGuiManager();
         Core.RegisterGlobalManager( imGuiManager );
         NezImGuiThemes.HighContrast();
+        Raven.Sheet.GuiStyles.StyleViridescent();
         ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
+        imGuiManager.ShowMenuBar = false;
         Scene = new SpriteSheetEditorScene();
 
     }

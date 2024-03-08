@@ -42,6 +42,7 @@ namespace Raven.Sheet
     private List<SubEntity> _children = new List<SubEntity>();
 
     private GuiData _gui = new GuiData();
+    [Inspectable]
     public GuiColors ColorSet = new GuiColors();
     public int TileWidth => SpriteSheet.TileHeight;
     public int TileHeight => SpriteSheet.TileHeight;
@@ -89,6 +90,7 @@ namespace Raven.Sheet
       IPropertied.RenderProperties(SpriteSheet);
       ImGui.End();
     }
+    
     public T GetSubEntity<T>() => (T)_children.OfType<T>().First();
     public void Set(EditingState state) { EditState = state;  }
 
