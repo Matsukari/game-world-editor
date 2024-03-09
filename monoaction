@@ -11,13 +11,13 @@ echo $NAME
 
 pkill dotnet
 
-if [[ $1 == "test" ]]; then
+if [[ $1 == "build" ]]; then
 	dotnet build -c Debug Source/$NAME.Desktop
 	dotnet run --project Source/$NAME.Desktop
-elif [[ $1 == "build" ]]; then
-  dotnet build Source/$NAME.${2^}
 elif [[ $1 == "run" ]]; then
   dotnet run --project $DESKTOP
+elif [[ $1 == "last" ]]; then
+    $DESKTOP/bin/Debug/net8.0/$NAME.Desktop
 elif [[ $1 == "runlog" ]]; then
   dotnet run --project $DESKTOP > ./Logs/stdout.txt 2> ./Logs/stderr.txt
 elif [[ $1 == "content" ]]; then

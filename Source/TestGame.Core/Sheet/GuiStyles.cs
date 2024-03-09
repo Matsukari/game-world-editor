@@ -21,6 +21,8 @@ namespace Raven.Sheet
       style.ButtonTextAlign = new Vector2(0.5f, 0.5f);
       style.SeparatorTextAlign = new Vector2(0.5f, 0.5f);
       style.SeparatorTextPadding = new Vector2(0f, 16);
+      style.SeparatorTextBorderSize = 1;
+
 
       style.Colors[(int) ImGuiCol.Border] = new Vector4(0.01f, 0.01f, 0.02f, 1f);
       style.Colors[(int) ImGuiCol.Text] = new Vector4(0.837f, 0.901f, 0.816f, 0.900f);
@@ -40,6 +42,8 @@ namespace Raven.Sheet
       style.Colors[(int) ImGuiCol.HeaderHovered] = new Vector4(0.472f, 0.687f, 0.477f, 1f);
       style.Colors[(int) ImGuiCol.HeaderActive] = new Vector4(0.380f, 0.830f, 0.644f, 1f);
       style.Colors[(int) ImGuiCol.ResizeGrip] = new Vector4(0.472f, 0.687f, 0.477f, 1f);
+      style.Colors[(int) ImGuiCol.Tab] = new Vector4(0.141f, 0.218f, 0.211f, 1f);
+      style.Colors[(int) ImGuiCol.TabHovered] = new Vector4(0.330f, 0.829f, 0.307f, 0.68f);
       style.Colors[(int) ImGuiCol.TabActive] = new Vector4(0.063f, 0.064f, 0.077f, 1f);
       style.Colors[(int) ImGuiCol.TabUnfocusedActive] = new Vector4(0.141f, 0.218f, 0.211f, 1f);
     }

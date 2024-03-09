@@ -27,12 +27,13 @@ namespace Raven.Sheet
         {
           get
           {
-            if (_areBoundsDirty)
+            if (_areBoundsDirty && _bounds.Width != 0)
             {
               _bounds.CalculateBounds(Entity.Position, _localOffset, new Vector2(_bounds.Width, _bounds.Height)/2, 
                   Entity.Scale, Entity.Rotation, _bounds.Width, _bounds.Height); 
               _areBoundsDirty = false;
             }
+            else _bounds = new RectangleF(-5000, -5000, 10000, 10000);
             return _bounds;
           }
         }       

@@ -94,7 +94,7 @@ namespace Nez.ImGuiTools
       }
       else 
       {
-        DefaultFontPtr = ImGui.GetIO().Fonts.AddFontFromFileTTF(options._fonts[0].Item1, 14);
+        DefaultFontPtr = ImGui.GetIO().Fonts.AddFontFromFileTTF(options._fonts[0].Item1, 16);
         options._fonts.RemoveAt(0);
       }
 

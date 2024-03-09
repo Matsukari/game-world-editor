@@ -15,12 +15,92 @@ namespace Raven.Sheet
     }    
     void RenderImGui()
     {
+      Vector2 menubarSize = new Vector2();
+      if (ImGui.BeginMainMenuBar())
+      {
+        menubarSize = ImGui.GetWindowSize();
+        if (ImGui.BeginMenu("Project"))
+        {
+
+        }
+        if (ImGui.BeginMenu("Worlds"))
+        {
+
+        }
+        if (ImGui.BeginMenu("Sheets"))
+        {
+
+        }
+        if (ImGui.BeginMenu("View"))
+        {
+
+        }
+        ImGui.EndMainMenuBar();
+      }
       ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration);
-      var position = new Vector2();
+      var position = new Vector2(0f, menubarSize.Y);
       var size = Screen.Size;
-      size.Y = 35;
+      size.Y = 40;
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
+      ImGui.Dummy(new System.Numerics.Vector2(300, 0f));
+      
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.MousePointer))
+      {
+
+      }
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.ArrowsAlt))
+      {
+
+      }
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.HandSpock))
+      {
+
+      }
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.Expand))
+      {
+
+      }
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.SyncAlt))
+      {
+
+      }
+      ImGui.SameLine();
+      ImGui.Dummy(new System.Numerics.Vector2(10, 0));
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.Th))
+      {
+
+      }
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.EllipsisV))
+      {
+
+      }
+      ImGui.SameLine();
+
+      ImGui.Dummy(new System.Numerics.Vector2(20, 0));
+      ImGui.SameLine();
+
+      if (ImGui.Button(IconFonts.FontAwesome5.MousePointer))
+      {
+
+      }
+      ImGui.SameLine();
+      if (ImGui.Button(IconFonts.FontAwesome5.Shapes))
+      {
+
+      }
+      ImGui.SameLine();
+
+      ImGui.Dummy(new System.Numerics.Vector2(20, 0));
+      ImGui.SameLine();
+
 
       foreach (var shapeType in typeof(Shape).GetNestedTypes())
       {

@@ -27,7 +27,9 @@ namespace Raven.Sheet
       {
         if (Editor.GetSubEntity<SheetView>().Enabled)
         {
-          Annotator.Renderable.DrawPropertiesShapes(Editor.SpriteSheet, batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
+          Gui.primitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
+          Annotator.Renderable.DrawPropertiesShapes(Editor.SpriteSheet, Gui.primitiveBatch, batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
+          Gui.primitiveBatch.End();
           foreach (var tile in Editor.SpriteSheet.TileMap)
           {
             batcher.DrawString(

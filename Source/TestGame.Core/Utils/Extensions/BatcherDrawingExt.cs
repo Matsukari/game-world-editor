@@ -9,9 +9,9 @@ namespace Raven
     {
       batcher.DrawPoints(new Vector2(), new []{rect.Location, rect.TopRight(), rect.BottomRight(), rect.BottomLeft()}, color, true);
     }
-    public static void DrawRectOutline(this Batcher batcher, Camera camera, RectangleF rect, Color color)
+    public static void DrawRectOutline(this Batcher batcher, Camera camera, RectangleF rect, Color color, float thickness=1f)
     {
-      batcher.DrawPoints(new Vector2(), new []{rect.Location, rect.TopRight(), rect.BottomRight(), rect.BottomLeft()}, color, true, 1/camera.RawZoom);
+      batcher.DrawPoints(new Vector2(), new []{rect.Location, rect.TopRight(), rect.BottomRight(), rect.BottomLeft()}, color, true, thickness/camera.RawZoom);
     }
 
   }
