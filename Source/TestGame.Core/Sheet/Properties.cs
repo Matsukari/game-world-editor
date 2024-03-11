@@ -37,6 +37,13 @@ namespace Raven
       list._counter = _counter;
       return list;
     }
+    public void OverrideOrAddAll(PropertyList properties) 
+    {
+      foreach (var prop in properties)
+      {
+        Data[prop.Key] = prop.Value;
+      }
+    }
     public void Remove(string name) => Data.Remove(name);
     public Dictionary<string, object>.Enumerator GetEnumerator() { return Data.GetEnumerator(); }
   }
@@ -236,16 +243,16 @@ namespace Raven
         OnChangeName(Name, name);
         Name = name;
       }
-      OnRenderAfterName();
+      OnRenderAfterName(renderer);
       if (IPropertied.RenderProperties(this)) OnChangeProperty(name);
       if (IPropertied.HandleNewProperty(this, renderer.Editor)) OnChangeProperty(name);
       ImGui.End();
     }
-    bool HasName() => Name != null && Name != string.Empty;
+    public bool HasName() => Name != null && Name != string.Empty;
     public virtual string GetIcon() => "";
     protected virtual void OnChangeProperty(string name) {}
     protected virtual void OnRenderBeforeName() {}
-    protected virtual void OnRenderAfterName() {}
+    protected virtual void OnRenderAfterName(Sheet.PropertiesRenderer renderer) {}
     protected virtual void OnChangeName(string prev, string curr) {}
 
   }

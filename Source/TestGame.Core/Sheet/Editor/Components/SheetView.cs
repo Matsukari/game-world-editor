@@ -19,10 +19,10 @@ namespace Raven.Sheet
     }    
     public class Renderable : Editor.SubEntity.RenderableComponent<SheetView>
     {
-      List<Rectangle> _tiles;
+      List<Rectangle> _tiles = new List<Rectangle>();
+      Point lastSize = Point.Zero;
       public override void OnAddedToEntity()
       {
-        _tiles = Editor.SpriteSheet.GetTiles();
       }      
       public override void Render(Batcher batcher, Camera camera)
       {
@@ -38,29 +38,32 @@ namespace Raven.Sheet
       // Rectangles & highlights
       void DrawArtifacts(Batcher batcher, Camera camera)
       {
-        if (Editor.EditState == Editor.EditingState.Default) 
+        if (lastSize != Editor.SpriteSheet.TileSize)
         {
-          // Draw tiles' grid
-          foreach (var tile in _tiles) 
-          {
-            var worldTile = tile.ToRectangleF();
-            worldTile.Location += Parent._image.Bounds.Location;
-            if (worldTile.Contains(camera.MouseToWorldPoint())) Parent.TileInMouse = tile;
-            batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
-          }
-          // Highlight the tile under mouse
-          var worldTileInMouse = Parent.TileInMouse.ToRectangleF();
-          if (worldTileInMouse != null) 
-          {
-            worldTileInMouse.Location += Parent._image.Bounds.Location;
-            batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
-          }
+          lastSize = Editor.SpriteSheet.TileSize;
+          _tiles = Editor.SpriteSheet.GetTiles();
+        }
+
+        // Draw tiles' grid
+        foreach (var tile in _tiles) 
+        {
+          var worldTile = tile.ToRectangleF();
+          worldTile.Location += Parent._image.Bounds.Location;
+          if (worldTile.Contains(camera.MouseToWorldPoint())) Parent.TileInMouse = tile;
+          batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
+        }
+        // Highlight the tile under mouse
+        var worldTileInMouse = Parent.TileInMouse.ToRectangleF();
+        if (worldTileInMouse != null) 
+        {
+          worldTileInMouse.Location += Parent._image.Bounds.Location;
+          batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
         }
         // Darken the whole image when under different editing state
-        else 
-        {
-          batcher.DrawRect(Parent._image.Bounds, Editor.ColorSet.SpriteRegionInactiveOutline); 
-        }
+        // if (Editor.EditingState != Editor.EditingState.Default)
+        // {
+        //   batcher.DrawRect(Parent._image.Bounds, Editor.ColorSet.SpriteRegionInactiveOutline); 
+        // }
       }
     }
         

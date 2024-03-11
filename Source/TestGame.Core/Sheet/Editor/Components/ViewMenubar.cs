@@ -16,6 +16,7 @@ namespace Raven.Sheet
     void RenderImGui()
     {
       Vector2 menubarSize = new Vector2();
+
       if (ImGui.BeginMainMenuBar())
       {
         menubarSize = ImGui.GetWindowSize();
@@ -37,14 +38,19 @@ namespace Raven.Sheet
         }
         ImGui.EndMainMenuBar();
       }
-      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration);
+      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBringToFrontOnFocus);
       var position = new Vector2(0f, menubarSize.Y);
       var size = Screen.Size;
       size.Y = 40;
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
+
+
+      // ImGui.Dummy(new System.Numerics.Vector2(300, 0f));
+      // ImGui.SameLine();
+
+
       ImGui.Dummy(new System.Numerics.Vector2(300, 0f));
-      
       ImGui.SameLine();
       if (ImGui.Button(IconFonts.FontAwesome5.MousePointer))
       {

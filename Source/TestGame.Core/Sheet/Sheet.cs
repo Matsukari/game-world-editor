@@ -127,6 +127,7 @@ namespace Raven.Sheet
       var name = Name;
       int w = TileWidth, h = TileHeight;
       if (ImGui.InputText("Name", ref name, 10)) Name = name;
+      ImGui.LabelText(IconFonts.FontAwesome5.File + " File", _texture.Name);
       if (ImGui.InputInt("TileWidth", ref w)) SetTileSize(w, TileHeight);
       if (ImGui.InputInt("TileHeight", ref h)) SetTileSize(TileWidth, h);
       ImGui.BeginDisabled();

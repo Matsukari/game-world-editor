@@ -14,7 +14,8 @@ namespace Raven.Sheet
     }
     public override void OnAddedToScene()
     {
-      AddComponent(new Renderable());
+      var com = AddComponent(new Renderable());
+      com.RenderLayer = -1;
     }
     public class Renderable : Editor.SubEntity.RenderableComponent<Annotator>
     {

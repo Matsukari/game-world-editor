@@ -51,7 +51,7 @@ namespace Raven.Sheet
     public EditingState EditState = EditingState.Default; 
     public EditingState PrevEditState = EditingState.Default; 
     public Sheet SpriteSheet = null; 
-    public static int ScreenRenderLayer = -1;
+    public static int ScreenRenderLayer = -2;
     public static int WorldRenderLayer = 0;
 
     public override void OnAddedToScene()
@@ -61,16 +61,16 @@ namespace Raven.Sheet
       SpriteSheet = new Sheet(_gui.LoadTexture("Assets/Raw/Unprocessed/export/test_canvas.png"));
       SpriteSheet.SetTileSize(16, 16);
       _gui.ShapeContext = SpriteSheet;
-      Scene.AddRenderer(new ScreenSpaceRenderer(-1, ScreenRenderLayer));
+      Scene.AddRenderer(new ScreenSpaceRenderer(-2, ScreenRenderLayer));
         
       Position = Screen.Center;
       AddSubEntity(new SheetView());
       AddSubEntity(new SheetSelector());
       AddSubEntity(new PropertiesRenderer());
       AddSubEntity(new ViewMenubar());
-      AddSubEntity(new Annotator());
       AddSubEntity(new SpritexView());
       AddSubEntity(new SpritexLister());
+      AddSubEntity(new Annotator());
 
     }
     public void AddSubEntity(SubEntity entity) 
@@ -84,19 +84,6 @@ namespace Raven.Sheet
     {
       ImGui.Begin(IconFonts.FontAwesome5.ThLarge + " " + GetType().Name);
       SpriteSheet.RenderImGui(renderer);
-      ImGui.BeginDisabled();
-      ImGui.LabelText("Editing", EditState.ToString());
-      ImGui.EndDisabled();
-      ImGui.SeparatorText("Selection Modes");
-      ImGui.PushItemWidth(ImGui.GetWindowSize().X/2);
-      if (ImGui.Button(IconFonts.FontAwesome5.PaintBrush)) 
-      {
-      }
-      ImGui.SameLine();
-      if (ImGui.Button(IconFonts.FontAwesome5.DrawPolygon))
-      {
-      }
-      ImGui.PopItemWidth();
       IPropertied.HandleNewProperty(SpriteSheet, this);
       IPropertied.RenderProperties(SpriteSheet);
       ImGui.End();

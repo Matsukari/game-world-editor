@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using ImGuiNET;
 
 namespace Raven.Sheet.Sprites 
 {
@@ -14,6 +15,17 @@ namespace Raven.Sheet.Sprites
       transform.LocalPosition = Position;
       transform.LocalScale = Scale;
       transform.LocalRotation = Rotation;
+    }
+    public void RenderImGui()
+    {
+      var pos = Position.ToNumerics();
+      var scale = Scale.ToNumerics();
+      var skew = Skew.ToNumerics();
+      if (ImGui.InputFloat2("Position", ref pos)) Position = pos.ToVector2();
+      if (ImGui.InputFloat2("Scale", ref scale)) Scale = scale.ToVector2();
+      if (ImGui.InputFloat2("Skew", ref skew)) Skew = skew.ToVector2();
+      ImGui.SliderFloat("Rotation", ref Rotation, 0, 360);
+
     }
   }
 }

@@ -22,8 +22,10 @@ namespace Raven.Sheet
       style.SeparatorTextAlign = new Vector2(0.5f, 0.5f);
       style.SeparatorTextPadding = new Vector2(0f, 16);
       style.SeparatorTextBorderSize = 1;
+      style.FrameBorderSize = 1;
+      style.ChildBorderSize = 1;
 
-
+      style.Colors[(int) ImGuiCol.ChildBg] = new Vector4(0.083f, 0.084f, 0.097f, 1f);
       style.Colors[(int) ImGuiCol.Border] = new Vector4(0.01f, 0.01f, 0.02f, 1f);
       style.Colors[(int) ImGuiCol.Text] = new Vector4(0.837f, 0.901f, 0.816f, 0.900f);
       style.Colors[(int) ImGuiCol.TextDisabled] = new Vector4(0.6f, 0.6f, 0.6f, 1f);
@@ -36,7 +38,7 @@ namespace Raven.Sheet
       style.Colors[(int) ImGuiCol.MenuBarBg] = new Vector4(0.01f, 0.01f, 0.02f, 1f);
       style.Colors[(int) ImGuiCol.ScrollbarBg] = new Vector4(0.184f, 0.21f, 0.206f, 1f);
       style.Colors[(int) ImGuiCol.CheckMark] = new Vector4(0.362f, 0.754f, 0.564f, 1f);
-      style.Colors[(int) ImGuiCol.Button] = new Vector4(0.224f, 0.243f, 0.230f, 490f);
+      style.Colors[(int) ImGuiCol.Button] = new Vector4(0.224f, 0.243f, 0.230f, 390f);
       style.Colors[(int) ImGuiCol.ButtonHovered] = new Vector4(0.330f, 0.829f, 0.307f, 0.68f);
       style.Colors[(int) ImGuiCol.Header] = new Vector4(0.172f, 0.218f, 0.19f, 0.530f);
       style.Colors[(int) ImGuiCol.HeaderHovered] = new Vector4(0.472f, 0.687f, 0.477f, 1f);

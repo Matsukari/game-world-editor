@@ -1,32 +1,43 @@
 
 
 ## Sheet
-Complete details on inspector
-Fix grid view
+~Complete details on inspector~
+~fix grid view~
 
 ## Geometry
+~Geometry on spritex~
+Correct position; relative to context
 Implement polygon shape
-Geometry on spritex
 Fix shape property's inspector
 
+## Multiple selection
+~Fix sprite property naming~
+~Fix sprite new property overriding~
+
 ## Spritex
-Complete inspector
+~Complete inspector~
+Correct positioning
 Parts picker
-Position, scale, rotate parts
 Selection on parts
+Position, scale, rotate parts
+Transform whole body
 Implemente animation
 
 ## Editor
 Project management
 File management / switching
+Better name annotations
+Better colors and sizing
+Better render orders
 
 ## Misc
+~Fix zoom switching context~
 Fix zooming
-Fix zoom switching context
 Save & load to file
 Undo & redo
 Grid view
 Snapping
 Shape & tile separate selection
 Separate transform operations
+Copy & paste shapes & parts 
 

@@ -48,6 +48,7 @@ namespace Raven.Sheet
       Editor.Set(Editor.EditingState.Default);
       Enabled = false;
       Gui.ShapeContext = Editor.SpriteSheet;
+      Scene.Camera.RawZoom = 1f;
     }
     public override void Update()
     {

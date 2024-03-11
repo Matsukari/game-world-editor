@@ -10,7 +10,8 @@ namespace Raven.Sheet
     public override void OnAddedToScene() 
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);    
-      AddComponent(new Renderable());
+      var render = AddComponent(new Renderable());
+      render.RenderLayer = -1;
     }
     public void RenderImGui() 
     {  
@@ -25,11 +26,14 @@ namespace Raven.Sheet
     {
       public override void Render(Batcher batcher, Camera camera)
       {
-        if (Editor.GetSubEntity<SheetView>().Enabled)
+        if (Gui.ShapeContext != null)
         {
           Gui.primitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
-          Annotator.Renderable.DrawPropertiesShapes(Editor.SpriteSheet, Gui.primitiveBatch, batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
+          Annotator.Renderable.DrawPropertiesShapes(Gui.ShapeContext, Gui.primitiveBatch, batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
           Gui.primitiveBatch.End();
+        }
+        if (Editor.GetSubEntity<SheetView>().Enabled)
+        {
           foreach (var tile in Editor.SpriteSheet.TileMap)
           {
             batcher.DrawString(

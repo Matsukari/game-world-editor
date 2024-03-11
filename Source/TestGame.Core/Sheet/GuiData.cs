@@ -30,6 +30,7 @@ namespace Raven.Sheet
     {
       var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
       SheetTexture = texture;
+      SheetTexture.Name = filename;
       return texture;
     } 
     public void LoadTextureFromFilePopup()

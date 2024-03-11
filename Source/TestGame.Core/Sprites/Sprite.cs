@@ -31,8 +31,8 @@ namespace Raven.Sheet.Sprites
     protected override void OnRenderBeforeName()
     {
       ImGui.BeginDisabled();
-      ImGui.LabelText(Id.ToString(), "Id");
-      ImGui.LabelText($"{Coordinates.X} {Coordinates.Y}", "Tile");
+      ImGui.LabelText("Id", Id.ToString());
+      ImGui.LabelText("Tile", $"{Coordinates.X}x, {Coordinates.Y}y");
       ImGui.EndDisabled();
     }
       
@@ -42,6 +42,7 @@ namespace Raven.Sheet.Sprites
     public Rectangle Region { get; private set; } = new Rectangle();
     List<int> _tiles = new List<int>();
     List<Tile> _createdTiles = new List<Tile>();
+    public List<Tile> GetTiles { get => _createdTiles; }
 
     Sheet _sheet;
     public Sprite(Rectangle region, Sheet sheet)
@@ -58,14 +59,25 @@ namespace Raven.Sheet.Sprites
     {
       foreach (var tile in _tiles)
       {
+        var tileCoord = _sheet.GetTileCoord(tile);
         // If not created yet
         _sheet.CreateTile(new Tile(_sheet.GetTileCoord(tile), _sheet));
         // Update
         var instanced = _sheet.GetCreatedTile(tile);
-        instanced.Properties = Properties.Copy();
+        instanced.Properties.OverrideOrAddAll(Properties);
       }
     }
-    protected override void OnRenderAfterName()
+    protected override void OnChangeName(string prev, string curr)
+    {
+      foreach (var tile in _tiles)
+      {
+        // If not created yet
+        _sheet.CreateTile(new Tile(_sheet.GetTileCoord(tile), _sheet));
+        var instanced = _sheet.GetCreatedTile(tile);
+        instanced.Name = curr;
+      }
+    } 
+    protected override void OnRenderAfterName(PropertiesRenderer renderer)
     {
       ImGui.BeginDisabled();
       ImGui.LabelText("Tiles", _tiles.Count.ToString());
@@ -82,6 +94,24 @@ namespace Raven.Sheet.Sprites
       public Sprites.Transform Transform; 
       public Vector2 Origin = new Vector2();
       public Sprite() {}
+      public override void RenderImGui(PropertiesRenderer renderer)
+      {
+        ImGui.BeginDisabled();
+        if (SourceSprite.HasName()) ImGui.LabelText("Source", SourceSprite.Name);
+        ImGui.LabelText("Tiles", SourceSprite.GetTiles.Count.ToString());
+        ImGui.LabelText("Region", SourceSprite.Region.RenderStringFormat());
+        ImGui.EndDisabled();
+        
+        if (ImGui.SmallButton(IconFonts.FontAwesome5.Edit))
+        {
+          
+        }
+        ImGui.SameLine();
+        ImGui.TextDisabled("Change source");
+
+        Transform.RenderImGui();
+        ImGui.LabelText("Origin", Origin.ToString());
+      }
     }
     public struct SpriteMap
     {
@@ -92,6 +122,7 @@ namespace Raven.Sheet.Sprites
     Sheet _sheet;
     public SpriteMap Parts = new SpriteMap();
     public Spritex.Sprite MainPart = new Spritex.Sprite();
+    public Transform Transform = new Transform();
     public Spritex(string name, Spritex.Sprite main, Sheet sheet) 
     {
       _sheet = sheet;
@@ -114,6 +145,10 @@ namespace Raven.Sheet.Sprites
         }
         return RectangleF.FromMinMax(min, max);
       }
+      set 
+      {
+
+      }
     }
     public List<Spritex.Sprite> Body
     {
@@ -124,10 +159,32 @@ namespace Raven.Sheet.Sprites
         return parts;
       }
     }
+    protected override void OnRenderAfterName(PropertiesRenderer renderer)
+    {
+      var bounds = Bounds.ToNumerics();
+      if (ImGui.InputFloat4("Bounds", ref bounds)) Bounds = bounds.ToRectangleF();
+      Transform.RenderImGui();
+      if (ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen))
+      {
+
+      }
+      if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
+      {
+        foreach (var part in Body)
+        {
+          if (ImGui.BeginChild(part.Name))
+          {
+            part.RenderImGui(renderer);
+            ImGui.NewLine();
+            ImGui.EndChild();
+          }
+        }
+      }
+    }
     public override string GetIcon()
     {
       return IconFonts.FontAwesome5.User;
-    } 
+    }
     protected override void OnChangeName(string old, string now)
     {
       _sheet.Spritexes.ChangeKey(old, now);
