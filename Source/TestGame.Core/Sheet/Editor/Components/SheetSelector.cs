@@ -89,7 +89,7 @@ namespace Raven.Sheet
           if (tileInCoord != null) Select(tileInCoord);
           else Select(new Sprites.Tile(coord, Editor.SpriteSheet));
         }
-        else if (!Gui.SelectionRect.IsEditingPoint && Gui.Selection != null) 
+        else if (Gui.Selection != null) 
         {
           Gui.Selection = null;
           Editor.Set(Editor.EditingState.Default);

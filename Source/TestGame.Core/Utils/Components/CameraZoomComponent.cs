@@ -16,7 +16,7 @@ namespace Raven.Utils.Components
         float zoomFactor = 1.2f;
         if (Nez.Input.MouseWheelDelta < 0) zoomFactor = 1/zoomFactor;
         var zoom = Entity.Scene.Camera.RawZoom * zoomFactor;
-        var delta = (Nez.Input.RawMousePosition.ToVector2() - Entity.Scene.Camera.Position) * (zoomFactor - 1);
+        var delta = (Entity.Scene.Camera.MouseToWorldPoint() - Entity.Scene.Camera.Position) * (zoomFactor - 1);
         Entity.Scene.Camera.Position += delta;
         Entity.Scene.Camera.RawZoom = zoom;
       }

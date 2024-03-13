@@ -12,6 +12,7 @@ namespace Raven.Sheet
     SpriteRenderer _image;
     public override void OnAddedToScene()
     {
+      Position = Screen.Center;
       _image = AddComponent(new SpriteRenderer(Gui.SheetTexture));
       AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());

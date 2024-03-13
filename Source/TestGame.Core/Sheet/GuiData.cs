@@ -17,13 +17,11 @@ namespace Raven.Sheet
     public Shape ShapeSelection = null;
     public IPropertied ShapeContext = null;
 
-    public Selection SelectionRect = null;
     public ImFontPtr NormalFont;
     internal PrimitiveBatch primitiveBatch;
 
     public GuiData() 
     {
-      SelectionRect = new Selection(this);
       primitiveBatch = new PrimitiveBatch();
     }
     public Texture2D LoadTexture(string filename)

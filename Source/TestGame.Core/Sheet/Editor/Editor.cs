@@ -63,7 +63,7 @@ namespace Raven.Sheet
       _gui.ShapeContext = SpriteSheet;
       Scene.AddRenderer(new ScreenSpaceRenderer(-2, ScreenRenderLayer));
         
-      Position = Screen.Center;
+      AddSubEntity(new Selection());
       AddSubEntity(new SheetView());
       AddSubEntity(new SheetSelector());
       AddSubEntity(new PropertiesRenderer());

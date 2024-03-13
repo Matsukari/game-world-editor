@@ -3,19 +3,20 @@ using ImGuiNET;
 using Nez.Sprites;
 using Nez.Textures;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework;
 
 
 namespace Raven.Sheet
 {
   public class SpritexView : Editor.SubEntity
   {
-    Entity _main;
     Sprites.Spritex _spritex;
     List<Entity> _entities = new List<Entity>();
     public void Edit(Sprites.Spritex spritex)
     {
       UnEdit();
       _spritex = spritex;
+      Position = new Vector2();
       Enabled = true;
       Gui.Selection = _spritex;
       Gui.ShapeContext = _spritex;
@@ -24,19 +25,15 @@ namespace Raven.Sheet
 
       var origin = AddComponent(new Guidelines.OriginLines());
       origin.Color = Editor.ColorSet.SpriteRegionActiveOutline;
-      // origin.RenderLayer = Editor.ScreenRenderLayer;
 
-      var mainEntity = Scene.CreateEntity(_spritex.Name);
       foreach (var part in _spritex.Body)
       {
         var partEntity = Scene.CreateEntity(_spritex.Name + part.SourceSprite.Name);
-        partEntity.AddComponent(new SpriteRenderer(new Sprite(Editor.SpriteSheet.Texture, part.SourceSprite.Region)));
-        partEntity.SetParent(mainEntity);
-        part.Transform.Apply(partEntity.Transform);
+        var ren = partEntity.AddComponent(new SpriteRenderer(new Sprite(Editor.SpriteSheet.Texture, part.SourceSprite.Region)));
+        part.Origin = ren.Origin;
+        partEntity.SetParent(this);
         _entities.Add(partEntity);
       }
-      _main = mainEntity;
-      _main.SetParent(this);
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
     }
@@ -44,17 +41,57 @@ namespace Raven.Sheet
     {
       RemoveAllComponents();
       foreach (var entity in _entities) entity.Destroy();
+      _entities.Clear();
+      Position = Screen.Center;
       Editor.GetSubEntity<SheetView>().Enabled = true;
       Editor.Set(Editor.EditingState.Default);
       Enabled = false;
       Gui.ShapeContext = Editor.SpriteSheet;
       Scene.Camera.RawZoom = 1f;
+      Scene.Camera.Position = new Vector2();
     }
     public override void Update()
     {
       base.Update();
       if (_entities.Count == 0) return;
       if (Nez.Input.IsKeyReleased(Keys.Escape)) UnEdit(); 
+
+      SyncEntitySpritex();
+      HandleSelection();
+    }
+    void SyncEntitySpritex()
+    {
+      // Overall transform; which covers all parts
+      // NOTE; it's the entity's transform that is begin modifed and synced to that of custom class' transform 
+      // and not the other way around
+      _spritex.Transform.Apply(Transform);
+      for (int i = 0; i < _entities.Count(); i++)
+      {
+        _spritex.Body[i].Transform.Apply(_entities[i].Transform);
+      }
+    }
+    Vector2 _initialScale = new Vector2();
+    void HandleSelection()
+    {
+      var selectionRect = Editor.GetSubEntity<Selection>();
+      if (Nez.Input.LeftMouseButtonPressed)
+      {
+        foreach (var part in _spritex.Body)
+        {
+          var mouse = Scene.Camera.MouseToWorldPoint();
+          if (part.Bounds.Contains(mouse))
+          {
+            _initialScale = part.Transform.Scale;
+            selectionRect.Begin(part.Bounds, part);
+            return;
+          }
+        }
+      }
+      if (selectionRect.Capture is Sprites.Spritex.Sprite selPart)
+      {
+        selPart.Transform.Scale = _initialScale + (selectionRect.Bounds.Size - selectionRect.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
+        selPart.Transform.Position = selectionRect.Bounds.Location + (selPart.Origin * selPart.Transform.Scale);
+      }
     }
     internal bool HasNoObstruction()
     {

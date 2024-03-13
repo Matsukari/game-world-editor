@@ -7,7 +7,7 @@ namespace Raven.Sheet
   public enum SelectionAxis
   {
     TopLeft,
-    BottomLeft,
+   BottomLeft,
     Left,
     TopRight,
     BottomRight,
@@ -18,98 +18,140 @@ namespace Raven.Sheet
   }
   public class Selection : Editor.SubEntity 
   {
-    GuiData _gui;
-    Editor _editor;
     public int MouseButton = 0;
-    public bool IsEditingPoint = false;
+    public bool IsEditingPoint { get => SelAxis != SelectionAxis.None; }
     public SelectionAxis SelAxis = SelectionAxis.None;
     public Renderable Ren { get; private set; }
-    public Selection(GuiData gui, Editor editor=null) 
+    public RectangleF Bounds = new RectangleF();
+    public RectangleF InitialBounds = new RectangleF();
+    public object Capture = null;
+    public Selection() 
     { 
-      _gui = gui;
-      _editor = editor;
+      Ren = AddComponent(new Renderable());
+      Ren.RenderLayer = -1;
+      End();
     }
     public class Renderable : Editor.SubEntity.RenderableComponent<Selection>
     {
       public int Radius = 4;
       public int SafeBuffer = 3;
+      public float SelectedSelectionPointSizeFactor = 1.5f;
       public List<RectangleF> Points = new List<RectangleF>();
       public override void Render(Batcher batcher, Camera camera)
       {
-        if (!IsVisible) return;
-        int axis = 0, selAxis = -1;
-        // float delta = 0;
+        int axis = -1, i = 0;
+
+        // Determine which resize point i being handled
         foreach (var point in Points)
         {
-          if (Utils.Input.IsMouseAt(point.GetCenterToStart())) 
+          if (point.GetCenterToStart().Contains(camera.MouseToWorldPoint())) 
           {
-            selAxis = axis;
+            axis = i;
           }
-          batcher.DrawCircle(point.Location, Radius, Color);
-          axis++;
+          batcher.DrawCircle(point.Location, Radius, Editor.ColorSet.SelectionPoint);
+          i++;
         }
-        LargenSelectionAxis((int)Parent.SelAxis, Color, batcher);
-        batcher.DrawRect(Bounds, Color);
+        // Enlargen the resizing point currently on hover
+        LargenSelectionAxis(axis, Editor.ColorSet.SelectionPoint, batcher, camera);
+
+        // Draw the selection area
+        batcher.DrawRect(Parent.Bounds, Editor.ColorSet.SelectionFill);
+
         var selectionPoint = axis != -1 ? (SelectionAxis)axis : SelectionAxis.None;
-        if (selectionPoint != SelectionAxis.None && Parent.SelAxis == SelectionAxis.None && ImGui.GetIO().MouseDown[0])
+        if (Nez.Input.LeftMouseButtonPressed)
         {
-          Parent.SelAxis = selectionPoint;
-          Parent.IsEditingPoint = true;
+          if (selectionPoint != SelectionAxis.None && !Parent.IsEditingPoint)
+          {
+            Parent.SelAxis = selectionPoint;
+          }
+          else if (Parent._hasInteraction && !Parent.Bounds.Contains(camera.MouseToWorldPoint()))
+          {
+            Parent.End();
+          }
         }
       }
       public void UpdatePoints()
       {
         Points.Clear();
-        Points.Add(new RectangleF(Bounds.Left , Bounds.Top         , Radius+SafeBuffer, Radius+SafeBuffer));
-        Points.Add(new RectangleF(Bounds.Left , Bounds.Bottom      , Radius+SafeBuffer, Radius+SafeBuffer));
-        Points.Add(new RectangleF(Bounds.Left , Bounds.Center.Y    , Radius+SafeBuffer, Radius+SafeBuffer));
-        Points.Add(new RectangleF(Bounds.Right , Bounds.Top        , Radius+SafeBuffer, Radius+SafeBuffer));
-        Points.Add(new RectangleF(Bounds.Right , Bounds.Bottom     , Radius+SafeBuffer, Radius+SafeBuffer));
-        Points.Add(new RectangleF(Bounds.Right , Bounds.Center.Y   , Radius+SafeBuffer, Radius+SafeBuffer));
-        Points.Add(new RectangleF(Bounds.Center.X , Bounds.Top     , Radius+SafeBuffer, Radius+SafeBuffer));
-        Points.Add(new RectangleF(Bounds.Center.X , Bounds.Bottom  , Radius+SafeBuffer, Radius+SafeBuffer)); 
+        Points.Add(new RectangleF(Parent.Bounds.Left , Parent.Bounds.Top         , Radius+SafeBuffer, Radius+SafeBuffer));
+        Points.Add(new RectangleF(Parent.Bounds.Left , Parent.Bounds.Bottom      , Radius+SafeBuffer, Radius+SafeBuffer));
+        Points.Add(new RectangleF(Parent.Bounds.Left , Parent.Bounds.Center.Y    , Radius+SafeBuffer, Radius+SafeBuffer));
+        Points.Add(new RectangleF(Parent.Bounds.Right , Parent.Bounds.Top        , Radius+SafeBuffer, Radius+SafeBuffer));
+        Points.Add(new RectangleF(Parent.Bounds.Right , Parent.Bounds.Bottom     , Radius+SafeBuffer, Radius+SafeBuffer));
+        Points.Add(new RectangleF(Parent.Bounds.Right , Parent.Bounds.Center.Y   , Radius+SafeBuffer, Radius+SafeBuffer));
+        Points.Add(new RectangleF(Parent.Bounds.Center.X , Parent.Bounds.Top     , Radius+SafeBuffer, Radius+SafeBuffer));
+        Points.Add(new RectangleF(Parent.Bounds.Center.X , Parent.Bounds.Bottom  , Radius+SafeBuffer, Radius+SafeBuffer)); 
       }
-      void LargenSelectionAxis(int point, Color color, Batcher batcher)
+      void LargenSelectionAxis(int point, Color color, Batcher batcher, Camera camera)
       {
         if (point >= 0 && point < (int)SelectionAxis.None) 
-        {  
-          batcher.DrawCircle(Points[point].Location, Radius*1.5f, color);  
+        { 
+          Gui.primitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.TransformMatrix);
+          Gui.primitiveBatch.DrawCircle(Points[point].Location, Radius*SelectedSelectionPointSizeFactor, color);
+          Gui.primitiveBatch.End();
         }
       }
-      public void Snap(int w, int h)
-      {
-        _bounds.Width = MathF.Floor(Bounds.Width / w) * w;
-        _bounds.Height = MathF.Floor(Bounds.Height / w) * w;
-      }
     }
+    public void Snap(int w, int h)
+    {
+      Bounds.Width = MathF.Floor(Bounds.Width / w) * w;
+      Bounds.Height = MathF.Floor(Bounds.Height / w) * w;
+    }
+    public void Begin(RectangleF area, object capture=null)
+    {
+      Capture = capture;
+      Bounds = area;
+      InitialBounds = area;
+      Enabled = true;
+    }
+    public void End()
+    {
+      Capture = null;
+      Enabled = false;
+    }
+    public bool HasBegun() => Enabled;
+
     RectangleF _selectionInitial = new RectangleF();
+    bool _isDragInsideArea = false;
+    bool _hasInteraction = false;
     public override void Update()
     {
       base.Update();
-      if (Gui.Selection == null) Gui.SelectionRect.Enabled = false;
-      if (Gui.SelectionRect != null && Gui.SelectionRect.IsEditingPoint) 
-      {
-        Gui.SelectionRect.Enabled = true;
-        Gui.SelectionRect.Ren.Snap(Editor.TileWidth, Editor.TileHeight);
-        Gui.SelectionRect.Update();
-      }
+      Ren.UpdatePoints();
 
       var input = Core.GetGlobalManager<Raven.Input.InputManager>();
+
+      // The distance between the movement of the mouse
+      var _bounds = Bounds;
+      var mouse = Nez.Input.RawMousePosition.ToVector2();
+      var delta = mouse - input.MouseDragStart;
+      delta /= Scene.Camera.RawZoom;
+
+      // start whatever selection
       if (input.IsDragFirst)
       {
-        _selectionInitial = Ren.Bounds;
-      }
+        _selectionInitial = Bounds;
+
+        // mouse is also inside the selection area; can insead be moved
+        if (_bounds.Width != 0 && _bounds.Contains(Scene.Camera.MouseToWorldPoint()))
+        {
+          _isDragInsideArea = true;
+        }
+      } 
+      else if (input.IsDragLast) _hasInteraction = false;
+      // released in point
       else if (IsEditingPoint && !input.IsDrag)
       {
-        IsEditingPoint = false;
         SelAxis = SelectionAxis.None;
       }
+      else if (input.IsDragLast)
+      {
+        _isDragInsideArea = false;
+      }
+      // draggin point
       if (IsEditingPoint)
       {
-        var mouse = ImGui.GetIO().MousePos;
-        var delta = mouse - input.MouseDragStart;
-        delta /= _gui.Zoom;
-        var _bounds = Ren.Bounds;
+        _hasInteraction = true;
         switch (SelAxis)
         {
           case SelectionAxis.TopLeft:
@@ -152,12 +194,17 @@ namespace Raven.Sheet
             _bounds.Height = _selectionInitial.Height + delta.Y; 
             break;
         }
-        Ren.SetBounds(_bounds);
-        // Console.WriteLine($"{selectionPoint}");
-        // Console.WriteLine($"Start: {Gui.MouseDragStart}, End {mouse}, Delta {delta}");
-        // Console.WriteLine($"area{Gui.MouseDragArea}");
-        Update();
+        Bounds = _bounds;
       }
+      // move selection
+      else if (input.IsDrag && _isDragInsideArea)
+      {
+        _bounds.Location = _selectionInitial.Location + delta;
+        Bounds = _bounds;
+        _hasInteraction = true;
+      }
+      
+
     }
   }
 

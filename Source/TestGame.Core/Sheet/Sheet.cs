@@ -29,6 +29,7 @@ namespace Raven.Sheet
     public Sheet(Texture2D texture) 
     {
       Insist.IsNotNull(texture);
+      
       _texture = texture;
     }
     public void SetTileSize(int w, int h) 

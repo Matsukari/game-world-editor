@@ -7,7 +7,6 @@ vim.cmd [[
 ]]
 local nvim_lsp = require('lspconfig')
 
-
 nvim_lsp.omnisharp.setup{
     on_attach = function (client)
       vim.api.nvim_exec([[
@@ -38,3 +37,6 @@ vim.api.nvim_set_keymap('n', '<leader>ca', '<cmd>lua vim.lsp.buf.code_action()<C
 -- vim.cmd('TagbarOpenAutoClose')
 
 -- https://medium.com/@shaikzahid0713/git-integration-in-neovim-a6f26c424b58
+--
+--
+

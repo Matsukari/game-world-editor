@@ -120,6 +120,7 @@ namespace Raven.Sheet
           Editor.GetSubEntity<Annotator>().Annotate(shapeInstance);
         ImGui.SameLine();
       }
+
       ImGui.End();
     }
   }

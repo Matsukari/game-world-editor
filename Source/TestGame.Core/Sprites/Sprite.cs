@@ -93,6 +93,13 @@ namespace Raven.Sheet.Sprites
       public Sprites.Sprite SourceSprite;
       public Sprites.Transform Transform; 
       public Vector2 Origin = new Vector2();
+      public RectangleF Bounds { 
+        get => new RectangleF(
+            Transform.Position.X - Origin.X * Transform.Scale.X, 
+            Transform.Position.Y - Origin.Y * Transform.Scale.Y, 
+            SourceSprite.Region.Width * Transform.Scale.X, 
+            SourceSprite.Region.Height * Transform.Scale.Y);
+      }
       public Sprite() {}
       public override void RenderImGui(PropertiesRenderer renderer)
       {

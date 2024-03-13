@@ -16,23 +16,26 @@ Fix shape property's inspector
 
 ## Spritex
 ~Complete inspector~
-Correct positioning
+~Correct positioning~
+~Position, scale, parts~
+~Selection on parts~
 Parts picker
-Selection on parts
-Position, scale, rotate parts
+Add other parts
+Rotate parts
 Transform whole body
 Implemente animation
 
 ## Editor
 Project management
 File management / switching
+Editing state indicator
 Better name annotations
 Better colors and sizing
 Better render orders
 
 ## Misc
 ~Fix zoom switching context~
-Fix zooming
+Fix zooming on mouse
 Save & load to file
 Undo & redo
 Grid view

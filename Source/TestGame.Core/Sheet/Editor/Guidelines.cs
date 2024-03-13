@@ -13,14 +13,14 @@ namespace Raven.Guidelines
     {  
       // Horizontal line 
       batcher.DrawLine(
-          new Vector2(-10000, Screen.Center.Y), 
-          new Vector2(10000 + Screen.Width, Screen.Center.Y), 
+          new Vector2(-10000, 0), 
+          new Vector2(10000 + Screen.Width, 0), 
           color: Color,
           thickness: 1/camera.RawZoom);
       // Vertival line
       batcher.DrawLine(
-          new Vector2(Screen.Center.X, -10000), 
-          new Vector2(Screen.Center.X, 10000), 
+          new Vector2(0, -10000), 
+          new Vector2(0, 10000), 
           color: Color,
           thickness: 1/camera.RawZoom);
     }
