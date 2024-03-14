@@ -131,17 +131,9 @@ namespace Raven
           {
             // Console.WriteLine($"Type of : {property} {propertyData.GetType().Name}");
             var subProperties = 
-              propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy); 
-            var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
-            if (subPropertiesCount > 1)
-            {
-              if (ImGui.TreeNode(propertyData.GetType().Name)) 
-              {
-                anyOtherChanges = RenderHardTypes(subProperties, propertyData);
-                ImGui.TreePop();
-              }
-            }
-            else anyOtherChanges = RenderHardTypes(subProperties, propertyData);
+              propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy); 
+            // var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
+            anyOtherChanges = RenderHardTypes(subProperties, propertyData);
           }
           ImGui.TreePop();
         }

@@ -6,9 +6,10 @@
 
 ## Geometry
 ~Geometry on spritex~
-Correct position; relative to context
+~Correct position; relative to context~
+~Fix shape property's inspector~
 Implement polygon shape
-Fix shape property's inspector
+Selectable shapes
 
 ## Multiple selection
 ~Fix sprite property naming~
@@ -38,9 +39,10 @@ Better render orders
 Fix zooming on mouse
 Save & load to file
 Undo & redo
-Grid view
-Snapping
 Shape & tile separate selection
 Separate transform operations
 Copy & paste shapes & parts 
+Snapping
+Rulers
+Grid
 

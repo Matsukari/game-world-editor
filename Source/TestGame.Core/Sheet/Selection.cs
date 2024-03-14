@@ -27,10 +27,15 @@ namespace Raven.Sheet
     public object Capture = null;
     public Selection() 
     { 
+    }
+    public override void OnAddedToScene()
+    {
+      base.OnAddedToScene();
       Ren = AddComponent(new Renderable());
       Ren.RenderLayer = -1;
       End();
     }
+        
     public class Renderable : Editor.SubEntity.RenderableComponent<Selection>
     {
       public int Radius = 4;
@@ -99,15 +104,21 @@ namespace Raven.Sheet
     }
     public void Begin(RectangleF area, object capture=null)
     {
-      Capture = capture;
+      End();
       Bounds = area;
       InitialBounds = area;
+      Capture = capture;
       Enabled = true;
+      Editor.Set(Editor.EditingState.SelectedSprite);
+      Core.GetGlobalManager<Raven.Input.InputManager>().IsDragFirst = true;
+      Update();
     }
     public void End()
     {
       Capture = null;
       Enabled = false;
+      SelAxis = SelectionAxis.None;
+      Editor.Set(Editor.EditingState.Default);
     }
     public bool HasBegun() => Enabled;
 

@@ -14,7 +14,7 @@ namespace Raven.Sheet.Sprites
     {
       transform.LocalPosition = Position;
       transform.LocalScale = Scale;
-      transform.LocalRotation = Rotation;
+      transform.LocalRotationDegrees = Rotation;
     }
     public void RenderImGui()
     {

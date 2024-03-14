@@ -25,7 +25,7 @@ namespace Raven.Sheet
           ImGui.Unindent();
         }
       }
-      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} Spritexes ({Editor.SpriteSheet.Spritexes.Count})"))
+      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} Spritexes ({Editor.SpriteSheet.Spritexes.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         ImGui.Indent();
         foreach (var (name, spritex) in Editor.SpriteSheet.Spritexes)

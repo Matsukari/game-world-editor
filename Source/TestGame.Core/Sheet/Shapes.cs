@@ -39,6 +39,7 @@ namespace Raven
         get => Bounds.Location+Bounds.Size/2; 
         set => Bounds = new RectangleF(value.X-Bounds.Size.X/2, value.Y-Bounds.Size.Y/2, Bounds.Width, Bounds.Height);  
       }
+      [PropertiedInput("Radius")]
       public float Radius
       { 
         get => Bounds.Width/2; 

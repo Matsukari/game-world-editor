@@ -92,8 +92,7 @@ namespace Raven.Sheet
         Enabled  
         && !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) 
         && !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow)
-        && Editor.EditState != Editor.EditingState.AnnotateShape
-        && Editor.EditState != Editor.EditingState.Modal;
+        && Editor.EditState == Editor.EditingState.Default;
     }
   }
 }
