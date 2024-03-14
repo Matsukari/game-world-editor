@@ -12,22 +12,55 @@ namespace Raven.Sheet
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(HandleEditSprite);
     }
+    Sprites.Spritex.SpriteMap _spriteMap = null;
     void HandleEditSprite()
     {
       if (ImGui.GetIO().MouseClicked[1] && Editor.GetSubEntity<SheetView>().HasNoObstruction() && Gui.Selection != null) ImGui.OpenPopup("sprite-popup");
-      if (Gui.Selection is Sprites.Sprite && ImGui.BeginPopupContextItem("sprite-popup"))
+      var spritexView = Editor.GetSubEntity<SpritexView>();
+      if (Gui.Selection is Sprites.Sprite sprite && ImGui.BeginPopupContextItem("sprite-popup"))
       {
-        if (ImGui.BeginMenu(IconFonts.FontAwesome5.PlusSquare + " Convert to"))
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to Sprite"))
         {
-          if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " Spritex")) 
+          ImGui.EndPopup();
+          ImGui.CloseCurrentPopup();
+          ImGui.OpenPopup("spritex-name");
+          return;
+        }
+        if (Editor.SpriteSheet.Spritexes.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to Spritex"))
+        {
+          foreach (var spritex in Editor.SpriteSheet.Spritexes)
           {
-            ImGui.EndMenu();
-            ImGui.EndPopup();
-            ImGui.CloseCurrentPopup();
-            ImGui.OpenPopup("spritex-name");
-            return;
+            if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " " + spritex.Key)) 
+            {
+              ImGui.EndMenu();
+              ImGui.EndPopup();
+              ImGui.CloseCurrentPopup();
+              _spriteMap = spritex.Value.Parts;
+              ImGui.OpenPopup("spritex-part-name");
+              return;
+            }
           }
           ImGui.EndMenu();
+        }
+        if (spritexView.LastSprite != null)
+        {
+          if (ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Add to last Spritex"))
+          {
+            ImGui.EndPopup();
+            ImGui.CloseCurrentPopup();
+            _spriteMap = spritexView.LastSprite.Parts;
+            ImGui.OpenPopup("spritex-part-name");
+            return;
+          }
+          if (spritexView.LastSprite.ChangePart != null && ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Change last Spritex part"))
+          {
+            ImGui.EndPopup();
+            ImGui.CloseCurrentPopup();
+            spritexView.LastSprite.Parts.Data[spritexView.LastSprite.ChangePart.Name] = new Sprites.Spritex.Sprite(sprite);
+            spritexView.LastSprite.Parts.Data[spritexView.LastSprite.ChangePart.Name].Name = spritexView.LastSprite.ChangePart.Name;
+            spritexView.Edit(spritexView.LastSprite);
+            return;
+          }
         }
         ImGui.EndPopup();
       }
@@ -37,6 +70,11 @@ namespace Raven.Sheet
         Editor.SpriteSheet.Spritexes.TryAdd(spritex.Name, spritex);
         Editor.GetSubEntity<SpritexView>().Edit(spritex);
       });
+      ImGuiViews.NamePopupModal(Editor, "spritex-part-name", ()=>
+      {
+        _spriteMap.Add(ImGuiViews.InputName, new Sprites.Spritex.Sprite(Gui.Selection as Sprites.Sprite));
+      });
+      
     } 
     public override void Update()
     {

@@ -20,9 +20,11 @@ Implement polygon shape
 ~Correct positioning~
 ~Position, scale, parts~
 ~Selection on parts~
-Parts picker
-Add other parts
-Rotate parts
+~Parts picker~
+~Add other parts~
+~Delete, name, change parts~
+Order parts
+Rotate parts on selection
 Transform whole body
 Implemente animation
 

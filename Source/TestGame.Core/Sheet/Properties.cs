@@ -77,10 +77,11 @@ namespace Raven
       string changedNameOfProperty = null;
       bool anyOtherChanges = false;
       if (propertied.Properties == null) return false;
-      if (propertied.Properties.Data.Count > 0)
+      if (ImGui.CollapsingHeader("Properties"))
       {
-        ImGui.SeparatorText("Properties");
-      }
+        if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
+
+        ImGui.BeginChild("Properties");
       foreach (var (property, propertyData) in propertied.Properties)
       {
         if (ImGui.TreeNode(property))
@@ -138,6 +139,8 @@ namespace Raven
           ImGui.TreePop();
         }
       }
+      ImGui.EndChild();
+      }
       if (changedName != null)
       {
         propertied.Properties.Data.ChangeKey(changedNameOfProperty, changedName);
@@ -179,7 +182,6 @@ namespace Raven
     static Type _pickedPropertyType = null;
     public static bool HandleNewProperty(IPropertied propertied, Sheet.Editor editor)
     {
-      if (ImGui.GetIO().MouseClicked[1] && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
       if (ImGui.BeginPopupContextItem("prop-popup"))
       {
         if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + " New Property"))
