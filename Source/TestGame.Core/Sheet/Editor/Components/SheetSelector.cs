@@ -53,7 +53,7 @@ namespace Raven.Sheet
     { 
       var sheetView = Editor.GetSubEntity<SheetView>();
       var input = Core.GetGlobalManager<Input.InputManager>();
-      if (!Editor.GetSubEntity<SheetView>().Enabled || input.IsImGuiBlocking) return;
+      if (!Editor.GetSubEntity<SheetView>().Enabled || input.IsImGuiBlocking || Editor.EditState != Editor.EditingState.Default) return;
 
       if (input.IsDragFirst && _initialMouse == Vector2.Zero) 
       {
@@ -64,6 +64,7 @@ namespace Raven.Sheet
         var mouseDragArea = new RectangleF();
         mouseDragArea.Location = sheetView.GetOffRegionInSheet(_initialMouse);
         mouseDragArea.Size = Scene.Camera.MouseToWorldPoint() - _initialMouse;
+        mouseDragArea = mouseDragArea.AlwaysPositive();
         _selectedTiles = Editor.SpriteSheet.GetTiles(mouseDragArea);
         if (_selectedTiles.Count > 1) 
         {

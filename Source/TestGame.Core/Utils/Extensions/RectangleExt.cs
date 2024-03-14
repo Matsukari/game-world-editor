@@ -36,6 +36,14 @@ namespace Raven
       rectangle.Height = Math.Abs(rectangle.Height);
       return rectangle;
     }
+    public static RectangleF AlwaysPositive(this RectangleF rectangle)
+    {
+      rectangle.X = Math.Min(rectangle.X, rectangle.X + rectangle.Width);
+      rectangle.Y = Math.Min(rectangle.Y, rectangle.Y + rectangle.Height);
+      rectangle.Width = Math.Abs(rectangle.Width);
+      rectangle.Height = Math.Abs(rectangle.Height);
+      return rectangle;
+    }
     public static RectangleF MinMax(RectangleF a, RectangleF b)
     {
       var min = new Vector2();

@@ -8,8 +8,8 @@
 ~Geometry on spritex~
 ~Correct position; relative to context~
 ~Fix shape property's inspector~
+~Selectable shapes~
 Implement polygon shape
-Selectable shapes
 
 ## Multiple selection
 ~Fix sprite property naming~
