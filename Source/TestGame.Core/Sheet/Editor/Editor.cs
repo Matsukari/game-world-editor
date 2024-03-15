@@ -46,12 +46,11 @@ namespace Raven.Sheet
     private GuiData _gui = new GuiData();
     [Inspectable]
     public GuiColors ColorSet = new GuiColors();
-    public int TileWidth => SpriteSheet.TileHeight;
-    public int TileHeight => SpriteSheet.TileHeight;
 
     public EditingState EditState = EditingState.Default; 
     public EditingState PrevEditState = EditingState.Default; 
     public Sheet SpriteSheet = null; 
+    public List<Sheet> Sheets = new List<Sheet>();
     public static int ScreenRenderLayer = -2;
     public static int WorldRenderLayer = 0;
 

@@ -8,7 +8,7 @@ namespace Raven.Sheet
     public static void StyleViridescent()
     {
       var style = ImGui.GetStyle();
-      style.WindowPadding = new Vector2(10, 13);
+      style.WindowPadding = new Vector2(10, 6);
       style.FramePadding = new Vector2(12, 3);
       style.ItemSpacing = new Vector2(9, 6);
       style.ItemInnerSpacing = new Vector2(5, 4);
@@ -56,7 +56,7 @@ namespace Raven.Sheet
     public static void StyleViolet()
     {
       var style = ImGui.GetStyle();
-      style.WindowPadding = new Vector2(10, 13);
+      style.WindowPadding = new Vector2(10, 6);
       style.FramePadding = new Vector2(12, 3);
       style.ItemSpacing = new Vector2(9, 6);
       style.ItemInnerSpacing = new Vector2(5, 4);

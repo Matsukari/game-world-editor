@@ -2,22 +2,20 @@ using ImGuiNET;
 using Microsoft.Xna.Framework.Graphics;
 using Nez;
 using Nez.ImGuiTools;
-using Num = System.Numerics;
+using Microsoft.Xna.Framework;
 
 
 namespace Raven.Sheet
 {
   public class GuiData 
   {
-    public Num.Vector2 SheetPosition = new Num.Vector2();
-    public Texture2D SheetTexture;
     public Object Selection = null; 
+    public Vector2 Position = new Vector2();
     public float Zoom = 1;
 
     public Shape ShapeSelection = null;
     public IPropertied ShapeContext = null;
 
-    public ImFontPtr NormalFont;
     internal PrimitiveBatch primitiveBatch;
 
     public GuiData() 
@@ -27,8 +25,7 @@ namespace Raven.Sheet
     public Texture2D LoadTexture(string filename)
     {
       var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
-      SheetTexture = texture;
-      SheetTexture.Name = filename;
+      texture.Name = filename;
       return texture;
     } 
     public void LoadTextureFromFilePopup()

@@ -16,10 +16,11 @@ namespace Raven.Sheet
     {
       ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoDocking);
       var size = Screen.Size;
-      size.Y = 45;
+      size.Y = 27;
       var position = new Vector2(0f, Screen.Height-size.Y-1);
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
+
 
       ImGui.Dummy(new System.Numerics.Vector2(20f, 0f));
 
@@ -41,7 +42,7 @@ namespace Raven.Sheet
         ImGui.SameLine();
         ImGui.Text($"Tile: {Editor.GetSubEntity<SheetView>().TileInMouse.Location.SimpleStringFormat()}");
       }
-
+    
       ImGui.End();
     }
   }
