@@ -1,6 +1,7 @@
 using ImGuiNET;
 using Nez;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace Raven.Sheet 
 {
@@ -64,13 +65,18 @@ namespace Raven.Sheet
         batcher.DrawRectOutline(camera, Parent.Bounds, Editor.ColorSet.SelectionOutline);
 
         var selectionPoint = axis != -1 ? (SelectionAxis)axis : SelectionAxis.None;
+
+        if (selectionPoint != SelectionAxis.None)
+        {
+          Parent.SetMouseCursor(selectionPoint);
+        }
         if (Nez.Input.LeftMouseButtonPressed)
         {
           if (selectionPoint != SelectionAxis.None && !Parent.IsEditingPoint)
           {
             Parent.SelAxis = selectionPoint;
           }
-          else if (Parent._hasInteraction && !Parent.Bounds.Contains(camera.MouseToWorldPoint()))
+          else if (!Parent.Bounds.Contains(camera.MouseToWorldPoint()))
           {
             Parent.End();
           }
@@ -111,6 +117,7 @@ namespace Raven.Sheet
       Capture = capture;
       Enabled = true;
       Editor.Set(Editor.EditingState.SelectedSprite);
+      Editor.GetSubEntity<SheetSelector>().RemoveSelection();
       Core.GetGlobalManager<Raven.Input.InputManager>().IsDragFirst = true;
       Update();
     }
@@ -125,7 +132,6 @@ namespace Raven.Sheet
 
     RectangleF _selectionInitial = new RectangleF();
     bool _isDragInsideArea = false;
-    bool _hasInteraction = false;
     public override void Update()
     {
       base.Update();
@@ -150,20 +156,20 @@ namespace Raven.Sheet
           _isDragInsideArea = true;
         }
       } 
-      else if (input.IsDragLast) _hasInteraction = false;
-      // released in point
-      else if (IsEditingPoint && !input.IsDrag)
-      {
-        SelAxis = SelectionAxis.None;
-      }
-      else if (input.IsDragLast)
+      else if (input.IsDragLast) 
       {
         _isDragInsideArea = false;
+        Mouse.SetCursor(MouseCursor.Arrow);
+        if (IsEditingPoint)
+        {
+          SelAxis = SelectionAxis.None;
+        }
       }
+
       // draggin point
       if (IsEditingPoint)
       {
-        _hasInteraction = true;
+        SetMouseCursor(SelAxis);
         switch (SelAxis)
         {
           case SelectionAxis.TopLeft:
@@ -213,11 +219,48 @@ namespace Raven.Sheet
       {
         _bounds.Location = _selectionInitial.Location + delta;
         Bounds = _bounds;
-        _hasInteraction = true;
       }
-      
+
 
     }
+    public void SetMouseCursor(SelectionAxis axis)
+    {
+      switch (axis)
+      {
+        case SelectionAxis.TopLeft:
+          Mouse.SetCursor(MouseCursor.SizeNWSE);
+          break;
+
+        case SelectionAxis.TopRight:
+          Mouse.SetCursor(MouseCursor.SizeNESW);
+          break;
+
+        case SelectionAxis.BottomLeft:
+          Mouse.SetCursor(MouseCursor.SizeNESW);
+          break;
+
+        case SelectionAxis.BottomRight: 
+          Mouse.SetCursor(MouseCursor.SizeNWSE);
+          break;
+
+        case SelectionAxis.Right: 
+          Mouse.SetCursor(MouseCursor.SizeWE);
+          break;
+
+        case SelectionAxis.Left: 
+          Mouse.SetCursor(MouseCursor.SizeWE);
+          break;
+
+        case SelectionAxis.Top: 
+          Mouse.SetCursor(MouseCursor.SizeNS);
+          break;
+
+        case SelectionAxis.Bottom: 
+          Mouse.SetCursor(MouseCursor.SizeNS);
+          break;
+      }
+    }  
   }
+
 
 }

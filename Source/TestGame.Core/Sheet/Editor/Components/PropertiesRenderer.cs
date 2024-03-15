@@ -74,7 +74,7 @@ namespace Raven.Sheet
         {
           foreach (var part in spritex.Body)
           {
-            DrawText(part.Name, part.Bounds.BottomCenter(), 1f/camera.RawZoom);
+            DrawText(part.Name, part.Bounds.BottomCenter(), Math.Clamp(1f/camera.RawZoom, 1f, 10f));
           }
         }
       }

@@ -28,6 +28,7 @@ namespace Raven.Sheet
       if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} Spritexes ({Editor.SpriteSheet.Spritexes.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         ImGui.BeginChild("spritexes");
+        ImGui.Indent();
         foreach (var (name, spritex) in Editor.SpriteSheet.Spritexes)
         {
           if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {name}")) 
@@ -36,6 +37,7 @@ namespace Raven.Sheet
             spritexView.Edit(spritex);
           }
         }
+        ImGui.Unindent();
         ImGui.EndChild();
       }
       ImGui.End();

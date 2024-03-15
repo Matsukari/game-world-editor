@@ -29,15 +29,15 @@ Transform whole body
 Implemente animation
 
 ## Editor
+~Variation of mouse curors~
+~Better name annotations~
 Project management
 File management / switching
 Editing state indicator
-Better name annotations
-Variation of mouse curors
 
 ## Misc
 ~Fix zoom switching context~
-Fix zooming on mouse
+~Fix zooming on mouse~
 Save & load to file
 Undo & redo
 Shape & tile separate selection

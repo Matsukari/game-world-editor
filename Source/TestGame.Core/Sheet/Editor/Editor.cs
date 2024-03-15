@@ -1,5 +1,6 @@
 using ImGuiNET;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Nez;
 
 namespace Raven.Sheet
@@ -91,7 +92,13 @@ namespace Raven.Sheet
     }
     
     public T GetSubEntity<T>() => (T)_children.OfType<T>().First();
-    public void Set(EditingState state) { EditState = state;  }
+    public void Set(EditingState state) 
+    { 
+      EditState = state;  
+      if (state == EditingState.AnnotateShape) Mouse.SetCursor(MouseCursor.Crosshair);
+      else if (state == EditingState.SelectedSprite) Mouse.SetCursor(MouseCursor.SizeAll);
+      else Mouse.SetCursor(MouseCursor.Arrow);
+    }
 
 	}
 }
