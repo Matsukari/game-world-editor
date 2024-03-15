@@ -15,7 +15,7 @@ namespace Raven.Sheet
     public Texture2D Texture { get => _texture; }
 		public Dictionary<String, Sprites.Spritex> Spritexes = new Dictionary<string, Sprites.Spritex>();
 		public Dictionary<String, Sprites.Sprite> Sprites = new Dictionary<String, Sprites.Sprite>();
-    public Dictionary<int, Sprites.Tile> TileMap { get=> _tiles; }
+    public Dictionary<int, Sprites.Tile> TileMap { get=> _tiles;  }
     // Only instanciated when a tile (primarily a rectangle) is assigned a property or anme
 		Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
 

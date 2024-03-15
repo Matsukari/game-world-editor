@@ -22,11 +22,16 @@ namespace Raven.Sheet.Sprites
     {
       return IconFonts.FontAwesome5.BorderNone;
     }
-
+    protected override void OnChangeName(string prev, string curr)
+    {
+      if (_sheet.CreateTile(this))
+        Console.WriteLine("Created tile");
+      _sheet.GetCreatedTile(Id).Name = curr;
+    }        
     protected override void OnChangeProperty(string name)
     {
       if (_sheet.CreateTile(this))
-        Console.WriteLine("Created ");
+        Console.WriteLine("Created tile");
     }
     protected override void OnRenderBeforeName()
     {

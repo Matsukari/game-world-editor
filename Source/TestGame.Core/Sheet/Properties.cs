@@ -77,7 +77,7 @@ namespace Raven
       string changedNameOfProperty = null;
       bool anyOtherChanges = false;
       if (propertied.Properties == null) return false;
-      if (ImGui.CollapsingHeader("Properties"))
+      if (ImGui.CollapsingHeader("Properties", ImGuiTreeNodeFlags.DefaultOpen))
       {
         if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
 
@@ -228,7 +228,7 @@ namespace Raven
     public virtual void RenderImGui(Sheet.PropertiesRenderer renderer)
     {
       var name = Name;
-      ImGui.Begin(GetIcon() + " " + GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoCollapse);
+      ImGui.Begin(GetIcon() + " " + GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
       if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
 
       OnRenderBeforeName();

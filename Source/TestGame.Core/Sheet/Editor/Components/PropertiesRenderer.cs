@@ -48,21 +48,33 @@ namespace Raven.Sheet
             theShape.Bounds = selectionRect.Bounds;
           }
         }
+        void DrawText(string text, Vector2 pos, float scale)
+        {
+          batcher.DrawString(
+              Graphics.Instance.BitmapFont, 
+              text,
+              pos,
+              color: Color.DarkGray, 
+              rotation: 0f, 
+              origin: Vector2.Zero, 
+              scale: scale, 
+              effects: Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 
+              layerDepth: 0f);
+        }
         // Draw editor's tile names
         if (Editor.GetSubEntity<SheetView>().Enabled)
         {
           foreach (var tile in Editor.SpriteSheet.TileMap)
           {
-            batcher.DrawString(
-                Graphics.Instance.BitmapFont, 
-                tile.Value.Name, 
-                Editor.GetSubEntity<SheetView>().GetRegionInSheet(tile.Value.Region.ToRectangleF()).Location, 
-                color: Color.White, 
-                rotation: 0f, 
-                origin: Editor.SpriteSheet.TileSize.ToVector2(), 
-                scale: 1, 
-                effects: Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 
-                layerDepth: 0f);
+            DrawText(tile.Value.Name, Editor.GetSubEntity<SheetView>().GetRegionInSheet(tile.Value.Region.ToRectangleF()).BottomLeft(), 
+                2.5f/tile.Value.Name.Count());
+          }   
+        }
+        else if (Editor.GetSubEntity<SpritexView>().Enabled && Gui.Selection is Sprites.Spritex spritex)
+        {
+          foreach (var part in spritex.Body)
+          {
+            DrawText(part.Name, part.Bounds.BottomCenter(), 1f/camera.RawZoom);
           }
         }
       }

@@ -6,6 +6,11 @@ namespace Raven
 {
   public static class RectangleExt 
   {
+    public static Vector2 LeftCenter(this RectangleF rect)
+    {
+      rect.Y = rect.Center.Y;
+      return rect.Location;
+    }
     public static Vector2 TopRight(this RectangleF rect)
     {
       rect.X = rect.Right;

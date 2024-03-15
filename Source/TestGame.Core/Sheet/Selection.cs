@@ -61,7 +61,7 @@ namespace Raven.Sheet
 
         // Draw the selection area
         batcher.DrawRect(Parent.Bounds, Editor.ColorSet.SelectionFill);
-        batcher.DrawRectOutline(Parent.Bounds, Editor.ColorSet.SelectionOutline);
+        batcher.DrawRectOutline(camera, Parent.Bounds, Editor.ColorSet.SelectionOutline);
 
         var selectionPoint = axis != -1 ? (SelectionAxis)axis : SelectionAxis.None;
         if (Nez.Input.LeftMouseButtonPressed)
@@ -91,7 +91,7 @@ namespace Raven.Sheet
       void LargenSelectionAxis(int point, Color color, Batcher batcher, Camera camera)
       {
         if (point >= 0 && point < (int)SelectionAxis.None) 
-        { 
+        {
           Gui.primitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.TransformMatrix);
           Gui.primitiveBatch.DrawCircle(Points[point].Location, Radius*SelectedSelectionPointSizeFactor, color);
           Gui.primitiveBatch.End();

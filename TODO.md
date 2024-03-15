@@ -33,8 +33,7 @@ Project management
 File management / switching
 Editing state indicator
 Better name annotations
-Better colors and sizing
-Better render orders
+Variation of mouse curors
 
 ## Misc
 ~Fix zoom switching context~
