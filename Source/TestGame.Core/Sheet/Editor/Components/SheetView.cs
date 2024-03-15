@@ -13,6 +13,7 @@ namespace Raven.Sheet
     public override void OnChangedTab()
     {
       Position = Vector2.Zero;
+      RemoveAllComponents(); 
       _image = AddComponent(new SpriteRenderer(Sheet.Texture));
       AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());

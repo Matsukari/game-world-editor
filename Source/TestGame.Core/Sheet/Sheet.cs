@@ -34,11 +34,12 @@ namespace Raven.Sheet
     }
     public Sheet(string filename) 
     {
+      Name = filename;
       var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
       texture.Name = filename;
       Insist.IsNotNull(texture); 
       _texture = texture;
-      SetTileSize(16, 16);
+      SetTileSize(16, 16); 
     }
     public void SetTileSize(int w, int h) 
     {

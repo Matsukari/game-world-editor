@@ -81,14 +81,14 @@ namespace Nez.ImGuiTools
 			ImGui.Text("Current Folder: " + Path.GetFileName(RootFolder) + CurrentFolder.Replace(RootFolder, ""));
 			bool result = false;
 
-			if (ImGui.BeginChildFrame(1, new Num.Vector2(500, 400)))
+			if (ImGui.BeginChild(1, new Num.Vector2(500, 400)))
 			{
 				var di = new DirectoryInfo(CurrentFolder);
 				if (di.Exists)
 				{
 					if (di.Parent != null && (!DontAllowTraverselBeyondRootFolder || CurrentFolder != RootFolder))
 					{
-						ImGui.PushStyleColor(ImGuiCol.Text, Color.Yellow.PackedValue);
+						ImGui.PushStyleColor(ImGuiCol.Text, Color.Violet.PackedValue);
 						if (ImGui.Selectable("../", false, ImGuiSelectableFlags.DontClosePopups))
 							CurrentFolder = di.Parent.FullName;
 						
@@ -101,7 +101,7 @@ namespace Nez.ImGuiTools
 						if (Directory.Exists(fse))
 						{
 							var name = Path.GetFileName(fse);
-							ImGui.PushStyleColor(ImGuiCol.Text, Color.Yellow.PackedValue);
+							ImGui.PushStyleColor(ImGuiCol.Text, Color.Violet.PackedValue);
 							if (ImGui.Selectable(name + "/", false, ImGuiSelectableFlags.DontClosePopups))
 								CurrentFolder = fse;
 							ImGui.PopStyleColor();
@@ -122,7 +122,7 @@ namespace Nez.ImGuiTools
 					}
 				}
 			}
-			ImGui.EndChildFrame();
+			ImGui.EndChild();
 
 
 			if (ImGui.Button("Cancel"))

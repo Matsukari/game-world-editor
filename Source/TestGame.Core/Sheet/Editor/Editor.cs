@@ -61,7 +61,7 @@ namespace Raven.Sheet
     public EditingState PrevEditState = EditingState.Default; 
     public GuiColors ColorSet = new GuiColors();
 
-    public List<IPropertied> _tabs = new List<IPropertied>();
+    internal List<IPropertied> _tabs = new List<IPropertied>();
     public List<GuiData> _tabsState = new List<GuiData>();
     private int _currentTab = 0;
     public static int ScreenRenderLayer = -2;
@@ -98,6 +98,7 @@ namespace Raven.Sheet
     public void RenderImGui(PropertiesRenderer renderer)
     {
       _tabs[_currentTab].RenderImGui(renderer);
+      DrawFilePicker();
     }
     public void Set(EditingState state) 
     { 
@@ -132,7 +133,36 @@ namespace Raven.Sheet
       _tabsState.Add(new GuiData());
       _tabsState.Last().ShapeContext = content;
     } 
-
+    Action<string> _pickerCallback = null;
+    bool _isOpenFile = false;
+    public void OpenFilePicker(Action<string> callback) 
+    {
+      _pickerCallback = callback;
+      _isOpenFile = true;
+    } 
+    void DrawFilePicker()
+    {
+      if (_isOpenFile)
+      {
+        ImGui.OpenPopup("file-picker-modal");
+        _isOpenFile = false;
+      }
+      var isOpen = true;
+      if (ImGui.BeginPopupModal("file-picker-modal", ref isOpen, ImGuiWindowFlags.NoTitleBar))
+      {
+        Set(EditingState.Modal);
+        var picker = Nez.ImGuiTools.FilePicker.GetFilePicker(this, Path.Combine(Environment.CurrentDirectory, "Content"), ".png|.atlas");
+        picker.DontAllowTraverselBeyondRootFolder = true;
+        if (picker.Draw())
+        {
+          _pickerCallback.Invoke(picker.SelectedFile);
+          _pickerCallback = null;
+          Set(EditingState.Default);
+          Nez.ImGuiTools.FilePicker.RemoveFilePicker(this);
+        }
+        ImGui.EndPopup();
+      }
+    }
 	}
 }
 

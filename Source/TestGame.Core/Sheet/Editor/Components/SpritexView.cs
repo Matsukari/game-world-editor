@@ -16,6 +16,8 @@ namespace Raven.Sheet
     public override void OnChangedTab()
     {
       UnEdit();
+      _spritex = null;
+      Gui.Selection = null;
     }
     // Go to canvas and close spritesheet view
     public void Edit(Sprites.Spritex spritex)
