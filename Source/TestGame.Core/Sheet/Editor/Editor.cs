@@ -82,7 +82,7 @@ namespace Raven.Sheet
     }
     public void RenderImGui(PropertiesRenderer renderer)
     {
-      ImGui.Begin(IconFonts.FontAwesome5.ThLarge + " " + GetType().Name);
+      ImGui.Begin(IconFonts.FontAwesome5.ThLarge + " " + GetType().Name, ImGuiWindowFlags.NoCollapse);
       SpriteSheet.RenderImGui(renderer);
       IPropertied.HandleNewProperty(SpriteSheet, this);
       IPropertied.RenderProperties(SpriteSheet);

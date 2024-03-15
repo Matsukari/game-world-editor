@@ -21,7 +21,7 @@ public class TestGameProcess : Core
         var imGuiManager = new ImGuiManager(imGuiOptions);
         Core.RegisterGlobalManager( imGuiManager );
         NezImGuiThemes.HighContrast();
-        Raven.Sheet.GuiStyles.StyleViridescent();
+        Raven.Sheet.GuiStyles.StyleViolet();
         ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
         imGuiManager.ShowMenuBar = false;
         Scene = new SpriteSheetEditorScene();

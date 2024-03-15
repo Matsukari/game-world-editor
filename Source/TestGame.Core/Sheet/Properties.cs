@@ -228,7 +228,7 @@ namespace Raven
     public virtual void RenderImGui(Sheet.PropertiesRenderer renderer)
     {
       var name = Name;
-      ImGui.Begin(GetIcon() + " " + GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
+      ImGui.Begin(GetIcon() + " " + GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoCollapse);
       if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
 
       OnRenderBeforeName();

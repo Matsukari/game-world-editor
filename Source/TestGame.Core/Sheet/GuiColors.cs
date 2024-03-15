@@ -5,7 +5,7 @@ namespace Raven.Sheet
   public struct GuiColors 
   {
     public Color SelectionOutline = new Color(0.85f, 0.85f, 0.85f);
-    public Color SelectionFill = new Color(0.85f, 0.85f, 0.85f, 0.04f);
+    public Color SelectionFill = new Color(0.2f, 0.2f, 0.2f, 0.04f);
     public Color SpriteGridOutline = new Color(0.3f, 0.3f, 0.3f, 0.17f);
     public Color SpriteRegionInactiveOutline = new Color(0.0f, 0.0f, 0.0f, 0.5f);
     public Color SheetInactiveFill = new Color(0.3f, 0.3f, 0.3f, 0.5f);

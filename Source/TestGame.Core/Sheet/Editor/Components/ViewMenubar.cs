@@ -38,17 +38,12 @@ namespace Raven.Sheet
         }
         ImGui.EndMainMenuBar();
       }
-      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBringToFrontOnFocus);
-      var position = new Vector2(0f, menubarSize.Y);
+      ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoDocking);
+      var position = new Vector2(0f, menubarSize.Y-1);
       var size = Screen.Size;
-      size.Y = 40;
+      size.Y = 45;
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
-
-
-      // ImGui.Dummy(new System.Numerics.Vector2(300, 0f));
-      // ImGui.SameLine();
-
 
       ImGui.Dummy(new System.Numerics.Vector2(300, 0f));
       ImGui.SameLine();
@@ -107,7 +102,7 @@ namespace Raven.Sheet
       ImGui.Dummy(new System.Numerics.Vector2(20, 0));
       ImGui.SameLine();
 
-
+      // Draw shape annotators
       foreach (var shapeType in typeof(Shape).GetNestedTypes())
       {
         var shapeInstance = System.Convert.ChangeType(System.Activator.CreateInstance(shapeType), shapeType) as Shape;
