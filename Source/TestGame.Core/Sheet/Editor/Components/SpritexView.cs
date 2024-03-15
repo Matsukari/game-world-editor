@@ -8,26 +8,28 @@ using Microsoft.Xna.Framework;
 
 namespace Raven.Sheet
 {
-  public class SpritexView : Editor.SubEntity
+  public class SpritexView : Editor.SheetEntity
   {
     public Sprites.Spritex LastSprite { get => _spritex; }
     Sprites.Spritex _spritex;
     List<Entity> _entities = new List<Entity>();
-    public override void OnAddedToScene()
+    public override void OnChangedTab()
     {
       UnEdit();
     }
+    // Go to canvas and close spritesheet view
     public void Edit(Sprites.Spritex spritex)
     {
       UnEdit();
       _spritex = spritex;
-      Position = new Vector2();
       Enabled = true;
+      Position = new Vector2();
       Gui.Selection = _spritex;
       Gui.ShapeContext = _spritex;
       Editor.GetSubEntity<SheetView>().Enabled = false;
       Editor.Set(Editor.EditingState.SelectedSprite);
 
+      // Origin lines
       var origin = AddComponent(new Guidelines.OriginLines());
       origin.Color = Editor.ColorSet.SpriteRegionActiveOutline;
 
@@ -36,6 +38,7 @@ namespace Raven.Sheet
 
       BuildBody();
     }
+    // back to spritesheet view
     public void UnEdit()
     {
       RemoveAllComponents();
@@ -47,7 +50,7 @@ namespace Raven.Sheet
       Editor.GetSubEntity<SheetSelector>().RemoveSelection();
       Editor.GetSubEntity<Selection>().End();
       Enabled = false;
-      Gui.ShapeContext = Editor.SpriteSheet;
+      Gui.ShapeContext = Sheet;
       Scene.Camera.RawZoom = 1f;
       Scene.Camera.Position = new Vector2();
     }
@@ -59,6 +62,7 @@ namespace Raven.Sheet
       SyncEntitySpritex();
       HandleSelection();
     }
+    // Recreate and sync entities to spritex parts
     void BuildBody()
     {
       foreach (var entity in _entities) entity.Destroy();
@@ -66,7 +70,7 @@ namespace Raven.Sheet
       foreach (var part in _spritex.Body)
       {
         var partEntity = Scene.CreateEntity(_spritex.Name + part.SourceSprite.Name);
-        var ren = partEntity.AddComponent(new SpriteRenderer(new Sprite(Editor.SpriteSheet.Texture, part.SourceSprite.Region)));
+        var ren = partEntity.AddComponent(new SpriteRenderer(new Sprite(Sheet.Texture, part.SourceSprite.Region)));
         part.Origin = ren.Origin;
         partEntity.SetParent(this);
         _entities.Add(partEntity);
@@ -79,7 +83,6 @@ namespace Raven.Sheet
         BuildBody();
       }
       // Overall transform; which covers all parts
-      // NOTE; it's the entity's transform that is begin modifed and synced to that of custom class' transform  and not the other way around
       _spritex.Transform.Apply(Transform);
       for (int i = 0; i < _entities.Count(); i++)
       {
@@ -90,6 +93,8 @@ namespace Raven.Sheet
     void HandleSelection()
     {
       var selectionRect = Editor.GetSubEntity<Selection>();
+
+      // select individual parts
       if (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed)
       {
         foreach (var part in _spritex.Body)
@@ -103,10 +108,6 @@ namespace Raven.Sheet
               selectionRect.Begin(part.Bounds, part);
               return;
             }
-            else 
-            {
-              ImGui.OpenPopup("sprite-component-options");
-            }
           }
         }
       }
@@ -115,13 +116,6 @@ namespace Raven.Sheet
         selPart.Transform.Scale = _initialScale + (selectionRect.Bounds.Size - selectionRect.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
         selPart.Transform.Position = selectionRect.Bounds.Location + (selPart.Origin * selPart.Transform.Scale);
       }
-    }
-    internal bool HasNoObstruction()
-    {
-      return 
-           !ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) 
-        && !ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow)
-        && Editor.EditState != Editor.EditingState.AnnotateShape;
     }
   }
 }

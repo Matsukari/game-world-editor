@@ -22,13 +22,7 @@ namespace Raven.Sheet
     {
       primitiveBatch = new PrimitiveBatch();
     }
-    public Texture2D LoadTexture(string filename)
-    {
-      var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
-      texture.Name = filename;
-      return texture;
-    } 
-    public void LoadTextureFromFilePopup()
+    public void LoadTextureFromFilePopup(Action<string> callback)
     {
       var isOpen = true;
       if (ImGui.BeginPopupModal(Names.OpenFile, ref isOpen, ImGuiWindowFlags.NoTitleBar))
@@ -37,7 +31,7 @@ namespace Raven.Sheet
         picker.DontAllowTraverselBeyondRootFolder = true;
         if (picker.Draw())
         {
-          LoadTexture(picker.SelectedFile);
+          callback.Invoke(picker.SelectedFile);
           FilePicker.RemoveFilePicker(this);
         }
         ImGui.EndPopup();

@@ -1,7 +1,6 @@
 
 using Nez;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 
 namespace Raven.Sheet
 {
@@ -10,28 +9,29 @@ namespace Raven.Sheet
     public void Annotate(Shape shape)
     {
       if (Gui.ShapeContext == null) throw new MissingFieldException();
-      Gui.ShapeSelection = shape;
       Editor.Set(Editor.EditingState.AnnotateShape);
+      Gui.ShapeSelection = shape;
     }
     public override void OnAddedToScene()
     {
-      var com = AddComponent(new Renderable());
-      com.RenderLayer = -1;
+      var renderable = AddComponent(new Renderable());
+      renderable.RenderLayer = -1;
     }
     public class Renderable : Editor.SubEntity.RenderableComponent<Annotator>
     {
       Vector2 _initialMouse = Vector2.Zero;
       public override void Render(Batcher batcher, Camera camera)
       {
-
         var input = Core.GetGlobalManager<Raven.Input.InputManager>();
         if (Editor.EditState != Editor.EditingState.AnnotateShape || input.IsImGuiBlocking) return;
 
+        // calculate position of area between mous drag
         var rect = input.MouseDragArea;
         rect.Location = _initialMouse;
         rect.Size = camera.MouseToWorldPoint() - _initialMouse;
         Gui.ShapeSelection.Bounds = rect;
-        
+      
+        // Adds to current context
         void Add()
         {
           Gui.ShapeContext.Properties.Add(Gui.ShapeSelection);
@@ -39,6 +39,8 @@ namespace Raven.Sheet
           Gui.ShapeSelection = null;
           _initialMouse = Vector2.Zero;
         }
+
+        // start point
         if (input.IsDragFirst && _initialMouse == Vector2.Zero)
         {
           Editor.GetSubEntity<SheetSelector>().RemoveSelection();
@@ -53,14 +55,18 @@ namespace Raven.Sheet
             Add();
           }
         }
+        // Dragging
         else if (input.IsDrag) 
         {
           Gui.primitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
           Gui.ShapeSelection.Render(Gui.primitiveBatch, batcher, camera, Editor.ColorSet.AnnotatedShapeActive);
           Gui.primitiveBatch.End(); 
         }
+        // Released; add 
         else if (input.IsDragLast && _initialMouse != Vector2.Zero && !(Gui.ShapeSelection is Shape.Polygon)) Add();
       }
+
+      // Draws all shapes in the properties
       public static void DrawPropertiesShapes(IPropertied propertied, PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
       {
         foreach (var prop in propertied.Properties)

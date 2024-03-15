@@ -6,28 +6,25 @@ using ImGuiNET;
 
 namespace Raven.Sheet
 {
-  public class SheetView : Editor.SubEntity
+  public class SheetView : Editor.SheetEntity
   {
     internal Rectangle TileInMouse;
     SpriteRenderer _image;
-    public override void OnAddedToScene()
+    public override void OnChangedTab()
     {
-      Position = Screen.Center;
-      _image = AddComponent(new SpriteRenderer(Gui.SheetTexture));
+      Position = Vector2.Zero;
+      _image = AddComponent(new SpriteRenderer(Sheet.Texture));
       AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
     }    
-    public class Renderable : Editor.SubEntity.RenderableComponent<SheetView>
+    public class Renderable : Editor.SheetEntity.Renderable<SheetView>
     {
       List<Rectangle> _tiles = new List<Rectangle>();
       Point lastSize = Point.Zero;
-      public override void OnAddedToEntity()
-      {
-      }      
       public override void Render(Batcher batcher, Camera camera)
       {
-        if (Editor.SpriteSheet == null) return;
+        SyncModifiedTiles();
         DrawArtifacts(batcher, camera);
 
         // Draw last selected sprite
@@ -36,15 +33,17 @@ namespace Raven.Sheet
         else if (Gui.Selection is Sprites.Tile tile) region = tile.Region.ToRectangleF();
         if (region != RectangleF.Empty) batcher.DrawRect(Parent.GetRegionInSheet(region), Editor.ColorSet.SpriteRegionActiveFill);
       }
+      void SyncModifiedTiles()
+      {
+        if (lastSize != Sheet.TileSize)
+        {
+          lastSize = Sheet.TileSize;
+          _tiles = Sheet.GetTiles();
+        }
+      }
       // Rectangles & highlights
       void DrawArtifacts(Batcher batcher, Camera camera)
       {
-        if (lastSize != Editor.SpriteSheet.TileSize)
-        {
-          lastSize = Editor.SpriteSheet.TileSize;
-          _tiles = Editor.SpriteSheet.GetTiles();
-        }
-
         // Draw tiles' grid
         foreach (var tile in _tiles) 
         {
@@ -60,11 +59,6 @@ namespace Raven.Sheet
           worldTileInMouse.Location += Parent._image.Bounds.Location;
           batcher.DrawRectOutline(camera, worldTileInMouse, Editor.ColorSet.SpriteRegionActiveFill);
         }
-        // Darken the whole image when under different editing state
-        // if (Editor.EditingState != Editor.EditingState.Default)
-        // {
-        //   batcher.DrawRect(Parent._image.Bounds, Editor.ColorSet.SpriteRegionInactiveOutline); 
-        // }
       }
     }
         

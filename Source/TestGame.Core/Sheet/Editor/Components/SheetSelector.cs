@@ -6,7 +6,7 @@ using ImGuiNET;
 
 namespace Raven.Sheet
 {
-  public class SheetSelector : Editor.SubEntity
+  public class SheetSelector : Editor.SheetEntity
   {
     public override void OnAddedToScene()
     {
@@ -15,41 +15,53 @@ namespace Raven.Sheet
     Sprites.Spritex.SpriteMap _spriteMap = null;
     void HandleEditSprite()
     {
-      if (ImGui.GetIO().MouseClicked[1] && Editor.GetSubEntity<SheetView>().HasNoObstruction() && Gui.Selection != null) ImGui.OpenPopup("sprite-popup");
+      if (!Enabled) return;
+      
       var spritexView = Editor.GetSubEntity<SpritexView>();
+
+      // right-click; open options
+      if (Nez.Input.RightMouseButtonPressed 
+          && Editor.GetSubEntity<SheetView>().HasNoObstruction() 
+          && Gui.Selection != null) ImGui.OpenPopup("sprite-popup");
+
+      void OpenPopup(string name)
+      {
+        ImGui.EndPopup();
+        ImGui.CloseCurrentPopup();
+        ImGui.OpenPopup(name);
+      }
+
+      // something is selected; render options
       if (Gui.Selection is Sprites.Sprite sprite && ImGui.BeginPopupContextItem("sprite-popup"))
       {
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to Sprite"))
+        // convert to new spritex
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to Spritex"))
         {
-          ImGui.EndPopup();
-          ImGui.CloseCurrentPopup();
-          ImGui.OpenPopup("spritex-name");
+          OpenPopup("spritex-name");
           return;
         }
-        if (Editor.SpriteSheet.Spritexes.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to Spritex"))
+        // add to exisiting spritex; select by list
+        if (Sheet.Spritexes.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to Spritex"))
         {
-          foreach (var spritex in Editor.SpriteSheet.Spritexes)
+          foreach (var spritex in Sheet.Spritexes)
           {
             if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " " + spritex.Key)) 
             {
               ImGui.EndMenu();
-              ImGui.EndPopup();
-              ImGui.CloseCurrentPopup();
+              OpenPopup("spritex-part-name");
               _spriteMap = spritex.Value.Parts;
-              ImGui.OpenPopup("spritex-part-name");
               return;
             }
           }
           ImGui.EndMenu();
         }
+        // Has opened and made operation to last spritex' part
         if (spritexView.LastSprite != null)
         {
           if (ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Add to last Spritex"))
           {
-            ImGui.EndPopup();
-            ImGui.CloseCurrentPopup();
             _spriteMap = spritexView.LastSprite.Parts;
-            ImGui.OpenPopup("spritex-part-name");
+            OpenPopup("spritex-part-name");
             return;
           }
           if (spritexView.LastSprite.ChangePart != null && ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Change last Spritex part"))
@@ -66,8 +78,8 @@ namespace Raven.Sheet
       }
       ImGuiViews.NamePopupModal(Editor, "spritex-name", ()=>
       {
-        var spritex = Editor.SpriteSheet.CreateSpritex(ImGuiViews.InputName, Gui.Selection as Sprites.Sprite);
-        Editor.SpriteSheet.Spritexes.TryAdd(spritex.Name, spritex);
+        var spritex = Sheet.CreateSpritex(ImGuiViews.InputName, Gui.Selection as Sprites.Sprite);
+        Sheet.Spritexes.TryAdd(spritex.Name, spritex);
         Editor.GetSubEntity<SpritexView>().Edit(spritex);
       });
       ImGuiViews.NamePopupModal(Editor, "spritex-part-name", ()=>
@@ -99,6 +111,7 @@ namespace Raven.Sheet
       var input = Core.GetGlobalManager<Input.InputManager>();
       if (!Editor.GetSubEntity<SheetView>().Enabled || input.IsImGuiBlocking || Editor.EditState != Editor.EditingState.Default) return;
 
+      // Foundation for multiple tile selection
       if (input.IsDragFirst && _initialMouse == Vector2.Zero) 
       {
         _initialMouse = Scene.Camera.MouseToWorldPoint();
@@ -109,10 +122,10 @@ namespace Raven.Sheet
         mouseDragArea.Location = sheetView.GetOffRegionInSheet(_initialMouse);
         mouseDragArea.Size = Scene.Camera.MouseToWorldPoint() - _initialMouse;
         mouseDragArea = mouseDragArea.AlwaysPositive();
-        _selectedTiles = Editor.SpriteSheet.GetTiles(mouseDragArea);
+        _selectedTiles = Sheet.GetTiles(mouseDragArea);
         if (_selectedTiles.Count > 1) 
         {
-          var sprite = Editor.SpriteSheet.CreateSprite(_selectedTiles.ToArray());
+          var sprite = Sheet.CreateSprite(_selectedTiles.ToArray());
           Select(sprite);
         }
       }
@@ -122,44 +135,27 @@ namespace Raven.Sheet
         _selectedTiles.Clear();
         _initialMouse = Vector2.Zero;
         if (count > 1 || !sheetView.HasNoObstruction()) return;
-        foreach (var sprite in Editor.SpriteSheet.Sprites)
+
+        // Selects multiple tiles
+        foreach (var sprite in Sheet.Sprites)
         {
           if (sheetView.GetRegionInSheet(sprite.Value.Region.ToRectangleF()).Contains(Scene.Camera.MouseToWorldPoint())) 
             Select(sprite.Value);
         }
+        // Selects single tile
         if (sheetView.TileInMouse != null) 
         {
-          var coord = Editor.SpriteSheet.GetTile(sheetView.TileInMouse);
-          var tileInCoord = Editor.SpriteSheet.CustomTileExists(coord.X, coord.Y);
+          var coord = Sheet.GetTile(sheetView.TileInMouse);
+          var tileInCoord = Sheet.CustomTileExists(coord.X, coord.Y);
           if (tileInCoord != null) Select(tileInCoord);
-          else Select(new Sprites.Tile(coord, Editor.SpriteSheet));
-        }
-        else if (Gui.Selection != null) 
-        {
-          Gui.Selection = null;
-          Editor.Set(Editor.EditingState.Default);
+          else Select(new Sprites.Tile(coord, Sheet));
         }
       }
-    }
-
-    public void Select(Shape shape)
-    {
-      Gui.ShapeSelection = shape;
     }
     public void Select(IPropertied sel)
     {
       if (Gui.ShapeSelection != null) return;
       Gui.Selection = sel;
-      if (Gui.Selection is Sprites.Sprite sprite)
-      {
-      }
-      else if (Gui.Selection is Sprites.Tile tile)
-      {
-      }
-      else if (Gui.Selection is Sprites.Spritex spritex)
-      {
-      }
-      else throw new TypeAccessException();
       Console.WriteLine($"Selected {Gui.Selection.GetType().Name}");
     }
 

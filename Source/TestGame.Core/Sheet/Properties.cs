@@ -82,64 +82,64 @@ namespace Raven
         if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
 
         ImGui.BeginChild("Properties");
-      foreach (var (property, propertyData) in propertied.Properties)
-      {
-        if (ImGui.TreeNode(property))
+        foreach (var (property, propertyData) in propertied.Properties)
         {
-          var nameHolder = property;
-          changedNameOfProperty = property;
-          if (ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue))
+          if (ImGui.TreeNode(property))
           {
-            changedName = nameHolder;
-          }
-          ImGui.LabelText("Type", propertyData.GetType().Name);
+            var nameHolder = property;
+            changedNameOfProperty = property;
+            if (ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue))
+            {
+              changedName = nameHolder;
+            }
+            ImGui.LabelText("Type", propertyData.GetType().Name);
 
-          // Property value itself is the data
-          if (propertyData.GetType().IsPrimitive)
-          {
-            switch (propertyData)
+            // Property value itself is the data
+            if (propertyData.GetType().IsPrimitive)
             {
-              case int intValue: 
-                if (ImGui.InputInt("Value", ref intValue)) 
-                {
-                  changedProperty = intValue;
-                }
-                break;
-              case bool boolValue: 
-                if (ImGui.Button("Value")) 
-                {
-                  boolValue = !boolValue;
-                  changedProperty = boolValue;
-                }
-                break;
-              case float floatValue: 
-                if (ImGui.InputFloat("Value", ref floatValue)) 
-                {
-                  changedProperty = floatValue;
-                }
-                break;
+              switch (propertyData)
+              {
+                case int intValue: 
+                  if (ImGui.InputInt("Value", ref intValue)) 
+                  {
+                    changedProperty = intValue;
+                  }
+                  break;
+                case bool boolValue: 
+                  if (ImGui.Button("Value")) 
+                  {
+                    boolValue = !boolValue;
+                    changedProperty = boolValue;
+                  }
+                  break;
+                case float floatValue: 
+                  if (ImGui.InputFloat("Value", ref floatValue)) 
+                  {
+                    changedProperty = floatValue;
+                  }
+                  break;
+              }
             }
-          }
-          else if (propertyData is string stringValue)
-          {
-            if (ImGui.InputText("Value", ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
+            else if (propertyData is string stringValue)
             {
-              changedProperty = stringValue;
+              if (ImGui.InputText("Value", ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
+              {
+                changedProperty = stringValue;
+              }
             }
+            // Property's value contains a set of data
+            else 
+            {
+              // Console.WriteLine($"Type of : {property} {propertyData.GetType().Name}");
+              var subProperties = 
+                propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy); 
+              // var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
+              anyOtherChanges = RenderHardTypes(subProperties, propertyData);
+            }
+            ImGui.TreePop();
           }
-          // Property's value contains a set of data
-          else 
-          {
-            // Console.WriteLine($"Type of : {property} {propertyData.GetType().Name}");
-            var subProperties = 
-              propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy); 
-            // var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
-            anyOtherChanges = RenderHardTypes(subProperties, propertyData);
-          }
-          ImGui.TreePop();
         }
-      }
-      ImGui.EndChild();
+        ImGui.EndChild();
       }
       if (changedName != null)
       {

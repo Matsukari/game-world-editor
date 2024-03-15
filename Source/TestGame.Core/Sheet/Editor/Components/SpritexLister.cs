@@ -7,16 +7,16 @@ using Num = System.Numerics;
 
 namespace Raven.Sheet
 {
-  public class SpritexLister : Editor.SubEntity
+  public class SpritexLister : Editor.SheetEntity
   {
     public override void OnAddedToScene() => Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
     public void RenderImGui() 
     {
-      if (Editor.SpriteSheet == null) return;
+      if (Sheet == null) return;
       ImGui.Begin(IconFonts.FontAwesome5.List + " " + GetType().Name);
-      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Th} Tiles ({Editor.SpriteSheet.Tiles.X * Editor.SpriteSheet.Tiles.Y})"))
+      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Th} Tiles ({Sheet.Tiles.X * Sheet.Tiles.Y})"))
       {
-        foreach (var (name, tile) in Editor.SpriteSheet.TileMap)
+        foreach (var (name, tile) in Sheet.TileMap)
         {
           ImGui.Indent();
           if (ImGui.MenuItem($"{name}"))
@@ -25,11 +25,11 @@ namespace Raven.Sheet
           ImGui.Unindent();
         }
       }
-      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} Spritexes ({Editor.SpriteSheet.Spritexes.Count})", ImGuiTreeNodeFlags.DefaultOpen))
+      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} Spritexes ({Sheet.Spritexes.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         ImGui.BeginChild("spritexes");
         ImGui.Indent();
-        foreach (var (name, spritex) in Editor.SpriteSheet.Spritexes)
+        foreach (var (name, spritex) in Sheet.Spritexes)
         {
           if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {name}")) 
           {

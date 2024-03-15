@@ -28,9 +28,17 @@ namespace Raven.Sheet
     private Texture2D _texture;
     public Sheet(Texture2D texture) 
     {
-      Insist.IsNotNull(texture);
-      
+      Insist.IsNotNull(texture); 
       _texture = texture;
+      SetTileSize(16, 16);
+    }
+    public Sheet(string filename) 
+    {
+      var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
+      texture.Name = filename;
+      Insist.IsNotNull(texture); 
+      _texture = texture;
+      SetTileSize(16, 16);
     }
     public void SetTileSize(int w, int h) 
     {
@@ -123,11 +131,13 @@ namespace Raven.Sheet
       }
       return result;
     }
-    public override void RenderImGui(PropertiesRenderer renderer)
+    public override string GetIcon()
     {
-      var name = Name;
+      return IconFonts.FontAwesome5.ThLarge;
+    }
+    protected override void OnRenderAfterName(PropertiesRenderer renderer)
+    {
       int w = TileWidth, h = TileHeight;
-      if (ImGui.InputText("Name", ref name, 10)) Name = name;
       ImGui.LabelText(IconFonts.FontAwesome5.File + " File", _texture.Name);
       if (ImGui.InputInt("TileWidth", ref w)) SetTileSize(w, TileHeight);
       if (ImGui.InputInt("TileHeight", ref h)) SetTileSize(TileWidth, h);

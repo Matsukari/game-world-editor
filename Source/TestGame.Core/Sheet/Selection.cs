@@ -117,7 +117,6 @@ namespace Raven.Sheet
       Capture = capture;
       Enabled = true;
       Editor.Set(Editor.EditingState.SelectedSprite);
-      Editor.GetSubEntity<SheetSelector>().RemoveSelection();
       Core.GetGlobalManager<Raven.Input.InputManager>().IsDragFirst = true;
       Update();
     }

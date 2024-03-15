@@ -14,13 +14,9 @@ namespace Raven.Sheet
       render.RenderLayer = -1;
     }
     public void RenderImGui() 
-    {  
-      if (Editor.SpriteSheet == null) return;
+    { 
       Editor.RenderImGui(this);
-      if (Gui.Selection is IPropertied propertied) 
-      {
-        propertied.RenderImGui(this); 
-      }
+      if (Gui.Selection is IPropertied propertied) propertied.RenderImGui(this);  
     }
     public class Renderable : Editor.SubEntity.RenderableComponent<PropertiesRenderer>
     {
@@ -28,26 +24,37 @@ namespace Raven.Sheet
       {
         if (Gui.ShapeContext != null)
         {
+          // Draw annotated shapes
           Gui.primitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
           Annotator.Renderable.DrawPropertiesShapes(Gui.ShapeContext, Gui.primitiveBatch, batcher, camera, Editor.ColorSet.AnnotatedShapeInactive);
           Gui.primitiveBatch.End();
+
+          // Check selection of shapes
           var selectionRect = Editor.GetSubEntity<Selection>();
-          if (Nez.Input.LeftMouseButtonPressed)
+          foreach (var shape in Gui.ShapeContext.Properties)
           {
-            foreach (var shape in Gui.ShapeContext.Properties)
+            if (Nez.Input.LeftMouseButtonPressed 
+                && shape.Value is Shape propShape 
+                && propShape.Bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
             {
-              if (shape.Value is Shape propShape && propShape.Bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
-              {
-                selectionRect.Begin(propShape.Bounds, propShape);
-                break;
-              }
-            } 
-          }
+              selectionRect.Begin(propShape.Bounds, propShape);
+
+              // Remove any tiles selected; aren't of significance
+              if (Editor.GetSubEntity<SheetView>().Enabled) 
+                Editor.GetSubEntity<SheetSelector>().RemoveSelection();
+              break;
+            }
+          } 
+          // update selection
           if (selectionRect.Capture is Shape theShape)
           {
             theShape.Bounds = selectionRect.Bounds;
           }
+          DrawNames(batcher, camera);
         }
+      }
+      void DrawNames(Batcher batcher, Camera camera)
+      {
         void DrawText(string text, Vector2 pos, float scale)
         {
           batcher.DrawString(
@@ -61,15 +68,16 @@ namespace Raven.Sheet
               effects: Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 
               layerDepth: 0f);
         }
-        // Draw editor's tile names
-        if (Editor.GetSubEntity<SheetView>().Enabled)
+        // Draw created tiles' names
+        if (Editor.GetCurrent() is Sheet sheet && Editor.GetSubEntity<SheetView>().Enabled)
         {
-          foreach (var tile in Editor.SpriteSheet.TileMap)
+          foreach (var tile in sheet.TileMap)
           {
             DrawText(tile.Value.Name, Editor.GetSubEntity<SheetView>().GetRegionInSheet(tile.Value.Region.ToRectangleF()).BottomLeft(), 
                 2.5f/tile.Value.Name.Count());
           }   
         }
+        // Draw spritex parts names
         else if (Editor.GetSubEntity<SpritexView>().Enabled && Gui.Selection is Sprites.Spritex spritex)
         {
           foreach (var part in spritex.Body)
