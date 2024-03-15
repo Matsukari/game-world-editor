@@ -44,6 +44,8 @@ namespace Raven.Sheet
       Position = Screen.Center;
       Editor.GetSubEntity<SheetView>().Enabled = true;
       Editor.Set(Editor.EditingState.Default);
+      Editor.GetSubEntity<SheetSelector>().RemoveSelection();
+      Editor.GetSubEntity<Selection>().End();
       Enabled = false;
       Gui.ShapeContext = Editor.SpriteSheet;
       Scene.Camera.RawZoom = 1f;

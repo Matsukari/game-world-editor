@@ -87,6 +87,12 @@ namespace Raven.Sheet
     }
     List<int> _selectedTiles = new List<int>();
     Vector2 _initialMouse = Vector2.Zero;
+    public void RemoveSelection()
+    {
+      _selectedTiles.Clear(); 
+      _initialMouse = Vector2.Zero;
+      Gui.Selection = null;
+    }
     void HandleSheetInputs()
     { 
       var sheetView = Editor.GetSubEntity<SheetView>();

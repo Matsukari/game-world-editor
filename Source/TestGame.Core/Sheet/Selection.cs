@@ -61,6 +61,7 @@ namespace Raven.Sheet
 
         // Draw the selection area
         batcher.DrawRect(Parent.Bounds, Editor.ColorSet.SelectionFill);
+        batcher.DrawRectOutline(Parent.Bounds, Editor.ColorSet.SelectionOutline);
 
         var selectionPoint = axis != -1 ? (SelectionAxis)axis : SelectionAxis.None;
         if (Nez.Input.LeftMouseButtonPressed)

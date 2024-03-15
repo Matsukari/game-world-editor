@@ -40,6 +40,7 @@ namespace Raven.Sheet
         }
         if (input.IsDragFirst && _initialMouse == Vector2.Zero)
         {
+          Editor.GetSubEntity<SheetSelector>().RemoveSelection();
           _initialMouse = camera.MouseToWorldPoint();
           if (Gui.ShapeSelection is Shape.Point)
           {

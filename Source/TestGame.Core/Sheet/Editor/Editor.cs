@@ -68,6 +68,7 @@ namespace Raven.Sheet
       AddSubEntity(new SheetSelector());
       AddSubEntity(new PropertiesRenderer());
       AddSubEntity(new ViewMenubar());
+      AddSubEntity(new ViewStatbar());
       AddSubEntity(new SpritexView());
       AddSubEntity(new SpritexLister());
       AddSubEntity(new Annotator());

@@ -45,7 +45,8 @@ namespace Raven.Sheet
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
 
-      ImGui.Dummy(new System.Numerics.Vector2(300, 0f));
+      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ViewbarSpecialButton.ToImColor());
+      ImGui.Dummy(new System.Numerics.Vector2(270f, 0f));
       ImGui.SameLine();
       if (ImGui.Button(IconFonts.FontAwesome5.MousePointer))
       {
@@ -71,6 +72,7 @@ namespace Raven.Sheet
       {
 
       }
+      ImGui.PopStyleColor();
       ImGui.SameLine();
       ImGui.Dummy(new System.Numerics.Vector2(10, 0));
       ImGui.SameLine();
@@ -101,7 +103,8 @@ namespace Raven.Sheet
 
       ImGui.Dummy(new System.Numerics.Vector2(20, 0));
       ImGui.SameLine();
-
+      
+      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ShapeButtonTextColor.ToImColor());
       // Draw shape annotators
       foreach (var shapeType in typeof(Shape).GetNestedTypes())
       {
@@ -115,6 +118,7 @@ namespace Raven.Sheet
           Editor.GetSubEntity<Annotator>().Annotate(shapeInstance);
         ImGui.SameLine();
       }
+      ImGui.PopStyleColor();
 
       ImGui.End();
     }

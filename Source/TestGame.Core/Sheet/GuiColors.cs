@@ -19,6 +19,10 @@ namespace Raven.Sheet
     public Color AnnotatedName = new Color(0.5f, 0.5f, 0.7f, 1f);
     public Color Background = new Color(0.15f, 0.15f, 0.15f);
     public Color DeleteButton = Color.PaleVioletRed;
+
+    public Color ShapeButtonTextColor = new Color(0.650f, 0.326f, 0.754f, 1f);
+    public Color ViewbarSpecialButton = Color.CadetBlue;
+
     public GuiColors() {}
   }
 }
