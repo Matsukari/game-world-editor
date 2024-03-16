@@ -27,8 +27,9 @@ namespace Raven.Sheet
              {
               Editor.OpenNameModal((name)=>{ 
                   var world = new World();
+                  if (Editor.GetCurrent() is Sheet sheet) world.AddSheet(sheet);
                   world.Name = name;
-                  Editor.AddTab(world); 
+                  Editor.AddTab(world);
                   });
              }
              }),

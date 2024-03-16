@@ -225,11 +225,12 @@ namespace Raven
   {
     public PropertyList Properties { get; set; } = new PropertyList();
     public string Name { get; set; } = "";
+    protected bool FocusFactor = true;
     public virtual void RenderImGui(Sheet.PropertiesRenderer renderer)
     {
       var name = Name;
       ImGui.Begin(GetIcon() + " " + GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
-      if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
+      if (ImGui.IsWindowHovered() && FocusFactor) ImGui.SetWindowFocus();
 
       OnRenderBeforeName();
       if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 

@@ -78,6 +78,11 @@ namespace Raven.Sheet
     public override void OnAddedToScene()
     {
       AddTab(new Sheet("Assets/Raw/Unprocessed/export/test_canvas.png"));
+      var world = new World();
+      world.Name = "sample.world";
+      world.AddSheet(GetCurrent() as Sheet);
+      AddTab(world);
+      Switch(1);
       Scene.AddRenderer(new ScreenSpaceRenderer(-2, ScreenRenderLayer));
   
       AddSubEntity(
