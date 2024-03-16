@@ -10,6 +10,29 @@ namespace Raven.Sheet
   public class ViewMenubar : Editor.SubEntity
   {
     (string, Action)[][] _buttons; 
+
+    void ProjectOptions()
+    {
+      if (ImGui.MenuItem("Save")) Editor.Save();
+      if (ImGui.MenuItem("Project Settings")) Editor.OpenProjectSettings();
+    }
+    void WorldOptions()
+    {
+      if (ImGui.MenuItem("New World")) Editor.OpenNameModal((name)=>Editor.AddTab(new World()));
+      if (ImGui.BeginMenu("Worlds"))
+      {
+        ImGui.EndMenu();
+      }
+    }
+    void SheetOptions()
+    {
+      if (ImGui.MenuItem("New Sheet")) Editor.OpenFilePicker((filename)=> Editor.AddTab(new Sheet(filename))); 
+      if (ImGui.BeginMenu("Sheets"))
+      {
+        ImGui.EndMenu();
+      }
+    }
+    void ViewOptions() {}
     public override void OnAddedToScene()
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
@@ -17,81 +40,31 @@ namespace Raven.Sheet
         // 0, main menu buttons
         new (string, Action)[]
         {
-          ("Project", ()=>
-           {
-
-           }),
-            ("World", ()=>
-             {
-             if (ImGui.MenuItem("New World"))
-             {
-              Editor.OpenNameModal((name)=>{ 
-                  var world = new World();
-                  if (Editor.GetCurrent() is Sheet sheet) world.AddSheet(sheet);
-                  world.Name = name;
-                  Editor.AddTab(world);
-                  });
-             }
-             }),
-            ("Sheet", ()=> 
-             {
-             if (ImGui.MenuItem("New Sheet"))
-             {
-              Editor.OpenFilePicker((filename)=>{ Editor.AddTab(new Sheet(filename)); });
-             }
-             }),
-            ("View", ()=>
-             {
-
-             }),
+          ("Project", ProjectOptions),
+            ("World", WorldOptions),
+            ("Sheet", SheetOptions),
+            ("View", ViewOptions),
         },
           // 1, operationButton
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.MousePointer, ()=>
-             {
-
-             }),
-            (IconFonts.FontAwesome5.ArrowsAlt, ()=>
-             {
-
-             }),
-            (IconFonts.FontAwesome5.HandSpock, ()=>
-             {
-
-             }),
-            (IconFonts.FontAwesome5.Expand, ()=>
-             {
-
-             }),
-            (IconFonts.FontAwesome5.SyncAlt, ()=>
-             {
-
-             }),
+            (IconFonts.FontAwesome5.MousePointer, ()=>{}),
+            (IconFonts.FontAwesome5.ArrowsAlt, ()=>{}),
+            (IconFonts.FontAwesome5.HandSpock, ()=>{}),
+            (IconFonts.FontAwesome5.Expand, ()=>{}),
+            (IconFonts.FontAwesome5.SyncAlt, ()=>{}),
           },
           // 2, view options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.Th, ()=>
-             {
-
-             }),
-            (IconFonts.FontAwesome5.EllipsisV, ()=>
-             {
-
-             }),
+            (IconFonts.FontAwesome5.Th, ()=>{}),
+            (IconFonts.FontAwesome5.EllipsisV, ()=>{}),
           },
           // 3, select type options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.MousePointer, ()=>
-             {
-
-             }),
-            (IconFonts.FontAwesome5.Shapes, ()=>
-             {
-
-             })
+            (IconFonts.FontAwesome5.MousePointer, ()=>{}),
+            (IconFonts.FontAwesome5.Shapes, ()=>{})
           }
       };
 

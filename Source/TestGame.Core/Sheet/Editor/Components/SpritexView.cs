@@ -13,23 +13,40 @@ namespace Raven.Sheet
     public Sprites.Spritex LastSprite { get => _spritex; }
     Sprites.Spritex _spritex;
     List<Entity> _entities = new List<Entity>();
+
     public override void OnChangedTab()
     {
-      UnEdit();
-      _spritex = null;
-      Gui.Selection = null;
+      Clean();
     }
+    public override void OnDisableTab()
+    {
+      Clean();
+    }        
     // Go to canvas and close spritesheet view
     public void Edit(Sprites.Spritex spritex)
     {
-      UnEdit();
+      // came from sheet
+      if (!Enabled)
+      {
+        // Save last sheet view state 
+        Gui.Position = Scene.Camera.Position;
+        Gui.Zoom = Scene.Camera.RawZoom;
+      }
+
+
+      Clean();
+
+      // Prepare
       _spritex = spritex;
       Enabled = true;
-      Position = new Vector2();
       Gui.Selection = _spritex;
       Gui.ShapeContext = _spritex;
       Editor.GetSubEntity<SheetView>().Enabled = false;
       Editor.Set(Editor.EditingState.SelectedSprite);
+  
+      // Rsetore last state
+      Scene.Camera.Position = _spritex.GuiPosition;
+      Scene.Camera.Zoom = _spritex.GuiZoom;
 
       // Origin lines
       var origin = AddComponent(new Guidelines.OriginLines());
@@ -43,6 +60,18 @@ namespace Raven.Sheet
     // back to spritesheet view
     public void UnEdit()
     {
+      Clean();
+
+      // Sotre last state
+      _spritex.GuiPosition = Scene.Camera.Position;
+      _spritex.GuiZoom = Scene.Camera.RawZoom;
+
+      // Enter sheet vew
+      Scene.Camera.RawZoom = Gui.Zoom;
+      Scene.Camera.Position = Gui.Position;
+    }
+    void Clean()
+    {
       RemoveAllComponents();
       foreach (var entity in _entities) entity.Destroy();
       _entities.Clear();
@@ -53,9 +82,8 @@ namespace Raven.Sheet
       Editor.GetSubEntity<Selection>().End();
       Enabled = false;
       Gui.ShapeContext = Sheet;
-      Scene.Camera.RawZoom = 1f;
-      Scene.Camera.Position = new Vector2();
     }
+
     public override void Update()
     {
       base.Update();
@@ -107,6 +135,7 @@ namespace Raven.Sheet
             if (Nez.Input.LeftMouseButtonPressed)
             {
               _initialScale = part.Transform.Scale;
+              Gui.Selection = _spritex;
               selectionRect.Begin(part.Bounds, part);
               return;
             }

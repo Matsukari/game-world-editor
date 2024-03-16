@@ -92,6 +92,8 @@ namespace Raven.Sheet.Sprites
   }
   public class Spritex : Propertied
   {  
+    public Vector2 GuiPosition = new Vector2();
+    public float GuiZoom = 1;
     public class Sprite : Propertied 
     {
       public Sprites.Sprite SourceSprite;

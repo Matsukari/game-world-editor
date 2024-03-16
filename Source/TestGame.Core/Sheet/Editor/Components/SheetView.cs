@@ -12,13 +12,17 @@ namespace Raven.Sheet
     SpriteRenderer _image;
     public override void OnChangedTab()
     {
-      Position = Vector2.Zero;
+      Position = Screen.Center;
       RemoveAllComponents(); 
       _image = AddComponent(new SpriteRenderer(Sheet.Texture));
       AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
-    }    
+    }
+    public override void OnDisableTab()
+    {
+      RemoveAllComponents();
+    }
     public class Renderable : Editor.SheetEntity.Renderable<SheetView>
     {
       List<Rectangle> _tiles = new List<Rectangle>();

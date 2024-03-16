@@ -25,6 +25,7 @@ namespace Raven.Sheet
       
       public void Init(Editor editor) => Editor = editor; 
       public virtual void OnChangedTab() {}
+      public virtual void OnDisableTab() {}
       public abstract class RenderableComponent<T> : Nez.RenderableComponent where T : SubEntity 
       { 
         public T Parent { get => Entity as T; }
@@ -82,7 +83,6 @@ namespace Raven.Sheet
       world.Name = "sample.world";
       world.AddSheet(GetCurrent() as Sheet);
       AddTab(world);
-      Switch(1);
       Scene.AddRenderer(new ScreenSpaceRenderer(-2, ScreenRenderLayer));
   
       AddSubEntity(
@@ -97,8 +97,7 @@ namespace Raven.Sheet
           new Annotator(),
 
           new WorldView());
-
-      Switch(0);
+      Switch(0); 
     }
     public void AddSubEntity(params SubEntity[] entities) 
     {
@@ -131,18 +130,41 @@ namespace Raven.Sheet
     public T GetSubEntity<T>() where T: SubEntity => (T)_children.OfType<T>().First();    
     public void Switch(int index) 
     {
+      // Store last state
+      GetCurrentState().Zoom = Scene.Camera.RawZoom;
+      GetCurrentState().Position = Scene.Camera.Position;
+
+      // Clean
+      GetSubEntity<Selection>().End();
+      GetSubEntity<SheetSelector>().RemoveSelection();
+
       _currentTab = Math.Clamp(index, 0, _tabs.Count()-1);
-      Console.WriteLine($"Is _currentTab({_currentTab}/{_tabs.Count()-1}) Sheet? {GetCurrent() is Sheet}");
+
+      // Restore last state
+      Scene.Camera.RawZoom = GetCurrentState().Zoom;
+      Scene.Camera.Position = GetCurrentState().Position;
+
+
       foreach (var child in _children) 
       {
-        if ((child is SheetEntity && GetCurrent() is Sheet) || child.GetType() == typeof(SubEntity))
+        if ((child is SheetEntity && GetCurrent() is Sheet) 
+         || (child is SubEntity && !(child is SheetEntity) && !(child is WorldEntity)))
         {
+          Console.WriteLine($"Enabled {child.GetType().Name}");
           child.Enabled = true;
           child.OnChangedTab();
         }
-        else child.Enabled = false;
+        else 
+        {
+          Console.WriteLine($"Disabled {child.GetType().Name}");
+          child.Enabled = false;
+          child.OnDisableTab();
+        }
       }
+      GetCurrentState().ShapeContext = GetCurrent();
+
     }
+    public void Save() {}
     public void AddTab(Sheet sheet) => AddTab(sheet, new GuiData());
     public void AddTab(World world) => AddTab(world, new WorldGuiData());
     void AddTab(Propertied content, GuiData gui)
@@ -166,6 +188,7 @@ namespace Raven.Sheet
       _nameCallback = callback;
       _isNameModal = true;
     }
+    public void OpenProjectSettings() {}
     void DrawNameModal()
     {
       if (_isNameModal)
