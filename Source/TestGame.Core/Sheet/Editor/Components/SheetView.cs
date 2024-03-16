@@ -19,10 +19,6 @@ namespace Raven.Sheet
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
     }
-    public override void OnDisableTab()
-    {
-      RemoveAllComponents();
-    }
     public class Renderable : Editor.SheetEntity.Renderable<SheetView>
     {
       List<Rectangle> _tiles = new List<Rectangle>();

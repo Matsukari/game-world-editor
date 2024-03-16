@@ -61,6 +61,7 @@ namespace Raven.Sheet
     public void UnEdit()
     {
       Clean();
+      Editor.GetSubEntity<SheetView>().Enabled = true;
 
       // Sotre last state
       _spritex.GuiPosition = Scene.Camera.Position;
@@ -76,7 +77,6 @@ namespace Raven.Sheet
       foreach (var entity in _entities) entity.Destroy();
       _entities.Clear();
       Position = Screen.Center;
-      Editor.GetSubEntity<SheetView>().Enabled = true;
       Editor.Set(Editor.EditingState.Default);
       Editor.GetSubEntity<SheetSelector>().RemoveSelection();
       Editor.GetSubEntity<Selection>().End();

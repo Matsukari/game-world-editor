@@ -60,7 +60,7 @@ namespace Raven.Sheet
     { 
       public abstract class Renderable<T> : SubEntity.RenderableComponent<T> where T : WorldEntity
       {  
-        public World Sheet { get => Parent.World; }
+        public World World { get => Parent.World; }
       }
       public World World { get => Editor.GetCurrent() as World; }
     }
@@ -148,6 +148,7 @@ namespace Raven.Sheet
       foreach (var child in _children) 
       {
         if ((child is SheetEntity && GetCurrent() is Sheet) 
+         || (child is WorldEntity && GetCurrent() is World)
          || (child is SubEntity && !(child is SheetEntity) && !(child is WorldEntity)))
         {
           Console.WriteLine($"Enabled {child.GetType().Name}");

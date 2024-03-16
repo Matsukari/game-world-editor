@@ -21,8 +21,18 @@ namespace Raven.Sheet
     public List<Level> Levels = new List<Level>();
     public Dictionary<string, Sheet> SpriteSheets = new Dictionary<string, Sheet>();
 
-    public World() {}
-    public void AddLevel() {}
+    public World() 
+    {
+      Level level = CreateLevel();
+    }
+    public Level CreateLevel(string name = "Level default") 
+    {
+      Level level = new Level(this);
+      level.Name = name;
+      level.Layers.Add(new Level.TileLayer(level, 16, 16));
+      Levels.Add(level);
+      return level;
+    }
     public void AddSheet(Sheet sheet) { SpriteSheets.Add(sheet.Name, sheet); }
     public override string GetIcon()
     {
@@ -108,7 +118,7 @@ namespace Raven.Sheet
     public class Level : Propertied
     {
       World _world;
-      public Point Size = new Point();
+      public Point Size = new Point(96, 96);
       public Vector2 Position = new Vector2();
       public RectangleF Bounds { get => new RectangleF(Position.X, Position.Y, Size.X, Size.Y); }
       public List<Layer> Layers = new List<Layer>();
@@ -137,6 +147,9 @@ namespace Raven.Sheet
         {
           Level = level;
         }
+        public virtual void Draw(Batcher batcher, Camera camera)
+        {
+        }
         protected override void OnRenderAfterName(PropertiesRenderer renderer)
         {
           var offset = Offset.ToNumerics();
@@ -158,15 +171,28 @@ namespace Raven.Sheet
         public int TileHeight;
         public Point TileSize { get => new Point(TileWidth, TileHeight); }
         public Point TilesQuantity { get => new Point(Level.Size.X/TileWidth, Level.Size.Y/TileHeight); }
-        Dictionary<int, IPropertied> _tiles = new Dictionary<int, IPropertied>();
+        public Dictionary<int, InstancedSprite> Tiles { get => _tiles; }
+        Dictionary<int, InstancedSprite> _tiles = new Dictionary<int, InstancedSprite>();
 
         public int GetTile(int x, int y) => y * TilesQuantity.X + x;
         public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
-        public void ReplaceTile(int x, int y, Propertied tile)
+        public void ReplaceTile(int x, int y, InstancedSprite tile)
         {
-          if (x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y || (!(tile is Tile || tile is Spritex))) return;
+          if (x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y) return;
           _tiles[GetTile(x, y)] = tile;
         }
+        public override void Draw(Batcher batcher, Camera camera)
+        {
+          foreach (var block in _tiles)
+          {
+            var pos = GetTile(block.Key);
+            switch (block.Value)
+            {
+              case TileInstance tile: tile.Draw(batcher, camera, new RectangleF(pos.X*TileWidth, pos.Y*TileHeight, TileWidth, TileHeight)); break;
+            }
+          }
+        }
+
       }
       public class EntityLayer : Layer
       {

@@ -1,15 +1,49 @@
 
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Nez;
 using ImGuiNET;
 
 namespace Raven.Sheet.Sprites 
 {
+  public class InstancedSprite : Propertied
+  {
+    public Transform Transform = new Transform();
+    public Color Color = Color.White;
+    public SpriteEffects SpriteEffects = SpriteEffects.None;
+    public virtual void Draw(Batcher batcher, Camera camera, RectangleF dest) {}
+  }
+  public class TileInstance : InstancedSprite
+  {
+    Tile _tile;
+    public TileInstance(Tile tile) => _tile = tile;
+    public override void Draw(Batcher batcher, Camera camera, RectangleF dest)
+    {
+      var scale = Transform.Scale;
+      scale.X *= dest.Width / _tile.Region.Width;
+      scale.Y *= dest.Height / _tile.Region.Height;
+      batcher.Draw(
+        texture: _tile.Texture,
+        position: dest.Location + Transform.Position,
+        sourceRectangle: _tile.Region,
+        color: Color,
+        rotation: Transform.Rotation,
+        origin: new Vector2(),
+        scale: scale,
+        effects: SpriteEffects,
+        layerDepth: 0);
+    }
+  }
+  public class SpritexInstance : InstancedSprite
+  {
+
+  }
   public class Tile : Propertied 
   { 
     public Point Coordinates;
     public Rectangle Region { get=>_sheet.GetTile(Id); }
     public int Id { get=>_sheet.GetTileId(Coordinates.X, Coordinates.Y); }
+    public Texture2D Texture { get => _sheet.Texture; }
     Sheet _sheet;
     public Tile(Point coord, Sheet sheet)
     {
@@ -159,6 +193,8 @@ namespace Raven.Sheet.Sprites
     }
     public List<Spritex.Sprite> Body { get => new List<Spritex.Sprite>(Parts.Data.Values); }
     Sprites.Spritex.Sprite _spritexPart;
+
+
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
     {
       var bounds = Bounds.ToNumerics();
