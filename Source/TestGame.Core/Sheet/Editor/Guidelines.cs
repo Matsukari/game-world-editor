@@ -13,14 +13,14 @@ namespace Raven.Guidelines
     {  
       // Horizontal line 
       batcher.DrawLine(
-          new Vector2(-10000, 0), 
-          new Vector2(10000 + Screen.Width, 0), 
+          new Vector2(camera.Bounds.Left, 0), 
+          new Vector2(camera.Bounds.Right, 0), 
           color: Color,
           thickness: 1/camera.RawZoom);
       // Vertival line
       batcher.DrawLine(
-          new Vector2(0, -10000), 
-          new Vector2(0, 10000), 
+          new Vector2(0, camera.Bounds.Top), 
+          new Vector2(0, camera.Bounds.Bottom), 
           color: Color,
           thickness: 1/camera.RawZoom);
     }
@@ -28,28 +28,37 @@ namespace Raven.Guidelines
   }
   public class GridLines : RenderableComponent
   {
-    public override float Width => Screen.Width;
-    public override float Height => Screen.Height;
-
-    int _size = 0;
-    public int Size { set => _size = value; }
-    public GridLines(int size)
+    public override RectangleF Bounds 
     {
-      _size = size;
+      get
+      {
+        if (_areBoundsDirty)
+        {
+          _bounds.CalculateBounds(Entity.Position, _localOffset, new Vector2(Lines.X * Margin.X, Lines.Y * Margin.Y)/2, 
+              Entity.Scale, Entity.Rotation, Lines.X * Margin.X, Lines.Y * Margin.Y); 
+          _areBoundsDirty = false;
+        }
+        return _bounds;
+      }
     }
+    public Point Lines = new Point();
+    public Vector2 Margin = new Vector2();
     public override void Render(Batcher batcher, Camera camera)
     {
-      int cols = (int)(Screen.Width / _size);
-      int rows = (int)(Screen.Height / _size);
-       
-      for (int x = 0; x <= cols; x++) 
+      for (int x = 0; x <= Lines.X; x++) 
       {
         // Vertival lines
-        batcher.DrawLine(new Vector2(x * _size, 0f) + camera.Position, new Vector2(x * _size, rows * _size) + camera.Position, Color);
-        for (int y = 0; y <= rows; y++) 
+        batcher.DrawLine(
+            new Vector2(x * Margin.X, 0f) + Bounds.Location, 
+            new Vector2(x * Margin.X, Lines.Y * Margin.Y) + Bounds.Location, 
+            Color);
+        for (int y = 0; y <= Lines.Y; y++) 
         {
           // Horizontal lines
-          batcher.DrawLine(new Vector2(0f, y * _size) + camera.Position, new Vector2(cols * _size, y * _size) + camera.Position, Color);
+          batcher.DrawLine(
+              new Vector2(0f, y * Margin.Y) + Bounds.Location, 
+              new Vector2(Lines.X * Margin.X, y * Margin.Y) + Bounds.Location, 
+              Color);
         }
       }
     }

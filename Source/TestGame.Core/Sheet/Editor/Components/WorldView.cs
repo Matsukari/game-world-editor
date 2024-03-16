@@ -10,6 +10,7 @@ namespace Raven.Sheet
 {
   public class WorldView : Editor.WorldEntity
   {
+    List<Guidelines.GridLines> _grids = new List<Guidelines.GridLines>();
     public override void OnChangedTab()
     {
       Position = Vector2.Zero;
@@ -17,6 +18,10 @@ namespace Raven.Sheet
       AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
+
+      var origin = AddComponent(new Guidelines.OriginLines());
+      origin.Color = Editor.ColorSet.SpriteRegionActiveOutline;
+
     }    
     public override void OnAddedToScene()
     {
@@ -29,13 +34,16 @@ namespace Raven.Sheet
     public override void Update()
     {
       base.Update();
+      
     } 
     public class Renderable : Editor.WorldEntity.Renderable<WorldView>
     {
       public override void Render(Batcher batcher, Camera camera)
       {
-        foreach (var level in World.Levels)
+        for (var i = 0; i < World.Levels.Count(); i++)
         {
+          var level = World.Levels[i];
+
           batcher.DrawRect(level.Bounds, Editor.ColorSet.LevelSheet);
           foreach (var layer in level.Layers)
           {
