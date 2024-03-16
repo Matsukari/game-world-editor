@@ -55,6 +55,14 @@ namespace Raven.Sheet
       }
       public Sheet Sheet { get => Editor.GetCurrent() as Sheet; }
     }
+    public class WorldEntity : SubEntity
+    { 
+      public abstract class Renderable<T> : SubEntity.RenderableComponent<T> where T : WorldEntity
+      {  
+        public World Sheet { get => Parent.World; }
+      }
+      public World World { get => Editor.GetCurrent() as World; }
+    }
     private List<SubEntity> _children = new List<SubEntity>();
 
     public EditingState EditState = EditingState.Default; 
@@ -81,7 +89,9 @@ namespace Raven.Sheet
           new ViewStatbar(),
           new SpritexView(),
           new SpritexLister(),
-          new Annotator());
+          new Annotator(),
+
+          new WorldView());
 
       Switch(0);
     }
@@ -99,6 +109,7 @@ namespace Raven.Sheet
     {
       _tabs[_currentTab].RenderImGui(renderer);
       DrawFilePicker();
+      DrawNameModal();
     }
     public void Set(EditingState state) 
     { 
@@ -113,13 +124,13 @@ namespace Raven.Sheet
     public IPropertied GetCurrent() => _tabs[_currentTab];
     public GuiData GetCurrentState() => _tabsState[_currentTab];
     public T GetSubEntity<T>() where T: SubEntity => (T)_children.OfType<T>().First();    
-    public T GetTab<T>(int index) where T: Sheet => (T)_tabs[index];
     public void Switch(int index) 
     {
-      _currentTab = Math.Clamp(index, 0, _tabs.Count());
+      _currentTab = Math.Clamp(index, 0, _tabs.Count()-1);
+      Console.WriteLine($"Is _currentTab({_currentTab}/{_tabs.Count()-1}) Sheet? {GetCurrent() is Sheet}");
       foreach (var child in _children) 
       {
-        if ((child is SheetEntity && GetCurrent() is Sheet) || child is SubEntity)
+        if ((child is SheetEntity && GetCurrent() is Sheet) || child.GetType() == typeof(SubEntity))
         {
           child.Enabled = true;
           child.OnChangedTab();
@@ -127,19 +138,52 @@ namespace Raven.Sheet
         else child.Enabled = false;
       }
     }
-    public void AddTab<T>(T content) where T: Sheet 
+    public void AddTab(Sheet sheet) => AddTab(sheet, new GuiData());
+    public void AddTab(World world) => AddTab(world, new WorldGuiData());
+    void AddTab(Propertied content, GuiData gui)
     {
       _tabs.Add(content);
-      _tabsState.Add(new GuiData());
+      _tabsState.Add(gui);
       _tabsState.Last().ShapeContext = content;
-    } 
+    }
     Action<string> _pickerCallback = null;
+    Action<string> _nameCallback = null;
     bool _isOpenFile = false;
+    bool _isNameModal = false;
+    string _nameModalInput = "";
     public void OpenFilePicker(Action<string> callback) 
     {
       _pickerCallback = callback;
       _isOpenFile = true;
-    } 
+    }
+    public void OpenNameModal(Action<string> callback) 
+    {
+      _nameCallback = callback;
+      _isNameModal = true;
+    }
+    void DrawNameModal()
+    {
+      if (_isNameModal)
+      {
+        ImGui.OpenPopup("name-action-modal");
+        _isNameModal = false;
+      }
+      var open = true;
+      if (ImGui.BeginPopupModal("name-action-modal", ref open, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.AlwaysAutoResize))
+      {
+        Set(Editor.EditingState.Modal);
+        ImGui.SetKeyboardFocusHere();
+        if (ImGui.InputText("Name", ref _nameModalInput, 50, ImGuiInputTextFlags.EnterReturnsTrue))
+        {
+          _nameCallback.Invoke(_nameModalInput);
+          Set(Editor.EditingState.Default);
+          ImGui.CloseCurrentPopup();
+          _nameModalInput = "";
+        }
+        ImGui.EndPopup();
+      }
+
+    }
     void DrawFilePicker()
     {
       if (_isOpenFile)

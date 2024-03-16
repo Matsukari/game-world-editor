@@ -23,4 +23,9 @@ namespace Raven.Sheet
       primitiveBatch = new PrimitiveBatch();
     }
   }
+  public class WorldGuiData : GuiData
+  {
+    public object LayerSelected;
+    public object LevelSelected;
+  }
 }

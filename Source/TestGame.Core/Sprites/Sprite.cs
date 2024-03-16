@@ -6,8 +6,7 @@ using ImGuiNET;
 namespace Raven.Sheet.Sprites 
 {
   public class Tile : Propertied 
-  {
-    
+  { 
     public Point Coordinates;
     public Rectangle Region { get=>_sheet.GetTile(Id); }
     public int Id { get=>_sheet.GetTileId(Coordinates.X, Coordinates.Y); }

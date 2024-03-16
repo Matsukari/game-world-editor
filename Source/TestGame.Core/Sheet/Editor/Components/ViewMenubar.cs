@@ -23,7 +23,14 @@ namespace Raven.Sheet
            }),
             ("World", ()=>
              {
-
+             if (ImGui.MenuItem("New World"))
+             {
+              Editor.OpenNameModal((name)=>{ 
+                  var world = new World();
+                  world.Name = name;
+                  Editor.AddTab(world); 
+                  });
+             }
              }),
             ("Sheet", ()=> 
              {
