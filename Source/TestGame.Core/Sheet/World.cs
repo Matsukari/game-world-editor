@@ -38,8 +38,7 @@ namespace Raven.Sheet
     {
       return IconFonts.FontAwesome5.ThLarge;
     }
-    Sheet _openSheet = null;
-    Sheet _selectedSheet = null;
+    SpritePicker _spritePicker = new SpritePicker();
     public override void RenderImGui(PropertiesRenderer renderer)
     {
       base.RenderImGui(renderer);
@@ -47,6 +46,12 @@ namespace Raven.Sheet
       var stack = new System.Numerics.Vector2(0, 0);
       var levelFlags = ImGuiTreeNodeFlags.None;
       if (Levels.Count() > 0) levelFlags = ImGuiTreeNodeFlags.DefaultOpen;
+      if (_spritePicker.Sheets.Count() != SpriteSheets.Count())
+      {
+        _spritePicker.Sheets.Clear();
+        foreach (var sheet in SpriteSheets) _spritePicker.Sheets.Add(new SheetPickerData(sheet.Value));
+      }
+
       if (ImGui.CollapsingHeader(IconFonts.FontAwesome5.ObjectGroup + " Levels", levelFlags))
       {
         var size = 200;
@@ -68,44 +73,35 @@ namespace Raven.Sheet
         stack.Y += size;
         ImGui.BeginChild("spritesheets-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
         ImGui.Indent();
-        foreach (var sheet in SpriteSheets)
+        foreach (var sheet in _spritePicker.Sheets)
         {
-          if (ImGui.MenuItem(sheet.Key)) 
+          if (ImGui.MenuItem(sheet.Sheet.Name)) 
           {
-            _selectedSheet = sheet.Value;
+            _spritePicker.SelectedSheet= sheet;
           }
         }
         ImGui.Unindent();
         ImGui.EndChild();
 
-        if (_selectedSheet != null)
+        if (_spritePicker.SelectedSheet != null)
         {
-          var previewHeight = 100;
-          float ratio = (ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X) / previewHeight;
+          float previewHeight = 100;
+          float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
+          float ratio = (previewWidth) / previewHeight;
 
-          var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_selectedSheet.Texture);
-          ImGui.Image(texture, new System.Numerics.Vector2(ImGui.GetWindowWidth(), previewHeight*ratio));
-          if (_openSheet == null && ImGui.IsItemHovered())
+          var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_spritePicker.SelectedSheet.Sheet.Texture);
+          ImGui.Image(texture, new System.Numerics.Vector2(previewWidth, previewHeight*ratio), 
+              _spritePicker.GetUvMin(_spritePicker.SelectedSheet), _spritePicker.GetUvMax(_spritePicker.SelectedSheet));
+          if (_spritePicker.OpenSheet == null && ImGui.IsItemHovered())
           {
-            _openSheet = _selectedSheet;
+            _spritePicker.OpenSheet = _spritePicker.SelectedSheet;
           }
         }
       }
       ImGui.End();
 
-      FocusFactor = _openSheet == null;
-      if (_openSheet != null)
-      {
-        ImGui.Begin("sheet-picker", ImGuiWindowFlags.NoDecoration);
-        ImGui.SetWindowSize(new System.Numerics.Vector2(450, 450));
-        ImGui.SetWindowPos(new System.Numerics.Vector2(0f, Screen.Height-ImGui.GetWindowHeight()-28));
-        ImGui.SetWindowFocus();
-       
-        var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_openSheet.Texture);
-        ImGui.GetWindowDrawList().AddImage(texture, ImGui.GetWindowPos(), ImGui.GetWindowPos() + ImGui.GetWindowSize());
-        if (!new RectangleF(ImGui.GetWindowPos(), ImGui.GetWindowSize()).Contains(ImGui.GetMousePos())) _openSheet = null;
-        ImGui.End(); 
-      }
+      FocusFactor = _spritePicker.OpenSheet == null;
+      _spritePicker.Draw();
     }
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
     {
