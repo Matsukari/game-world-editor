@@ -101,7 +101,8 @@ namespace Raven.Sheet
       ImGui.End();
 
       FocusFactor = _spritePicker.OpenSheet == null;
-      _spritePicker.Draw();
+      _spritePicker.Draw(renderer.Editor, this);
+      if (_spritePicker.SelectedSprite != null && Nez.Input.RightMouseButtonReleased) _spritePicker.SelectedSprite = null;
     }
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
     {
@@ -171,6 +172,7 @@ namespace Raven.Sheet
         Dictionary<int, InstancedSprite> _tiles = new Dictionary<int, InstancedSprite>();
 
         public int GetTile(int x, int y) => y * TilesQuantity.X + x;
+        public int GetTileFromWorld(Vector2 point) => GetTile((int)point.X / TileWidth, (int)point.Y / TileHeight);
         public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
         public void ReplaceTile(int x, int y, InstancedSprite tile)
         {

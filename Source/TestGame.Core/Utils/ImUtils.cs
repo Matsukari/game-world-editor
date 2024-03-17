@@ -81,7 +81,7 @@ namespace Raven
           new Num.Vector2(windowMin.X + rect.Right, windowMin.Y + rect.Bottom), 
           outline.ToImColor());
     }
-    public static void DrawRect(ImDrawListPtr drawList, Rectangle rect, Color outline, Num.Vector2 offset, float zoom) 
+    public static void DrawRect(ImDrawListPtr drawList, RectangleF rect, Color outline, Num.Vector2 offset, float zoom) 
     {
       var (windowMin, windowMax) = GetWindowArea();
       drawList.AddRect(

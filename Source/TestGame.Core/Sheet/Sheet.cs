@@ -47,11 +47,18 @@ namespace Raven.Sheet
       TileHeight = h;
     }
     public Sprites.Tile GetCreatedTile(int coord) => _tiles[coord];
+    public Sprites.Tile GetTileData(int coord) 
+    {
+      if (!IsTileValid(coord)) throw new ArgumentOutOfRangeException();
+      if (_tiles.ContainsKey(coord)) return _tiles[coord];
+      return new Sprites.Tile(GetTileCoord(coord), this);
+    }
     public Rectangle GetTile(int x, int y) => new Rectangle(x*TileWidth, y*TileHeight, TileWidth, TileHeight);
     public Rectangle GetTile(int index) => GetTile(index % Tiles.X, index / Tiles.X);
     public Point GetTile(Rectangle rect) => new Point(rect.X/TileWidth, rect.Y/TileHeight);
 
     public int GetTileId(int x, int y) => y * Tiles.X + x;
+    public int GetTileIdFromWorld(float x, float y) => GetTileId((int)x/TileWidth, (int)y/TileHeight);
     public Point GetTileCoord(int index) => new Point(index % Tiles.X, index / Tiles.X); 
 
     public bool IsTileValid(int index) => index >= 0 && index < Tiles.X * Tiles.Y;
