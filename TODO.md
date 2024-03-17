@@ -31,19 +31,38 @@ Implemente animation
 ## Editor
 ~Variation of mouse curors~
 ~Better name annotations~
-Project management
-File management / switching
-Editing state indicator
+~File management / switching~
+~Editing state indicator~
+
+## Level
+Resizing, moving levels
+Painting tiles on Level
+Painting spritexes on levels
+Bucket, rectangle, line paint 
+Random painting 
+Transforms on instanced sprites 
+Layer management 
+Freeform layer 
+
+## World
+Add other spritesheet on world
+Create own level
+Connect levels 
+Single level context
+
 
 ## Misc
 ~Fix zoom switching context~
 ~Fix zooming on mouse~
+Group workspaces
 Save & load to file
 Undo & redo
 Shape & tile separate selection
 Separate transform operations
 Copy & paste shapes & parts 
-Snapping
-Rulers
+Fix primitive rendering order 
+Fix debug window
+Snapping mouse
+Rulers 
 Grid
 
