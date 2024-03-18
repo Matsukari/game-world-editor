@@ -21,6 +21,7 @@ namespace Raven.Sheet
     public IPropertied SelectedSprite;
     public RectangleF Bounds = new RectangleF(0, 0, 1, 1);
     Vector2 _initialPosition = Vector2.Zero;
+    List<RectangleF> _tiles = new List<RectangleF>();
     public void Draw(Editor editor, World world)
     {
       var input = Core.GetGlobalManager<Input.InputManager>();
@@ -28,8 +29,8 @@ namespace Raven.Sheet
 
       if (SelectedSprite is Tile tile)
       {
-        var min = tile.Region.Location.ToVector2() / Bounds.Size;
-        var max = (tile.Region.Location + tile.Region.Size).ToVector2() / Bounds.Size;
+        var min = tile.Region.Location.ToVector2() / tile.Texture.GetSize();
+        var max = (tile.Region.Location + tile.Region.Size).ToVector2() / tile.Texture.GetSize();
 
         ImGui.GetForegroundDrawList().AddImage(
             Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(tile.Texture),
@@ -51,19 +52,55 @@ namespace Raven.Sheet
       ImGui.SetWindowFocus();
       Bounds.Location = ImGui.GetWindowPos();
       Bounds.Size = ImGui.GetWindowSize();
+      if (_tiles.Count() == 0)
+      {
+        for (int x = 0; x < OpenSheet.Sheet.Tiles.X; x++)
+        {
+          for (int y = 0; y < OpenSheet.Sheet.Tiles.Y; y++)
+          {
+            _tiles.Add(new RectangleF(x * OpenSheet.Sheet.TileWidth, y * OpenSheet.Sheet.TileHeight, OpenSheet.Sheet.TileWidth, OpenSheet.Sheet.TileHeight));
+          }
+        }
+      }
 
-      var mouse = MouseToPickerPoint(OpenSheet);
+      var sheetScale = Bounds.Size / OpenSheet.Sheet.Size;
+      // var mouse = MouseToPickerPoint(OpenSheet);
+      // mouse /= sheetScale;
+      var mouse = rawMouse - Bounds.Location;  
+      mouse = mouse + OpenSheet.Position;
+      mouse /= OpenSheet.Zoom * sheetScale;
+
       if (ImGui.BeginTabBar("sheet-picker-tab"))
       {
         if (ImGui.BeginTabItem("Tiles"))
         {
-          var tiledMouse = rawMouse;
-          tiledMouse.X = (int)(tiledMouse.X / OpenSheet.Sheet.TileWidth) * OpenSheet.Sheet.TileWidth;
-          tiledMouse.Y = (int)(tiledMouse.Y / OpenSheet.Sheet.TileHeight) * OpenSheet.Sheet.TileHeight;
+          var sheetZoom = sheetScale * OpenSheet.Zoom;
+          var tiledMouse = mouse;
+          var tileSize = OpenSheet.Sheet.TileSize.ToVector2() ;
+          tiledMouse -= OpenSheet.Position;
+          tiledMouse /= new Vector2(OpenSheet.Zoom, OpenSheet.Zoom);
+          tiledMouse.X = ((int)(tiledMouse.X / tileSize.X) * tileSize.X); 
+          tiledMouse.Y = ((int)(tiledMouse.Y / tileSize.Y) * tileSize.Y); 
+
+          // foreach (var rectTile in _tiles)
+          // {
+          //   var worldTile = rectTile;
+          //   worldTile.Location += Bounds.Location;
+          //   worldTile.Location *= sheetScale;
+          //   worldTile.Size *= sheetZoom;
+          //   if (rectTile.Contains(mouse))
+          //   {
+          //     ImGui.GetForegroundDrawList().AddRect(
+          //         (worldTile.Location).ToNumerics(), 
+          //         (worldTile.Location + worldTile.Size).ToNumerics(), 
+          //         editor.ColorSet.SpriteRegionActiveOutline.ToImColor());
+          //   }
+          // }
           ImGui.GetForegroundDrawList().AddRect(
-              tiledMouse.ToVector2().ToNumerics(), 
-              (tiledMouse + OpenSheet.Sheet.TileSize.ToVector2()).ToNumerics(), 
+              (Bounds.Location + tiledMouse).ToNumerics(), 
+              (Bounds.Location + tiledMouse + OpenSheet.Sheet.TileSize.ToVector2() * sheetZoom).ToNumerics(), 
               editor.ColorSet.SpriteRegionActiveOutline.ToImColor());
+          // tiledMouse += OpenSheet.Position.ToNumerics() * sheetZoom.ToNumerics();
           if (input.IsDragFirst) 
           {
           }
@@ -72,8 +109,23 @@ namespace Raven.Sheet
           }
           else if (input.IsDragLast)
           {
-            SelectedSprite = OpenSheet.Sheet.GetTileData(OpenSheet.Sheet.GetTileIdFromWorld(mouse.X, mouse.Y));
-            Console.WriteLine("Got: " + mouse.X + " " + mouse.Y);
+            var zoom = OpenSheet.Zoom;
+            var mouseRel = rawMouse - Bounds.Location;
+            var position = OpenSheet.Position / OpenSheet.Zoom;
+            var excess = Bounds.Size - position;
+            foreach (var rectTile in _tiles)
+            {
+              var worldTile = rectTile;
+              worldTile.Location += Bounds.Location;
+              if (rectTile.Contains(mouse))
+              {
+                SelectedSprite = OpenSheet.Sheet.GetTileData(OpenSheet.Sheet.GetTileIdFromWorld(rectTile.X, rectTile.Y));
+              }
+            }
+            // var tileCoord = (position + mouseRel / OpenSheet.Zoom) / sheetScale;
+            // var tileCoord = (position + excess * (mouseRel / Bounds.Size)) / sheetScale; 
+            // Console.WriteLine($"\n Position: {OpenSheet.Position/OpenSheet.Zoom}\n Mouse zoomed: {mouse}\n Mouse relative: {rawMouse-Bounds.Location}\n World {tileCoord},\n Total zoom: {sheetZoom}\n Sheet scale {sheetScale}\n Gui Zoom {OpenSheet.Zoom}\n ");
+            // SelectedSprite = OpenSheet.Sheet.GetTileData(OpenSheet.Sheet.GetTileIdFromWorld(tileCoord.X, tileCoord.Y));
           }
         }
         if (ImGui.BeginTabItem("Spritexes"))
@@ -90,7 +142,11 @@ namespace Raven.Sheet
           Bounds.Location.ToNumerics() + Bounds.Size.ToNumerics(), 
           GetUvMin(OpenSheet), GetUvMax(OpenSheet));
 
-      if (!Bounds.Contains(ImGui.GetMousePos()) && !input.IsDrag) OpenSheet = null;
+      if (!Bounds.Contains(ImGui.GetMousePos()) && !input.IsDrag) 
+      {
+        OpenSheet = null;
+        _tiles.Clear();
+      }
       ImGui.End(); 
     }
     void HandleMoveZoom()
