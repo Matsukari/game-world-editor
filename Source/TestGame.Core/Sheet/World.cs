@@ -89,6 +89,7 @@ namespace Raven.Sheet
           float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
           float ratio = (previewWidth) / previewHeight;
 
+          // Draws the selected spritesheet
           var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_spritePicker.SelectedSheet.Sheet.Texture);
           ImGui.Image(texture, new System.Numerics.Vector2(previewWidth, previewHeight*ratio), 
               _spritePicker.GetUvMin(_spritePicker.SelectedSheet), _spritePicker.GetUvMax(_spritePicker.SelectedSheet));
