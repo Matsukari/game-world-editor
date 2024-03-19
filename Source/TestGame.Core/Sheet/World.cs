@@ -174,7 +174,9 @@ namespace Raven.Sheet
 
         public int GetTile(int x, int y) => y * TilesQuantity.X + x;
         public int GetTileFromWorld(Vector2 point) => GetTile((int)point.X / TileWidth, (int)point.Y / TileHeight);
+        public Point GetTileCoordFromWorld(Vector2 point) => new Point((int)point.X / TileWidth, (int)point.Y / TileHeight);
         public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
+        public void ReplaceTile(Point point, InstancedSprite tile) => ReplaceTile(point.X, point.Y, tile);
         public void ReplaceTile(int x, int y, InstancedSprite tile)
         {
           if (x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y) return;

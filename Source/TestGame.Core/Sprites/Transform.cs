@@ -5,7 +5,7 @@ namespace Raven.Sheet.Sprites
 {
   public class Transform 
   {
-    public Vector2 Position = new Vector2(1, 1);
+    public Vector2 Position = new Vector2(0, 0);
     public Vector2 Scale = new Vector2(1, 1);
     public Vector2 Skew = new Vector2(1, 1);
     public float Rotation = 0f;

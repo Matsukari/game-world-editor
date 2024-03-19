@@ -11,6 +11,7 @@ namespace Raven.Sheet
   public class WorldView : Editor.WorldEntity
   {
     List<Guidelines.GridLines> _grids = new List<Guidelines.GridLines>();
+    public bool IsEditFree = false;
     public override void OnChangedTab()
     {
       Position = Vector2.Zero;
@@ -45,6 +46,16 @@ namespace Raven.Sheet
           var level = World.Levels[i];
 
           batcher.DrawRect(level.Bounds, Editor.ColorSet.LevelSheet);
+          var selection = Editor.GetSubEntity<Selection>();
+          if (level.Bounds.Contains(camera.MouseToWorldPoint()) && Nez.Input.LeftMouseButtonReleased)
+          {
+            selection.Begin(level.Bounds, this);
+          }
+          if (selection.Capture is Renderable)
+          {
+            level.Position = selection.Bounds.Location;
+            level.Size = selection.Bounds.Size.ToPoint();
+          }
           foreach (var layer in level.Layers)
           {
             layer.Draw(batcher, camera);

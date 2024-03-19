@@ -36,13 +36,14 @@ namespace Raven.Sheet
         ImGui.GetForegroundDrawList().AddImage(
             Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(tile.Texture),
             rawMouse - tile.Region.GetHalfSize().ToNumerics(), 
-            rawMouse + tile.Region.Size.ToVector2().ToNumerics() - tile.Region.GetHalfSize().ToNumerics() + new Num.Vector2(16),
-            min.ToNumerics(), max.ToNumerics());
+            rawMouse - tile.Region.GetHalfSize().ToNumerics() + tile.Region.Size.ToVector2().ToNumerics(),
+            min.ToNumerics(), max.ToNumerics(), new Color(1f, 1f, 1f, 0.3f).ToImColor());
 
         if (Nez.Input.LeftMouseButtonPressed && !input.IsImGuiBlocking)
         {
           var tilelayer = (world.Levels[0].Layers[0] as World.Level.TileLayer);
-          tilelayer.Tiles[tilelayer.GetTileFromWorld(editor.Scene.Camera.MouseToWorldPoint())] = new TileInstance(tile);
+          var tileApprox = editor.Scene.Camera.MouseToWorldPoint(); 
+          tilelayer.ReplaceTile(tilelayer.GetTileCoordFromWorld(tileApprox), new TileInstance(tile));
         }
       }
     }
