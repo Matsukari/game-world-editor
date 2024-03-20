@@ -32,6 +32,13 @@ namespace Raven.Sheet
       {
         var min = tile.Region.Location.ToVector2() / tile.Texture.GetSize();
         var max = (tile.Region.Location + tile.Region.Size).ToVector2() / tile.Texture.GetSize();
+        var tilelayer = (world.Levels[0].Layers[0] as World.Level.TileLayer);
+        var tileApprox = editor.Scene.Camera.MouseToWorldPoint(); 
+        var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
+       
+        if (tilelayer.IsTileValid(tileInLayer.X, tileInLayer.Y))
+        {
+        }
 
         ImGui.GetForegroundDrawList().AddImage(
             Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(tile.Texture),
@@ -39,11 +46,9 @@ namespace Raven.Sheet
             rawMouse - tile.Region.GetHalfSize().ToNumerics() + tile.Region.Size.ToVector2().ToNumerics(),
             min.ToNumerics(), max.ToNumerics(), new Color(1f, 1f, 1f, 0.3f).ToImColor());
 
-        if (Nez.Input.LeftMouseButtonPressed && !input.IsImGuiBlocking)
+        if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
         {
-          var tilelayer = (world.Levels[0].Layers[0] as World.Level.TileLayer);
-          var tileApprox = editor.Scene.Camera.MouseToWorldPoint(); 
-          tilelayer.ReplaceTile(tilelayer.GetTileCoordFromWorld(tileApprox), new TileInstance(tile));
+          tilelayer.ReplaceTile(tileInLayer, new TileInstance(tile));
         }
       }
     }

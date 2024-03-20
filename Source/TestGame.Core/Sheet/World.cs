@@ -20,6 +20,7 @@ namespace Raven.Sheet
     public Level CurrentLevel = null;
     public List<Level> Levels = new List<Level>();
     public Dictionary<string, Sheet> SpriteSheets = new Dictionary<string, Sheet>();
+    public IPropertied SelectedSprite;
 
     public World() 
     {
@@ -57,6 +58,7 @@ namespace Raven.Sheet
         var size = 200;
         stack.Y += size;
         ImGui.BeginChild("levels-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
+        ImGui.Indent();
         foreach (var level in Levels)
         {
           if (ImGui.MenuItem(level.Name))
@@ -65,6 +67,7 @@ namespace Raven.Sheet
             CurrentLevel = level;
           }
         }
+        ImGui.Unindent();
         ImGui.EndChild();
       }
       if (ImGui.CollapsingHeader(IconFonts.FontAwesome5.Th + " SpriteSheets", ImGuiTreeNodeFlags.DefaultOpen))
@@ -103,6 +106,7 @@ namespace Raven.Sheet
 
       FocusFactor = _spritePicker.OpenSheet == null;
       _spritePicker.Draw(renderer.Editor, this);
+      SelectedSprite = _spritePicker.SelectedSprite;
       if (_spritePicker.SelectedSprite != null && Nez.Input.RightMouseButtonReleased) _spritePicker.SelectedSprite = null;
     }
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
@@ -169,28 +173,37 @@ namespace Raven.Sheet
         public int TileHeight;
         public Point TileSize { get => new Point(TileWidth, TileHeight); }
         public Point TilesQuantity { get => new Point(Level.Size.X/TileWidth, Level.Size.Y/TileHeight); }
-        public Dictionary<int, InstancedSprite> Tiles { get => _tiles; }
-        Dictionary<int, InstancedSprite> _tiles = new Dictionary<int, InstancedSprite>();
+        public List<Point> TileHighlights = new List<Point>();
+        public Dictionary<Point, InstancedSprite> Tiles { get => _tiles; }
+        Dictionary<Point, InstancedSprite> _tiles = new Dictionary<Point, InstancedSprite>();
 
-        public int GetTile(int x, int y) => y * TilesQuantity.X + x;
-        public int GetTileFromWorld(Vector2 point) => GetTile((int)point.X / TileWidth, (int)point.Y / TileHeight);
-        public Point GetTileCoordFromWorld(Vector2 point) => new Point((int)point.X / TileWidth, (int)point.Y / TileHeight);
+        public Point GetTileCoordFromWorld(Vector2 point) => new Point(
+            (int)(point.X - Level.Bounds.Location.X) / TileWidth, 
+            (int)(point.Y - Level.Bounds.Location.Y) / TileHeight);
         public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
+        public bool IsTileValid(int x, int y) => !(x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y); 
         public void ReplaceTile(Point point, InstancedSprite tile) => ReplaceTile(point.X, point.Y, tile);
         public void ReplaceTile(int x, int y, InstancedSprite tile)
         {
-          if (x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y) return;
-          _tiles[GetTile(x, y)] = tile;
+          if (!IsTileValid(x, y)) return;
+          _tiles[new Point(x, y)] = tile;
         }
         public override void Draw(Batcher batcher, Camera camera)
         {
           foreach (var block in _tiles)
           {
-            var pos = GetTile(block.Key);
+            var bounds = new RectangleF(block.Key.X*TileWidth, block.Key.Y*TileHeight, TileWidth, TileHeight);
+            bounds.Location += Level.Bounds.Location;
             switch (block.Value)
             {
-              case TileInstance tile: tile.Draw(batcher, camera, new RectangleF(pos.X*TileWidth, pos.Y*TileHeight, TileWidth, TileHeight)); break;
+              case TileInstance tile: tile.Draw(batcher, camera, bounds); break;
             }
+          }
+          foreach (var tile in TileHighlights)
+          {
+            var bounds = new RectangleF(tile.X*TileWidth, tile.Y*TileHeight, TileWidth, TileHeight);
+            bounds.Location += Level.Bounds.Location;
+            _tiles[tile].Draw(batcher, camera, bounds);
           }
         }
 

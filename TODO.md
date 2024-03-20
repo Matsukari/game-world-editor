@@ -35,8 +35,8 @@ Implemente animation
 ~Editing state indicator~
 
 ## Level
-Resizing, moving levels
-Painting tiles on Level
+~Resizing, moving levels~
+~Painting tiles on Level~
 Painting spritexes on levels
 Bucket, rectangle, line paint 
 Random painting 
@@ -45,7 +45,7 @@ Layer management
 Freeform layer 
 
 ## World
-Add other spritesheet on world
+~Add other spritesheet on world~
 Create own level
 Connect levels 
 Single level context

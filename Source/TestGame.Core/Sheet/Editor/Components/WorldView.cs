@@ -47,7 +47,7 @@ namespace Raven.Sheet
 
           batcher.DrawRect(level.Bounds, Editor.ColorSet.LevelSheet);
           var selection = Editor.GetSubEntity<Selection>();
-          if (level.Bounds.Contains(camera.MouseToWorldPoint()) && Nez.Input.LeftMouseButtonReleased)
+          if (level.Bounds.Contains(camera.MouseToWorldPoint()) && Nez.Input.LeftMouseButtonReleased && World.SelectedSprite == null)
           {
             selection.Begin(level.Bounds, this);
           }
