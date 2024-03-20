@@ -159,15 +159,23 @@ namespace Raven.Sheet
           }
           else if (input.IsDrag)
           {
-            mouseDragArea.Size = mouse - _initialMouseOnDrag;
+            mouseDragArea.Size = (mouse - _initialMouseOnDrag);
             mouseDragArea = mouseDragArea.AlwaysPositive();
-            foreach (var rectTile in _tiles)
+
+            var bounds = Bounds;
+            bounds.Location = new Vector2();
+            bounds.Size /= sheetScale;
+            var rectTile = new RectangleF();
+            rectTile.Location = mouse;
+            rectTile.Size = OpenSheet.Sheet.TileSize.ToVector2();
+            if (mouseDragArea.Intersects(bounds))
             {
-              if (mouseDragArea.Intersects(rectTile))
-              {
-                if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileIdFromWorld(rectTile.X, rectTile.Y));
-                else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile, OpenSheet.Sheet);
-              }
+              var tiled = OpenSheet.Sheet.GetTileCoordFromWorld(rectTile.X, rectTile.Y);
+              tiled.X = Math.Min(tiled.X, OpenSheet.Sheet.Tiles.X-1);
+              tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1);
+              Console.WriteLine(tiled.ToString());
+              if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
+              else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile, OpenSheet.Sheet);
             }
           }
           else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;

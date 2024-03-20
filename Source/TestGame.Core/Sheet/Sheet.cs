@@ -59,6 +59,8 @@ namespace Raven.Sheet
 
     public int GetTileId(int x, int y) => y * Tiles.X + x;
     public int GetTileIdFromWorld(float x, float y) => GetTileId((int)x/TileWidth, (int)y/TileHeight);
+    public Point GetTileCoordFromWorld(float x, float y) => new Point((int)x/TileWidth, (int)y/TileHeight);
+
     public Point GetTileCoord(int index) => new Point(index % Tiles.X, index / Tiles.X); 
 
     public bool IsTileValid(int index) => index >= 0 && index < Tiles.X * Tiles.Y;
