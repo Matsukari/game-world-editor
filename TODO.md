@@ -46,7 +46,7 @@ Freeform layer
 
 ## World
 ~Add other spritesheet on world~
-Create own level
+~Create own level~
 Connect levels 
 Single level context
 

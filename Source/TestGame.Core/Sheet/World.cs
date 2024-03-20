@@ -25,12 +25,15 @@ namespace Raven.Sheet
     public World() 
     {
       Level level = CreateLevel();
+      CurrentLevel = level;
     }
     public Level CreateLevel(string name = "Level default") 
     {
       Level level = new Level(this);
+      Level.Layer layer = new Level.TileLayer(level, 16, 16);
       level.Name = name;
-      level.Layers.Add(new Level.TileLayer(level, 16, 16));
+      level.Layers.Add(layer);
+      level.CurrentLayer = layer;
       Levels.Add(level);
       return level;
     }
@@ -38,6 +41,13 @@ namespace Raven.Sheet
     public override string GetIcon()
     {
       return IconFonts.FontAwesome5.ThLarge;
+    }
+    public void DrawArtifacts(Batcher batcher, Camera camera, Editor editor, GuiData gui)
+    {
+      if (CurrentLevel != null)
+      {
+        batcher.DrawRectOutline(camera, CurrentLevel.Bounds, editor.ColorSet.SpriteRegionActiveOutline);
+      }
     }
     SpritePicker _spritePicker = new SpritePicker();
     public override void RenderImGui(PropertiesRenderer renderer)
@@ -124,6 +134,7 @@ namespace Raven.Sheet
       public Vector2 Position = new Vector2();
       public RectangleF Bounds { get => new RectangleF(Position.X, Position.Y, Size.X, Size.Y); }
       public List<Layer> Layers = new List<Layer>();
+      public Layer CurrentLayer = null;
       public Level(World world)
       {
         _world = world;

@@ -28,9 +28,39 @@ namespace Raven.Sheet
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
     }
+    Vector2 _mouseWhenLevelAdd = Vector2.Zero;
     public void RenderImGui()
     {
-      // Options
+      if (!Enabled) return;
+      for (var i = 0; i < World.Levels.Count(); i++)
+      {
+        var level = World.Levels[i];
+        if (Nez.Input.RightMouseButtonReleased)
+        {
+          if (level.Bounds.Contains(Scene.Camera.MouseToWorldPoint()))
+          {
+            ImGui.OpenPopup("level-options-popup");
+          }
+          else
+          {
+            ImGui.OpenPopup("world-options-popup");
+          }
+        }
+      }
+      if (ImGui.BeginPopupContextItem("level-options-popup"))
+      {
+        ImGui.EndPopup();
+      }
+      if (ImGui.BeginPopupContextItem("world-options-popup"))
+      {
+        if (ImGui.MenuItem("Add level here"))
+        {
+          _mouseWhenLevelAdd = Scene.Camera.MouseToWorldPoint();
+          Editor.OpenNameModal((name)=>{ World.CreateLevel(name).Position = _mouseWhenLevelAdd; });
+        }
+        ImGui.EndPopup();
+      }
+
     }
     public override void Update()
     {
@@ -41,25 +71,27 @@ namespace Raven.Sheet
     {
       public override void Render(Batcher batcher, Camera camera)
       {
+        World.DrawArtifacts(batcher, camera, Editor, Gui);
+        var selection = Editor.GetSubEntity<Selection>();
         for (var i = 0; i < World.Levels.Count(); i++)
         {
           var level = World.Levels[i];
 
           batcher.DrawRect(level.Bounds, Editor.ColorSet.LevelSheet);
-          var selection = Editor.GetSubEntity<Selection>();
-          if (level.Bounds.Contains(camera.MouseToWorldPoint()) && Nez.Input.LeftMouseButtonReleased && World.SelectedSprite == null)
+  
+          if (Nez.Input.LeftMouseButtonReleased)
           {
-            selection.Begin(level.Bounds, this);
-          }
-          if (selection.Capture is Renderable)
-          {
-            level.Position = selection.Bounds.Location;
-            level.Size = selection.Bounds.Size.ToPoint();
+            if (level.Bounds.Contains(camera.MouseToWorldPoint()) && World.SelectedSprite == null) selection.Begin(level.Bounds, level);
           }
           foreach (var layer in level.Layers)
           {
             layer.Draw(batcher, camera);
           }
+        }
+        if (selection.Capture is World.Level lev)
+        {
+          lev.Position = selection.Bounds.Location;
+          lev.Size = selection.Bounds.Size.ToPoint();
         }
       }
     }
