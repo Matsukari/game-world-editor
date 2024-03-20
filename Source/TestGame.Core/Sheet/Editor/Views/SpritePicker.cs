@@ -28,15 +28,15 @@ namespace Raven.Sheet
       var input = Core.GetGlobalManager<Input.InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
-      if (SelectedSprite is Tile tile)
+      if (SelectedSprite is Sprite sprite)
       {
-        var min = tile.Region.Location.ToVector2() / tile.Texture.GetSize();
-        var max = (tile.Region.Location + tile.Region.Size).ToVector2() / tile.Texture.GetSize();
+        var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
+        var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
        
         ImGui.GetForegroundDrawList().AddImage(
-            Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(tile.Texture),
-            rawMouse - tile.Region.GetHalfSize().ToNumerics(), 
-            rawMouse - tile.Region.GetHalfSize().ToNumerics() + tile.Region.Size.ToVector2().ToNumerics(),
+            Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
+            rawMouse - sprite.Region.GetHalfSize().ToNumerics(), 
+            rawMouse - sprite.Region.GetHalfSize().ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics(),
             min.ToNumerics(), max.ToNumerics(), new Color(1f, 1f, 1f, 0.3f).ToImColor());
 
         if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking 
@@ -45,15 +45,18 @@ namespace Raven.Sheet
         {
           var tileApprox = editor.Scene.Camera.MouseToWorldPoint(); 
           var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
-          tilelayer.ReplaceTile(tileInLayer, new TileInstance(tile));
+          foreach (var tile in sprite.GetRectTiles())
+          {
+            tilelayer.ReplaceTile(tileInLayer, new TileInstance(tile));
+          }
         }
       }
     }
+    Vector2 _initialMouseOnDrag = Vector2.Zero;
     public void Draw(Editor editor, World world)
     {
       var input = Core.GetGlobalManager<Input.InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
-
 
       if (OpenSheet == null) 
       {
@@ -66,10 +69,15 @@ namespace Raven.Sheet
       ImGui.SetWindowSize(new System.Numerics.Vector2(450, 450));
       ImGui.SetWindowPos(new System.Numerics.Vector2(0f, Screen.Height-ImGui.GetWindowHeight()-28));
       ImGui.SetWindowFocus();
+
       Bounds.Location = ImGui.GetWindowPos();
       Bounds.Size = ImGui.GetWindowSize();
+  
+      // Window draws 2 vertical components; use only partitioned size from total bounds
       var totalBounds = Bounds;
       var barSize = new Vector2(0, 25);
+
+      // The bounds of the picker itself
       Bounds.Location += barSize;
       Bounds.Size -= barSize;
       // Sync tiles
@@ -92,6 +100,7 @@ namespace Raven.Sheet
 
       if (ImGui.BeginTabBar("sheet-picker-tab"))
       {
+        // Show tiles
         if (ImGui.BeginTabItem("Tiles"))
         {
           // Highlights tile on mouse hvoer
@@ -103,6 +112,8 @@ namespace Raven.Sheet
             worldTile.Location -= OpenSheet.Position;
             worldTile.Location += Bounds.Location;
             worldTile.Size *= sheetZoom;
+
+            // Draws grid
             if (totalBounds.Contains(worldTile))
             {
               ImGui.GetForegroundDrawList().AddRect(
@@ -110,6 +121,7 @@ namespace Raven.Sheet
                   (worldTile.Location + worldTile.Size).ToNumerics(), 
                   editor.ColorSet.SpriteRegionInactiveOutline.ToImColor());
             }
+            // Draws highlight
             if (rectTile.Contains(mouse))
             {
               ImGui.GetForegroundDrawList().AddRect(
@@ -118,21 +130,28 @@ namespace Raven.Sheet
                   editor.ColorSet.SpriteRegionActiveOutline.ToImColor());
             }
           }
+          var mouseDragArea = new RectangleF();
+          mouseDragArea.Location = _initialMouseOnDrag;
+          // Multiple selection (rectangle) 
           if (input.IsDragFirst) 
           {
+            _initialMouseOnDrag = mouse;
           }
           else if (input.IsDrag)
           {
+            mouseDragArea.Size = mouse - _initialMouseOnDrag;
+            mouseDragArea = mouseDragArea.AlwaysPositive();
+            foreach (var rectTile in _tiles)
+            {
+              if (mouseDragArea.Intersects(rectTile))
+              {
+                if (SelectedSprite is Sprite sprite) sprite.AddTile(OpenSheet.Sheet.GetTileIdFromWorld((int)rectTile.X, (int)rectTile.Y));
+                else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile, OpenSheet.Sheet);
+                Console.WriteLine($"\n_initialMouseOnDrag {_initialMouseOnDrag}\nMouseDragArea {mouseDragArea.RenderStringFormat()}\nSelectedSprite {(SelectedSprite as Sprite).Region}"); };
+            }
           }
           else if (input.IsDragLast)
           {
-            foreach (var rectTile in _tiles)
-            {
-              if (rectTile.Contains(mouse))
-              {
-                SelectedSprite = OpenSheet.Sheet.GetTileData(OpenSheet.Sheet.GetTileIdFromWorld(rectTile.X, rectTile.Y));
-              }
-            }
           }
         }
         if (ImGui.BeginTabItem("Spritexes"))

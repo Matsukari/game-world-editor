@@ -81,6 +81,7 @@ namespace Raven.Sheet.Sprites
     List<int> _tiles = new List<int>();
     List<Tile> _createdTiles = new List<Tile>();
     public List<Tile> GetTiles { get => _createdTiles; }
+    public Texture2D Texture { get => _sheet.Texture; }
 
     Sheet _sheet;
     public Sprite(Rectangle region, Sheet sheet)
@@ -88,6 +89,24 @@ namespace Raven.Sheet.Sprites
       Region = region;
       _sheet = sheet;
       _tiles = sheet.GetTiles(region.ToRectangleF());
+    }
+    public List<Tile> GetRectTiles()
+    {
+      var list = new List<Tile>();
+      foreach (var tile in _tiles)
+      {
+        list.AddIfNotPresent(new Tile(_sheet.GetTileCoord(tile), _sheet));
+      }
+      return list;
+    }
+    public void AddTile(int coord)
+    {
+      if (_sheet.IsTileValid(coord)) throw new Exception();
+      _tiles.AddIfNotPresent(coord);
+      var list = new List<Rectangle>();
+      list.AddIfNotPresent(Region);
+      list.AddIfNotPresent(_sheet.GetTile(coord));
+      Region = RectangleExt.MinMax(list);
     }
     public override string GetIcon()
     {
@@ -97,12 +116,10 @@ namespace Raven.Sheet.Sprites
     {
       foreach (var tile in _tiles)
       {
-        var tileCoord = _sheet.GetTileCoord(tile);
+         var existingTile = _sheet.GetTileData(tile);
         // If not created yet
-        _sheet.CreateTile(new Tile(_sheet.GetTileCoord(tile), _sheet));
-        // Update
-        var instanced = _sheet.GetCreatedTile(tile);
-        instanced.Properties.OverrideOrAddAll(Properties);
+        _sheet.CreateTile(existingTile);
+        existingTile.Properties.OverrideOrAddAll(Properties);
       }
     }
     protected override void OnChangeName(string prev, string curr)
@@ -110,9 +127,9 @@ namespace Raven.Sheet.Sprites
       foreach (var tile in _tiles)
       {
         // If not created yet
-        _sheet.CreateTile(new Tile(_sheet.GetTileCoord(tile), _sheet));
-        var instanced = _sheet.GetCreatedTile(tile);
-        instanced.Name = curr;
+        var existingTile = _sheet.GetTileData(tile);
+        _sheet.CreateTile(existingTile);
+        existingTile.Name = curr;
       }
     } 
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
