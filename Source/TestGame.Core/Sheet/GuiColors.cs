@@ -20,8 +20,10 @@ namespace Raven.Sheet
     public Color Background = new Color(0.15f, 0.15f, 0.15f);
     public Color DeleteButton = Color.PaleVioletRed;
 
-    public Color ShapeButtonTextColor = new Color(0.650f, 0.326f, 0.754f, 1f);
-    public Color ViewbarSpecialButton = Color.CadetBlue;
+    public Color ViewbarSpecialButton = Color.Turquoise;
+    public Color ViewbarViewButton = Color.PaleVioletRed;
+    public Color ViewbarShapeButton = Color.OrangeRed;
+
 
     public Color LevelSheet = new Color(0.20f, 0.2f, 0.2f, 2f);
 

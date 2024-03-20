@@ -65,6 +65,16 @@ namespace Raven.Sheet
           {
             (IconFonts.FontAwesome5.MousePointer, ()=>{}),
             (IconFonts.FontAwesome5.Shapes, ()=>{})
+          },
+          // 4, paint type options
+          new (string, Action)[]
+          {
+            (IconFonts.FontAwesome5.PaintBrush, ()=>{}),
+            (IconFonts.FontAwesome5.Eraser, ()=>{}),
+            ("/", ()=>{}),
+            (IconFonts.FontAwesome5.Square, ()=>{}),
+            (IconFonts.FontAwesome5.Fill, ()=>{}),
+            (IconFonts.FontAwesome5.Dice, ()=>{}),            
           }
       };
 
@@ -136,13 +146,15 @@ namespace Raven.Sheet
       ImGui.PopStyleColor();
 
       // View options
+      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ViewbarViewButton.ToImColor());
       ButtonSetFlat(2, 10);
+      ImGui.PopStyleColor();
 
       // Select type options
       ButtonSetFlat(3, 20);
     
       // Geometry opeionts
-      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ShapeButtonTextColor.ToImColor());
+      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ViewbarShapeButton.ToImColor());
       ImGui.SameLine();
       ImGui.Dummy(new System.Numerics.Vector2(20, 0)); 
       // Draw shape annotators
@@ -158,7 +170,13 @@ namespace Raven.Sheet
       }
       ImGui.PopStyleColor();
 
-
+      if (Editor.GetCurrent() is World)
+      {
+        // Paint options
+        ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg]);
+        ButtonSetFlat(4, 20);
+        ImGui.PopStyleColor();
+      }
 
 
 
