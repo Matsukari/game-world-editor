@@ -34,6 +34,7 @@ public class TestGameProcess : Core
       var imgui = Core.GetGlobalManager<ImGuiManager>();
       if (which == "imdemo") imgui.ShowDemoWindow = !imgui.ShowDemoWindow;
       else if (which == "scene") imgui.ShowSceneGraphWindow = !imgui.ShowSceneGraphWindow;
+      else if (which == "core") imgui.ShowCoreWindow = !imgui.ShowCoreWindow;
 
     }
 

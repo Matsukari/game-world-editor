@@ -28,7 +28,7 @@ namespace Raven.Sheet
       var input = Core.GetGlobalManager<Input.InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
-      if (SelectedSprite is Sprite sprite)
+      if (SelectedSprite is Sprite sprite && _initialMouseOnDrag == Vector2.Zero)
       {
         var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
         var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
@@ -39,15 +39,19 @@ namespace Raven.Sheet
             rawMouse - sprite.Region.GetHalfSize().ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics(),
             min.ToNumerics(), max.ToNumerics(), new Color(1f, 1f, 1f, 0.3f).ToImColor());
 
-        if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking 
+        if (Nez.Input.LeftMouseButtonDown 
+            && !input.IsImGuiBlocking 
             && world.CurrentLevel != null 
             && world.CurrentLevel.CurrentLayer is World.Level.TileLayer tilelayer)
         {
           var tileApprox = editor.Scene.Camera.MouseToWorldPoint(); 
           var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
+          var tileStart = sprite.GetRectTiles().First() ;
+          if (tileStart == null) return;
           foreach (var tile in sprite.GetRectTiles())
           {
-            tilelayer.ReplaceTile(tileInLayer, new TileInstance(tile));
+            var delta = tile.Coordinates - tileStart.Coordinates;
+            tilelayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
           }
         }
       }
@@ -121,13 +125,28 @@ namespace Raven.Sheet
                   (worldTile.Location + worldTile.Size).ToNumerics(), 
                   editor.ColorSet.SpriteRegionInactiveOutline.ToImColor());
             }
-            // Draws highlight
-            if (rectTile.Contains(mouse))
+            // Draws highlight under mouse
+            if (rectTile.Contains(mouse) && !input.IsDrag)
             {
               ImGui.GetForegroundDrawList().AddRect(
                   (worldTile.Location).ToNumerics(), 
                   (worldTile.Location + worldTile.Size).ToNumerics(), 
                   editor.ColorSet.SpriteRegionActiveOutline.ToImColor());
+            }
+          }
+          // Highlights selected sprite
+          {
+            if (SelectedSprite is Sprite sprite)
+            {
+              var regionWorld = sprite.Region.ToRectangleF();
+              regionWorld.Location *= sheetZoom;
+              regionWorld.Location -= OpenSheet.Position;
+              regionWorld.Location += Bounds.Location;
+              regionWorld.Size *= sheetZoom;
+              ImGui.GetForegroundDrawList().AddRectFilled(
+                  (regionWorld.Location).ToNumerics(), 
+                  (regionWorld.Location + regionWorld.Size).ToNumerics(), 
+                  editor.ColorSet.SpriteRegionActiveFill.Add(new Color(0.1f, 0.1f, 0.1f, 0.2f)).ToImColor());               
             }
           }
           var mouseDragArea = new RectangleF();
@@ -136,6 +155,7 @@ namespace Raven.Sheet
           if (input.IsDragFirst) 
           {
             _initialMouseOnDrag = mouse;
+            SelectedSprite = null;
           }
           else if (input.IsDrag)
           {
@@ -145,14 +165,12 @@ namespace Raven.Sheet
             {
               if (mouseDragArea.Intersects(rectTile))
               {
-                if (SelectedSprite is Sprite sprite) sprite.AddTile(OpenSheet.Sheet.GetTileIdFromWorld((int)rectTile.X, (int)rectTile.Y));
+                if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileIdFromWorld(rectTile.X, rectTile.Y));
                 else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile, OpenSheet.Sheet);
-                Console.WriteLine($"\n_initialMouseOnDrag {_initialMouseOnDrag}\nMouseDragArea {mouseDragArea.RenderStringFormat()}\nSelectedSprite {(SelectedSprite as Sprite).Region}"); };
+              }
             }
           }
-          else if (input.IsDragLast)
-          {
-          }
+          else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;
         }
         if (ImGui.BeginTabItem("Spritexes"))
         {

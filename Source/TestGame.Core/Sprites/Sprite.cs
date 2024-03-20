@@ -95,18 +95,22 @@ namespace Raven.Sheet.Sprites
       var list = new List<Tile>();
       foreach (var tile in _tiles)
       {
-        list.AddIfNotPresent(new Tile(_sheet.GetTileCoord(tile), _sheet));
+        list.Add(new Tile(_sheet.GetTileCoord(tile), _sheet));
       }
       return list;
     }
-    public void AddTile(int coord)
+    public void Rectangular(int coord)
     {
-      if (_sheet.IsTileValid(coord)) throw new Exception();
-      _tiles.AddIfNotPresent(coord);
+      if (!_sheet.IsTileValid(coord)) throw new Exception();
       var list = new List<Rectangle>();
+      var rect2 = _sheet.GetTile(coord);
       list.AddIfNotPresent(Region);
       list.AddIfNotPresent(_sheet.GetTile(coord));
-      Region = RectangleExt.MinMax(list);
+      var region = Region;
+      region.Width = rect2.Right - region.X;
+      region.Height = rect2.Bottom - region.Y;
+      Region = region.ToRectangleF().AlwaysPositive();
+      _tiles = _sheet.GetTiles(Region.ToRectangleF());
     }
     public override string GetIcon()
     {
