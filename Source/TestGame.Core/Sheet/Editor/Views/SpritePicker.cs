@@ -28,7 +28,10 @@ namespace Raven.Sheet
       var input = Core.GetGlobalManager<Input.InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
-      if (SelectedSprite is Sprite sprite && _initialMouseOnDrag == Vector2.Zero)
+      // Effectively on drag
+      if (_initialMouseOnDrag != Vector2.Zero) return;
+
+      if (SelectedSprite is Sprite sprite)
       {
         var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
         var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
@@ -53,6 +56,14 @@ namespace Raven.Sheet
             var delta = tile.Coordinates - tileStart.Coordinates;
             tilelayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
           }
+        }
+      }
+      else if (SelectedSprite is Spritex spritex)
+      {
+        if (editor.Scene.Entities.FindEntity(spritex.Name) == null)
+        {
+          editor.Scene.CreateEntity(spritex.Name);
+
         }
       }
     }
@@ -118,7 +129,7 @@ namespace Raven.Sheet
             worldTile.Size *= sheetZoom;
 
             // Draws grid
-            if (totalBounds.Contains(worldTile))
+            if (Bounds.Contains(worldTile))
             {
               ImGui.GetForegroundDrawList().AddRect(
                   (worldTile.Location).ToNumerics(), 
@@ -173,26 +184,50 @@ namespace Raven.Sheet
               var tiled = OpenSheet.Sheet.GetTileCoordFromWorld(rectTile.X, rectTile.Y);
               tiled.X = Math.Min(tiled.X, OpenSheet.Sheet.Tiles.X-1);
               tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1);
-              Console.WriteLine(tiled.ToString());
               if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
               else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile, OpenSheet.Sheet);
             }
           }
           else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;
+
+          HandleMoveZoom();
+          // Draws the spritesheet with zoom and fofset
+          var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(OpenSheet.Sheet.Texture);
+          ImGui.GetWindowDrawList().AddImage(texture, 
+              Bounds.Location.ToNumerics(), 
+              Bounds.Location.ToNumerics() + Bounds.Size.ToNumerics(), 
+              GetUvMin(OpenSheet), GetUvMax(OpenSheet));
+
+          ImGui.EndTabItem();
         }
+        var grid = false;
         if (ImGui.BeginTabItem("Spritexes"))
         {
+          ImGuiViews.ButtonSetFlat(new List<(string, Action)>{
+              (IconFonts.FontAwesome5.Th, ()=>{grid=true;}),
+              (IconFonts.FontAwesome5.ThList, ()=>{grid=false;}),
+          });
+          if (grid)
+          {
+          }
+          else 
+          {
+            ImGui.Indent();
+            foreach (var spritex in OpenSheet.Sheet.Spritexes)
+            {
+              if (ImGui.MenuItem(spritex.Key))
+              {
+                SelectedSprite = spritex.Value;
+              }
+            }
+            ImGui.Unindent();
+          }
+          ImGui.EndTabItem();
         }
       }
-      HandleMoveZoom();
       HandleSelectedSprite(editor, world);
 
-      // Draws the spritesheet with zoom and fofset
-      var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(OpenSheet.Sheet.Texture);
-      ImGui.GetWindowDrawList().AddImage(texture, 
-          Bounds.Location.ToNumerics(), 
-          Bounds.Location.ToNumerics() + Bounds.Size.ToNumerics(), 
-          GetUvMin(OpenSheet), GetUvMax(OpenSheet));
+
 
       // Mouse is outside the enlargened picker
       if (!totalBounds.Contains(ImGui.GetMousePos()) && !input.IsDrag) 

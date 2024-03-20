@@ -71,7 +71,6 @@ namespace Raven.Sheet
     {
       public override void Render(Batcher batcher, Camera camera)
       {
-        World.DrawArtifacts(batcher, camera, Editor, Gui);
         var selection = Editor.GetSubEntity<Selection>();
         for (var i = 0; i < World.Levels.Count(); i++)
         {
@@ -93,6 +92,7 @@ namespace Raven.Sheet
           lev.Position = selection.Bounds.Location;
           lev.Size = selection.Bounds.Size.ToPoint();
         }
+        World.DrawArtifacts(batcher, camera, Editor, Gui);
       }
     }
   }

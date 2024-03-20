@@ -37,8 +37,9 @@ Implemente animation
 ## Level
 ~Resizing, moving levels~
 ~Painting tiles on Level~
+~Rectangle select on tiles~
+Paint preview on layer
 Painting spritexes on levels
-Rectangle select on tiles
 Bucket, rectangle, line paint 
 Random painting 
 Transforms on instanced sprites 
