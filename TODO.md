@@ -39,6 +39,14 @@ Implemente animation
 ~Resizing, moving levels~
 ~Painting tiles on Level~
 ~Rectangle select on tiles~
+~Layer listings~
+~Level listings~
+Delete level 
+Enabled level
+Lock layer 
+Delete layer 
+Create own layer 
+Order layers
 Paint preview on layer
 Painting spritexes on levels
 Bucket, rectangle, line paint 
@@ -47,11 +55,14 @@ Transforms on instanced sprites
 Layer management 
 Freeform layer 
 
+
+
 ## World
 ~Add other spritesheet on world~
 ~Create own level~
+~Single level context~
+~Current level maximize~
 Connect levels 
-Single level context
 
 
 ## Misc

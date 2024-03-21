@@ -29,7 +29,14 @@ namespace Raven.Sheet
       Level level = CreateLevel();
       CurrentLevel = level;
     }
-
+    public Level GetLevel(string name)
+    {
+      foreach (var level in Levels) if (level.Name == name) return level;
+      return null;
+    }
+    public void RemoveLevel(Level level) => RemoveComponent(level);
+    public void RemoveLevel(string level) => RemoveComponent(GetLevel(level));
+ 
     public Level CreateLevel(string name = "Level default") 
     {
       Level level = new Level(this);
@@ -38,7 +45,6 @@ namespace Raven.Sheet
       level.Layers.Add(layer);
       level.CurrentLayer = layer;
       AddComponent(level);
-      Levels.Add(level);
       return level;
     }
     public void AddSheet(Sheet sheet) { SpriteSheets.Add(sheet.Name, sheet); }

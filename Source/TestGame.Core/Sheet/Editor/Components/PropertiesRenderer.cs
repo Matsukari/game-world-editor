@@ -50,8 +50,8 @@ namespace Raven.Sheet
           {
             theShape.Bounds = selectionRect.Bounds;
           }
-          DrawNames(batcher, camera);
         }
+        DrawNames(batcher, camera);
       }
       void DrawNames(Batcher batcher, Camera camera)
       {

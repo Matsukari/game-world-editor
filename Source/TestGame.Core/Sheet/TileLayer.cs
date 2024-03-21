@@ -39,6 +39,7 @@ namespace Raven.Sheet
       {
         var bounds = new RectangleF(block.Key.X*TileWidth, block.Key.Y*TileHeight, TileWidth, TileHeight);
         bounds.Location += Level.Bounds.Location;
+        bounds.Location += Offset;
         switch (block.Value)
         {
           case TileInstance tile: tile.Draw(batcher, camera, bounds); break;

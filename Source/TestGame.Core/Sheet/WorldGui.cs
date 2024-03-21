@@ -87,16 +87,31 @@ namespace Raven.Sheet
         }
       }
     }
+    void SyncLevelGuis()
+    {
+      if (_levelGuis.Count() != _world.Levels.Count())
+      {
+        _levelGuis.Clear();
+        foreach (var level in _world.Levels) _levelGuis.Add(new LevelGui(level));
+      }
+    }
     public override void RenderImGui(PropertiesRenderer renderer)
     {
       // The base window
       base.RenderImGui(renderer);
+
+      if (SelectedLevel != -1)
+      {
+        _levelGuis[SelectedLevel].RenderImGui(renderer);
+      }
 
       // Another dock, levels panel
       ImGui.Begin(IconFonts.FontAwesome5.ObjectGroup + " World Lister");
       var stack = new System.Numerics.Vector2(0, 0);
       var levelFlags = ImGuiTreeNodeFlags.None;
       if (_world.Levels.Count() > 0) levelFlags = ImGuiTreeNodeFlags.DefaultOpen;
+      SyncLevelGuis();
+
       if (_spritePicker.Sheets.Count() != _world.SpriteSheets.Count())
       {
         _spritePicker.Sheets.Clear();
@@ -114,23 +129,42 @@ namespace Raven.Sheet
       // Levels listings
       if (ImGui.CollapsingHeader(IconFonts.FontAwesome5.ObjectGroup + "  Levels", levelFlags))
       {
-        ImGui.BeginChild("levels-content");
         ImGui.Indent();
-        foreach (var level in _levelGuis)
+        for (int i = 0; i < _levelGuis.Count(); i++)
         {
-          if (ImGui.Selectable(level.Name, ref level.Selected))
+          var level = _levelGuis[i];
+          if (ImGui.Selectable(level.Name, ref level.Selected, ImGuiSelectableFlags.AllowItemOverlap))
           {
             // Clear selection if not held with CTRL
             if (!ImGui.GetIO().KeyCtrl)
             {
-              _levelGuis.ForEach((l)=>l.Selected=false);
+              foreach (var levelGui in _levelGuis)
+              {
+                levelGui.Selected = false;
+              }
             }
-            level.Selected ^= true;
+            SelectedLevel = i;
+            level.Selected = true;
           }
+          ImGui.SameLine();
+          ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(level.Name).X - 150, 0f));
+          ImGui.SameLine();
+          ImGui.PushID($"level-{level.Name}-id");
+          var visibState = (!level._level.Enabled) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
+          if (ImGui.SmallButton(visibState))
+          {
+            level._level.Enabled = !level._level.Enabled;
+          }
+          ImGui.SameLine();
+          if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
+          {
+            _world.RemoveLevel(level._level);
+            SelectedLevel = -1;
+          }
+          ImGui.PopID();
+          stack.Y += ImGui.GetItemRectSize().Y;
         }
-        stack.Y += ImGui.GetItemRectSize().Y;
         ImGui.Unindent();
-        ImGui.EndChild();
       }
 
       // Spritesheet listings

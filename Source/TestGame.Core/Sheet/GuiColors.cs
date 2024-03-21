@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using ImGuiNET;
 
 namespace Raven.Sheet
 {
@@ -23,6 +24,8 @@ namespace Raven.Sheet
     public Color ViewbarSpecialButton = Color.Turquoise;
     public Color ViewbarViewButton = Color.PaleVioletRed;
     public Color ViewbarShapeButton = Color.OrangeRed;
+
+    public static uint Get(ImGuiCol col) => ImGui.ColorConvertFloat4ToU32(ImGui.GetStyle().Colors[(int) col]);
 
 
     public Color LevelSheet = new Color(0.20f, 0.2f, 0.2f, 2f);

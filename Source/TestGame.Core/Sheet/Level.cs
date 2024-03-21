@@ -8,7 +8,7 @@ namespace Raven.Sheet
   public class Level : RenderableComponent
   {
     public string Name = "default";
-    public Point ContentSize = new Point(96, 96);
+    public Point ContentSize = new Point(Screen.Width, Screen.Height);
     public World World { get; private set; }
     public List<Layer> Layers = new List<Layer>();
     public Layer CurrentLayer = null;

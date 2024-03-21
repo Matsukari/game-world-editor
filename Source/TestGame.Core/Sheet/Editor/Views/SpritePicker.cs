@@ -164,8 +164,8 @@ namespace Raven.Sheet
         if (ImGui.BeginTabItem("Spritexes"))
         {
           ImGuiViews.ButtonSetFlat(new List<(string, Action)>{
-              (IconFonts.FontAwesome5.Th, ()=>{grid=true;}),
-              (IconFonts.FontAwesome5.ThList, ()=>{grid=false;}),
+              (IconFonts.FontAwesome5.ThLarge, ()=>{grid=true;}),
+              (IconFonts.FontAwesome5.GripLines, ()=>{grid=false;}),
           });
           if (grid)
           {
