@@ -91,11 +91,9 @@ namespace Raven.Sheet
     public Sprites.Spritex CreateSpritex(Sprites.Sprite sprite) => CreateSpritex($"Spritex_{_continousCounter++}", sprite);
     public Sprites.Spritex CreateSpritex(string name, Sprites.Sprite sprite)
     {
-      var main = new Sprites.Spritex.Sprite();
-      main.SourceSprite = sprite;
-      main.Transform = new Sprites.Transform();
-
-      return new Sprites.Spritex(name, main, this);
+      var main = new Sprites.SourcedSprite(sprite: sprite);
+      var spritex = new Sprites.Spritex(name, main, this);
+      return spritex;
     }
     public List<string> GetSprites(RectangleF container)
     {

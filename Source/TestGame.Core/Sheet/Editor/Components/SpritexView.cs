@@ -2,6 +2,7 @@ using Nez;
 using ImGuiNET;
 using Nez.Sprites;
 using Nez.Textures;
+using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 
@@ -10,9 +11,8 @@ namespace Raven.Sheet
 {
   public class SpritexView : Editor.SheetEntity
   {
-    public Sprites.Spritex LastSprite { get => _spritex; }
-    Sprites.Spritex _spritex;
-    List<Entity> _entities = new List<Entity>();
+    public SpritexGui LastSprite { get => _spritex; }
+    SpritexGui _spritex;
 
     public override void OnChangedTab()
     {
@@ -25,6 +25,7 @@ namespace Raven.Sheet
     // Go to canvas and close spritesheet view
     public void Edit(Sprites.Spritex spritex)
     {
+      if (_spritex != null && _spritex.Spritex.Name == spritex.Name) return;
       // came from sheet
       if (!Enabled)
       {
@@ -37,7 +38,7 @@ namespace Raven.Sheet
       Clean();
 
       // Prepare
-      _spritex = spritex;
+      _spritex = new SpritexGui(spritex);
       Enabled = true;
       Gui.Selection = _spritex;
       Gui.ShapeContext = _spritex;
@@ -54,8 +55,8 @@ namespace Raven.Sheet
 
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
+      var x = AddComponent(_spritex.Spritex);
 
-      BuildBody();
     }
     // back to spritesheet view
     public void UnEdit()
@@ -74,13 +75,10 @@ namespace Raven.Sheet
     void Clean()
     {
       RemoveAllComponents();
-      foreach (var entity in _entities) entity.Destroy();
-      _entities.Clear();
-      Position = Screen.Center;
       Editor.Set(Editor.EditingState.Default);
       Editor.GetSubEntity<SheetSelector>().RemoveSelection();
       Editor.GetSubEntity<Selection>().End();
-      Enabled = false;
+      if (Enabled) Enabled = false;
       Gui.ShapeContext = Sheet;
     }
 
@@ -88,36 +86,7 @@ namespace Raven.Sheet
     {
       base.Update();
       if (Nez.Input.IsKeyReleased(Keys.Escape)) UnEdit(); 
-
-      SyncEntitySpritex();
       HandleSelection();
-    }
-    // Recreate and sync entities to spritex parts
-    void BuildBody()
-    {
-      foreach (var entity in _entities) entity.Destroy();
-      _entities.Clear();
-      foreach (var part in _spritex.Body)
-      {
-        var partEntity = Scene.CreateEntity(_spritex.Name + part.SourceSprite.Name);
-        var ren = partEntity.AddComponent(new SpriteRenderer(new Sprite(Sheet.Texture, part.SourceSprite.Region)));
-        part.Origin = ren.Origin;
-        partEntity.SetParent(this);
-        _entities.Add(partEntity);
-      }
-    }
-    void SyncEntitySpritex()
-    {
-      if (_entities.Count() != _spritex.Body.Count() && Enabled)
-      {
-        BuildBody();
-      }
-      // Overall transform; which covers all parts
-      _spritex.Transform.Apply(Transform);
-      for (int i = 0; i < _entities.Count(); i++)
-      {
-        _spritex.Body[i].Transform.Apply(_entities[i].Transform);
-      }
     }
     Vector2 _initialScale = new Vector2();
     void HandleSelection()
@@ -127,22 +96,22 @@ namespace Raven.Sheet
       // select individual parts
       if (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed)
       {
-        foreach (var part in _spritex.Body)
+        foreach (var part in _spritex.Spritex.Body)
         {
           var mouse = Scene.Camera.MouseToWorldPoint();
-          if (part.Bounds.Contains(mouse))
+          if (part.WorldBounds.Contains(mouse))
           {
             if (Nez.Input.LeftMouseButtonPressed)
             {
               _initialScale = part.Transform.Scale;
               Gui.Selection = _spritex;
-              selectionRect.Begin(part.Bounds, part);
+              selectionRect.Begin(part.WorldBounds, part);
               return;
             }
           }
         }
       }
-      if (selectionRect.Capture is Sprites.Spritex.Sprite selPart)
+      if (selectionRect.Capture is SourcedSprite selPart)
       {
         selPart.Transform.Scale = _initialScale + (selectionRect.Bounds.Size - selectionRect.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
         selPart.Transform.Position = selectionRect.Bounds.Location + (selPart.Origin * selPart.Transform.Scale);

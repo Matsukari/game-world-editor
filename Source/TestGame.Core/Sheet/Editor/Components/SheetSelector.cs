@@ -12,7 +12,7 @@ namespace Raven.Sheet
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(HandleEditSprite);
     }
-    Sprites.Spritex.SpriteMap _spriteMap = null;
+    Sprites.Spritex _spritexOnName = null;
     void HandleEditSprite()
     {
       if (!Enabled) return;
@@ -49,7 +49,7 @@ namespace Raven.Sheet
             {
               ImGui.EndMenu();
               OpenPopup("spritex-part-name");
-              _spriteMap = spritex.Value.Parts;
+              _spritexOnName = spritex.Value;
               return;
             }
           }
@@ -60,7 +60,7 @@ namespace Raven.Sheet
         {
           if (ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Add to last Spritex"))
           {
-            _spriteMap = spritexView.LastSprite.Parts;
+            _spritexOnName = spritexView.LastSprite.Spritex;
             OpenPopup("spritex-part-name");
             return;
           }
@@ -68,9 +68,9 @@ namespace Raven.Sheet
           {
             ImGui.EndPopup();
             ImGui.CloseCurrentPopup();
-            spritexView.LastSprite.Parts.Data[spritexView.LastSprite.ChangePart.Name] = new Sprites.Spritex.Sprite(sprite);
-            spritexView.LastSprite.Parts.Data[spritexView.LastSprite.ChangePart.Name].Name = spritexView.LastSprite.ChangePart.Name;
-            spritexView.Edit(spritexView.LastSprite);
+            spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name] = new Sprites.SourcedSprite(spritexView.LastSprite.Spritex, sprite);
+            spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name].Name = spritexView.LastSprite.ChangePart.Name;
+            spritexView.Edit(spritexView.LastSprite.Spritex);
             return;
           }
         }
@@ -84,7 +84,7 @@ namespace Raven.Sheet
       });
       ImGuiViews.NamePopupModal(Editor, "spritex-part-name", ()=>
       {
-        _spriteMap.Add(ImGuiViews.InputName, new Sprites.Spritex.Sprite(Gui.Selection as Sprites.Sprite));
+        _spritexOnName.AddSprite(ImGuiViews.InputName, new Sprites.SourcedSprite(sprite: Gui.Selection as Sprites.Sprite));
       });
       
     } 

@@ -145,55 +145,20 @@ namespace Raven.Sheet.Sprites
     }
 
   }
-  public class Spritex : Propertied
-  {  
-    public Vector2 GuiPosition = new Vector2();
-    public float GuiZoom = 1;
-    public class Sprite : Propertied 
-    {
-      public Sprites.Sprite SourceSprite;
-      public Sprites.Transform Transform = new Transform();
-      public Vector2 Origin = new Vector2();
-      public RectangleF Bounds { 
-        get => new RectangleF(
-            Transform.Position.X - Origin.X * Transform.Scale.X, 
-            Transform.Position.Y - Origin.Y * Transform.Scale.Y, 
-            SourceSprite.Region.Width * Transform.Scale.X, 
-            SourceSprite.Region.Height * Transform.Scale.Y);
-      }
-      public Sprite(Sprites.Sprite sprite=null) 
-      {
-        SourceSprite = sprite;
-      }
-      public override void RenderImGui(PropertiesRenderer renderer)
-      {
-        ImGui.BeginDisabled();
-        if (SourceSprite.HasName()) ImGui.LabelText("Source", SourceSprite.Name);
-        ImGui.LabelText("Region", SourceSprite.Region.RenderStringFormat());
-        ImGui.EndDisabled();
-        
-        Transform.RenderImGui();
-        var origin = Origin.ToNumerics();
-        if (ImGui.InputFloat2("Origin", ref origin)) Origin = origin;
-      }
-    }
-    public class SpriteMap
-    {
-      public Dictionary<string, Spritex.Sprite> Data = new Dictionary<string, Spritex.Sprite>();
-      public void Add(string name, Spritex.Sprite part) { Data.TryAdd(name, part); part.Name = name; }
-      public SpriteMap() { }
-    }
-    Sheet _sheet;
-    public Spritex.Sprite ChangePart = null;
+  public class Spritex : RenderableComponent
+  {
+    internal Sheet _sheet;
+    public string Name;
     public SpriteMap Parts = new SpriteMap();
-    public Transform Transform = new Transform();
-    public Spritex(string name, Spritex.Sprite main, Sheet sheet) 
+    public List<SourcedSprite> Body { get => new List<SourcedSprite>(Parts.Data.Values); } 
+    public Spritex(string name, SourcedSprite main, Sheet sheet) 
     {
-      _sheet = sheet;
-      Parts.Add(name, main);
       Name = name;
+      Parts.Add(name, main);
+      main.Spritex = this;
+      _sheet = sheet;
     }
-    public RectangleF Bounds 
+    public RectangleF EnclosingBounds
     {
       get 
       {
@@ -208,26 +173,132 @@ namespace Raven.Sheet.Sprites
         }
         return RectangleF.FromMinMax(min, max);
       }
-      set 
+    }
+    public override RectangleF Bounds
+    {
+      get 
       {
+				if (_areBoundsDirty)
+				{
+          _bounds = EnclosingBounds;
+          _bounds.CalculateBounds(Transform.Position, _localOffset, _bounds.Size/2f, Transform.Scale, Transform.Rotation, _bounds.Width, _bounds.Height);
+          _areBoundsDirty = true;
+        }
+        return _bounds;
       }
     }
-    public List<Spritex.Sprite> Body { get => new List<Spritex.Sprite>(Parts.Data.Values); }
-    Sprites.Spritex.Sprite _spritexPart;
+    public SourcedSprite AddSprite(string name, SourcedSprite sprite=null) 
+    {
+      if (sprite == null)
+      {
+        sprite = new SourcedSprite();
+      }
+      sprite.Spritex = this;
+      Parts.Add(name, sprite);
+      return sprite;
+    }
+    public override void Render(Batcher batcher, Camera camera)
+    {
+      foreach (var sprite in Body)
+      {
+        batcher.Draw(
+            texture: sprite.SourceSprite.Texture,
+            position: Transform.Position + LocalOffset + sprite.Transform.Position,
+            sourceRectangle: sprite.SourceSprite.Region,
+            color: sprite.Color,
+            rotation: Transform.Rotation + sprite.Transform.Rotation,
+            origin: sprite.Origin,
+            scale: Transform.Scale * sprite.Transform.Scale,
+            effects: sprite.SpriteEffects,
+            layerDepth: _layerDepth);
+      }
+    }
+    public class SpriteMap
+    {
+      public Dictionary<string, SourcedSprite> Data = new Dictionary<string, SourcedSprite>();
+      public void Add(string name, SourcedSprite part) { Data.TryAdd(name, part); part.Name = name; }
+      public SpriteMap() { }
+    }
 
+  }
+  public class SourcedSprite
+  {
+    public string Name = "";
+    public Spritex Spritex;
+    public Sprite SourceSprite;
+    public Sprites.Transform Transform = new Transform(); 
+    public SpriteEffects SpriteEffects;
+    public Vector2 Origin = new Vector2();
+    public Color Color = Color.White;
 
+    // Local bounds
+    public RectangleF LocalBounds { 
+      get => new RectangleF(
+          Transform.Position.X - Origin.X * Transform.Scale.X, 
+          Transform.Position.Y - Origin.Y * Transform.Scale.Y, 
+          SourceSprite.Region.Width * Transform.Scale.X, 
+          SourceSprite.Region.Height * Transform.Scale.Y);
+    }
+    public RectangleF WorldBounds { 
+      get 
+      {
+        var bounds = LocalBounds;
+        bounds.Location += Spritex.Transform.Position;
+        bounds.Size *= Spritex.Transform.Scale;
+        return bounds;
+      }
+    }
+    public SourcedSprite(Spritex spritex=null, Sprites.Sprite sprite=null) 
+    {
+      Spritex = spritex;
+      SourceSprite = sprite;
+    }
+  }
+
+  public class SpritexGui : Propertied
+  {  
+    public Spritex Spritex;
+    public Vector2 GuiPosition = new Vector2();
+    public float GuiZoom = 1;
+
+    public SpritexGui(Spritex spritex) 
+    {
+      Spritex = spritex;
+    }
+    void Sprite_RenderImGui(SourcedSprite sprite, PropertiesRenderer renderer)
+    {
+      ImGui.BeginDisabled();
+      if (sprite.SourceSprite.HasName()) 
+        ImGui.LabelText("Source", sprite.SourceSprite.Name);
+      ImGui.LabelText("Region", sprite.SourceSprite.Region.RenderStringFormat());
+      ImGui.EndDisabled();
+
+      sprite.Transform.RenderImGui();
+      var origin = sprite.Origin.ToNumerics();
+     
+      int originType = 1;
+      if (ImGui.Combo("Origin", ref originType, new string[]{"Center", "Topleft", "Custom"}, 3))
+      {
+        if (originType == 0) sprite.Origin = sprite.LocalBounds.Size/2f;
+        else if (originType == 1) sprite.Origin = new Vector2();
+      }
+      if (originType == 2)
+      {
+        if (ImGui.InputFloat2("Origin", ref origin)) sprite.Origin = origin;
+      }
+    }
+
+    public SourcedSprite ChangePart = null;
+    SourcedSprite  _spritexPart;
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
     {
-      var bounds = Bounds.ToNumerics();
-      if (ImGui.InputFloat4("Bounds", ref bounds)) Bounds = bounds.ToRectangleF();
-      Transform.RenderImGui();
+      Transform.RenderImGui(Spritex.Transform);
       if (ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen))
       {
-
       }
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
-        foreach (var part in Body)
+        foreach (var part in Spritex.Body)
         {
           if (ImGui.TreeNodeEx(part.Name, ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.DefaultOpen))
           {
@@ -242,14 +313,15 @@ namespace Raven.Sheet.Sprites
             string name = part.Name;
             if (ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
             {
-              Parts.Data.ChangeKey(part.Name, name);
+              Spritex.Parts.Data.ChangeKey(part.Name, name);
               part.Name = name;
             }
             ImGui.PopID();
             if (ImGui.Button(IconFonts.FontAwesome5.Edit)) ChangePart = part;
             ImGui.SameLine();
             ImGui.TextDisabled("Change source");
-            part.RenderImGui(renderer);
+            Sprite_RenderImGui(part, renderer);
+
             // Options
             ImGui.TreePop();
           }
@@ -259,7 +331,7 @@ namespace Raven.Sheet.Sprites
           if (ImGui.MenuItem("Delete"))
           {
             Console.WriteLine("Deleteing " + _spritexPart.Name);
-            Parts.Data.Remove(_spritexPart.Name);
+            Spritex.Parts.Data.Remove(_spritexPart.Name);
             ImGui.CloseCurrentPopup();
           }
           if (ImGui.MenuItem("Change region"))
@@ -278,7 +350,7 @@ namespace Raven.Sheet.Sprites
     }
     protected override void OnChangeName(string old, string now)
     {
-      _sheet.Spritexes.ChangeKey(old, now);
+      Spritex._sheet.Spritexes.ChangeKey(old, now);
     } 
   }
 }

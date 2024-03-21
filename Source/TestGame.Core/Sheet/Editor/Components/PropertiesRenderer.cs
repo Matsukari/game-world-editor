@@ -82,7 +82,7 @@ namespace Raven.Sheet
         {
           foreach (var part in spritex.Body)
           {
-            DrawText(part.Name, part.Bounds.BottomCenter(), Math.Clamp(1f/camera.RawZoom, 1f, 10f));
+            DrawText(part.Name, part.WorldBounds.BottomCenter(), Math.Clamp(1f/camera.RawZoom, 1f, 10f));
           }
         }
       }

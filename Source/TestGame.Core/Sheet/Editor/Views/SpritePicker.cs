@@ -18,7 +18,7 @@ namespace Raven.Sheet
     public List<SheetPickerData> Sheets = new List<SheetPickerData>();
     public SheetPickerData OpenSheet;
     public SheetPickerData SelectedSheet;
-    public IPropertied SelectedSprite;
+    public object SelectedSprite;
     public RectangleF Bounds = new RectangleF(0, 0, 1, 1);
     Vector2 _initialPosition = Vector2.Zero;
     List<RectangleF> _tiles = new List<RectangleF>();

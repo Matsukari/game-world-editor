@@ -20,7 +20,7 @@ namespace Raven.Sheet
     public Level CurrentLevel = null;
     public List<Level> Levels = new List<Level>();
     public Dictionary<string, Sheet> SpriteSheets = new Dictionary<string, Sheet>();
-    public IPropertied SelectedSprite;
+    public object SelectedSprite;
 
     public World() 
     {
