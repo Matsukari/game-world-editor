@@ -81,7 +81,7 @@ namespace Raven.Sheet
       Editor.GetSubEntity<SheetSelector>().RemoveSelection();
       Editor.GetSubEntity<Selection>().End();
       if (Enabled) Enabled = false;
-      Gui.ShapeContext = Sheet;
+      Gui.ShapeContext = SheetGui;
     }
 
     public override void Update()

@@ -23,9 +23,10 @@ Implement polygon shape
 ~Parts picker~
 ~Add other parts~
 ~Delete, name, change parts~
+~Transform whole body~
+Pick parts directly from canvas
 Order parts
 Rotate parts on selection
-Transform whole body
 Implemente animation
 
 ## Editor

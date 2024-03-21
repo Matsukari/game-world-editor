@@ -52,17 +52,22 @@ namespace Raven.Sheet
     { 
       public abstract class Renderable<T> : SubEntity.RenderableComponent<T> where T : SheetEntity
       {  
+        public SheetGui SheetGui { get => Parent.SheetGui; }
         public Sheet Sheet { get => Parent.Sheet; }
       }
-      public Sheet Sheet { get => Editor.GetCurrent() as Sheet; }
+      public Sheet Sheet { get => SheetGui._sheet; }
+      public SheetGui SheetGui { get => Editor.GetCurrentGui() as SheetGui; }
     }
     public class WorldEntity : SubEntity
     { 
       public abstract class Renderable<T> : SubEntity.RenderableComponent<T> where T : WorldEntity
       {  
         public World World { get => Parent.World; }
+        public WorldGui WorldGui { get => Parent.WorldGui; }
+
       }
-      public World World { get => Editor.GetCurrent() as World; }
+      public World World { get => WorldGui._world; }
+      public WorldGui WorldGui { get => Editor.GetCurrentGui() as WorldGui; }
     }
     private List<SubEntity> _children = new List<SubEntity>();
 
@@ -125,7 +130,13 @@ namespace Raven.Sheet
         default: Mouse.SetCursor(MouseCursor.Arrow); break;
       }
     }
-    public IPropertied GetCurrent() => _tabs[_currentTab];
+    public object GetCurrent() 
+    {
+      if (_tabs[_currentTab] is WorldGui world) return world._world; 
+      else if (_tabs[_currentTab] is SheetGui sheet) return sheet._sheet; 
+      throw new Exception();
+    }
+    public IPropertied GetCurrentGui() => _tabs[_currentTab];
     public GuiData GetCurrentState() => _tabsState[_currentTab];
     public T GetSubEntity<T>() where T: SubEntity => (T)_children.OfType<T>().First();    
     public void Switch(int index) 
@@ -147,11 +158,13 @@ namespace Raven.Sheet
 
       foreach (var child in _children) 
       {
-        if ((child is SheetEntity && GetCurrent() is Sheet) 
-         || (child is WorldEntity && GetCurrent() is World)
+        if ((child is SheetEntity && GetCurrentGui() is SheetGui) 
+         || (child is WorldEntity && GetCurrentGui() is WorldGui)
          || (child is SubEntity && !(child is SheetEntity) && !(child is WorldEntity)))
         {
           Console.WriteLine($"Enabled {child.GetType().Name}");
+          if (GetCurrent() is Component component) component.Entity = this;
+          else if (GetCurrent() is Entity entity) entity.Scene = Scene;
           child.Enabled = true;
           child.OnChangedTab();
         }
@@ -162,12 +175,12 @@ namespace Raven.Sheet
           child.OnDisableTab();
         }
       }
-      GetCurrentState().ShapeContext = GetCurrent();
+      GetCurrentState().ShapeContext = GetCurrentGui();
 
     }
     public void Save() {}
-    public void AddTab(Sheet sheet) => AddTab(sheet, new GuiData());
-    public void AddTab(World world) => AddTab(world, new WorldGuiData());
+    public void AddTab(Sheet sheet) => AddTab(new SheetGui(sheet), new GuiData());
+    public void AddTab(World world) => AddTab(new WorldGui(world), new WorldGuiData());
     void AddTab(Propertied content, GuiData gui)
     {
       _tabs.Add(content);

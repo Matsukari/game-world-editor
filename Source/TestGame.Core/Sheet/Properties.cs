@@ -224,7 +224,7 @@ namespace Raven
   public class Propertied : IPropertied
   {
     public PropertyList Properties { get; set; } = new PropertyList();
-    public string Name { get; set; } = "";
+    public virtual string Name { get; set; } = "";
     protected bool FocusFactor = true;
     public virtual void RenderImGui(Sheet.PropertiesRenderer renderer)
     {

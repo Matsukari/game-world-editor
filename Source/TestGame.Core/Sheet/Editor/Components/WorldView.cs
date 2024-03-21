@@ -35,14 +35,19 @@ namespace Raven.Sheet
       for (var i = 0; i < World.Levels.Count(); i++)
       {
         var level = World.Levels[i];
+
         if (Nez.Input.RightMouseButtonReleased)
         {
+          // Clicked inside a level
           if (level.Bounds.Contains(Scene.Camera.MouseToWorldPoint()))
           {
             ImGui.OpenPopup("level-options-popup");
+            WorldGui.SelectedLevel = i;
           }
+          // Clikced outside; canvas
           else
           {
+            WorldGui.SelectedLevel = -1;
             ImGui.OpenPopup("world-options-popup");
           }
         }
@@ -56,7 +61,7 @@ namespace Raven.Sheet
         if (ImGui.MenuItem("Add level here"))
         {
           _mouseWhenLevelAdd = Scene.Camera.MouseToWorldPoint();
-          Editor.OpenNameModal((name)=>{ World.CreateLevel(name).Position = _mouseWhenLevelAdd; });
+          Editor.OpenNameModal((name)=>{ World.CreateLevel(name).Transform.Position = _mouseWhenLevelAdd; });
         }
         ImGui.EndPopup();
       }
@@ -78,19 +83,20 @@ namespace Raven.Sheet
 
           batcher.DrawRect(level.Bounds, Editor.ColorSet.LevelSheet);
   
-          if (Nez.Input.LeftMouseButtonReleased)
+          if (Nez.Input.LeftMouseButtonPressed)
           {
-            if (level.Bounds.Contains(camera.MouseToWorldPoint()) && World.SelectedSprite == null) selection.Begin(level.Bounds, level);
+            if (level.Bounds.Contains(camera.MouseToWorldPoint()) && WorldGui.SelectedSprite == null) 
+            {
+              selection.Begin(level.Bounds, level);
+              WorldGui.SelectedLevel = i;
+            }
           }
-          foreach (var layer in level.Layers)
-          {
-            layer.Draw(batcher, camera);
-          }
+          level.Render(batcher, camera);
         }
-        if (selection.Capture is World.Level lev)
+        if (selection.Capture is Level lev)
         {
-          lev.Position = selection.Bounds.Location;
-          lev.Size = selection.Bounds.Size.ToPoint();
+          lev.Transform.LocalPosition = selection.Bounds.Center;
+          lev.ContentSize = selection.Bounds.Size.ToPoint();
         }
         World.DrawArtifacts(batcher, camera, Editor, Gui);
       }

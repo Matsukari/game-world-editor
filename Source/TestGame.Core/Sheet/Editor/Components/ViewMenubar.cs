@@ -129,7 +129,7 @@ namespace Raven.Sheet
       {
         if (ImGui.BeginTabItem(Editor._tabs[i].Name))
         {
-          if (Editor.GetCurrent().Name != Editor._tabs[i].Name) Editor.Switch(i);
+          if (Editor.GetCurrentGui().Name != Editor._tabs[i].Name) Editor.Switch(i);
           ImGui.EndTabItem();
         }
       }

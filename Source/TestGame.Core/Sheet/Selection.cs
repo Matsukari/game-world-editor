@@ -68,7 +68,7 @@ namespace Raven.Sheet
 
         if (selectionPoint != SelectionAxis.None)
         {
-          Parent.SetMouseCursor(selectionPoint);
+          // Parent.SetMouseCursor(selectionPoint);
         }
         if (Nez.Input.LeftMouseButtonPressed)
         {
@@ -168,7 +168,7 @@ namespace Raven.Sheet
       // draggin point
       if (IsEditingPoint)
       {
-        SetMouseCursor(SelAxis);
+        // SetMouseCursor(SelAxis);
         switch (SelAxis)
         {
           case SelectionAxis.TopLeft:

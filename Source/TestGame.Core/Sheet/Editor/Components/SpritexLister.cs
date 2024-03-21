@@ -13,7 +13,7 @@ namespace Raven.Sheet
     Sprites.Spritex _spritexOnOption;
     public void RenderImGui() 
     {
-      if (Sheet == null) return;
+      if (!Enabled) return;
       ImGui.Begin(IconFonts.FontAwesome5.List + " " + GetType().Name);
       if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Th} Tiles ({Sheet.Tiles.X * Sheet.Tiles.Y})"))
       {

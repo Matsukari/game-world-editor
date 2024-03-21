@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nez;
-using ImGuiNET;
 
 namespace Raven.Sheet
 { 
@@ -10,8 +9,9 @@ namespace Raven.Sheet
   /// Tree layers:spritexes, sprites, both which is dynamic, and a virtual 
   /// non-immutable in-there tiles of uniform size across the spritesheet image
   /// </summary>
-	public class Sheet : Propertied
+	public class Sheet : Component
 	{
+    public string Name = "";
     public Texture2D Texture { get => _texture; }
 		public Dictionary<String, Sprites.Spritex> Spritexes = new Dictionary<string, Sprites.Spritex>();
 		public Dictionary<String, Sprites.Sprite> Sprites = new Dictionary<String, Sprites.Sprite>();
@@ -139,22 +139,5 @@ namespace Raven.Sheet
       }
       return result;
     }
-    public override string GetIcon()
-    {
-      return IconFonts.FontAwesome5.ThLarge;
-    }
-    protected override void OnRenderAfterName(PropertiesRenderer renderer)
-    {
-      int w = TileWidth, h = TileHeight;
-      ImGui.LabelText(IconFonts.FontAwesome5.File + " File", _texture.Name);
-      if (ImGui.InputInt("TileWidth", ref w)) SetTileSize(w, TileHeight);
-      if (ImGui.InputInt("TileHeight", ref h)) SetTileSize(TileWidth, h);
-      ImGui.BeginDisabled();
-      ImGui.LabelText("Width", $"{Tiles.X} tiles");
-      ImGui.LabelText("Height", $"{Tiles.Y} tiles");
-      ImGui.EndDisabled();
-    }
-
 	}
-
 }

@@ -2,7 +2,6 @@ using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Nez;
 using ImGuiNET;
-using Num = System.Numerics;
 
 namespace Raven.Sheet
 {
@@ -11,6 +10,9 @@ namespace Raven.Sheet
     public Sheet Sheet;
     public Vector2 Position = new Vector2();
     public float Zoom = 1;
+    public uint GridColor = 0;
+    public uint HoverTileBorderColor = 0;
+    public uint HoverTileFillColor = 0;
     public SheetPickerData(Sheet sheet) => Sheet = sheet;
   }
   public class SpritePicker
@@ -22,60 +24,18 @@ namespace Raven.Sheet
     public RectangleF Bounds = new RectangleF(0, 0, 1, 1);
     Vector2 _initialPosition = Vector2.Zero;
     List<RectangleF> _tiles = new List<RectangleF>();
+    public Action HandleSelectedSprite = null;
 
-    void HandleSelectedSprite(Editor editor, World world)
-    {
-      var input = Core.GetGlobalManager<Input.InputManager>();
-      var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
-
-      // Effectively on drag
-      if (_initialMouseOnDrag != Vector2.Zero) return;
-
-      if (SelectedSprite is Sprite sprite)
-      {
-        var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
-        var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
-       
-        ImGui.GetForegroundDrawList().AddImage(
-            Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
-            rawMouse - sprite.Region.GetHalfSize().ToNumerics(), 
-            rawMouse - sprite.Region.GetHalfSize().ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics(),
-            min.ToNumerics(), max.ToNumerics(), new Color(1f, 1f, 1f, 0.3f).ToImColor());
-
-        if (Nez.Input.LeftMouseButtonDown 
-            && !input.IsImGuiBlocking 
-            && world.CurrentLevel != null 
-            && world.CurrentLevel.CurrentLayer is World.Level.TileLayer tilelayer)
-        {
-          var tileApprox = editor.Scene.Camera.MouseToWorldPoint(); 
-          var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
-          var tileStart = sprite.GetRectTiles().First() ;
-          if (tileStart == null) return;
-          foreach (var tile in sprite.GetRectTiles())
-          {
-            var delta = tile.Coordinates - tileStart.Coordinates;
-            tilelayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
-          }
-        }
-      }
-      else if (SelectedSprite is Spritex spritex)
-      {
-        if (editor.Scene.Entities.FindEntity(spritex.Name) == null)
-        {
-          editor.Scene.CreateEntity(spritex.Name);
-
-        }
-      }
-    }
     Vector2 _initialMouseOnDrag = Vector2.Zero;
-    public void Draw(Editor editor, World world)
+    public void Draw()
     {
       var input = Core.GetGlobalManager<Input.InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
       if (OpenSheet == null) 
       {
-        HandleSelectedSprite(editor, world);
+        if (SelectedSprite != null && HandleSelectedSprite != null && _initialMouseOnDrag == Vector2.Zero)
+          HandleSelectedSprite.Invoke();
         return;
       }
 
@@ -134,7 +94,7 @@ namespace Raven.Sheet
               ImGui.GetForegroundDrawList().AddRect(
                   (worldTile.Location).ToNumerics(), 
                   (worldTile.Location + worldTile.Size).ToNumerics(), 
-                  editor.ColorSet.SpriteRegionInactiveOutline.ToImColor());
+                  OpenSheet.GridColor);
             }
             // Draws highlight under mouse
             if (rectTile.Contains(mouse) && !input.IsDrag)
@@ -142,7 +102,7 @@ namespace Raven.Sheet
               ImGui.GetForegroundDrawList().AddRect(
                   (worldTile.Location).ToNumerics(), 
                   (worldTile.Location + worldTile.Size).ToNumerics(), 
-                  editor.ColorSet.SpriteRegionActiveOutline.ToImColor());
+                  OpenSheet.HoverTileBorderColor);
             }
           }
           // Highlights selected sprite
@@ -157,7 +117,7 @@ namespace Raven.Sheet
               ImGui.GetForegroundDrawList().AddRectFilled(
                   (regionWorld.Location).ToNumerics(), 
                   (regionWorld.Location + regionWorld.Size).ToNumerics(), 
-                  editor.ColorSet.SpriteRegionActiveFill.Add(new Color(0.1f, 0.1f, 0.1f, 0.2f)).ToImColor());               
+                  OpenSheet.HoverTileFillColor);               
             }
           }
           var mouseDragArea = new RectangleF();
@@ -225,7 +185,9 @@ namespace Raven.Sheet
           ImGui.EndTabItem();
         }
       }
-      HandleSelectedSprite(editor, world);
+      if (SelectedSprite != null && HandleSelectedSprite != null && _initialMouseOnDrag == Vector2.Zero)
+          HandleSelectedSprite.Invoke();
+
 
 
 
