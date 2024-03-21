@@ -259,12 +259,13 @@ namespace Raven.Sheet.Sprites
   {  
     public Spritex Spritex;
     public Vector2 GuiPosition = new Vector2();
-    public float GuiZoom = 1;
+    public float GuiZoom = 0.5f;
 
     public SpritexGui(Spritex spritex) 
     {
       Spritex = spritex;
     }
+    int _originType = 1;
     void Sprite_RenderImGui(SourcedSprite sprite, PropertiesRenderer renderer)
     {
       ImGui.BeginDisabled();
@@ -276,13 +277,12 @@ namespace Raven.Sheet.Sprites
       sprite.Transform.RenderImGui();
       var origin = sprite.Origin.ToNumerics();
      
-      int originType = 1;
-      if (ImGui.Combo("Origin", ref originType, new string[]{"Center", "Topleft", "Custom"}, 3))
+      if (ImGui.Combo("Origin", ref _originType, new string[]{"Center", "Topleft", "Custom"}, 3))
       {
-        if (originType == 0) sprite.Origin = sprite.LocalBounds.Size/2f;
-        else if (originType == 1) sprite.Origin = new Vector2();
+        if (_originType == 0) sprite.Origin = sprite.LocalBounds.Size/2f;
+        else if (_originType == 1) sprite.Origin = new Vector2();
       }
-      if (originType == 2)
+      if (_originType == 2)
       {
         if (ImGui.InputFloat2("Origin", ref origin)) sprite.Origin = origin;
       }

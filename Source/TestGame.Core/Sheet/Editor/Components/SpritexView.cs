@@ -29,7 +29,6 @@ namespace Raven.Sheet
     // Go to canvas and close spritesheet view
     public void Edit(Sprites.Spritex spritex)
     {
-      if (_spritex != null && _spritex.Spritex.Name == spritex.Name) return;
       // came from sheet
       if (!Enabled)
       {
@@ -67,12 +66,9 @@ namespace Raven.Sheet
       Clean();
       Editor.GetSubEntity<SheetView>().Enabled = true;
 
-
       // Sotre last state
       _spritex.GuiPosition = Scene.Camera.Position;
       _spritex.GuiZoom = Scene.Camera.RawZoom;
-
-      _spritex = null;
 
       // Enter sheet vew
       Scene.Camera.RawZoom = Gui.Zoom;
@@ -80,7 +76,7 @@ namespace Raven.Sheet
     }
     void Clean()
     {
-      RemoveAllComponents();
+      Components.RemoveAllComponents();
       Editor.Set(Editor.EditingState.Default);
       Editor.GetSubEntity<SheetSelector>().RemoveSelection();
       Editor.GetSubEntity<Selection>().End();
