@@ -5,6 +5,7 @@ using Nez.Textures;
 using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
+using Nez.ImGuiTools;
 
 
 namespace Raven.Sheet
@@ -12,7 +13,10 @@ namespace Raven.Sheet
   public class SpritexView : Editor.SheetEntity
   {
     public SpritexGui LastSprite { get => _spritex; }
+    public override void OnAddedToScene() => Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
+        
     SpritexGui _spritex;
+
 
     public override void OnChangedTab()
     {
@@ -33,7 +37,6 @@ namespace Raven.Sheet
         Gui.Position = Scene.Camera.Position;
         Gui.Zoom = Scene.Camera.RawZoom;
       }
-
 
       Clean();
 
@@ -64,9 +67,12 @@ namespace Raven.Sheet
       Clean();
       Editor.GetSubEntity<SheetView>().Enabled = true;
 
+
       // Sotre last state
       _spritex.GuiPosition = Scene.Camera.Position;
       _spritex.GuiZoom = Scene.Camera.RawZoom;
+
+      _spritex = null;
 
       // Enter sheet vew
       Scene.Camera.RawZoom = Gui.Zoom;
@@ -87,6 +93,33 @@ namespace Raven.Sheet
       base.Update();
       if (Nez.Input.IsKeyReleased(Keys.Escape)) UnEdit(); 
       HandleSelection();
+    }
+    public void RenderImGui() 
+    {
+      if (!Enabled) return;
+      if (Nez.Input.RightMouseButtonPressed)
+      {
+        var hasSelection = false;
+        foreach (var part in _spritex.Spritex.Body)
+        {
+          var mouse = Scene.Camera.MouseToWorldPoint();
+          if (part.WorldBounds.Contains(mouse))
+          {
+            hasSelection = true;
+          }
+        }
+        if (!hasSelection)
+        {
+          ImGui.OpenPopup("spritex-canvas-options-popup");
+        }
+      }
+      if (ImGui.BeginPopupContextItem("spritex-canvas-options-popup"))
+      {
+        if (ImGui.MenuItem("Add new component here"))
+        {
+        }
+        ImGui.EndPopup();
+      }
     }
     Vector2 _initialScale = new Vector2();
     void HandleSelection()

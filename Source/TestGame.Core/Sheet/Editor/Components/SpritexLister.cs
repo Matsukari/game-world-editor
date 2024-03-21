@@ -10,6 +10,7 @@ namespace Raven.Sheet
   public class SpritexLister : Editor.SheetEntity
   {
     public override void OnAddedToScene() => Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
+    Sprites.Spritex _spritexOnOption;
     public void RenderImGui() 
     {
       if (Sheet == null) return;
@@ -36,9 +37,27 @@ namespace Raven.Sheet
             var spritexView = Editor.GetSubEntity<SpritexView>();
             spritexView.Edit(spritex);
           }
+          if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+          {
+            ImGui.OpenPopup("spritex-options-popup");
+            _spritexOnOption = spritex;
+          }
         }
         ImGui.Unindent();
         ImGui.EndChild();
+      }
+      if (ImGui.BeginPopupContextItem("spritex-options-popup"))
+      {
+        if (ImGui.MenuItem("Rename"))
+        {
+          Editor.OpenNameModal((name)=>{Sheet.Spritexes.ChangeKey(_spritexOnOption.Name, name); _spritexOnOption.Name = name;});
+        }
+        if (ImGui.MenuItem("Delete"))
+        {
+          Sheet.Spritexes.Remove(_spritexOnOption.Name);
+          if (Sheet.Spritexes.Count() == 0) Editor.GetSubEntity<SpritexView>().UnEdit();
+        }
+        ImGui.EndPopup();
       }
       ImGui.End();
     }

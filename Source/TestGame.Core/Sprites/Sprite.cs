@@ -317,27 +317,33 @@ namespace Raven.Sheet.Sprites
               part.Name = name;
             }
             ImGui.PopID();
-            if (ImGui.Button(IconFonts.FontAwesome5.Edit)) ChangePart = part;
-            ImGui.SameLine();
-            ImGui.TextDisabled("Change source");
             Sprite_RenderImGui(part, renderer);
 
             // Options
             ImGui.TreePop();
           }
+          if (part.WorldBounds.Contains(renderer.Scene.Camera.MouseToWorldPoint()) && Nez.Input.RightMouseButtonPressed)
+          {
+            ImGui.OpenPopup("sprite-component-options");
+            _spritexPart = part;
+          }
         }
         if (ImGui.BeginPopupContextItem("sprite-component-options"))
         {
-          if (ImGui.MenuItem("Delete"))
+          if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
           {
             Console.WriteLine("Deleteing " + _spritexPart.Name);
             Spritex.Parts.Data.Remove(_spritexPart.Name);
             ImGui.CloseCurrentPopup();
           }
-          if (ImGui.MenuItem("Change region"))
+          if (ImGui.MenuItem(IconFonts.FontAwesome5.Edit + "  Change region"))
           {
             ChangePart = _spritexPart;
             renderer.Editor.GetSubEntity<SpritexView>().UnEdit();
+            ImGui.CloseCurrentPopup();
+          }
+          if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate"))
+          {
             ImGui.CloseCurrentPopup();
           }
           ImGui.EndPopup();
