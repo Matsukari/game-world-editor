@@ -59,6 +59,11 @@ namespace Raven
       max.Y = Math.Max(a.Bottom, b.Bottom);
       return RectangleF.FromMinMax(min, max);
     }
+    public static RectangleF AddPosition(this RectangleF rect, Vector2 delta)
+    {
+      rect.Location += delta;
+      return rect;
+    }
     public static RectangleF MinMax(List<RectangleF> rects)
     {
       var min = new Vector2(10000, 10000);

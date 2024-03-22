@@ -11,6 +11,7 @@ namespace Raven.Sheet
     public bool IsVisible = true;
     public bool IsLocked = false;
     public Vector2 Offset = new Vector2();
+    public RectangleF Bounds { get => Level.Bounds.AddPosition(Offset); }
     public Layer(Level level)
     {
       Level = level;

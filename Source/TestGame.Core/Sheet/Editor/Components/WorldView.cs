@@ -84,9 +84,10 @@ namespace Raven.Sheet
       {
         var selection = Editor.GetSubEntity<Selection>();
         var input = Core.GetGlobalManager<Raven.Input.InputManager>();
-        for (var i = 0; i < World.Levels.Count(); i++)
+        for (var i = 0; i < WorldGui._levelGuis.Count(); i++)
         {
           var level = World.Levels[i];
+          var levelGui = WorldGui._levelGuis[i];
           if (!level.Enabled) continue;
 
           batcher.DrawRect(level.Bounds, Editor.ColorSet.LevelSheet);
@@ -105,6 +106,7 @@ namespace Raven.Sheet
             }
           }
           level.Render(batcher, camera);
+          levelGui.Render(batcher, camera);
         }
         if (selection.Capture is Level lev)
         {

@@ -13,7 +13,8 @@ namespace Raven.Sheet
     internal World _world;
     public object SelectedSprite;
     SpritePicker _spritePicker = new SpritePicker();
-    List<LevelGui> _levelGuis = new List<LevelGui>();
+    internal List<LevelGui> _levelGuis = new List<LevelGui>();
+    
     public int SelectedLevel 
     { 
       get => _selectedLevel; 
@@ -55,26 +56,32 @@ namespace Raven.Sheet
       {
         var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
         var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
-       
+        var tilePos = rawMouse;
+        tilePos.X = (int)(tilePos.X / sprite.TileSize.X) * sprite.TileSize.X;
+        tilePos.Y = (int)(tilePos.Y / sprite.TileSize.Y) * sprite.TileSize.Y; 
+        // var mouseTileArea = new RectangleF();
+        // mouseTileArea.Location = tilePos * _world.Scene.Camera.RawZoom;
+        // mouseTileArea.Size = sprite.Region.Size.ToVector2() * _world.Scene.Camera.RawZoom;
+        
         ImGui.GetForegroundDrawList().AddImage(
             Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
-            rawMouse - sprite.Region.GetHalfSize().ToNumerics(), 
-            rawMouse - sprite.Region.GetHalfSize().ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics(),
-            min.ToNumerics(), max.ToNumerics(), new Color(1f, 1f, 1f, 0.3f).ToImColor());
+            tilePos - sprite.Region.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom, 
+            tilePos - sprite.Region.GetHalfSize().ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics() * _world.Scene.Camera.RawZoom,
+            min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
 
-        if (Nez.Input.LeftMouseButtonDown 
-            && !input.IsImGuiBlocking 
-            && _world.CurrentLevel != null 
-            && _world.CurrentLevel.CurrentLayer is TileLayer tilelayer)
+        if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is TileLayer tilelayer)
         {
-          var tileApprox = _world.Scene.Camera.MouseToWorldPoint(); 
-          var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
-          var tileStart = sprite.GetRectTiles().First() ;
-          if (tileStart == null) return;
-          foreach (var tile in sprite.GetRectTiles())
+          if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
           {
-            var delta = tile.Coordinates - tileStart.Coordinates;
-            tilelayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
+            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize(); 
+            var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
+            var tileStart = sprite.GetRectTiles().First() ;
+            if (tileStart == null) return;
+            foreach (var tile in sprite.GetRectTiles())
+            {
+              var delta = tile.Coordinates - tileStart.Coordinates;
+              tilelayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
+            }
           }
         }
       }

@@ -62,5 +62,27 @@ namespace Raven.Guidelines
         }
       }
     }
+    public static void RenderGridLines(Batcher batcher, Camera camera, Vector2 position, Color color, Point lines, Vector2 margin, bool noZoom=true)
+    {
+      batcher.SetIgnoreRoundingDestinations(noZoom);
+      for (int x = 0; x <= lines.X; x++) 
+      {
+        // Vertival lines
+        batcher.DrawLine(
+            new Vector2(x * margin.X, 0f) + position, 
+            new Vector2(x * margin.X, lines.Y * margin.Y) + position, 
+            color,
+            thickness: 1f/camera.RawZoom);
+        for (int y = 0; y <= lines.Y; y++) 
+        {
+          // Horizontal lines
+          batcher.DrawLine(
+              new Vector2(0f, y * margin.Y) + position, 
+              new Vector2(lines.X * margin.X, y * margin.Y) + position, 
+              color,
+              thickness: 1f/camera.RawZoom);
+        }
+      }
+    }
   }
 }

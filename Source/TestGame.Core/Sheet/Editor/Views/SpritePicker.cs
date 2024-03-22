@@ -25,6 +25,10 @@ namespace Raven.Sheet
     Vector2 _initialPosition = Vector2.Zero;
     List<RectangleF> _tiles = new List<RectangleF>();
     public Action HandleSelectedSprite = null;
+    public Action OnSelectRightMouseClick = null;
+
+    public bool isPickOnlyTile = false;
+    public bool enabledRectangleSelect = true;
 
     Vector2 _initialMouseOnDrag = Vector2.Zero;
     public void Draw()

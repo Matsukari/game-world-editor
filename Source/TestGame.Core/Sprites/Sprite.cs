@@ -78,10 +78,11 @@ namespace Raven.Sheet.Sprites
   public class Sprite : Propertied
   {
     public Rectangle Region { get; private set; } = new Rectangle();
-    List<int> _tiles = new List<int>();
-    List<Tile> _createdTiles = new List<Tile>();
     public List<Tile> GetTiles { get => _createdTiles; }
     public Texture2D Texture { get => _sheet.Texture; }
+    public Point TileSize { get => _sheet.TileSize; }
+    List<int> _tiles = new List<int>();
+    List<Tile> _createdTiles = new List<Tile>();
 
     Sheet _sheet;
     public Sprite(Rectangle region, Sheet sheet)

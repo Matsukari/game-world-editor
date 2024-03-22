@@ -41,11 +41,11 @@ Implemente animation
 ~Rectangle select on tiles~
 ~Layer listings~
 ~Level listings~
-Delete level 
-Enabled level
-Lock layer 
-Delete layer 
+~Delete level~
+~Enabled level~
+~Delete layer~
 Create own layer 
+Lock layer 
 Order layers
 Paint preview on layer
 Painting spritexes on levels
