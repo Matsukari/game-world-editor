@@ -31,7 +31,14 @@ namespace Raven.Sheet
     public void ReplaceTile(int x, int y, InstancedSprite tile)
     {
       if (!IsTileValid(x, y)) return;
-      _tiles[new Point(x, y)] = tile;
+      var loc = new Point(x, y);
+      // if (tile is SpritexInstance spritex)
+      // {
+      //   if (_tiles.ContainsKey(loc) && _tiles[loc] is SpritexInstance prevSpritex) prevSpritex.Component.RemoveComponent();
+      //   spritex.AddToEntity(Level.World);
+      //   Console.WriteLine($"Tiling spritex at: {spritex.Component.Transform.LocalPosition}, in {spritex.Component.RenderLayer}");
+      // }
+      _tiles[loc] = tile;
     }
     public override void Draw(Batcher batcher, Camera camera)
     {
@@ -42,6 +49,7 @@ namespace Raven.Sheet
         switch (block.Value)
         {
           case TileInstance tile: tile.Draw(batcher, camera, bounds); break;
+          case SpritexInstance spritex: spritex.Draw(batcher, camera, bounds); break;
         }
       }
       foreach (var tile in TileHighlights)

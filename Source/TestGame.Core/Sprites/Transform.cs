@@ -37,5 +37,14 @@ namespace Raven.Sheet.Sprites
       if (ImGui.SliderFloat("Rotation", ref rot, 0, 360)) transform.RotationDegrees = rot;
 
     }
+    public Transform Duplicate()
+    {
+      Transform transform = new Transform();
+      transform.Skew = Skew;
+      transform.Position = Position;
+      transform.Rotation = Rotation;
+      transform.Scale = Scale;
+      return transform;
+    }
   }
 }

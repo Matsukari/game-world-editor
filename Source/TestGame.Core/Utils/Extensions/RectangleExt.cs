@@ -64,6 +64,10 @@ namespace Raven
       rect.Location += delta;
       return rect;
     }
+    public static Vector2 GetHalfSize(this RectangleF rect)
+    {
+      return rect.Size/2f;
+    }
     public static RectangleF MinMax(List<RectangleF> rects)
     {
       var min = new Vector2(10000, 10000);

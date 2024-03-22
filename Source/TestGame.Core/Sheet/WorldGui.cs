@@ -59,9 +59,6 @@ namespace Raven.Sheet
         var tilePos = rawMouse;
         tilePos.X = (int)(tilePos.X / sprite.TileSize.X) * sprite.TileSize.X;
         tilePos.Y = (int)(tilePos.Y / sprite.TileSize.Y) * sprite.TileSize.Y; 
-        // var mouseTileArea = new RectangleF();
-        // mouseTileArea.Location = tilePos * _world.Scene.Camera.RawZoom;
-        // mouseTileArea.Size = sprite.Region.Size.ToVector2() * _world.Scene.Camera.RawZoom;
         
         ImGui.GetForegroundDrawList().AddImage(
             Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
@@ -87,10 +84,30 @@ namespace Raven.Sheet
       }
       else if (SelectedSprite is Spritex spritex)
       {
-        if (_world.Scene.Entities.FindEntity(spritex.Name) == null)
+        foreach (var part in spritex.Body)
         {
-          _world.Scene.CreateEntity(spritex.Name);
+          var min = part.SourceSprite.Region.Location.ToVector2() / part.SourceSprite.Texture.GetSize();
+          var max = (part.SourceSprite.Region.Location + part.SourceSprite.Region.Size).ToVector2() / part.SourceSprite.Texture.GetSize();
+          var tilePos = rawMouse + part.LocalBounds.Location.ToNumerics();
+          tilePos.X = (int)(tilePos.X / part.SourceSprite.TileSize.X) * part.SourceSprite.TileSize.X;
+          tilePos.Y = (int)(tilePos.Y / part.SourceSprite.TileSize.Y) * part.SourceSprite.TileSize.Y; 
 
+          ImGui.GetForegroundDrawList().AddImage(
+              Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(part.SourceSprite.Texture),
+              tilePos - spritex.EnclosingBounds.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom, 
+              tilePos - spritex.EnclosingBounds.GetHalfSize().ToNumerics() + spritex.EnclosingBounds.Size.ToNumerics() * _world.Scene.Camera.RawZoom,
+              min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+
+        }
+
+        if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is TileLayer tilelayer)
+        {
+          if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
+          { 
+            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - spritex.Bounds.Size/2f; 
+            var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
+            tilelayer.ReplaceTile(tileInLayer, new SpritexInstance(spritex));
+          }
         }
       }
     }
@@ -213,7 +230,11 @@ namespace Raven.Sheet
       FocusFactor = _spritePicker.OpenSheet == null;
       _spritePicker.Draw();
       SelectedSprite = _spritePicker.SelectedSprite;
-      if (_spritePicker.SelectedSprite != null && Nez.Input.RightMouseButtonReleased) _spritePicker.SelectedSprite = null;
+      if (_spritePicker.SelectedSprite != null && Nez.Input.RightMouseButtonReleased) CleanSelected();
+    }
+    void CleanSelected()
+    {
+      _spritePicker.SelectedSprite = null;
     }
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
     {

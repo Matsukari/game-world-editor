@@ -6,18 +6,24 @@ using ImGuiNET;
 
 namespace Raven.Sheet.Sprites 
 {
-  public class InstancedSprite : Propertied
+  public interface InstancedSprite 
   {
-    public Transform Transform = new Transform();
-    public Color Color = Color.White;
-    public SpriteEffects SpriteEffects = SpriteEffects.None;
-    public virtual void Draw(Batcher batcher, Camera camera, RectangleF dest) {}
+    public PropertyList Properties { get; set; }
+    public string Name { get; set; }
+    public Transform Transform { get; set; }
+    public Color Color { get; set; }
+    public SpriteEffects SpriteEffects { get; set; } 
   }
   public class TileInstance : InstancedSprite
   {
+    public PropertyList Properties { get; set; } = new PropertyList();
+    public string Name { get; set; } = "";
+    public Transform Transform { get; set; } = new Transform();
+    public Color Color { get; set; } = Color.White;
+    public SpriteEffects SpriteEffects { get; set; } = SpriteEffects.None;
     Tile _tile;
     public TileInstance(Tile tile) => _tile = tile;
-    public override void Draw(Batcher batcher, Camera camera, RectangleF dest)
+    public void Draw(Batcher batcher, Camera camera, RectangleF dest)
     {
       var scale = Transform.Scale;
       scale.X *= dest.Width / _tile.Region.Width;
@@ -36,7 +42,35 @@ namespace Raven.Sheet.Sprites
   }
   public class SpritexInstance : InstancedSprite
   {
-
+    public PropertyList Properties { get; set; } = new PropertyList();
+    public string Name { get; set; } = "";
+    public Transform Transform { get; set; } = new Transform();
+    public Color Color { get; set; } = Color.White;
+    public SpriteEffects SpriteEffects { get; set; } = SpriteEffects.None;
+    Spritex _spritex;
+    public Spritex Component { get => _spritex; }
+    public void AddToEntity(Entity entity) => entity.AddComponent(_spritex);
+    public SpritexInstance(Spritex spritex)
+    {
+      _spritex = spritex;
+    }
+    public void Draw(Batcher batcher, Camera camera, RectangleF dest)
+    {
+      foreach (var sprite in _spritex.Body)
+      {
+        batcher.Draw(
+            texture: sprite.SourceSprite.Texture,
+            position: dest.Location + Transform.Position + _spritex.LocalOffset + sprite.Transform.Position,
+            sourceRectangle: sprite.SourceSprite.Region,
+            color: sprite.Color,
+            rotation: Transform.Rotation + sprite.Transform.Rotation,
+            origin: sprite.Origin,
+            scale: Transform.Scale * sprite.Transform.Scale,
+            effects: sprite.SpriteEffects,
+            layerDepth: _spritex.LayerDepth);
+      }
+      
+    }
   }
   public class Tile : Propertied 
   { 
@@ -179,13 +213,20 @@ namespace Raven.Sheet.Sprites
     {
       get 
       {
-				if (_areBoundsDirty)
-				{
-          _bounds = EnclosingBounds;
-          _bounds.CalculateBounds(Transform.Position, _localOffset, _bounds.Size/2f, Transform.Scale, Transform.Rotation, _bounds.Width, _bounds.Height);
-          _areBoundsDirty = true;
+        try 
+        {
+          if (_areBoundsDirty)
+          {
+            _bounds = EnclosingBounds;
+            _bounds.CalculateBounds(Transform.Position, _localOffset, _bounds.Size/2f, Transform.Scale, Transform.Rotation, _bounds.Width, _bounds.Height);
+            _areBoundsDirty = true;
+          }
+          return _bounds;
         }
-        return _bounds;
+        catch (Exception _) 
+        {
+          return EnclosingBounds;
+        }
       }
     }
     public SourcedSprite AddSprite(string name, SourcedSprite sprite=null) 
@@ -214,11 +255,27 @@ namespace Raven.Sheet.Sprites
             layerDepth: _layerDepth);
       }
     }
-    public class SpriteMap
+    public override Component Clone()
+    {
+      Spritex spritex = base.Clone() as Spritex;
+      spritex.Entity = Entity;
+      spritex._sheet = _sheet;
+      spritex.Parts = Parts.Duplicate();
+      return spritex;
+    }
+        
+    public class SpriteMap 
     {
       public Dictionary<string, SourcedSprite> Data = new Dictionary<string, SourcedSprite>();
       public void Add(string name, SourcedSprite part) { Data.TryAdd(name, part); part.Name = name; }
       public SpriteMap() { }
+      public SpriteMap Duplicate()
+      {
+        SpriteMap spriteMap = new SpriteMap();
+        foreach (var sprite in Data) spriteMap.Data.Add(sprite.Key, sprite.Value.Duplicate());
+        return spriteMap;
+      }
+
     }
 
   }
@@ -253,6 +310,17 @@ namespace Raven.Sheet.Sprites
     {
       Spritex = spritex;
       SourceSprite = sprite;
+    }
+    public SourcedSprite Duplicate()
+    {
+      SourcedSprite sprite = new SourcedSprite();
+      sprite.Spritex = Spritex;
+      sprite.SourceSprite = SourceSprite;
+      sprite.Transform = Transform.Duplicate();
+      sprite.SpriteEffects = SpriteEffects;
+      sprite.Origin = Origin;
+      sprite.Color = Color;
+      return sprite;
     }
   }
 

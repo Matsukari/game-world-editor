@@ -44,11 +44,12 @@ Implemente animation
 ~Delete level~
 ~Enabled level~
 ~Delete layer~
+~Paint preview on layer~
+~Painting spritexes on levels~
+Fix spritex paint preview
 Create own layer 
 Lock layer 
 Order layers
-Paint preview on layer
-Painting spritexes on levels
 Bucket, rectangle, line paint 
 Random painting 
 Transforms on instanced sprites 
