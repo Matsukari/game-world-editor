@@ -137,6 +137,7 @@ namespace Raven.Sheet
       throw new Exception();
     }
     public IPropertied GetCurrentGui() => _tabs[_currentTab];
+    public T GetCurrentGui<T>() where T: Propertied => _tabs[_currentTab] as T;
     public GuiData GetCurrentState() => _tabsState[_currentTab];
     public T GetSubEntity<T>() where T: SubEntity => (T)_children.OfType<T>().First();    
     public void Switch(int index) 

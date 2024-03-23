@@ -57,8 +57,8 @@ namespace Raven.Sheet
           // 2, view options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.Th, ()=>{}),
-            (IconFonts.FontAwesome5.EllipsisV, ()=>{}),
+            (IconFonts.FontAwesome5.Th, ToogleGrid),
+            (IconFonts.FontAwesome5.EllipsisV, DrawSnappingPopup),
           },
           // 3, select type options
           new (string, Action)[]
@@ -69,16 +69,30 @@ namespace Raven.Sheet
           // 4, paint type options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.PaintBrush, ()=>{}),
-            (IconFonts.FontAwesome5.Eraser, ()=>{}),
-            ("/", ()=>{}),
-            (IconFonts.FontAwesome5.Square, ()=>{}),
-            (IconFonts.FontAwesome5.Fill, ()=>{}),
-            (IconFonts.FontAwesome5.Dice, ()=>{}),            
+            (IconFonts.FontAwesome5.PaintBrush, ()=>Editor.GetCurrentGui<WorldGui>().PaintMode = PaintMode.Pen),
+            (IconFonts.FontAwesome5.Eraser, ()=>Editor.GetCurrentGui<WorldGui>().PaintMode = PaintMode.Eraser),
+            ("/",                           ()=>Editor.GetCurrentGui<WorldGui>().PaintType = PaintType.Line),
+            (IconFonts.FontAwesome5.Square, ()=>Editor.GetCurrentGui<WorldGui>().PaintType = PaintType.Rectangle),
+            (IconFonts.FontAwesome5.Fill,   ()=>Editor.GetCurrentGui<WorldGui>().PaintType = PaintType.Fill),
+            (IconFonts.FontAwesome5.Dice,   ()=>Editor.GetCurrentGui<WorldGui>().IsRandomPaint = !Editor.GetCurrentGui<WorldGui>().IsRandomPaint),            
           }
       };
 
-    }    
+    } 
+    void ToogleGrid()
+    {
+      if (Editor.GetCurrent() is Sheet sheet) Editor.GetSubEntity<SheetView>().IsDrawGrid = !Editor.GetSubEntity<SheetView>().IsDrawGrid;
+      else if (Editor.GetCurrentGui() is WorldGui worldGui) worldGui.IsDrawTileLayerGrid = !worldGui.IsDrawTileLayerGrid;
+    }
+    void DrawSnappingPopup()
+    {
+      if (ImGui.MenuItem("Snap to grid"))
+      {
+      }
+      if (ImGui.MenuItem("Snap to custom size"))
+      {
+      }
+    }
     void RenderImGui()
     {
       Vector2 stackSize = new Vector2();

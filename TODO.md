@@ -53,6 +53,7 @@ Spritex y-sorting
 Lock layer 
 Order layers
 Bucket, rectangle, line paint 
+Erase paint
 Random painting 
 Transforms on instanced sprites 
 Layer management 
@@ -80,6 +81,7 @@ Separate transform operations
 Copy & paste shapes & parts 
 Fix primitive rendering order
 Fix camera bounds culling
+Optimize super big rendering
 Snapping mouse
 Rulers 
 Grid

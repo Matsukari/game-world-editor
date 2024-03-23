@@ -28,11 +28,18 @@ namespace Raven.Sheet
     public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
     public bool IsTileValid(int x, int y) => !(x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y); 
     public void ReplaceTile(Point point, InstancedSprite tile) => ReplaceTile(point.X, point.Y, tile);
+    public void RemoveTile(Point point) => RemoveTile(point.X, point.Y);
     public void ReplaceTile(int x, int y, InstancedSprite tile)
     {
       if (!IsTileValid(x, y)) return;
       var loc = new Point(x, y);
       _tiles[loc] = tile;
+    }
+    public void RemoveTile(int x, int y)
+    {
+      if (!IsTileValid(x, y)) return;
+      var loc = new Point(x, y);
+      _tiles.Remove(loc);
     }
     public override void Draw(Batcher batcher, Camera camera)
     {

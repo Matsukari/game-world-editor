@@ -10,12 +10,14 @@ namespace Raven.Sheet
   {
     public override string Name { get => _level.Name; set => _level.Name = value;}
     internal Level _level;
+    internal WorldGui _worldGui;
     public bool Selected = false;
     public Color TileActiveGridColor = new Color(0.2f, 0.2f, 0.2f, 0.4f);
     public Color TileInactiveGridColor = new Color(0.1f, 0.1f, 0.1f, 0.4f);
-    public LevelGui(Level level)
+    public LevelGui(Level level, WorldGui gui)
     {
       _level = level;
+      _worldGui = gui;
     }
     public override string GetIcon()
     {
@@ -25,7 +27,7 @@ namespace Raven.Sheet
     {
       foreach (var layer in _level.Layers)
       {
-        if (layer is TileLayer tileLayer) 
+        if (layer is TileLayer tileLayer && _worldGui.IsDrawTileLayerGrid) 
         {
           var color = (_level.CurrentLayer.Name == tileLayer.Name) ? TileActiveGridColor : TileInactiveGridColor;
           Guidelines.GridLines.RenderGridLines(batcher, camera, layer.Bounds.Location, color, tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());

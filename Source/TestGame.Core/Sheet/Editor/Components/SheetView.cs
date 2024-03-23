@@ -10,6 +10,7 @@ namespace Raven.Sheet
   {
     internal Rectangle TileInMouse;
     SpriteRenderer _image;
+    public bool IsDrawGrid = true;
     public override void OnChangedTab()
     {
       Position = Screen.Center;
@@ -45,13 +46,16 @@ namespace Raven.Sheet
       // Rectangles & highlights
       void DrawArtifacts(Batcher batcher, Camera camera)
       {
-        // Draw tiles' grid
-        foreach (var tile in _tiles) 
+        if (Parent.IsDrawGrid)
         {
-          var worldTile = tile.ToRectangleF();
-          worldTile.Location += Parent._image.Bounds.Location;
-          if (worldTile.Contains(camera.MouseToWorldPoint())) Parent.TileInMouse = tile;
-          batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
+          // Draw tiles' grid
+          foreach (var tile in _tiles) 
+          {
+            var worldTile = tile.ToRectangleF();
+            worldTile.Location += Parent._image.Bounds.Location;
+            if (worldTile.Contains(camera.MouseToWorldPoint())) Parent.TileInMouse = tile;
+            batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
+          }
         }
         // Highlight the tile under mouse
         var worldTileInMouse = Parent.TileInMouse.ToRectangleF();

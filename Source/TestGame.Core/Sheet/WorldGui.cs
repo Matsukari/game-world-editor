@@ -8,11 +8,18 @@ namespace Raven.Sheet
   // <summary>
   // Expands as the levels are painted on
   // </summary>
+  public enum PaintType { Single, Rectangle, Line, Fill }
+  public enum PaintMode { Pen, Eraser }
   public class WorldGui : Propertied
   {
     internal World _world;
     public object SelectedSprite;
     SpritePicker _spritePicker = new SpritePicker();
+    public bool IsDrawTileLayerGrid = false;
+    public bool IsRandomPaint = false;
+    public PaintMode PaintMode = PaintMode.Pen;
+    public PaintType PaintType = PaintType.Single;
+    public bool CanPaint { get => SelectedSprite != null; }
     internal List<LevelGui> _levelGuis = new List<LevelGui>();
     
     public int SelectedLevel 
@@ -69,18 +76,20 @@ namespace Raven.Sheet
             tilePos - sprite.Region.GetHalfSize().ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics() * _world.Scene.Camera.RawZoom,
             min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
 
-        if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is TileLayer tilelayer)
+        if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is TileLayer tilelayer && !input.IsImGuiBlocking)
         {
-          if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
+          if (Nez.Input.LeftMouseButtonDown && PaintType == PaintType.Single)
           {
             var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize(); 
             var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
             var tileStart = sprite.GetRectTiles().First() ;
             if (tileStart == null) return;
-            foreach (var tile in sprite.GetRectTiles())
+            var tilesToPaint = sprite.GetRectTiles();
+            foreach (var tile in tilesToPaint)
             {
               var delta = tile.Coordinates - tileStart.Coordinates;
-              tilelayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
+              if (PaintMode == PaintMode.Pen) tilelayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
+              else if (PaintMode == PaintMode.Eraser) tilelayer.RemoveTile(tileInLayer + delta);
             }
           }
         }
@@ -121,7 +130,7 @@ namespace Raven.Sheet
         _levelGuis.Clear();
         foreach (var level in _world.Levels) 
         {
-          _levelGuis.Add(new LevelGui(level));
+          _levelGuis.Add(new LevelGui(level, this));
           if (_world.CurrentLevel != null && _world.CurrentLevel.Name == level.Name) _levelGuis.Last().Selected = true;
         }
       }
