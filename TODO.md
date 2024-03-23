@@ -47,6 +47,8 @@ Implemente animation
 ~Paint preview on layer~
 ~Painting spritexes on levels~
 Fix spritex paint preview
+Add, remove spritesheet
+Spritex y-sorting
 Create own layer 
 Lock layer 
 Order layers
@@ -75,7 +77,8 @@ Undo & redo
 Shape & tile separate selection
 Separate transform operations
 Copy & paste shapes & parts 
-Fix primitive rendering order 
+Fix primitive rendering order
+Fix camera bounds culling
 Fix debug window
 Snapping mouse
 Rulers 

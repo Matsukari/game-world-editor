@@ -20,10 +20,13 @@ namespace Raven.Sheet
       get => _selectedLevel; 
       set 
       {
+        SyncLevelGuis();
         if (value < -1 || value >= _world.Levels.Count) throw new IndexOutOfRangeException();
         _selectedLevel = value; 
+        foreach (var levelGui in _levelGuis) levelGui.Selected = false;
         if (value >= 0)
         {
+          _levelGuis[SelectedLevel].Selected = true;
           _world.CurrentLevel = _world.Levels[value]; 
         }
       }
@@ -116,7 +119,11 @@ namespace Raven.Sheet
       if (_levelGuis.Count() != _world.Levels.Count())
       {
         _levelGuis.Clear();
-        foreach (var level in _world.Levels) _levelGuis.Add(new LevelGui(level));
+        foreach (var level in _world.Levels) 
+        {
+          _levelGuis.Add(new LevelGui(level));
+          if (_world.CurrentLevel != null && _world.CurrentLevel.Name == level.Name) _levelGuis.Last().Selected = true;
+        }
       }
     }
     public override void RenderImGui(PropertiesRenderer renderer)
@@ -153,11 +160,13 @@ namespace Raven.Sheet
       // Levels listings
       if (ImGui.CollapsingHeader(IconFonts.FontAwesome5.ObjectGroup + "  Levels", levelFlags))
       {
-        ImGui.Indent();
+        var size = 100;
+        stack.Y += size;
+        ImGui.BeginChild("levels-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
         for (int i = 0; i < _levelGuis.Count(); i++)
         {
           var level = _levelGuis[i];
-          if (ImGui.Selectable(level.Name, ref level.Selected, ImGuiSelectableFlags.AllowItemOverlap))
+          if (ImGui.Selectable($"{i+1}. {level.Name}", ref level.Selected, ImGuiSelectableFlags.AllowItemOverlap))
           {
             // Clear selection if not held with CTRL
             if (!ImGui.GetIO().KeyCtrl)
@@ -183,12 +192,13 @@ namespace Raven.Sheet
           if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
           {
             _world.RemoveLevel(level._level);
+            renderer.Editor.GetSubEntity<Selection>().End();
             SelectedLevel = -1;
           }
           ImGui.PopID();
           stack.Y += ImGui.GetItemRectSize().Y;
         }
-        ImGui.Unindent();
+        ImGui.EndChild();
       }
 
       // Spritesheet listings
@@ -196,8 +206,7 @@ namespace Raven.Sheet
       {
         var size = 100;
         stack.Y += size;
-        ImGui.BeginChild("spritesheets-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
-        ImGui.Indent();
+        ImGui.BeginChild("spritesheets-content");
         foreach (var sheet in _spritePicker.Sheets)
         {
           if (ImGui.MenuItem(sheet.Sheet.Name)) 
@@ -205,7 +214,6 @@ namespace Raven.Sheet
             _spritePicker.SelectedSheet = sheet;
           }
         }
-        ImGui.Unindent();
         ImGui.EndChild();
 
         // Draw preview spritesheet

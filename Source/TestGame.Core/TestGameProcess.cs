@@ -35,8 +35,7 @@ public class TestGameProcess : Core
       if (which == "imdemo") imgui.ShowDemoWindow = !imgui.ShowDemoWindow;
       else if (which == "scene") imgui.ShowSceneGraphWindow = !imgui.ShowSceneGraphWindow;
       else if (which == "core") imgui.ShowCoreWindow = !imgui.ShowCoreWindow;
-
+      else if (which == "style") imgui.ShowStyleEditor = !imgui.ShowStyleEditor;
+      else if (which == "separate") imgui.ShowSeperateGameWindow = !imgui.ShowSeperateGameWindow;
     }
-
-
 }

@@ -11,8 +11,8 @@ namespace Raven.Sheet
     public override string Name { get => _level.Name; set => _level.Name = value;}
     internal Level _level;
     public bool Selected = false;
-    public Color TileActiveGridColor = new Color(0.1f, 0.1f, 0.1f, 0.4f);
-    public Color TileInactiveGridColor = new Color(0.1f, 0.1f, 0.1f, 0.1f);
+    public Color TileActiveGridColor = new Color(0.2f, 0.2f, 0.2f, 0.4f);
+    public Color TileInactiveGridColor = new Color(0.1f, 0.1f, 0.1f, 0.4f);
     public LevelGui(Level level)
     {
       _level = level;
@@ -35,6 +35,41 @@ namespace Raven.Sheet
     public override void RenderImGui(PropertiesRenderer renderer)
     {
       base.RenderImGui(renderer);
+      DrawLayerOptionsPopup();
+      DrawLayerHeaderPopup();
+    }
+    void DrawLayerHeaderPopup()
+    {
+      if (_isOpenLayerHeaderPopup)
+      {
+        _isOpenLayerHeaderPopup = false;
+        ImGui.OpenPopup("layer-header-options-popup");
+      }
+      if (ImGui.BeginPopupContextItem("layer-header-options-popup"))
+      {
+        if (ImGui.BeginMenu(IconFonts.FontAwesome5.PlusSquare + "  Create Layer"))
+        {
+          if (ImGui.MenuItem("Tiled")) 
+          {
+            var layer = new TileLayer(_level, 16, 16);
+            layer.Name = $"Layer {_level.Layers.Count()+1}";
+            _level.Layers.Add(layer);
+          }
+          if (ImGui.MenuItem("Freeform"))
+          { 
+          }
+          ImGui.EndMenu();
+        }
+        ImGui.EndPopup();
+      }
+    }
+    void DrawLayerOptionsPopup()
+    {
+      if (_isOpenLayerOptionPopup)
+      {
+        _isOpenLayerOptionPopup = false;
+        ImGui.OpenPopup("layer-options-popup");
+      }
       if (ImGui.BeginPopupContextItem("layer-options-popup") && _layerOnOptions != null)
       {
         var lockState = (_layerOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
@@ -53,62 +88,87 @@ namespace Raven.Sheet
         }
         ImGui.EndPopup();
       }
-    } 
-    Layer _layerOnOptions = null;
-    protected override void OnRenderAfterName(PropertiesRenderer renderer)
+    }
+    void DrawLayerOptions(Layer layer, ref Layer removeLayer)
+    {
+      // Options next to name
+      ImGui.SameLine();
+      ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(layer.Name).X - 200, 0f));
+      ImGui.SameLine();
+      ImGui.PushID($"level-{layer.Name}-id");
+      var visibState = (!layer.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
+      if (ImGui.SmallButton(visibState))
+      {
+        layer.IsVisible = !layer.IsVisible;
+      }
+      ImGui.SameLine();
+      var lockState = (!layer.IsLocked) ? IconFonts.FontAwesome5.LockOpen: IconFonts.FontAwesome5.Lock;
+      if (ImGui.SmallButton(lockState))
+      {
+        layer.IsLocked = !layer.IsLocked;
+      }
+      ImGui.SameLine();
+      if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
+      {
+        removeLayer = layer;
+      }
+      ImGui.PopID();
+
+    }
+    void DrawLayerContent(Layer layer)
+    {
+      if (!layer.IsVisible || layer.IsLocked) ImGui.BeginDisabled();
+      var name = layer.Name;
+      var offset = layer.Offset.ToNumerics();
+      if (ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) layer.Name = name;
+      if (layer.IsVisible && !layer.IsLocked) ImGui.BeginDisabled();
+      ImGui.LabelText("Type", layer.GetType().Name);
+      ImGui.LabelText("Level", layer.Level.Name);
+      if (layer.IsVisible && !layer.IsLocked) ImGui.EndDisabled();
+      ImGui.InputFloat("Opacity", ref layer.Opacity);
+      if (ImGui.InputFloat2("Offset", ref offset)) layer.Offset = offset.ToVector2();
+      if (!layer.IsVisible || layer.IsLocked) ImGui.EndDisabled();
+    }
+    void DrawLevelContent()
     {
       ImGui.LabelText("Width", $"{_level.ContentSize.X} px");
       ImGui.LabelText("Height", $"{_level.ContentSize.Y} px");
       var levelOffset = _level.LocalOffset.ToNumerics();
       if (ImGui.InputFloat2("Position", ref levelOffset)) _level.LocalOffset = levelOffset;
-
-      if (ImGui.CollapsingHeader("Layers", ImGuiTreeNodeFlags.DefaultOpen))
+    }
+    Layer _layerOnOptions = null;
+    bool _isOpenLayerHeaderPopup = false;
+    bool _isOpenLayerOptionPopup = false;
+    protected override void OnRenderAfterName(PropertiesRenderer renderer)
+    {
+      DrawLevelContent();
+      var header = ImGui.CollapsingHeader("Layers", ImGuiTreeNodeFlags.DefaultOpen);
+      // The hader
+      if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
       {
+        _isOpenLayerHeaderPopup = true;
+      }
+      if (header)
+      {
+        // Draw layers
         Layer removeLayer = null;
         foreach (var layer in _level.Layers)
         {
-          if (ImGui.TreeNodeEx(layer.Name, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap))
+          var layerNode = (ImGui.TreeNodeEx(layer.Name, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap));
+          // Layer options
+          if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
           {
-            // Options next to name
-            ImGui.SameLine();
-            ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(layer.Name).X - 200, 0f));
-            ImGui.SameLine();
-            ImGui.PushID($"level-{layer.Name}-id");
-            var visibState = (!layer.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
-            if (ImGui.SmallButton(visibState))
-            {
-              layer.IsVisible = !layer.IsVisible;
-            }
-            ImGui.SameLine();
-            var lockState = (!layer.IsLocked) ? IconFonts.FontAwesome5.LockOpen: IconFonts.FontAwesome5.Lock;
-            if (ImGui.SmallButton(lockState))
-            {
-              layer.IsLocked = !layer.IsLocked;
-            }
-            ImGui.SameLine();
-            if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
-            {
-              removeLayer = layer;
-            }
+            _layerOnOptions = layer;
+            _isOpenLayerOptionPopup = true;
+          }
+          DrawLayerOptions(layer, ref removeLayer);
+         
+          // Layer content
+          if (layerNode)
+          { 
+            ImGui.PushID($"layer-{layer.Name}-content");
+            DrawLayerContent(layer);
             ImGui.PopID();
-
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Right)) 
-            {
-              _layerOnOptions = layer;
-              ImGui.OpenPopup("layer-options-popup");
-            }
-            if (!layer.IsVisible || layer.IsLocked) ImGui.BeginDisabled();
-            var name = layer.Name;
-            var offset = layer.Offset.ToNumerics();
-            if (ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) layer.Name = name;
-            if (layer.IsVisible && !layer.IsLocked) ImGui.BeginDisabled();
-            ImGui.LabelText("Type", layer.GetType().Name);
-            ImGui.LabelText("Level", layer.Level.Name);
-            if (layer.IsVisible && !layer.IsLocked) ImGui.EndDisabled();
-            ImGui.InputFloat("Opacity", ref layer.Opacity);
-            if (ImGui.InputFloat2("Offset", ref offset)) layer.Offset = offset.ToVector2();
-            if (!layer.IsVisible || layer.IsLocked) ImGui.EndDisabled();
-            // ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), GuiColors.Get(ImGuiCol.Border));
             ImGui.TreePop();
           }
         }
@@ -118,6 +178,7 @@ namespace Raven.Sheet
           _level.CurrentLayer = null;
         }
       }
+
     }
   }
 }
