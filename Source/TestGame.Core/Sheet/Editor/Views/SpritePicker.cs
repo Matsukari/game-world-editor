@@ -13,6 +13,7 @@ namespace Raven.Sheet
     public uint GridColor = 0;
     public uint HoverTileBorderColor = 0;
     public uint HoverTileFillColor = 0;
+    public bool Selected = false;
     public SheetPickerData(Sheet sheet) => Sheet = sheet;
   }
   public class SpritePicker

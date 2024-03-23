@@ -126,6 +126,8 @@ namespace Raven.Sheet
         }
       }
     }
+
+    bool _isOpenSheetHeaderPopup = false;
     public override void RenderImGui(PropertiesRenderer renderer)
     {
       // The base window
@@ -200,45 +202,89 @@ namespace Raven.Sheet
         }
         ImGui.EndChild();
       }
+      SheetPickerData removeSheet = null;
 
       // Spritesheet listings
       if (ImGui.CollapsingHeader(IconFonts.FontAwesome5.Th + "  SpriteSheets", ImGuiTreeNodeFlags.DefaultOpen))
       {
-        var size = 100;
-        stack.Y += size;
+        if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowHovered()) _isOpenSheetHeaderPopup = true;
+
         ImGui.BeginChild("spritesheets-content");
-        foreach (var sheet in _spritePicker.Sheets)
+        for (int i = 0; i < _spritePicker.Sheets.Count(); i++)
         {
-          if (ImGui.MenuItem(sheet.Sheet.Name)) 
+          var sheet = _spritePicker.Sheets[i];
+          
+          var flags = ImGuiTreeNodeFlags.AllowItemOverlap | ImGuiTreeNodeFlags.NoTreePushOnOpen 
+            | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick; 
+          if (sheet.Selected)
+          {
+            flags |= ImGuiTreeNodeFlags.Selected;
+          }
+          var sheetNode = ImGui.TreeNodeEx(sheet.Sheet.Name, flags); 
+
+          if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen())
+          {
+            // Reset selection
+            if (!ImGui.GetIO().KeyCtrl)
+            {
+              foreach (var sheetJ in _spritePicker.Sheets) sheetJ.Selected = false;
+            }
+            sheet.Selected = true;
+          }
+
+          ImGui.SameLine();
+          ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(sheet.Sheet.Name).X - 150, 0f));
+          ImGui.SameLine();
+          if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
+          {
+            removeSheet = sheet;
+          }
+
+          if (sheetNode)
           {
             _spritePicker.SelectedSheet = sheet;
+            // Draw preview spritesheet
+            float previewHeight = 100;
+            float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
+            float ratio = (previewWidth) / previewHeight;
+
+            // Draws the selected spritesheet
+            var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_spritePicker.SelectedSheet.Sheet.Texture);
+            ImGui.Image(texture, new System.Numerics.Vector2(previewWidth, previewHeight*ratio), 
+                _spritePicker.GetUvMin(_spritePicker.SelectedSheet), _spritePicker.GetUvMax(_spritePicker.SelectedSheet));
+            if (_spritePicker.OpenSheet == null && ImGui.IsItemHovered())
+            {
+              _spritePicker.OpenSheet = _spritePicker.SelectedSheet;
+            }
           }
         }
         ImGui.EndChild();
-
-        // Draw preview spritesheet
-        if (_spritePicker.SelectedSheet != null)
-        {
-          float previewHeight = 100;
-          float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
-          float ratio = (previewWidth) / previewHeight;
-
-          // Draws the selected spritesheet
-          var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_spritePicker.SelectedSheet.Sheet.Texture);
-          ImGui.Image(texture, new System.Numerics.Vector2(previewWidth, previewHeight*ratio), 
-              _spritePicker.GetUvMin(_spritePicker.SelectedSheet), _spritePicker.GetUvMax(_spritePicker.SelectedSheet));
-          if (_spritePicker.OpenSheet == null && ImGui.IsItemHovered())
-          {
-            _spritePicker.OpenSheet = _spritePicker.SelectedSheet;
-          }
-        }
       }
       ImGui.End();
+      if (removeSheet != null)
+      {
+        _spritePicker.Sheets.Remove(removeSheet);
+        _world.SpriteSheets.Remove(removeSheet.Sheet.Name);
+      }
 
       FocusFactor = _spritePicker.OpenSheet == null;
       _spritePicker.Draw();
       SelectedSprite = _spritePicker.SelectedSprite;
       if (_spritePicker.SelectedSprite != null && Nez.Input.RightMouseButtonReleased) CleanSelected();
+
+
+      if (_isOpenSheetHeaderPopup)
+      {
+        _isOpenSheetHeaderPopup = false;
+        ImGui.OpenPopup("sheet-header-options-popup");
+      }
+      if (ImGui.BeginPopupContextItem("sheet-header-options-popup"))
+      {
+        if (ImGui.MenuItem("Add Sheet"))
+        {
+        }
+        ImGui.EndPopup();
+      }
     }
     void CleanSelected()
     {

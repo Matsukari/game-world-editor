@@ -46,10 +46,10 @@ Implemente animation
 ~Delete layer~
 ~Paint preview on layer~
 ~Painting spritexes on levels~
+~Create own layer~
+~Add, remove spritesheet~
 Fix spritex paint preview
-Add, remove spritesheet
 Spritex y-sorting
-Create own layer 
 Lock layer 
 Order layers
 Bucket, rectangle, line paint 
