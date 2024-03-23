@@ -71,6 +71,7 @@ Connect levels
 ## Misc
 ~Fix zoom switching context~
 ~Fix zooming on mouse~
+~Fix debug window~
 Group workspaces
 Save & load to file
 Undo & redo
@@ -79,7 +80,6 @@ Separate transform operations
 Copy & paste shapes & parts 
 Fix primitive rendering order
 Fix camera bounds culling
-Fix debug window
 Snapping mouse
 Rulers 
 Grid
