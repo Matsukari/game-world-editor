@@ -13,6 +13,7 @@ namespace Raven.Sheet.Sprites
     public Transform Transform { get; set; }
     public Color Color { get; set; }
     public SpriteEffects SpriteEffects { get; set; } 
+    public bool HasSameSource(InstancedSprite instanced);
   }
   public class TileInstance : InstancedSprite
   {
@@ -23,6 +24,8 @@ namespace Raven.Sheet.Sprites
     public SpriteEffects SpriteEffects { get; set; } = SpriteEffects.None;
     Tile _tile;
     public TileInstance(Tile tile) => _tile = tile;
+    
+    public bool HasSameSource(InstancedSprite instanced) => _tile.Id == ((TileInstance)instanced)._tile.Id;
     public void Draw(Batcher batcher, Camera camera, RectangleF dest)
     {
       var scale = Transform.Scale;
@@ -54,6 +57,7 @@ namespace Raven.Sheet.Sprites
     {
       _spritex = spritex;
     }
+    public bool HasSameSource(InstancedSprite instanced) => _spritex.Name == ((SpritexInstance)instanced)._spritex.Name;
     public void Draw(Batcher batcher, Camera camera, RectangleF dest)
     {
       foreach (var sprite in _spritex.Body)

@@ -46,17 +46,17 @@ namespace Raven.Sheet
       // Rectangles & highlights
       void DrawArtifacts(Batcher batcher, Camera camera)
       {
-        if (Parent.IsDrawGrid)
-        {
           // Draw tiles' grid
           foreach (var tile in _tiles) 
           {
             var worldTile = tile.ToRectangleF();
             worldTile.Location += Parent._image.Bounds.Location;
             if (worldTile.Contains(camera.MouseToWorldPoint())) Parent.TileInMouse = tile;
-            batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
+            if (Parent.IsDrawGrid)
+            {
+              batcher.DrawRectOutline(camera, worldTile, Editor.ColorSet.SpriteRegionInactiveOutline);
+            }
           }
-        }
         // Highlight the tile under mouse
         var worldTileInMouse = Parent.TileInMouse.ToRectangleF();
         if (worldTileInMouse != null) 

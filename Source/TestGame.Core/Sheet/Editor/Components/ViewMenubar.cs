@@ -58,7 +58,7 @@ namespace Raven.Sheet
           new (string, Action)[]
           {
             (IconFonts.FontAwesome5.Th, ToogleGrid),
-            (IconFonts.FontAwesome5.EllipsisV, DrawSnappingPopup),
+            (IconFonts.FontAwesome5.EllipsisV, ()=>_isDrawSnappingPopup = !_isDrawSnappingPopup),
           },
           // 3, select type options
           new (string, Action)[]
@@ -78,7 +78,8 @@ namespace Raven.Sheet
           }
       };
 
-    } 
+    }
+    bool _isDrawSnappingPopup = false;
     void ToogleGrid()
     {
       if (Editor.GetCurrent() is Sheet sheet) Editor.GetSubEntity<SheetView>().IsDrawGrid = !Editor.GetSubEntity<SheetView>().IsDrawGrid;
@@ -86,11 +87,20 @@ namespace Raven.Sheet
     }
     void DrawSnappingPopup()
     {
-      if (ImGui.MenuItem("Snap to grid"))
+      if (_isDrawSnappingPopup)
       {
+        _isDrawSnappingPopup = false;
+        ImGui.OpenPopup("snap-options-popup");
       }
-      if (ImGui.MenuItem("Snap to custom size"))
+      if (ImGui.BeginPopupContextItem("snap-options-popup"))
       {
+        if (ImGui.MenuItem("Snap to grid"))
+        {
+        }
+        if (ImGui.MenuItem("Snap to custom size"))
+        {
+        }
+        ImGui.EndPopup();
       }
     }
     void RenderImGui()
@@ -192,7 +202,7 @@ namespace Raven.Sheet
         ImGui.PopStyleColor();
       }
 
-
+      DrawSnappingPopup();
 
       ImGui.End();
     }

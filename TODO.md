@@ -48,12 +48,14 @@ Implemente animation
 ~Painting spritexes on levels~
 ~Create own layer~
 ~Add, remove spritesheet~
-Fix spritex paint preview
+~Erase paint~
+~Bucket~
+Fix paint previews on layer
 Spritex y-sorting
 Lock layer 
 Order layers
-Bucket, rectangle, line paint 
-Erase paint
+Rectangle 
+Line
 Random painting 
 Transforms on instanced sprites 
 Layer management 

@@ -29,6 +29,14 @@ namespace Raven.Sheet
     public bool IsTileValid(int x, int y) => !(x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y); 
     public void ReplaceTile(Point point, InstancedSprite tile) => ReplaceTile(point.X, point.Y, tile);
     public void RemoveTile(Point point) => RemoveTile(point.X, point.Y);
+
+    // <summary>
+    // Replaces the point with the spritex and consume all tiles that the spritex touches
+    // </summary>
+    public void ReplaceAndFillTiles(int x, int y, SpritexInstance tile)
+    {
+
+    }
     public void ReplaceTile(int x, int y, InstancedSprite tile)
     {
       if (!IsTileValid(x, y)) return;
