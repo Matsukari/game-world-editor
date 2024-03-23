@@ -163,6 +163,10 @@ namespace Raven.Sheet
             _layerOnOptions = layer;
             _isOpenLayerOptionPopup = true;
           }
+          if (ImGui.IsItemClicked())
+          {
+            _level.CurrentLayer = layer; 
+          }
           DrawLayerOptions(layer, ref removeLayer);
          
           // Layer content

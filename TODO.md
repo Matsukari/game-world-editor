@@ -50,11 +50,11 @@ Implemente animation
 ~Add, remove spritesheet~
 ~Erase paint~
 ~Bucket~
+~Rectangle~
 Fix paint previews on layer
 Spritex y-sorting
 Lock layer 
 Order layers
-Rectangle 
 Line
 Random painting 
 Transforms on instanced sprites 

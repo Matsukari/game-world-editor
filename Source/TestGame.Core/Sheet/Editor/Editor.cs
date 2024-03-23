@@ -181,7 +181,7 @@ namespace Raven.Sheet
     }
     public void Save() {}
     public void AddTab(Sheet sheet) => AddTab(new SheetGui(sheet), new GuiData());
-    public void AddTab(World world) => AddTab(new WorldGui(world), new WorldGuiData());
+    public void AddTab(World world) => AddTab(new WorldGui(this, world), new WorldGuiData());
     void AddTab(Propertied content, GuiData gui)
     {
       _tabs.Add(content);

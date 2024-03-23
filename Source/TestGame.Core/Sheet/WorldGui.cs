@@ -39,10 +39,12 @@ namespace Raven.Sheet
       }
     }
     int _selectedLevel = -1;
+    Editor _editor;
     public override string Name { get => _world.Name; set => _world.Name = value; }
         
-    public WorldGui(World world) 
+    public WorldGui(Editor editor, World world) 
     {
+      _editor = editor;
       _world = world;
       _spritePicker.HandleSelectedSprite = SpritePicker_HandleSelected;
     }
@@ -86,10 +88,14 @@ namespace Raven.Sheet
             PaintPreviewAt(tilePos);
             break;
           case PaintType.Fill:
-            // foreach (var fillTile in _canFillTiles)
-            // {
-            //   PaintPreviewAt(tilePos + (fillTile * sprite.Region.Size).ToVector2().ToNumerics());
-            // }
+            break;
+          case PaintType.Rectangle:
+            if (input.IsDrag && !input.IsDragFirst)
+            {
+              ImGui.GetForegroundDrawList().AddRectFilled(
+                  input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
+                  _editor.ColorSet.SpriteRegionActiveFill.Add(new Color(1f, 1f, 1f, 0.3f)).ToImColor());
+            }
             break;
         }
 
@@ -124,6 +130,26 @@ namespace Raven.Sheet
           {
             PaintAt(tileLayer, spriteCenter);
           }
+          if (PaintType == PaintType.Rectangle)
+          {
+
+            if (input.IsDragFirst) _mouseStart = _world.Scene.Camera.MouseToWorldPoint();
+            if (input.IsDragLast) 
+            {
+              var rect = new RectangleF(); 
+              rect.Location = _mouseStart;
+              rect.Size = _world.Scene.Camera.MouseToWorldPoint() - _mouseStart;
+
+              for (int x = 0; x < rect.Size.X; x+=sprite.Region.Size.X)
+              {
+                for (int y = 0; y < rect.Size.Y; y+=sprite.Region.Size.Y)
+                {
+                  PaintAtLayer(tileLayer, tileLayer.GetTileCoordFromWorld(rect.Location + new Vector2(x, y)));
+                  
+                }
+              }
+            }
+          }
           if (PaintType == PaintType.Fill)
           {
             var tileInLayer = tileLayer.GetTileCoordFromWorld(spriteCenter); 
@@ -132,13 +158,14 @@ namespace Raven.Sheet
             _canFillTiles = _tileFiller.Update(tileLayer, tileInLayer, sprite.Region.Size/sprite.TileSize);
             if (Nez.Input.LeftMouseButtonPressed) 
             {
-              _tileFiller.Start((fill)=>
-                  {
-                  foreach (var tile in _canFillTiles) 
-                  {
+              void FloodFill(List<Point> fill)
+              {
+                foreach (var tile in _canFillTiles) 
+                {
                   PaintAtLayer(tileLayer, tile);
-                  }
-                  });
+                }
+              }
+              _tileFiller.Start(FloodFill);
             }
           }
         }
@@ -172,6 +199,7 @@ namespace Raven.Sheet
         }
       }
     }
+    Vector2 _mouseStart = Vector2.Zero;
     TileFillFlooder _tileFiller = new TileFillFlooder();
     bool _isQueuedPaint = false;
     void SyncLevelGuis()
