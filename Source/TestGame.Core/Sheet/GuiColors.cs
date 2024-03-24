@@ -3,7 +3,7 @@ using ImGuiNET;
 
 namespace Raven.Sheet
 {
-  public struct GuiColors 
+  public class GuiColors 
   {
     public Color SelectionOutline = new Color(0.85f, 0.85f, 0.85f);
     public Color SelectionFill = new Color(0.2f, 0.2f, 0.2f, 0.04f);

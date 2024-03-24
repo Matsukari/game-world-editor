@@ -90,6 +90,7 @@ namespace Raven.Sheet
       AddTab(world);
       Scene.AddRenderer(new ScreenSpaceRenderer(-2, ScreenRenderLayer));
   
+      AddComponent(new Settings(ColorSet));
       AddSubEntity(
           new Selection(),
           new SheetView(),

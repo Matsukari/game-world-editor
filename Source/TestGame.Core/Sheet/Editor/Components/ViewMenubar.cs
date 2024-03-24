@@ -32,7 +32,10 @@ namespace Raven.Sheet
         ImGui.EndMenu();
       }
     }
-    void ViewOptions() {}
+    void ViewOptions() 
+    {
+      Editor.GetComponent<Settings>().Enabled = true;
+    }
     public override void OnAddedToScene()
     {
       Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
