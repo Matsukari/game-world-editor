@@ -39,13 +39,13 @@ namespace Raven.Sheet
     }
     public void ReplaceTile(int x, int y, InstancedSprite tile)
     {
-      if (!IsTileValid(x, y)) return;
+      if (!IsTileValid(x, y) || !IsVisible || IsLocked) return;
       var loc = new Point(x, y);
       _tiles[loc] = tile;
     }
     public void RemoveTile(int x, int y)
     {
-      if (!IsTileValid(x, y)) return;
+      if (!IsTileValid(x, y) || !IsVisible || IsLocked) return;
       var loc = new Point(x, y);
       _tiles.Remove(loc);
     }

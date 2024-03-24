@@ -51,9 +51,9 @@ Implemente animation
 ~Erase paint~
 ~Bucket~
 ~Rectangle~
+~Lock layer~
 Fix paint previews on layer
 Spritex y-sorting
-Lock layer 
 Order layers
 Line
 Random painting 
