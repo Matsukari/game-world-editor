@@ -229,7 +229,7 @@ namespace Raven
     public virtual void RenderImGui(Sheet.PropertiesRenderer renderer)
     {
       var name = Name;
-      ImGui.Begin(GetIcon() + " " + GetType().Name, ImGuiWindowFlags.NoFocusOnAppearing);
+      ImGui.Begin(GetIcon() + "   " + GetName(), ImGuiWindowFlags.NoFocusOnAppearing);
       if (ImGui.IsWindowHovered() && FocusFactor) ImGui.SetWindowFocus();
 
       OnRenderBeforeName();
@@ -245,6 +245,7 @@ namespace Raven
     }
     public bool HasName() => Name != null && Name != string.Empty;
     public virtual string GetIcon() => "";
+    public virtual string GetName() => GetType().Name;
     protected virtual void OnChangeProperty(string name) {}
     protected virtual void OnRenderBeforeName() {}
     protected virtual void OnRenderAfterName(Sheet.PropertiesRenderer renderer) {}

@@ -60,13 +60,13 @@ namespace Raven.Sheet
           // 2, view options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.Th, ToogleGrid),
+            (IconFonts.FontAwesome5.BorderAll, ToogleGrid),
             (IconFonts.FontAwesome5.EllipsisV, ()=>_isDrawSnappingPopup = !_isDrawSnappingPopup),
           },
           // 3, select type options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.MousePointer, ()=>{}),
+            (IconFonts.FontAwesome5.User, ()=>{}),
             (IconFonts.FontAwesome5.Shapes, ()=>{})
           },
           // 4, paint type options
@@ -125,6 +125,7 @@ namespace Raven.Sheet
         foreach (var button in _buttons[set]) 
         {
           ImGui.SameLine();
+          
           if (ImGui.Button(button.Item1)) button.Item2.Invoke();
         }
       }
@@ -168,20 +169,15 @@ namespace Raven.Sheet
       BeginStackBar("tools-bar", 37);
 
       // Operation buttosn
-      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ViewbarSpecialButton.ToImColor());
       ButtonSetFlat(1, 270);
-      ImGui.PopStyleColor();
 
       // View options
-      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ViewbarViewButton.ToImColor());
       ButtonSetFlat(2, 10);
-      ImGui.PopStyleColor();
 
       // Select type options
       ButtonSetFlat(3, 20);
     
       // Geometry opeionts
-      ImGui.PushStyleColor(ImGuiCol.Text, Editor.ColorSet.ViewbarShapeButton.ToImColor());
       ImGui.SameLine();
       ImGui.Dummy(new System.Numerics.Vector2(20, 0)); 
       // Draw shape annotators
@@ -195,14 +191,11 @@ namespace Raven.Sheet
         // pressed; begin annotation
         if (ImGui.Button(label)) Editor.GetSubEntity<Annotator>().Annotate(shapeInstance);
       }
-      ImGui.PopStyleColor();
 
       if (Editor.GetCurrent() is World)
       {
         // Paint options
-        ImGui.PushStyleColor(ImGuiCol.Button, ImGui.GetStyle().Colors[(int)ImGuiCol.WindowBg]);
         ButtonSetFlat(4, 20);
-        ImGui.PopStyleColor();
       }
 
       DrawSnappingPopup();

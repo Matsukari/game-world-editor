@@ -57,7 +57,7 @@ namespace Raven
 
     public class Point : Shape
     {
-      public static string Icon = IconFonts.FontAwesome5.MapMarker;
+      public static string Icon = IconFonts.FontAwesome5.MapMarkerAlt;
       [PropertiedInput("Position")]
       public Vector2 Position 
       { 

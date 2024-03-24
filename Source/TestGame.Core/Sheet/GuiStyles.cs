@@ -57,11 +57,11 @@ namespace Raven.Sheet
     {
       var style = ImGui.GetStyle();
       style.WindowPadding = new Vector2(10, 6);
-      style.FramePadding = new Vector2(12, 3);
-      style.ItemSpacing = new Vector2(9, 6);
-      style.ItemInnerSpacing = new Vector2(5, 4);
+      style.FramePadding = new Vector2(6, 3);
+      style.ItemSpacing = new Vector2(6, 6);
+      style.ItemInnerSpacing = new Vector2(4, 4);
       style.TouchExtraPadding = new Vector2(0, 0);
-      style.IndentSpacing = 22;
+      style.IndentSpacing = 15;
       style.ScrollbarSize = 11;
       style.GrabMinSize = 11;
       style.WindowRounding = 0;
@@ -70,8 +70,8 @@ namespace Raven.Sheet
       style.SeparatorTextAlign = new Vector2(0.5f, 0.5f);
       style.SeparatorTextPadding = new Vector2(0f, 16);
       style.SeparatorTextBorderSize = 1;
-      style.WindowBorderSize = 1;
-      style.PopupBorderSize = 1;
+      style.WindowBorderSize = 0;
+      style.PopupBorderSize = 0;
       style.FrameBorderSize = 0;
       style.ChildBorderSize = 1;
       style.TabBorderSize = 0;

@@ -21,8 +21,13 @@ namespace Raven.Sheet
     }
     public override string GetIcon()
     {
-      return IconFonts.FontAwesome5.LayerGroup;
+      return IconFonts.FontAwesome5.ObjectGroup;
     }
+    public override string GetName()
+    {
+      return "Level";
+    }
+        
     public void Render(Batcher batcher, Camera camera)
     {
       foreach (var layer in _level.Layers)
@@ -49,7 +54,7 @@ namespace Raven.Sheet
       }
       if (ImGui.BeginPopupContextItem("layer-header-options-popup"))
       {
-        if (ImGui.BeginMenu(IconFonts.FontAwesome5.PlusSquare + "  Create Layer"))
+        if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + "  Create Layer"))
         {
           if (ImGui.MenuItem("Tiled")) 
           {
@@ -95,7 +100,7 @@ namespace Raven.Sheet
     {
       // Options next to name
       ImGui.SameLine();
-      ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(layer.Name).X - 200, 0f));
+      ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(layer.Name).X - 140, 0f));
       ImGui.SameLine();
       ImGui.PushID($"level-{layer.Name}-id");
       var visibState = (!layer.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
