@@ -14,8 +14,8 @@ public class TestGameProcess : Core
         Window.IsBorderless = true; 
         IsFixedTimeStep = true;
         var imGuiOptions = new ImGuiOptions();
-        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.RobotoCondensedRegular, 13);
-        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.FontAwesome6FreeSolid900, 13);
+        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.RobotoCondensedRegular, 16);
+        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.FontAwesome6FreeSolid900, 16);
         imGuiOptions.IncludeDefaultFont(false);
         
         var imGuiManager = new ImGuiManager(imGuiOptions);
