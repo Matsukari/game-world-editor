@@ -70,7 +70,7 @@ namespace Raven.Sheet
         {
           // Parent.SetMouseCursor(selectionPoint);
         }
-        if (Nez.Input.LeftMouseButtonPressed)
+        if (Nez.Input.LeftMouseButtonPressed && !Core.GetGlobalManager<Raven.Input.InputManager>().IsImGuiBlocking)
         {
           if (selectionPoint != SelectionAxis.None && !Parent.IsEditingPoint)
           {
@@ -145,7 +145,7 @@ namespace Raven.Sheet
       delta /= Scene.Camera.RawZoom;
 
       // start whatever selection
-      if (input.IsDragFirst)
+      if (input.IsDragFirst && Nez.Input.LeftMouseButtonDown)
       {
         _selectionInitial = Bounds;
 
@@ -155,7 +155,7 @@ namespace Raven.Sheet
           _isDragInsideArea = true;
         }
       } 
-      else if (input.IsDragLast) 
+      else if (input.IsDragLast && Nez.Input.LeftMouseButtonDown) 
       {
         _isDragInsideArea = false;
         Mouse.SetCursor(MouseCursor.Arrow);
@@ -214,7 +214,7 @@ namespace Raven.Sheet
         Bounds = _bounds;
       }
       // move selection
-      else if (input.IsDrag && _isDragInsideArea)
+      else if (input.IsDrag && _isDragInsideArea && Nez.Input.LeftMouseButtonDown)
       {
         _bounds.Location = _selectionInitial.Location + delta;
         Bounds = _bounds;
