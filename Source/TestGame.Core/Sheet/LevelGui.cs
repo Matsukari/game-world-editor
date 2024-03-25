@@ -11,9 +11,11 @@ namespace Raven.Sheet
     public override string Name { get => _level.Name; set => _level.Name = value;}
     internal Level _level;
     internal WorldGui _worldGui;
+    internal List<bool> _levelSelected = new List<bool>();
     public bool Selected = false;
     public Color TileActiveGridColor = new Color(0.2f, 0.2f, 0.2f, 0.4f);
     public Color TileInactiveGridColor = new Color(0.1f, 0.1f, 0.1f, 0.4f);
+    
     public LevelGui(Level level, WorldGui gui)
     {
       _level = level;
@@ -143,11 +145,24 @@ namespace Raven.Sheet
       var levelOffset = _level.LocalOffset.ToNumerics();
       if (ImGui.InputFloat2("Position", ref levelOffset)) _level.LocalOffset = levelOffset;
     }
+    void SyncLayersGui()
+    {
+      if (_levelSelected.Count() != _level.Layers.Count())
+      {
+        _levelSelected.Clear();
+        foreach (var layer in _level.Layers)
+        {
+          _levelSelected.Add(false);
+          if (layer.IsCurrentLayerInLevel) _levelSelected[_levelSelected.Count()-1] = true;
+        }
+      }
+    }
     Layer _layerOnOptions = null;
     bool _isOpenLayerHeaderPopup = false;
     bool _isOpenLayerOptionPopup = false;
     protected override void OnRenderAfterName(PropertiesRenderer renderer)
     {
+      SyncLayersGui();
       DrawLevelContent();
       var header = ImGui.CollapsingHeader("Layers", ImGuiTreeNodeFlags.DefaultOpen);
       // The hader
@@ -159,18 +174,33 @@ namespace Raven.Sheet
       {
         // Draw layers
         Layer removeLayer = null;
-        foreach (var layer in _level.Layers)
+        for (int i = 0; i < _level.Layers.Count(); i++)
         {
-          var layerNode = (ImGui.TreeNodeEx(layer.Name, ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap));
-          // Layer options
+          var layer = _level.Layers[i];
+          var flags = ImGuiTreeNodeFlags.AllowItemOverlap | ImGuiTreeNodeFlags.NoTreePushOnOpen 
+            | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick; 
+
+          if (_levelSelected[i]) flags |= ImGuiTreeNodeFlags.Selected;
+
+          var layerNode = (ImGui.TreeNodeEx(layer.Name, flags));
+
+          // Multiple select
+          if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen())
+          {
+            // Reset selection
+            if (!ImGui.GetIO().KeyCtrl)
+            {
+              for (int j = 0; j < _levelSelected.Count(); j++) _levelSelected[j] = false;
+            }
+            _levelSelected[i] = true;
+            _level.CurrentLayer = layer;
+          }
+
+          // Layer options; select
           if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
           {
             _layerOnOptions = layer;
             _isOpenLayerOptionPopup = true;
-          }
-          if (ImGui.IsItemClicked())
-          {
-            _level.CurrentLayer = layer; 
           }
           DrawLayerOptions(layer, ref removeLayer);
          
