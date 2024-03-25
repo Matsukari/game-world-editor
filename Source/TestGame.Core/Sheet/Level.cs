@@ -12,6 +12,7 @@ namespace Raven.Sheet
     public World World { get; private set; }
     public List<Layer> Layers = new List<Layer>();
     public Layer CurrentLayer = null;
+    public bool IsLocked { get; set; }
     public override RectangleF Bounds 
     { 
       get 

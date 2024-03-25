@@ -32,37 +32,28 @@ namespace Raven.Sheet
     public void RenderImGui()
     {
       if (!Enabled) return;
-      var hasSelection = false;
-      var input = Core.GetGlobalManager<Raven.Input.InputManager>();
-      for (var i = 0; i < World.Levels.Count(); i++)
-      {
-        var level = World.Levels[i];
 
-        if (Nez.Input.RightMouseButtonReleased && !input.IsImGuiBlocking)
-        {
-          // Clicked inside a level
-          if (level.Bounds.Contains(Scene.Camera.MouseToWorldPoint()))
-          {
-            ImGui.OpenPopup("level-options-popup");
-            WorldGui.SelectedLevel = i;
-            hasSelection = true;
-          }
-        }
-      }
-      // Clikced outside; canvas
-      if (Nez.Input.RightMouseButtonReleased && !input.IsImGuiBlocking && !hasSelection)
+      if (_isOpenWorldOptinos)
       {
-        WorldGui.SelectedLevel = -1;
+        _isOpenWorldOptinos = false;
         ImGui.OpenPopup("world-options-popup");
+      }
+      if (_isOpenLevelOptions)
+      {
+        _isOpenLevelOptions = false;
+        ImGui.OpenPopup("level-options-popup");
       }
 
       // Popups
-      if (ImGui.BeginPopupContextItem("level-options-popup"))
+      if (ImGui.BeginPopup("level-options-popup"))
       {
-        
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete")) 
+        {
+          
+        }
         ImGui.EndPopup();
       }
-      if (ImGui.BeginPopupContextItem("world-options-popup"))
+      if (ImGui.BeginPopup("world-options-popup"))
       {
         if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + "  Add level here"))
         {
@@ -78,6 +69,8 @@ namespace Raven.Sheet
       base.Update();
       
     } 
+    bool _isOpenWorldOptinos = false;
+    bool _isOpenLevelOptions = false;
     public class Renderable : Editor.WorldEntity.Renderable<WorldView>
     {
       public override void Render(Batcher batcher, Camera camera)
@@ -96,14 +89,18 @@ namespace Raven.Sheet
           {
             if (level.Bounds.Contains(camera.MouseToWorldPoint()) && WorldGui.SelectedSprite == null) 
             {
-              if (WorldGui.SelectedLevel == -1)
-              {
-                WorldGui.SelectedLevel = i;
-                Entity.Scene.Camera.Position = World.CurrentLevel.Bounds.Center;
-              }
               selection.Begin(level.Bounds, level);
               WorldGui.SelectedLevel = i;
             }
+          }
+          else if (Nez.Input.RightMouseButtonPressed && !input.IsImGuiBlocking)
+          {
+            if (level.Bounds.Contains(camera.MouseToWorldPoint())) 
+            {
+              if (WorldGui.SelectedSprite == null) Parent._isOpenLevelOptions = true;
+            }
+            else Parent._isOpenWorldOptinos = true;
+            
           }
           level.Render(batcher, camera);
           levelGui.Render(batcher, camera);

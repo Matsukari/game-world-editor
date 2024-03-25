@@ -52,6 +52,8 @@ Implemente animation
 ~Bucket~
 ~Rectangle~
 ~Lock layer~
+Scene state overlay
+Indicator for able and not able paint
 Fix paint previews on layer
 Spritex y-sorting
 Order layers

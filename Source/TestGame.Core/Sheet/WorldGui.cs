@@ -15,7 +15,7 @@ namespace Raven.Sheet
     internal World _world;
     public object SelectedSprite;
     SpritePicker _spritePicker = new SpritePicker();
-    public bool IsDrawTileLayerGrid = false;
+    public bool IsDrawTileLayerGrid = true;
     public bool IsRandomPaint = false;
     public PaintMode PaintMode = PaintMode.Pen;
     public PaintType PaintType = PaintType.Single;
@@ -305,7 +305,7 @@ namespace Raven.Sheet
             level.Selected = true;
           }
           ImGui.SameLine();
-          ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(level.Name).X - 120, 0f));
+          ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(level.Name).X - 100, 0f));
           ImGui.SameLine();
           ImGui.PushID($"level-{level.Name}-id");
           var visibState = (!level._level.Enabled) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
