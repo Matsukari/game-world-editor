@@ -16,12 +16,12 @@ namespace Raven.Sheet
     {
       Position = Vector2.Zero;
       RemoveAllComponents(); 
-      AddComponent(new Renderable());
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent());
 
       var origin = AddComponent(new Guidelines.OriginLines());
       origin.Color = Editor.ColorSet.SpriteRegionActiveOutline;
+      AddComponent(new Renderable());
 
     }    
     public override void OnAddedToScene()

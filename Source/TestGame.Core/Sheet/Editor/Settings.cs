@@ -36,17 +36,21 @@ namespace Raven.Sheet
             var colorField = field.GetValue(_colors);
             if (colorField is Color color)
             {
-              var colorText = String.Concat(Enumerable.Repeat(IconFonts.FontAwesome5.SquareFull, 3));
-              ImGui.Text($"{field.Name.PadRight(20)}");
-              ImGui.SameLine();
-              ImGui.PushStyleColor(ImGuiCol.Text, color.ToImColor());
-              ImGui.Text(colorText);
-              ImGui.PopStyleColor();
-              if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
-              {
-                _fieldOnOpenColor = field;
-                _isOpenColor = true;
-              }
+              var numerics = ((Color)field.GetValue(_colors)).ToVector4().ToNumerics();
+              if (ImGui.ColorEdit4(field.Name, ref numerics, 
+                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_colors, new Color(numerics));
+
+              // var colorText = String.Concat(Enumerable.Repeat(IconFonts.FontAwesome5.SquareFull, 3));
+              // ImGui.Text($"{field.Name.PadRight(20)}");
+              // ImGui.SameLine();
+              // ImGui.PushStyleColor(ImGuiCol.Text, color.ToImColor());
+              // ImGui.Text(colorText);
+              // ImGui.PopStyleColor();
+              // if (ImGui.IsItemClicked(ImGuiMouseButton.Left))
+              // {
+              //   _fieldOnOpenColor = field;
+              //   _isOpenColor = true;
+              // }
             }
           }
           ImGui.EndTabItem();
@@ -58,20 +62,20 @@ namespace Raven.Sheet
         Enabled = false;
       }
       ImGui.End();
-
-      if (_isOpenColor)
-      {
-        ImGui.OpenPopup("color-picker");
-        _isOpenColor = false;
-      }
-      if (ImGui.BeginPopupContextItem("color-picker"))
-      {
-        var numerics = ((Color)_fieldOnOpenColor.GetValue(_colors)).ToVector4().ToNumerics();
-        if (ImGui.ColorPicker4(_fieldOnOpenColor.Name, ref numerics, 
-              ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) _fieldOnOpenColor.SetValue(_colors, new Color(numerics));
-        ImGui.EndPopup();
-
-      }
+      //
+      // if (_isOpenColor)
+      // {
+      //   ImGui.OpenPopup("color-picker");
+      //   _isOpenColor = false;
+      // }
+      // if (ImGui.BeginPopupContextItem("color-picker"))
+      // {
+      //   var numerics = ((Color)_fieldOnOpenColor.GetValue(_colors)).ToVector4().ToNumerics();
+      //   if (ImGui.ColorEdit4(_fieldOnOpenColor.Name, ref numerics, 
+      //         ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) _fieldOnOpenColor.SetValue(_colors, new Color(numerics));
+      //   ImGui.EndPopup();
+      //
+      // }
     }
   }
 }

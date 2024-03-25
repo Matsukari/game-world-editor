@@ -14,7 +14,6 @@ namespace TestGame
       Content.RootDirectory = "Assets";
        
       var editor = AddEntity(new Raven.Sheet.Editor());
-      ClearColor = editor.ColorSet.Background;
 
     }   
   }

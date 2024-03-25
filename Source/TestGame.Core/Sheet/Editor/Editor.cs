@@ -105,6 +105,11 @@ namespace Raven.Sheet
           new WorldView());
       Switch(0); 
     }
+    public override void Update()
+    {
+      base.Update();
+      Scene.ClearColor = ColorSet.Background;
+    }
     public void AddSubEntity(params SubEntity[] entities) 
     {
       foreach (var entity in entities)

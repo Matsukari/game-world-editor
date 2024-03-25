@@ -165,11 +165,13 @@ namespace Raven.Sheet
       SyncLayersGui();
       DrawLevelContent();
       var header = ImGui.CollapsingHeader("Layers", ImGuiTreeNodeFlags.DefaultOpen);
+
       // The hader
       if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
       {
         _isOpenLayerHeaderPopup = true;
       }
+      ImGui.BeginChild($"level-layers-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200));
       if (header)
       {
         // Draw layers
@@ -219,7 +221,7 @@ namespace Raven.Sheet
           _level.CurrentLayer = null;
         }
       }
-
+      ImGui.EndChild();
     }
   }
 }
