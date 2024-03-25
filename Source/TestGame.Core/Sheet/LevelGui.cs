@@ -171,15 +171,15 @@ namespace Raven.Sheet
       {
         _isOpenLayerHeaderPopup = true;
       }
-      ImGui.BeginChild($"level-layers-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200));
       if (header)
       {
+        ImGui.BeginChild($"level-layers-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
         // Draw layers
         Layer removeLayer = null;
         for (int i = 0; i < _level.Layers.Count(); i++)
         {
           var layer = _level.Layers[i];
-          var flags = ImGuiTreeNodeFlags.AllowItemOverlap | ImGuiTreeNodeFlags.NoTreePushOnOpen 
+          var flags = ImGuiTreeNodeFlags.AllowItemOverlap 
             | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick; 
 
           if (_levelSelected[i]) flags |= ImGuiTreeNodeFlags.Selected;
@@ -220,8 +220,8 @@ namespace Raven.Sheet
           _level.Layers.Remove(removeLayer);
           _level.CurrentLayer = null;
         }
+        ImGui.EndChild();
       }
-      ImGui.EndChild();
     }
   }
 }
