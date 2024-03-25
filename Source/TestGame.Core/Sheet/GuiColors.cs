@@ -5,6 +5,7 @@ namespace Raven.Sheet
 {
   public class GuiColors 
   {
+    public Color Accent = new Color(0.561f, 0.386f, 0.712f, 1f); 
     public Color SelectionOutline = new Color(0.85f, 0.85f, 0.85f);
     public Color SelectionFill = new Color(0.2f, 0.2f, 0.2f, 0.04f);
     public Color SpriteGridOutline = new Color(0.3f, 0.3f, 0.3f, 0.17f);

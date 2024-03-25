@@ -27,6 +27,7 @@ namespace Raven.Sheet
     public World() 
     {
       Level level = CreateLevel();
+      Name = "Default World";
       CurrentLevel = level;
     }
     public Level GetLevel(string name)

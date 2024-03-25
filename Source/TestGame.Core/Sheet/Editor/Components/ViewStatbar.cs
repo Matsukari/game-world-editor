@@ -35,12 +35,23 @@ namespace Raven.Sheet
       ImGui.SameLine();
       ImGui.TextDisabled($"State: {Editor.EditState}");
 
+      var worldView = Editor.GetSubEntity<WorldView>();
       if (Editor.GetSubEntity<SheetView>().Enabled)
       {
         ImGui.SameLine();
         ImGui.Dummy(new System.Numerics.Vector2(10, 0));
         ImGui.SameLine();
         ImGui.Text($"Tile: {Editor.GetSubEntity<SheetView>().TileInMouse.Location.SimpleStringFormat()}");
+      }
+      else if (worldView.Enabled)
+      {
+        if (worldView.WorldGui.SelectedSprite != null)
+        {
+          ImGui.SameLine();
+          ImGui.Dummy(new System.Numerics.Vector2(20, 0));
+          ImGui.SameLine();
+          ImGui.Text($"Paint {worldView.WorldGui.PaintMode} > {worldView.WorldGui.PaintType}");
+        }
       }
     
       ImGui.End();

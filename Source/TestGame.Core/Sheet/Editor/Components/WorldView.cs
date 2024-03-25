@@ -33,6 +33,34 @@ namespace Raven.Sheet
     {
       if (!Enabled) return;
 
+      ImGui.SetNextWindowPos(new System.Numerics.Vector2(263f, 93));
+      ImGui.Begin("world-scene-indicator-overlay", ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoDecoration 
+          | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav);
+    
+      void BreadCrumb(params string[] labels)
+      {
+        ImGui.PushStyleColor(ImGuiCol.Text, GuiColors.Get(ImGuiCol.TextDisabled));
+        for (int i = 0; i < labels.Count()-1; i++)
+        {
+          ImGui.Text(labels[i]);
+          ImGui.SameLine();
+        }
+        ImGui.PopStyleColor();
+        ImGui.Text(labels.Last());
+      }
+      var scene = new List<string>();
+      scene.Add(World.Name);
+      if (World.CurrentLevel != null)
+      {
+        scene.Add($" > {World.CurrentLevel.Name}");
+        if (World.CurrentLevel.CurrentLayer != null)
+        {
+          scene.Add($" > {World.CurrentLevel.CurrentLayer.Name}");
+        }
+      }
+      BreadCrumb(scene.ToArray());
+      ImGui.End();
+
       if (_isOpenWorldOptinos)
       {
         _isOpenWorldOptinos = false;
