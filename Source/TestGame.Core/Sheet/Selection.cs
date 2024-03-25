@@ -214,7 +214,7 @@ namespace Raven.Sheet
         Bounds = _bounds;
       }
       // move selection
-      else if (input.IsDrag && _isDragInsideArea && Nez.Input.LeftMouseButtonDown)
+      else if (input.IsDrag && _isDragInsideArea && Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
       {
         _bounds.Location = _selectionInitial.Location + delta;
         Bounds = _bounds;
