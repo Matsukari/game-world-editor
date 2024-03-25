@@ -6,6 +6,12 @@ namespace Raven
 {
   public static class RectangleExt 
   {
+    public static RectangleF RoundLocationFloor(this RectangleF vec, Point point)
+    {
+      vec.X = (int)(vec.X / point.X) * point.X;
+      vec.Y = (int)(vec.Y / point.Y) * point.Y;
+      return vec;
+    }
     public static Vector2 LeftCenter(this RectangleF rect)
     {
       rect.Y = rect.Center.Y;

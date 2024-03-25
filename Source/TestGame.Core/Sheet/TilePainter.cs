@@ -1,0 +1,150 @@
+using Nez;
+using Microsoft.Xna.Framework;
+using ImGuiNET;
+using Raven.Sheet.Sprites;
+
+namespace Raven.Sheet
+{
+  public class TilePainter
+  {
+    Editor _editor;
+    World _world;
+    WorldGui _gui;
+    List<Point> _canFillTiles = new List<Point>();
+    public TilePainter(WorldGui gui, Editor editor)
+    {
+      _gui = gui;
+      _world = gui._world;
+      _editor = editor;
+    }
+    public void HandleSelectedSprite()
+    {
+      var input = Core.GetGlobalManager<Input.InputManager>();
+      var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
+
+      if (_gui.SelectedSprite is Sprite sprite)
+      {
+        var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
+        var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
+        var tilePos = rawMouse.ToVector2().RoundFloor(sprite.TileSize).ToNumerics(); 
+        var tilesToPaint = sprite.GetRectTiles();
+
+        void PaintAtLayer(TileLayer tileLayer, Point tileInLayer)
+        {
+          var tileStart = tilesToPaint.First();
+          foreach (var tile in tilesToPaint)
+          {
+            var delta = tile.Coordinates - tileStart.Coordinates;
+                 if (_gui.PaintMode == PaintMode.Pen) tileLayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
+            else if (_gui.PaintMode == PaintMode.Eraser) tileLayer.RemoveTile(tileInLayer + delta);
+          }
+        }
+        void PaintPreviewAt(System.Numerics.Vector2 screenPos)
+        { 
+          ImGui.GetForegroundDrawList().AddImage(
+              Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
+              screenPos - sprite.Region.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom, 
+              screenPos - sprite.Region.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom + sprite.Region.Size.ToVector2().ToNumerics() 
+              * _world.Scene.Camera.RawZoom,
+              min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+        }
+
+        // Show paint previews
+        switch (_gui.PaintType)
+        {
+          case PaintType.Single: PaintPreviewAt(tilePos); break;
+          case PaintType.Rectangle:
+            if (input.IsDrag && !input.IsDragFirst)
+            {
+              ImGui.GetForegroundDrawList().AddRectFilled(
+                  input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
+                  _editor.ColorSet.SpriteRegionActiveFill.Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
+            } 
+            break;
+        }
+
+        // Handle paint inputs; tile layer
+        if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is TileLayer tileLayer && !input.IsImGuiBlocking)
+        {
+          var spriteCenter = _world.Scene.Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize();
+
+          // Single painting
+          if (Nez.Input.LeftMouseButtonDown && _gui.PaintType == PaintType.Single)
+          {
+            PaintAtLayer(tileLayer, tileLayer.GetTileCoordFromWorld(spriteCenter));
+          }
+
+          // Rectangle painting
+          if (_gui.PaintType == PaintType.Rectangle)
+          {
+            if (input.IsDragFirst) _mouseStart = _world.Scene.Camera.MouseToWorldPoint();
+            if (input.IsDragLast) 
+            {
+              var rect = new RectangleF(); 
+              rect.Location = _mouseStart;
+              rect.Size = _world.Scene.Camera.MouseToWorldPoint() - _mouseStart;
+
+              for (int x = 0; x < rect.Size.X; x+=sprite.Region.Size.X)
+              {
+                for (int y = 0; y < rect.Size.Y; y+=sprite.Region.Size.Y)
+                {
+                  PaintAtLayer(tileLayer, tileLayer.GetTileCoordFromWorld(rect.Location + new Vector2(x, y)));
+                }
+              }
+            }
+          }
+
+          // Fill painting
+          if (_gui.PaintType == PaintType.Fill)
+          {
+            var tileInLayer = tileLayer.GetTileCoordFromWorld(spriteCenter); 
+            var tileStart = tilesToPaint[tilesToPaint.Count/2];
+            if (tileStart == null) return;
+            _canFillTiles = _tileFiller.Update(tileLayer, tileInLayer, sprite.Region.Size/sprite.TileSize);
+            if (Nez.Input.LeftMouseButtonPressed) 
+            {
+              void FloodFill(List<Point> fill)
+              {
+                foreach (var tile in _canFillTiles) 
+                {
+                  PaintAtLayer(tileLayer, tile);
+                }
+              }
+              _tileFiller.Start(FloodFill);
+            }
+          }
+        }
+      }
+      else if (_gui.SelectedSprite is Spritex spritex)
+      {
+        foreach (var part in spritex.Body)
+        {
+          var min = part.SourceSprite.Region.Location.ToVector2() / part.SourceSprite.Texture.GetSize();
+          var max = (part.SourceSprite.Region.Location + part.SourceSprite.Region.Size).ToVector2() / part.SourceSprite.Texture.GetSize();
+          var tilePos = rawMouse + part.LocalBounds.Location.ToNumerics();
+          tilePos.X = (int)(tilePos.X / part.SourceSprite.TileSize.X) * part.SourceSprite.TileSize.X;
+          tilePos.Y = (int)(tilePos.Y / part.SourceSprite.TileSize.Y) * part.SourceSprite.TileSize.Y; 
+
+          ImGui.GetForegroundDrawList().AddImage(
+              Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(part.SourceSprite.Texture),
+              tilePos - spritex.EnclosingBounds.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom, 
+              tilePos - spritex.EnclosingBounds.GetHalfSize().ToNumerics() + spritex.EnclosingBounds.Size.ToNumerics() * _world.Scene.Camera.RawZoom,
+              min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+
+        }
+
+        if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is TileLayer tilelayer)
+        {
+          if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
+          { 
+            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - spritex.Bounds.Size/2f; 
+            var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
+            tilelayer.ReplaceTile(tileInLayer, new SpritexInstance(spritex));
+          }
+        }
+      }
+    }
+    Vector2 _mouseStart = Vector2.Zero;
+    TileFillFlooder _tileFiller = new TileFillFlooder();
+  }
+}

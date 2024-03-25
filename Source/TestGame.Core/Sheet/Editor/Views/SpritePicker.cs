@@ -73,9 +73,15 @@ namespace Raven.Sheet
       mouse = mouse + OpenSheet.Position;
       mouse /= sheetZoom;
 
-      // Highlights selection
-      if (SelectedSprite is Tile tile)
+      // Convenicne for translating raw data to renderable position
+      RectangleF TranslateToWorld(RectangleF rect)
       {
+        var worldTile = rect;
+        worldTile.Location *= sheetZoom;
+        worldTile.Location -= OpenSheet.Position;
+        worldTile.Location += Bounds.Location;
+        worldTile.Size *= sheetZoom;
+        return worldTile;
       }
 
       if (ImGui.BeginTabBar("sheet-picker-tab"))
@@ -87,11 +93,7 @@ namespace Raven.Sheet
           foreach (var rectTile in _tiles)
           {
             // Translate to world
-            var worldTile = rectTile;
-            worldTile.Location *= sheetZoom;
-            worldTile.Location -= OpenSheet.Position;
-            worldTile.Location += Bounds.Location;
-            worldTile.Size *= sheetZoom;
+            var worldTile = TranslateToWorld(rectTile);
 
             // Draws grid
             if (Bounds.Contains(worldTile))
@@ -114,11 +116,7 @@ namespace Raven.Sheet
           {
             if (SelectedSprite is Sprite sprite)
             {
-              var regionWorld = sprite.Region.ToRectangleF();
-              regionWorld.Location *= sheetZoom;
-              regionWorld.Location -= OpenSheet.Position;
-              regionWorld.Location += Bounds.Location;
-              regionWorld.Size *= sheetZoom;
+              var regionWorld = TranslateToWorld(sprite.Region.ToRectangleF());
               ImGui.GetForegroundDrawList().AddRectFilled(
                   (regionWorld.Location).ToNumerics(), 
                   (regionWorld.Location + regionWorld.Size).ToNumerics(), 
@@ -127,6 +125,7 @@ namespace Raven.Sheet
           }
           var mouseDragArea = new RectangleF();
           mouseDragArea.Location = _initialMouseOnDrag;
+
           // Multiple selection (rectangle) 
           if (input.IsDragFirst) 
           {
@@ -141,16 +140,20 @@ namespace Raven.Sheet
             var bounds = Bounds;
             bounds.Location = new Vector2();
             bounds.Size /= sheetScale;
+
             var rectTile = new RectangleF();
             rectTile.Location = mouse;
             rectTile.Size = OpenSheet.Sheet.TileSize.ToVector2();
+
             if (mouseDragArea.Intersects(bounds))
             {
               var tiled = OpenSheet.Sheet.GetTileCoordFromWorld(rectTile.X, rectTile.Y);
+              // Prevent going out of bounds
               tiled.X = Math.Min(tiled.X, OpenSheet.Sheet.Tiles.X-1);
-              tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1);
+              tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1); 
+
               if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
-              else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile, OpenSheet.Sheet);
+              else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile.RoundLocationFloor(OpenSheet.Sheet.TileSize), OpenSheet.Sheet);
             }
           }
           else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;

@@ -141,14 +141,12 @@ namespace Raven.Sheet.Sprites
     public void Rectangular(int coord)
     {
       if (!_sheet.IsTileValid(coord)) throw new Exception();
-      var list = new List<Rectangle>();
       var rect2 = _sheet.GetTile(coord);
-      list.AddIfNotPresent(Region);
-      list.AddIfNotPresent(_sheet.GetTile(coord));
       var region = Region;
       region.Width = rect2.Right - region.X;
       region.Height = rect2.Bottom - region.Y;
       Region = region.ToRectangleF().AlwaysPositive();
+      Console.WriteLine("Size: " + Region.Size);
       _tiles = _sheet.GetTiles(Region.ToRectangleF());
     }
     public override string GetIcon()

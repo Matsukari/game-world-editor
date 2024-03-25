@@ -36,7 +36,7 @@ namespace Raven.Sheet
       {
         if (layer is TileLayer tileLayer && _worldGui.IsDrawTileLayerGrid) 
         {
-          var color = (_level.CurrentLayer.Name == tileLayer.Name) ? TileActiveGridColor : TileInactiveGridColor;
+          var color = (_level.CurrentLayer != null && _level.CurrentLayer.Name == tileLayer.Name) ? TileActiveGridColor : TileInactiveGridColor;
           Guidelines.GridLines.RenderGridLines(batcher, camera, layer.Bounds.Location, color, tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
         }
       }
