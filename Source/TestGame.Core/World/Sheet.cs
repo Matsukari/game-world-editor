@@ -9,12 +9,14 @@ namespace Raven.Sheet
   /// Tree layers:spritexes, sprites, both which is dynamic, and a virtual 
   /// non-immutable in-there tiles of uniform size across the spritesheet image
   /// </summary>
-	public class Sheet : Component
+	public class Sheet : Component, IPropertied
 	{
-    public string Name = "";
+    public string Name { get; set; } = "";
+    public PropertyList Properties { get; set; } = new PropertyList();
+
     public Texture2D Texture { get => _texture; }
-		public Dictionary<String, Sprites.Spritex> Spritexes = new Dictionary<string, Sprites.Spritex>();
-		public Dictionary<String, Sprites.Sprite> Sprites = new Dictionary<String, Sprites.Sprite>();
+		public List<Sprites.Spritex> Spritexes = new List<Sprites.Spritex>();
+		public List<Sprites.Sprite> Sprites = new List<Sprites.Sprite>();
     public Dictionary<int, Sprites.Tile> TileMap { get=> _tiles;  }
     // Only instanciated when a tile (primarily a rectangle) is assigned a property or anme
 		Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
@@ -46,6 +48,7 @@ namespace Raven.Sheet
       TileWidth = w;
       TileHeight = h;
     }
+    public Sprites.Spritex GetSpritex(string name) => Spritexes.Find((spritex)=>spritex.Name == name);
     public Sprites.Tile GetCreatedTile(int coord) => _tiles[coord];
     public Sprites.Tile GetTileData(int coord) 
     {
@@ -95,18 +98,6 @@ namespace Raven.Sheet
       var spritex = new Sprites.Spritex(name, main, this);
       return spritex;
     }
-    public List<string> GetSprites(RectangleF container)
-    {
-      var tiles = new List<string>();
-      foreach (var (id, tile) in Sprites)
-      {
-        if (container.Contains(tile.Region.ToRectangleF())) 
-        { 
-          tiles.Add(id);
-        }
-      }
-      return tiles;
-    }
     public List<int> GetTiles(RectangleF container)
     {
       var tiles = new List<int>();
@@ -133,9 +124,9 @@ namespace Raven.Sheet
     bool IntersectSprite(Rectangle rect) 
     {
       bool result = false;
-      foreach (var (_, tile) in Sprites)
+      foreach (var sprite in Sprites)
       {
-        if (rect.Intersects(tile.Region)) result = true;
+        if (rect.Intersects(sprite.Region)) result = true;
       }
       return result;
     }

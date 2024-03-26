@@ -6,20 +6,30 @@ using ImGuiNET;
 namespace Raven.Sheet
 {
   // <summary>
-  // Expands as the levels are painted on
+  // Composed of Levels.
   // </summary>
-  public class World : Entity
+  public class World : Entity, IPropertied
   {
-    public Point Size 
+    string IPropertied.Name { get => Name; set => Name = value; }
+    public PropertyList Properties { get; set; } = new PropertyList();
+
+    public RectangleF Bounds 
     { 
       get 
-      { 
-        var size = new Point();
-        foreach (var level in Levels) 
-          size += level.ContentSize;
-        return size;
-      } 
+      {
+        var min = new Vector2(100000, 100000);
+        var max = new Vector2(-10000, -10000);
+        foreach (var level in Levels)
+        {
+          min.X = Math.Min(min.X, level.Bounds.X);
+          min.Y = Math.Min(min.Y, level.Bounds.Y);
+          max.X = Math.Max(max.X, level.Bounds.Right);
+          max.Y = Math.Max(max.Y, level.Bounds.Bottom);
+        }
+        return RectangleF.FromMinMax(min, max);
+      }
     }
+
     public Level CurrentLevel = null;
     public List<Level> Levels { get => Components.GetComponents<Level>(); } 
     public Dictionary<string, Sheet> SpriteSheets = new Dictionary<string, Sheet>();
@@ -48,13 +58,9 @@ namespace Raven.Sheet
       AddComponent(level);
       return level;
     }
-    public void AddSheet(Sheet sheet) { SpriteSheets.Add(sheet.Name, sheet); }
-    public void DrawArtifacts(Batcher batcher, Camera camera, Editor editor, GuiData gui)
-    {
-      if (CurrentLevel != null)
-      {
-        batcher.DrawRectOutline(camera, CurrentLevel.Bounds, editor.ColorSet.SpriteRegionActiveOutline);
-      }
+    public void AddSheet(Sheet sheet) 
+    { 
+      SpriteSheets.Add(sheet.Name, sheet); 
     }
   }
 }

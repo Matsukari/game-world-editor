@@ -7,22 +7,20 @@ namespace Raven.Sheet
 {
   public class TilePainter
   {
-    Editor _editor;
     World _world;
-    WorldGui _gui;
+    WorldEditor _worldEditor;
     List<Point> _canFillTiles = new List<Point>();
-    public TilePainter(WorldGui gui, Editor editor)
+    public TilePainter(WorldEditor gui, Editor editor)
     {
-      _gui = gui;
+      _worldEditor = gui;
       _world = gui._world;
-      _editor = editor;
     }
     public void HandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<Input.InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
-      if (_gui.SelectedSprite is Sprite sprite)
+      if (_worldEditor.SelectedSprite is Sprite sprite)
       {
         var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
         var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
@@ -35,8 +33,8 @@ namespace Raven.Sheet
           foreach (var tile in tilesToPaint)
           {
             var delta = tile.Coordinates - tileStart.Coordinates;
-                 if (_gui.PaintMode == PaintMode.Pen) tileLayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
-            else if (_gui.PaintMode == PaintMode.Eraser) tileLayer.RemoveTile(tileInLayer + delta);
+                 if (_worldEditor.PaintMode == PaintMode.Pen) tileLayer.ReplaceTile(tileInLayer + delta, new TileInstance(tile));
+            else if (_worldEditor.PaintMode == PaintMode.Eraser) tileLayer.RemoveTile(tileInLayer + delta);
           }
         }
         void PaintPreviewAt(System.Numerics.Vector2 screenPos)
@@ -50,7 +48,7 @@ namespace Raven.Sheet
         }
 
         // Show paint previews
-        switch (_gui.PaintType)
+        switch (_worldEditor.PaintType)
         {
           case PaintType.Single: PaintPreviewAt(tilePos); break;
           case PaintType.Rectangle:
@@ -58,7 +56,7 @@ namespace Raven.Sheet
             {
               ImGui.GetForegroundDrawList().AddRectFilled(
                   input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
-                  _editor.ColorSet.SpriteRegionActiveFill.Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
+                  _worldEditor.Editor.Settings.Colors.SpriteRegionActiveFill.Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
             } 
             break;
         }
@@ -69,13 +67,13 @@ namespace Raven.Sheet
           var spriteCenter = _world.Scene.Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize();
 
           // Single painting
-          if (Nez.Input.LeftMouseButtonDown && _gui.PaintType == PaintType.Single)
+          if (Nez.Input.LeftMouseButtonDown && _worldEditor.PaintType == PaintType.Single)
           {
             PaintAtLayer(tileLayer, tileLayer.GetTileCoordFromWorld(spriteCenter));
           }
 
           // Rectangle painting
-          if (_gui.PaintType == PaintType.Rectangle)
+          if (_worldEditor.PaintType == PaintType.Rectangle)
           {
             if (input.IsDragFirst) _mouseStart = _world.Scene.Camera.MouseToWorldPoint();
             if (input.IsDragLast) 
@@ -95,7 +93,7 @@ namespace Raven.Sheet
           }
 
           // Fill painting
-          if (_gui.PaintType == PaintType.Fill)
+          if (_worldEditor.PaintType == PaintType.Fill)
           {
             var tileInLayer = tileLayer.GetTileCoordFromWorld(spriteCenter); 
             var tileStart = tilesToPaint[tilesToPaint.Count/2];
@@ -115,7 +113,7 @@ namespace Raven.Sheet
           }
         }
       }
-      else if (_gui.SelectedSprite is Spritex spritex)
+      else if (_worldEditor.SelectedSprite is Spritex spritex)
       {
         foreach (var part in spritex.Body)
         {

@@ -1,6 +1,4 @@
 using Nez;
-using Nez.ImGuiTools;
-using ImGuiNET;
 
 namespace TestGame
 {
@@ -13,7 +11,7 @@ namespace TestGame
 			Screen.SetSize(1280, 720);
       Content.RootDirectory = "Assets";
        
-      var editor = AddEntity(new Raven.Sheet.Editor());
+      var editor = AddEntity(new Raven.Editor());
 
     }   
   }
