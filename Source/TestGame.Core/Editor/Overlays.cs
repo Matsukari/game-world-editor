@@ -40,7 +40,7 @@ namespace Raven.Sheet
         // update selection
         if (selectionRect.Capture is Shape theShape)
         {
-          theShape.Bounds = selectionRect.Bounds;
+          theShape.Bounds = selectionRect.ContentBounds;
         }
       }
       DrawNames(batcher, camera);

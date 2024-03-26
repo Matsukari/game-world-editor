@@ -39,12 +39,14 @@ namespace Raven.Sheet
         }
         void PaintPreviewAt(System.Numerics.Vector2 screenPos)
         { 
+
           ImGui.GetForegroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
               screenPos - sprite.Region.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom, 
               screenPos - sprite.Region.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom + sprite.Region.Size.ToVector2().ToNumerics() 
               * _world.Scene.Camera.RawZoom,
               min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+
         }
 
         // Show paint previews

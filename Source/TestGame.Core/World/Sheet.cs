@@ -9,7 +9,7 @@ namespace Raven.Sheet
   /// Tree layers:spritexes, sprites, both which is dynamic, and a virtual 
   /// non-immutable in-there tiles of uniform size across the spritesheet image
   /// </summary>
-	public class Sheet : Component, IPropertied
+	public class Sheet : IPropertied
 	{
     public string Name { get; set; } = "";
     public PropertyList Properties { get; set; } = new PropertyList();

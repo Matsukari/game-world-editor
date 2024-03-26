@@ -15,11 +15,6 @@ namespace Raven.Sheet
     public SpritexInspector LastSprite { get => _spritex; }
     SpritexInspector _spritex;
 
-    public override void OnAddedToEntity()
-    {
-      _entityHandle = Entity.Scene.CreateEntity("editor-spritex");
-    }
-        
     public override void OnContent()
     {
       RestrictTo<Sheet>();
@@ -51,11 +46,8 @@ namespace Raven.Sheet
 
       Entity.GetComponent<Utils.Components.CameraMoveComponent>().Enabled = true;
       Entity.GetComponent<Utils.Components.CameraZoomComponent>().Enabled = true;
-      _entityHandle.SetParent(Entity);
-      _spritexComponent = _entityHandle.AddComponent(spritex);
+      spritex.Entity = Entity;
     }
-    Component _spritexComponent;
-    Entity _entityHandle;
 
     // back to spritesheet view
     public void UnEdit()
@@ -73,10 +65,6 @@ namespace Raven.Sheet
     }
     void Clean()
     {
-      if (_entityHandle != null)
-      {
-        _entityHandle.RemoveAllComponents();
-      }
       Editor.GetEditorComponent<SheetSelector>().RemoveSelection();
       Editor.GetEditorComponent<Selection>().End();
       Enabled = false;
@@ -93,6 +81,7 @@ namespace Raven.Sheet
     public override void Render(Batcher batcher, Camera camera)
     {
       Guidelines.OriginLinesRenderable.Render(batcher, camera, Editor.Settings.Colors.OriginLineX, Editor.Settings.Colors.OriginLineY);
+      _spritex.Spritex.Render(batcher, camera);
     }  
     public void Render(Editor editor) 
     {

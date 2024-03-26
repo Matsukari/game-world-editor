@@ -145,7 +145,7 @@ namespace Raven.Sheet
     }
     public void Select(IPropertied sel)
     {
-      if (ContentData.ShapeSelection != null) return;
+      if (ContentData.ShapeSelection != null || Editor.GetEditorComponent<Selection>().HasBegun()) return;
       ContentData.Selection = sel;
       Console.WriteLine($"Selected {ContentData.Selection.GetType().Name}");
     }

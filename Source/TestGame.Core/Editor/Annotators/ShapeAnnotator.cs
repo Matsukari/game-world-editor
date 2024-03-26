@@ -37,7 +37,7 @@ namespace Raven.Sheet
       }
 
       // start point
-      if (input.IsDragFirst && _initialMouse == Vector2.Zero && Nez.Input.LeftMouseButtonDown)
+      if (input.IsDragFirst && _initialMouse == Vector2.Zero)
       {
         Editor.GetEditorComponent<SheetSelector>().RemoveSelection();
         _initialMouse = camera.MouseToWorldPoint();
@@ -52,7 +52,7 @@ namespace Raven.Sheet
         }
       }
       // Dragging
-      else if (input.IsDrag && Nez.Input.LeftMouseButtonDown) 
+      else if (input.IsDrag && _initialMouse != Vector2.Zero) 
       {
         Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
         ContentData.ShapeSelection.Render(Editor.PrimitiveBatch, batcher, camera, Editor.Settings.Colors.AnnotatedShapeActive);

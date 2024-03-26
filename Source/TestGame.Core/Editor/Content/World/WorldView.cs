@@ -11,9 +11,11 @@ namespace Raven.Sheet
     public bool IsEditFree = false;
     public override void OnContent()
     {
+      Entity.Scene.EntitiesOfType<World>().ForEach((world)=>world.Enabled=false);
       if (RestrictTo<World>())
       {
         _world = Content as World;
+        _world.Enabled = true;
         Entity.GetComponent<Utils.Components.CameraMoveComponent>().Enabled = true;
         Entity.GetComponent<Utils.Components.CameraZoomComponent>().Enabled = true;
       }
@@ -86,7 +88,7 @@ namespace Raven.Sheet
       for (var i = 0; i < worldEditor._levelInspectors.Count(); i++)
       {
         var level = _world.Levels[i];
-        var levelGui = worldEditor._levelInspectors[i];
+        var levelInspector = worldEditor._levelInspectors[i];
         if (!level.Enabled) continue;
 
         batcher.DrawRect(level.Bounds, Editor.Settings.Colors.LevelSheet);
@@ -108,8 +110,7 @@ namespace Raven.Sheet
           else _isOpenWorldOptions = true;
 
         }
-        level.Render(batcher, camera);
-        levelGui.Render(batcher, camera);
+        levelInspector.Render(batcher, camera);
       }
       if (selection.Capture is Level lev)
       {

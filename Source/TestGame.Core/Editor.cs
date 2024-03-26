@@ -119,6 +119,7 @@ namespace Raven
     {
       _tabs.Add(new EditorContent(content));
       _tabs.Last().Data.ShapeContext = content;
+      if (content is Entity entity && !Scene.Entities.Contains(entity)) Scene.AddEntity(entity);
     }
     public void Save() {}
     public void OpenProjectSettings() {}
