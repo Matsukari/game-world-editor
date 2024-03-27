@@ -5,17 +5,30 @@ namespace Raven
   {  
     public Animation Animation = new Animation();
     public AnimationFrame CurrentFrame { get => Animation.Frames[_currentKeyframe]; }
-    public int CurrentIndex { get => _currentKeyframe; }
+    public int CurrentIndex { 
+      get => _currentKeyframe; 
+      set
+      {
+        _currentKeyframe = Math.Max(value, 0);
+        if (IsLooping) _currentKeyframe = _currentKeyframe % Animation.TotalFrames;
+        else if (_currentKeyframe >= Animation.TotalFrames && !IsFinished) 
+        {
+          _currentKeyframe--;
+          IsFinished = true;
+          OnFinished();
+        }
+      }
+    }
 
     public event Action OnKeyframeChanged;
     public event Action OnFinished;
 
     int _currentKeyframe = 0;
-    float _frameTimer = 0;
-    bool IsPaused = true;
-    bool IsFinished = false;
-    bool IsReversed = false;
-    bool IsLooping = false;
+    public float _frameTimer = 0;
+    public bool IsPaused = true;
+    public bool IsFinished = false;
+    public bool IsReversed = false;
+    public bool IsLooping = false;
 
     public bool Paused;
 
@@ -39,18 +52,10 @@ namespace Raven
       if (_frameTimer >= Animation.Frames[_currentKeyframe].Duration)
       {
         _frameTimer = 0;
-        _currentKeyframe++;
+        CurrentIndex++;
         OnKeyframeChanged();
-        if (IsLooping) _currentKeyframe = _currentKeyframe % Animation.TotalFrames;
-        else if (_currentKeyframe >= Animation.TotalFrames && !IsFinished) 
-        {
-          _currentKeyframe--;
-          IsFinished = true;
-          OnFinished();
-        }
       }
     }
-
   }
 
 }

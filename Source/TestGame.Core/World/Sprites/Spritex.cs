@@ -13,7 +13,7 @@ namespace Raven.Sheet.Sprites
     public List<Animation> Animations = new List<Animation>();
     public List<SourcedSprite> Parts = new List<SourcedSprite>();
     public List<SourcedSprite> Body { get => Parts; }
-        
+       
     public Spritex(string name, SourcedSprite main, Sheet sheet) 
     {
       Name = name;
@@ -55,6 +55,24 @@ namespace Raven.Sheet.Sprites
           return EnclosingBounds;
         }
       }
+    }
+    public List<SourcedSprite> DuplicateParts()
+    {
+      var list = new List<SourcedSprite>();
+      foreach (var part in Parts) list.Add(part.Duplicate());
+      return list;
+    }
+    public void AddFrame(string anim, SpritexAnimationFrame frame)
+    {
+      GetAnimation(anim)?.Frames.Add(frame);
+    }
+    public Animation GetAnimation(string anim) => Animations.Find((animation)=>animation.Name == anim);
+    public void InsertFrame(string anim, int index, SpritexAnimationFrame frame)
+    {
+      var animation = GetAnimation(anim);
+      if (index < 0 || index > animation.TotalFrames) return;
+      // else if (index == animation.TotalFrames) AddFrame(anim, frame);
+      animation.Frames.Insert(index, frame);
     }
     public SourcedSprite AddSprite(string name, SourcedSprite sprite=null) 
     {

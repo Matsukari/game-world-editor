@@ -19,10 +19,6 @@ namespace Raven.Sheet
     }
     protected override void OnRenderAfterName()
     {
-      if (Animator.Animation.TotalFrames > 0 && Animator.CurrentFrame is SpriteAnimationFrame spriteFrame)     
-      {
-        spriteFrame.Transform.RenderImGui();
-      }
     }
   }
 }

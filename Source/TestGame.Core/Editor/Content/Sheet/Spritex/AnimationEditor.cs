@@ -11,6 +11,9 @@ namespace Raven.Sheet
     AnimationPlayer _player;
     public Animation Animation;
     public Spritex Spritex;
+    public bool IsOpen { get => _player != null; }
+    public SpritexAnimationFrame SelectedFrame;
+
     public AnimationEditor()
     {
       _frameInspector = new AnimationFrameInspector(this);
@@ -27,6 +30,13 @@ namespace Raven.Sheet
     {
       _player = null;
     }
+    public void AddFrameFromCurrentState()
+    {
+      if (!IsOpen) return;
+      var frame = new SpritexAnimationFrame(Spritex);
+      var index = _player.CurrentIndex;
+      Spritex.InsertFrame(Animation.Name, index, frame);
+    }
     public override void OnContent()
     {
       RestrictTo<Sheet>();
@@ -36,8 +46,11 @@ namespace Raven.Sheet
       _inspector.Animator = _player;
       _inspector.Render(editor);  
 
-      _frameInspector.Animator = _player;
-      _frameInspector.Render(editor);
+      if (SelectedFrame != null)
+      {
+        _frameInspector.Animator = _player;
+        _frameInspector.Render(editor);
+      }
 
       if (_player != null) _player.Update();
     } 
