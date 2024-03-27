@@ -5,6 +5,10 @@ namespace Raven.Sheet
 {
   public class EditorColors
   {
+    public uint FrameInactive { get => Get(ImGuiCol.TextDisabled); }
+    public uint FrameActive { get => Get(ImGuiCol.Text); }
+
+
     public Color OriginLineX = new Color(0.5f, 0.5f, 0.5f, 1f);
     public Color OriginLineY = new Color(0.5f, 0.5f, 0.5f, 1f);
 

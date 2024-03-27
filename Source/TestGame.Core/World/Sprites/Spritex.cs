@@ -67,12 +67,14 @@ namespace Raven.Sheet.Sprites
       GetAnimation(anim)?.Frames.Add(frame);
     }
     public Animation GetAnimation(string anim) => Animations.Find((animation)=>animation.Name == anim);
+
+    // Insert after the element
     public void InsertFrame(string anim, int index, SpritexAnimationFrame frame)
     {
       var animation = GetAnimation(anim);
       if (index < 0 || index > animation.TotalFrames) return;
-      // else if (index == animation.TotalFrames) AddFrame(anim, frame);
-      animation.Frames.Insert(index, frame);
+      else if (index == animation.TotalFrames) AddFrame(anim, frame);
+      else animation.Frames.Insert(++index, frame);
     }
     public SourcedSprite AddSprite(string name, SourcedSprite sprite=null) 
     {

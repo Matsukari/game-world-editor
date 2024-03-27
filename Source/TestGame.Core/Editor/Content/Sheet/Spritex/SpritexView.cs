@@ -62,6 +62,7 @@ namespace Raven.Sheet
       Clean();
       Editor.GetEditorComponent<SheetView>().Enabled = true;
       Editor.GetEditorComponent<SheetView>()._inspector.ShowPicker = false; 
+      Editor.GetEditorComponent<AnimationEditor>().Close();
 
       // Sotre last state
       _spritex.GuiPosition = Entity.Scene.Camera.Position;

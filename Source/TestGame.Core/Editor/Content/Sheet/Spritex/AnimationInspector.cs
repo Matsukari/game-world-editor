@@ -50,23 +50,24 @@ namespace Raven.Sheet
       Widget.ImGuiWidget.DelegateButton(IconFonts.FontAwesome5.Key, ()=>_animEditor.AddFrameFromCurrentState());
 
       ImGui.BeginChild("animation-content");
-
       _trackContentMin = ImGui.GetItemRectMax();
+      var childSize = ImGui.GetWindowSize() - _trackContentMin;
 
-
-      // DrawFrameHeader();
-
-      // Draw line below
-      // var style = ImGui.GetStyle();
-      // var max = new System.Numerics.Vector2();
-      // max.X = _trackContentMin.X;
-      // max.Y = ImGui.GetWindowHeight() ;
-      // ImGui.GetWindowDrawList().AddLine(_trackContentMin.ToNumerics(), max, EditorColors.Get(ImGuiCol.Separator));
-
-      DrawComponentsTrack();
+      if (Animator.Animation.TotalFrames > 0)
+        DrawComponentsTrack();
+      else 
+      {
+        var msg = "This animation contains no frames yet. ";
+        var msgSize = ImGui.CalcTextSize(msg);
+        ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowWidth()/2-msgSize.X/2, childSize.Y/2-msgSize.Y/2));
+        ImGui.SameLine();
+        ImGui.TextDisabled(msg);
+      }
 
       ImGui.EndChild();
-    }
+   }
+    bool _isOpenFrameOptions = false;
+    SpritexAnimationFrame _frameOnOpenOptions = null;
     void DrawComponentsTrack()
     {
       ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(2, 2));
@@ -94,7 +95,19 @@ namespace Raven.Sheet
             var frameSet = Animator.Animation.Frames[j] as SpritexAnimationFrame;
             var frame = frameSet.Parts[i];
 
+            var color = (Animator.CurrentIndex == j) ? _animEditor.Editor.Settings.Colors.FrameActive : _animEditor.Editor.Settings.Colors.FrameInactive;
+            ImGui.PushStyleColor(ImGuiCol.Text, color);
             ImGui.Text(IconFonts.FontAwesome5.Circle);
+            ImGui.PopStyleColor();
+            
+            var name = (frameSet.Name != string.Empty) ? frameSet.Name : "No name";
+            Widget.ImGuiWidget.TextTooltip($"{name} ({j})");
+            if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) _animEditor.SelectFrame(j);
+            if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
+            {
+              _isOpenFrameOptions = true;
+              _frameOnOpenOptions = frameSet;
+            } 
             Widget.ImGuiWidget.SpanX(10f);
           }
 
@@ -111,6 +124,7 @@ namespace Raven.Sheet
         var frame = Animator.Animation.Frames[i];
         ImGui.Text(i.ToString());
         Widget.ImGuiWidget.SpanX(10f);
+
       }
     }
 

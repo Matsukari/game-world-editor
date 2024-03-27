@@ -10,13 +10,18 @@ namespace Raven
       set
       {
         _currentKeyframe = Math.Max(value, 0);
-        if (IsLooping) _currentKeyframe = _currentKeyframe % Animation.TotalFrames;
-        else if (_currentKeyframe >= Animation.TotalFrames && !IsFinished) 
+        if (IsLooping) 
+        {
+          _currentKeyframe = _currentKeyframe % Animation.TotalFrames;
+          return;
+        } 
+        if (_currentKeyframe >= Animation.TotalFrames && !IsFinished) 
         {
           _currentKeyframe--;
           IsFinished = true;
-          OnFinished();
+          if (OnFinished != null) OnFinished();
         }
+        _currentKeyframe = Math.Min(_currentKeyframe, Animation.TotalFrames-1);
       }
     }
 
@@ -30,7 +35,7 @@ namespace Raven
     public bool IsReversed = false;
     public bool IsLooping = false;
 
-    public bool Paused;
+    public bool Paused = true;
 
     public void Start() 
     {
@@ -46,14 +51,14 @@ namespace Raven
     public void Update() => Update(Nez.Time.DeltaTime);
     public void Update(float dt)
     {
-      if (IsPaused && Animation.TotalFrames <= 0) return;
+      if (IsPaused || Animation.TotalFrames <= 0) return;
 
       _frameTimer += dt;
       if (_frameTimer >= Animation.Frames[_currentKeyframe].Duration)
       {
         _frameTimer = 0;
         CurrentIndex++;
-        OnKeyframeChanged();
+        if (OnKeyframeChanged != null) OnKeyframeChanged();
       }
     }
   }
