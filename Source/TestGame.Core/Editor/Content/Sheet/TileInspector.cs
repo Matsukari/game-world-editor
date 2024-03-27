@@ -6,6 +6,8 @@ namespace Raven.Sheet
   public class TileInspector : Widget.PropertiedWindow
   { 
     public override string Name { get => Tile.Name; set => Tile.Name = value;}
+    public override PropertyList Properties { get => Tile.Properties; set => Tile.Properties = value; }
+
     public Tile Tile;
     public override void Render(Editor editor)
     {

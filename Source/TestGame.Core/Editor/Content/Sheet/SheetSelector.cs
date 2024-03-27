@@ -59,25 +59,25 @@ namespace Raven.Sheet
           }
           ImGui.EndMenu();
         }
-        // Has opened and made operation to last spritex' part
-        if (spritexView.LastSprite != null)
-        {
-          if (ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Add to last Spritex"))
-          {
-            _spritexOnName = spritexView.LastSprite.Spritex;
-            OpenPopup("spritex-part-name");
-            return;
-          }
-          if (spritexView.LastSprite.ChangePart != null && ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Change last Spritex part"))
-          {
-            ImGui.EndPopup();
-            ImGui.CloseCurrentPopup();
-            spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name] = new Sprites.SourcedSprite(spritexView.LastSprite.Spritex, sprite);
-            spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name].Name = spritexView.LastSprite.ChangePart.Name;
-            spritexView.Edit(spritexView.LastSprite.Spritex);
-            return;
-          }
-        }
+        // // Has opened and made operation to last spritex' part
+        // if (spritexView.LastSprite != null)
+        // {
+        //   if (ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Add to last Spritex"))
+        //   {
+        //     _spritexOnName = spritexView.LastSprite.Spritex;
+        //     OpenPopup("spritex-part-name");
+        //     return;
+        //   }
+        //   if (spritexView.LastSprite.ChangePart != null && ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Change last Spritex part"))
+        //   {
+        //     ImGui.EndPopup();
+        //     ImGui.CloseCurrentPopup();
+        //     spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name] = new Sprites.SourcedSprite(spritexView.LastSprite.Spritex, sprite);
+        //     spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name].Name = spritexView.LastSprite.ChangePart.Name;
+        //     spritexView.Edit(spritexView.LastSprite.Spritex);
+        //     return;
+        //   }
+        // }
         ImGui.EndPopup();
       }
 

@@ -24,7 +24,7 @@ Implement polygon shape
 ~Add other parts~
 ~Delete, name, change parts~
 ~Transform whole body~
-Pick parts directly from canvas
+~Pick parts directly from canvas~
 Order parts
 Rotate parts on selection
 Implemente animation
@@ -83,6 +83,7 @@ Undo & redo
 Shape & tile separate selection
 Separate transform operations
 Copy & paste shapes & parts 
+Fix selection points
 Fix primitive rendering order
 Fix camera bounds culling
 Optimize super big rendering

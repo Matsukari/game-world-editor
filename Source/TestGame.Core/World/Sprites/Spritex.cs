@@ -9,15 +9,14 @@ namespace Raven.Sheet.Sprites
     public PropertyList Properties { get; set; } = new PropertyList();
 
     internal Sheet _sheet;
-    public string Name;
-    public SpriteMap Parts = new SpriteMap();
-    public List<SourcedSprite> Body { get => new List<SourcedSprite>(Parts.Data.Values); } 
+    public string Name = "";
+    public List<SourcedSprite> Parts = new List<SourcedSprite>();
+    public List<SourcedSprite> Body { get => Parts; } 
 
     public Spritex(string name, SourcedSprite main, Sheet sheet) 
     {
       Name = name;
-      Parts.Add(name, main);
-      main.Spritex = this;
+      AddSprite("Main component", main);
       _sheet = sheet;
     }
     public RectangleF EnclosingBounds
@@ -63,8 +62,15 @@ namespace Raven.Sheet.Sprites
         sprite = new SourcedSprite();
       }
       sprite.Spritex = this;
-      Parts.Add(name, sprite);
+      sprite.Name = name;
+      Parts.Add(sprite);
       return sprite;
+    }
+    public void RemoveSprite(string name)
+    {
+      int remove = -1;
+      for (int i = 0; i < Parts.Count(); i++) if (Parts[i].Name == name) remove = i;
+      if (remove != -1) Parts.RemoveAt(remove);
     }
     public override void Render(Batcher batcher, Camera camera)
     {
@@ -87,7 +93,6 @@ namespace Raven.Sheet.Sprites
       Spritex spritex = base.Clone() as Spritex;
       spritex.Entity = Entity;
       spritex._sheet = _sheet;
-      spritex.Parts = Parts.Duplicate();
       return spritex;
     }
         

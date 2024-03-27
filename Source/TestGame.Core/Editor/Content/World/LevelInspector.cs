@@ -7,6 +7,8 @@ namespace Raven.Sheet
   public class LevelInspector : Widget.PropertiedWindow
   {
     public override string Name { get => _level.Name; set => _level.Name = value;}
+    public override PropertyList Properties { get => _level.Properties; set => _level.Properties = value; }
+
     internal Level _level;
     internal WorldEditor _worldEditor;
     internal List<bool> _levelSelected = new List<bool>();

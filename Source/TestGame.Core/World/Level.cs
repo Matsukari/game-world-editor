@@ -5,8 +5,11 @@ using Nez;
 
 namespace Raven.Sheet
 {
-  public class Level : RenderableComponent
+  public class Level : RenderableComponent, IPropertied
   {
+    string IPropertied.Name { get => Name; set => Name = value; }
+    public PropertyList Properties { get; set; } = new PropertyList();
+
     public string Name = "default";
     public Point ContentSize = new Point(Screen.Width, Screen.Height);
     public World World { get; private set; }

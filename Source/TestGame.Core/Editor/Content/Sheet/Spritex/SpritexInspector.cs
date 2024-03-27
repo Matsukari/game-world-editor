@@ -9,6 +9,7 @@ namespace Raven.Sheet.Sprites
   public class SpritexInspector : Widget.PropertiedWindow
   {
     public override string Name { get => Spritex.Name; set => Spritex.Name = value; }
+    public override PropertyList Properties { get => Spritex.Properties; set => Spritex.Properties = value; }
     
     public SourcedSprite ChangePart = null;
     SourcedSprite  _spritexPart;
@@ -33,6 +34,11 @@ namespace Raven.Sheet.Sprites
     }
     void RenderSprite(SourcedSprite sprite)
     {
+      string name = sprite.Name;
+      if (ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
+      {
+        sprite.Name = name;
+      }
       ImGui.BeginDisabled();
         if (sprite.SourceSprite.Name != "") ImGui.LabelText("Source", sprite.SourceSprite.Name);
         ImGui.LabelText("Region", sprite.SourceSprite.Region.RenderStringFormat());
@@ -53,65 +59,125 @@ namespace Raven.Sheet.Sprites
         if (ImGui.InputFloat2("Origin", ref origin)) sprite.Origin = origin;
       }
     }
+    bool _isOpenComponentOptionPopup = false;
+    SourcedSprite _compOnOptions = null;
+    void DrawOptions()
+    {
+      if (_isOpenComponentOptionPopup)
+      {
+        _isOpenComponentOptionPopup = false;
+        ImGui.OpenPopup("sprite-component-options");
+      }
+      if (ImGui.BeginPopupContextItem("sprite-component-options") && _compOnOptions != null)
+      {
+        var lockState = (_compOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
+        if (ImGui.MenuItem(lockState))
+        {
+          _compOnOptions.IsLocked = !_compOnOptions.IsLocked;
+        }
+        var visib = (_compOnOptions.IsVisible) ? IconFonts.FontAwesome5.EyeSlash + "  Hide" : IconFonts.FontAwesome5.Eye + "  Show";
+        if (ImGui.MenuItem(visib))
+        {
+          _compOnOptions.IsVisible = !_compOnOptions.IsVisible;
+        }
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
+        {
+          _compOnOptions.DetachFromSpritex();
+        }
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate"))
+        {
+          ImGui.CloseCurrentPopup();
+        }
+        ImGui.EndPopup();
+      }
+    }
+    void DrawComponentOptions(SourcedSprite sprite, ref SourcedSprite removeSprite)
+    {
+      // Options next to name
+      ImGui.SameLine();
+      ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(sprite.Name).X - 140, 0f));
+      ImGui.SameLine();
+      ImGui.PushID($"spritex-component-{sprite.Name}-options");
+      var visibState = (!sprite.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
+      if (ImGui.SmallButton(visibState))
+      {
+        sprite.IsVisible = !sprite.IsVisible;
+      }
+      ImGui.SameLine();
+      var lockState = (!sprite.IsLocked) ? IconFonts.FontAwesome5.LockOpen: IconFonts.FontAwesome5.Lock;
+      if (ImGui.SmallButton(lockState))
+      {
+        sprite.IsLocked = !sprite.IsLocked;
+      }
+      ImGui.SameLine();
+      if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
+      {
+        removeSprite = sprite;
+      }
+      ImGui.PopID();
 
+    }
+    List<bool> _selectedSprites = new List<bool>();
     protected override void OnRenderAfterName()
     {
+      if (_selectedSprites.Count() != Spritex.Parts.Count)
+      {
+        _selectedSprites.Clear();
+        foreach (var sprite in Spritex.Parts) _selectedSprites.Add(false);
+      }
       Transform.RenderImGui(Spritex.Transform);
       if (ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen))
       {
       }
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
-        foreach (var part in Spritex.Body)
+        ImGui.BeginChild($"spritex-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+
+        SourcedSprite removeSprite = null;
+        for (int i = 0; i < _selectedSprites.Count; i++)
         {
-          if (ImGui.TreeNodeEx(part.Name, ImGuiTreeNodeFlags.FramePadding | ImGuiTreeNodeFlags.DefaultOpen))
+          var part = Spritex.Parts[i];
+          var isSelected = _selectedSprites[i];
+          var flags = ImGuiTreeNodeFlags.AllowItemOverlap | ImGuiTreeNodeFlags.NoTreePushOnOpen 
+            | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick; 
+          if (isSelected) flags |= ImGuiTreeNodeFlags.Selected;
+          
+          var spriteNode = ImGui.TreeNodeEx(part.Name, flags);
+
+          if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen())
+          {
+            // Reset selection
+            if (!ImGui.GetIO().KeyCtrl)
+            {
+              for (int j = 0; j < _selectedSprites.Count; j++) _selectedSprites[j] = false;
+            }
+            _selectedSprites[i] = true;
+          }
+
+          DrawComponentOptions(part, ref removeSprite);
+
+          if (spriteNode)
           {
             if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
             {
-              ImGui.TreePop();
-              ImGui.OpenPopup("sprite-component-options");
-              _spritexPart = part;
-              return;
+              _isOpenComponentOptionPopup = true;
+              _compOnOptions = part;
             }
-            ImGui.PushID("spritex-component-name" + part.Name);
-            string name = part.Name;
-            if (ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
-            {
-              Spritex.Parts.Data.ChangeKey(part.Name, name);
-              part.Name = name;
-            }
-            ImGui.PopID();
+            ImGui.PushID("spritex-component-content-" + part.Name);
             RenderSprite(part);
+            ImGui.PopID();
 
-            // Options
             ImGui.TreePop();
           }
           if (part.WorldBounds.Contains(_view.Entity.Scene.Camera.MouseToWorldPoint()) && Nez.Input.RightMouseButtonPressed)
           {
-            ImGui.OpenPopup("sprite-component-options");
-            _spritexPart = part;
+            _isOpenComponentOptionPopup = true;
+            _compOnOptions = part;
           }
         }
-        if (ImGui.BeginPopupContextItem("sprite-component-options"))
-        {
-          if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
-          {
-            Console.WriteLine("Deleteing " + _spritexPart.Name);
-            Spritex.Parts.Data.Remove(_spritexPart.Name);
-            ImGui.CloseCurrentPopup();
-          }
-          if (ImGui.MenuItem(IconFonts.FontAwesome5.Edit + "  Change region"))
-          {
-            ChangePart = _spritexPart;
-            _view.UnEdit();
-            ImGui.CloseCurrentPopup();
-          }
-          if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate"))
-          {
-            ImGui.CloseCurrentPopup();
-          }
-          ImGui.EndPopup();
-        }
+        ImGui.EndChild();
+        DrawOptions();
+        if (removeSprite != null) removeSprite.DetachFromSpritex();
       }
     }
     public override string GetIcon()

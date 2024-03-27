@@ -8,6 +8,8 @@ namespace Raven.Sheet
   public class WorldInspector : Widget.PropertiedWindow
   {
     public override string Name { get => World.Name; set => World.Name = value;}
+    public override PropertyList Properties { get => World.Properties; set => World.Properties = value; }
+
     Editor _editor;
     public World World;
     public WorldEditor WorldEditor;

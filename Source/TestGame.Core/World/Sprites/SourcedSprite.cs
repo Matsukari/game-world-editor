@@ -15,6 +15,8 @@ namespace Raven.Sheet.Sprites
     public SpriteEffects SpriteEffects;
     public Vector2 Origin = new Vector2();
     public Color Color = Color.White;
+    public bool IsVisible = true;
+    public bool IsLocked = false;
 
     // Local bounds
     public RectangleF LocalBounds { 
@@ -37,6 +39,10 @@ namespace Raven.Sheet.Sprites
     {
       Spritex = spritex;
       SourceSprite = sprite;
+    }
+    public void DetachFromSpritex()
+    {
+      Spritex.RemoveSprite(Name);
     }
     public SourcedSprite Duplicate()
     {

@@ -6,6 +6,8 @@ namespace Raven.Sheet
   public class SpriteInspector: Widget.PropertiedWindow
   {
     public override string Name { get => Sprite.Name; set => Sprite.Name = value;}
+    public override PropertyList Properties { get => Sprite.Properties; set => Sprite.Properties = value; }
+
     public Sprite Sprite;
     public override void Render(Editor editor)
     {

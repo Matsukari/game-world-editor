@@ -4,7 +4,7 @@ namespace Raven.Widget
 {
   public class PropertiedWindow : Window, IPropertied, IImGuiRenderable
   {
-    public PropertyList Properties { get; set; } = new PropertyList();
+    public virtual PropertyList Properties { get; set; } = new PropertyList();
     public virtual new string Name { get; set; } = "";
     public PropertiedWindow() => Flags = ImGuiWindowFlags.NoFocusOnAppearing;
 

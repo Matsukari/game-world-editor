@@ -28,6 +28,7 @@ namespace Raven.Sheet
     }
     public override void OnContent()
     {
+      _inspector._editor  = Editor;
       RenderLayer = -1;
       if (_image != null) Entity.RemoveComponent(_image);
       if (RestrictTo<Sheet>())

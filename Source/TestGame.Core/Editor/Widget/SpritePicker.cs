@@ -15,6 +15,14 @@ namespace Raven.Sheet
     public uint HoverTileFillColor = 0;
     public bool Selected = false;
     public SheetPickerData(Sheet sheet) => Sheet = sheet;
+    public SheetPickerData(Sheet sheet, EditorColors colors) 
+    {
+      Sheet = sheet;
+      GridColor = colors.GridOutline.ToImColor();
+      HoverTileBorderColor = colors.PickHoverOutline.ToImColor();
+      HoverTileFillColor = colors.PickHover.ToImColor();
+    }
+
   }
   public class SpritePicker
   {
@@ -29,10 +37,11 @@ namespace Raven.Sheet
     public Action OnSelectRightMouseClick = null;
 
     public bool isPickOnlyTile = false;
-    public bool enabledRectangleSelect = true;
+    public bool IsHoverSelected = false;
+    public bool EnableReselect = true;
 
     Vector2 _initialMouseOnDrag = Vector2.Zero;
-    public void Draw()
+    public void Draw(RectangleF preBounds)
     {
       var input = Core.GetGlobalManager<Input.InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
@@ -48,8 +57,8 @@ namespace Raven.Sheet
 
       // Begin picker
       ImGui.Begin("sheet-picker", ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoMove);
-      ImGui.SetWindowSize(new System.Numerics.Vector2(450, 450));
-      ImGui.SetWindowPos(new System.Numerics.Vector2(0f, Screen.Height-ImGui.GetWindowHeight()-28));
+      ImGui.SetWindowSize(preBounds.Size.ToNumerics());
+      ImGui.SetWindowPos(new System.Numerics.Vector2(preBounds.X, preBounds.Y));
       ImGui.SetWindowFocus();
 
       Bounds.Location = ImGui.GetWindowPos();
@@ -118,6 +127,8 @@ namespace Raven.Sheet
           {
             if (SelectedSprite is Sprite sprite)
             {
+              IsHoverSelected = false;
+              if (sprite.Region.Contains(mouse)) IsHoverSelected = true;
               var regionWorld = TranslateToWorld(sprite.Region.ToRectangleF());
               ImGui.GetForegroundDrawList().AddRectFilled(
                   (regionWorld.Location).ToNumerics(), 
@@ -129,12 +140,12 @@ namespace Raven.Sheet
           mouseDragArea.Location = _initialMouseOnDrag;
 
           // Multiple selection (rectangle) 
-          if (input.IsDragFirst) 
+          if (input.IsDragFirst && (EnableReselect || !IsHoverSelected))
           {
             _initialMouseOnDrag = mouse;
             SelectedSprite = null;
           }
-          else if (input.IsDrag)
+          else if (input.IsDrag && _initialMouseOnDrag != Vector2.Zero)
           {
             mouseDragArea.Size = (mouse - _initialMouseOnDrag);
             mouseDragArea = mouseDragArea.AlwaysPositive();
@@ -171,7 +182,7 @@ namespace Raven.Sheet
           ImGui.EndTabItem();
         }
         var grid = false;
-        if (ImGui.BeginTabItem("Spritexes"))
+        if (!isPickOnlyTile && ImGui.BeginTabItem("Spritexes"))
         {
           ImGuiViews.ButtonSetFlat(new List<(string, Action)>{
               (IconFonts.FontAwesome5.ThLarge, ()=>{grid=true;}),

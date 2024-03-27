@@ -14,15 +14,21 @@ namespace Raven.Sheet
   {
     public SpritexInspector LastSprite { get => _spritex; }
     SpritexInspector _spritex;
+    SpritexSpritePicker _picker;
 
     public override void OnContent()
     {
-      RestrictTo<Sheet>();
+      if (RestrictTo<Sheet>())
+      {
+        _picker = new SpritexSpritePicker(this);
+        Editor.GetEditorComponent<SheetView>()._inspector.SpritePicker.HandleSelectedSprite = _picker.HandleSelectedSprite;
+      }
       Clean();
     }        
     // Go to canvas and close spritesheet view
     public void Edit(Sprites.Spritex spritex)
     {
+
       // came from sheet
       if (!Enabled)
       {
@@ -39,6 +45,7 @@ namespace Raven.Sheet
       ContentData.Selection = spritex;
       ContentData.ShapeContext = spritex;
       Editor.GetEditorComponent<SheetView>().Enabled = false;
+      Editor.GetEditorComponent<SheetView>()._inspector.ShowPicker = true; 
   
       // Rsetore last state
       Entity.Scene.Camera.Position = _spritex.GuiPosition;
@@ -54,6 +61,7 @@ namespace Raven.Sheet
     {
       Clean();
       Editor.GetEditorComponent<SheetView>().Enabled = true;
+      Editor.GetEditorComponent<SheetView>()._inspector.ShowPicker = false; 
 
       // Sotre last state
       _spritex.GuiPosition = Entity.Scene.Camera.Position;

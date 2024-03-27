@@ -1,3 +1,5 @@
+using Nez;
+
 
 namespace Raven.Sheet
 {
@@ -77,7 +79,7 @@ namespace Raven.Sheet
       // Render window of current level
       if (SelectedLevel != -1) _levelInspectors[SelectedLevel].Render(editor);
 
-      _spritePicker.Draw();
+      _spritePicker.Draw(new Nez.RectangleF(0f, Screen.Height-450-28, 450, 450));
 
 
     }
