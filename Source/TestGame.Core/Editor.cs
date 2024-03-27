@@ -56,6 +56,7 @@ namespace Raven
           new StatusBar(),
           new SpritexView(),
           new ShapeAnnotator(),
+          new AnimationEditor(),
           new WorldView(),
           new WorldEditor());
       Switch(0); 

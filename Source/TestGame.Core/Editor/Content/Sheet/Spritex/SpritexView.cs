@@ -93,8 +93,6 @@ namespace Raven.Sheet
     }  
     public void Render(Editor editor) 
     {
-      Editor.GetEditorComponent<SheetView>()._inspector.Render(editor);
-      _spritex.Render(editor);
 
       if (Nez.Input.RightMouseButtonPressed)
       {
@@ -119,6 +117,8 @@ namespace Raven.Sheet
         }
         ImGui.EndPopup();
       }
+      Editor.GetEditorComponent<SheetView>()._inspector.Render(editor);
+      _spritex.Render(editor);
     }
     Vector2 _initialScale = new Vector2();
     void HandleSelection()

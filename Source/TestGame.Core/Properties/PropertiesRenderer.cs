@@ -15,6 +15,47 @@ namespace Raven
       ("Boolean", typeof(bool)),
       ("Color", typeof(Color)),
     };
+    public static void RenderBestMatch(string name, ref object propertyData)
+    {
+      // Property value itself is the data
+      if (propertyData.GetType().IsPrimitive)
+      {
+        switch (propertyData)
+        {
+          case int intValue: 
+            if (ImGui.InputInt(name, ref intValue)) 
+            {
+              propertyData = intValue;
+            }
+            break;
+          case bool boolValue: 
+            if (ImGui.Button(name)) 
+            {
+              boolValue = !boolValue;
+              propertyData = boolValue;
+            }
+            break;
+          case float floatValue: 
+            if (ImGui.InputFloat(name, ref floatValue)) 
+            {
+              propertyData = floatValue;
+            }
+            break;
+        }
+      }
+      else if (propertyData is Vector2 vector)
+      {
+        var vecNum = vector.ToNumerics();
+        if (ImGui.InputFloat2(name, ref vecNum)) propertyData = vecNum;
+      }
+      else if (propertyData is string stringValue)
+      {
+        if (ImGui.InputText(name, ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
+        {
+          propertyData = stringValue;
+        }
+      }
+    }
     public static bool Render(Editor editor, IPropertied propertied)
     {
       string changedName = null;
@@ -105,25 +146,31 @@ namespace Raven
         // Attribute that must be present in the property to be queried and placed as renderable imgui component
         var attr = (PropertiedInputAttribute)subPropertyInfo.GetCustomAttribute<PropertiedInputAttribute>(false);
         if (attr == null) continue;
-
-        var subProperty = subPropertyInfo.GetValue(propertyData);
-        var subPropertyName = subPropertyInfo.Name;
-        switch (subProperty)
-        {
-          case RectangleF rectProperty: 
-            var numerics = rectProperty.ToNumerics();
-            if (ImGui.InputFloat4(subPropertyName, ref numerics))
-              subPropertyInfo.SetValue(propertyData, numerics.ToRectangleF()); 
-            return true;
-          case Vector2 vecProperty: 
-            var vecNum = vecProperty.ToNumerics();
-            if (ImGui.InputFloat2(subPropertyName, ref vecNum))
-              subPropertyInfo.SetValue(propertyData, vecNum.ToVector2()); 
-            return true;
-        }
+        RenderHardTypes(subPropertyInfo, propertyData);
       }
       return false;
     }
+    static bool RenderHardTypes(PropertyInfo subPropertyInfo, object propertyData)
+    {
+      var subProperty = subPropertyInfo.GetValue(propertyData);
+      var subPropertyName = subPropertyInfo.Name;
+      switch (subProperty)
+      {
+        case RectangleF rectProperty: 
+          var numerics = rectProperty.ToNumerics();
+          if (ImGui.InputFloat4(subPropertyName, ref numerics))
+            subPropertyInfo.SetValue(propertyData, numerics.ToRectangleF()); 
+          return true;
+        case Vector2 vecProperty: 
+          var vecNum = vecProperty.ToNumerics();
+          if (ImGui.InputFloat2(subPropertyName, ref vecNum))
+            subPropertyInfo.SetValue(propertyData, vecNum.ToVector2()); 
+          return true;
+      }
+      return false;
+    }
+
+
     static Type _pickedPropertyType = null;
     public static bool HandleNewProperty(IPropertied propertied, Editor editor)
     {

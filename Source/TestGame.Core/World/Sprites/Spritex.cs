@@ -10,9 +10,10 @@ namespace Raven.Sheet.Sprites
 
     internal Sheet _sheet;
     public string Name = "";
+    public List<Animation> Animations = new List<Animation>();
     public List<SourcedSprite> Parts = new List<SourcedSprite>();
-    public List<SourcedSprite> Body { get => Parts; } 
-
+    public List<SourcedSprite> Body { get => Parts; }
+        
     public Spritex(string name, SourcedSprite main, Sheet sheet) 
     {
       Name = name;

@@ -184,7 +184,7 @@ namespace Raven.Sheet
         var grid = false;
         if (!isPickOnlyTile && ImGui.BeginTabItem("Spritexes"))
         {
-          ImGuiViews.ButtonSetFlat(new List<(string, Action)>{
+          Widget.ImGuiWidget.ButtonSetFlat(new List<(string, Action)>{
               (IconFonts.FontAwesome5.ThLarge, ()=>{grid=true;}),
               (IconFonts.FontAwesome5.GripLines, ()=>{grid=false;}),
           });

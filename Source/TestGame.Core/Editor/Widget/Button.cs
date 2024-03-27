@@ -1,8 +1,8 @@
 using ImGuiNET;
 
-namespace Raven.Sheet
+namespace Raven.Widget
 { 
-  public partial class ImGuiViews
+  public partial class ImGuiWidget
   {
     public static void ButtonSetFlat(List<(string, Action)> actions, float span = 10)
     {

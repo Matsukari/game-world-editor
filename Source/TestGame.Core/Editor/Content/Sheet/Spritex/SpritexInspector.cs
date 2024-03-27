@@ -117,17 +117,54 @@ namespace Raven.Sheet.Sprites
       ImGui.PopID();
 
     }
+    void DrawAnimationOptionPopup()
+    {
+      if (_isOpenAnimationOptionPopup)
+      {
+        _isOpenAnimationOptionPopup = false;
+        ImGui.CloseCurrentPopup();
+        ImGui.OpenPopup("animation-options-popup");
+      }
+      if (ImGui.BeginPopup("animation-options-popup"))
+      {
+        if (ImGui.MenuItem("Create Animation"))
+        {
+          Spritex.Animations.Add(new Animation("new-animation"));
+        }
+        ImGui.EndPopup();
+      }
+    }
     List<bool> _selectedSprites = new List<bool>();
+    List<bool> _selectedAnims = new List<bool>();
+    bool _isOpenAnimationOptionPopup = false;
     protected override void OnRenderAfterName()
     {
-      if (_selectedSprites.Count() != Spritex.Parts.Count)
-      {
-        _selectedSprites.Clear();
-        foreach (var sprite in Spritex.Parts) _selectedSprites.Add(false);
-      }
+      _selectedSprites.EqualFalseRange(Spritex.Parts.Count());      
+      _selectedAnims.EqualFalseRange(Spritex.Animations.Count());
+
       Transform.RenderImGui(Spritex.Transform);
-      if (ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen))
+      var animheader = ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap);
+      if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
       {
+        _isOpenAnimationOptionPopup = true;
+      }
+      if (animheader)
+      {
+
+        ImGui.BeginChild($"spritex-anim-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        for (int i = 0; i < Spritex.Animations.Count(); i++)
+        {
+          var animation = Spritex.Animations[i];
+          var isSelected = _selectedAnims[i];
+          if (ImGui.Selectable($"{i+1}. {animation.Name}", ref isSelected, ImGuiSelectableFlags.AllowItemOverlap))
+          {
+            if (!ImGui.GetIO().KeyCtrl) _selectedAnims.FalseRange(_selectedAnims.Count());
+            _selectedAnims[i] = true;
+            _view.Editor.GetEditorComponent<AnimationEditor>().Open(Spritex, animation);
+          }
+        }
+
+        ImGui.EndChild();
       }
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
@@ -177,6 +214,7 @@ namespace Raven.Sheet.Sprites
         }
         ImGui.EndChild();
         DrawOptions();
+        DrawAnimationOptionPopup();
         if (removeSprite != null) removeSprite.DetachFromSpritex();
       }
     }
