@@ -20,18 +20,12 @@ namespace Raven.Sheet
       _frameInspector = new AnimationFrameInspector(this);
       _inspector = new AnimationInspector(this);
     }
-    public void SelectFrame(int index, int part, bool modify = false)
+    public void SelectFrame(int index, int part)
     {
       _frameInspector.IsOpen = true;
       _player.CurrentIndex = index;
       var newFrame = Animation.Frames[index] as SpritexAnimationFrame;
-      if (modify) newFrame.BeginReference(Spritex);
-      else 
-      {
-        // Previous frame
-        if (SelectedFrame != null) SelectedFrame.EndReference(Spritex);
-        newFrame.Apply(Spritex);
-      }
+      newFrame.Apply(Spritex);
       SelectedFrame = newFrame;
       SelectedFramePart = SelectedFrame.Parts[part];
     }

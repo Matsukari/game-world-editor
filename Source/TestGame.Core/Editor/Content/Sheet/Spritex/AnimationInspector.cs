@@ -20,6 +20,21 @@ namespace Raven.Sheet
     {
       if (Animator == null) return;
       base.Render(editor);
+      DrawFrameOptions();
+    }
+    void DrawFrameOptions()
+    {
+      if (_isOpenFrameOptions)
+      {
+        _isOpenFrameOptions = false;
+        ImGui.OpenPopup("frame-options-popup");
+      }
+      if (ImGui.BeginPopup("frame-options-popup"))
+      {
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete")) {}
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.Copy + "  Duplicate")) {}
+        ImGui.EndPopup();
+      }
     }
     Vector2 _trackContentMin = Vector2.Zero;
     public override void OnRender(Editor editor)
@@ -97,7 +112,6 @@ namespace Raven.Sheet
 
             var color = (Animator.CurrentIndex == j) ? _animEditor.Editor.Settings.Colors.FrameActive : _animEditor.Editor.Settings.Colors.FrameInactive;
             var frameIcon = IconFonts.FontAwesome5.Circle;
-            if (_modifiedFrame != -1) frameIcon = IconFonts.FontAwesome5.ExclamationCircle;
             if (Animator.CurrentIndex == j) frameIcon = IconFonts.FontAwesome5.DotCircle; 
 
             ImGui.PushStyleColor(ImGuiCol.Text, color);
@@ -108,10 +122,7 @@ namespace Raven.Sheet
             Widget.ImGuiWidget.TextTooltip($"{name} ({j})");
             if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) 
             {
-              var modified = (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left));
-              _animEditor.SelectFrame(j, i, modified);
-              _modifiedFrame = -1;
-              if (modified) _modifiedFrame = j;
+              _animEditor.SelectFrame(j, i);
             }
             if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
             {
