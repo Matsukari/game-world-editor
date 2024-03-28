@@ -108,30 +108,37 @@ namespace Raven.Sheet
           for (int j = 0; j < Animator.Animation.TotalFrames; j++)
           {
             var frameSet = Animator.Animation.Frames[j] as SpritexAnimationFrame;
-            var frame = frameSet.Parts[i];
-
-            var color = (Animator.CurrentIndex == j) ? _animEditor.Editor.Settings.Colors.FrameActive : _animEditor.Editor.Settings.Colors.FrameInactive;
-            var frameIcon = IconFonts.FontAwesome5.Circle;
-            if (Animator.CurrentIndex == j) frameIcon = IconFonts.FontAwesome5.DotCircle; 
-
-            ImGui.PushStyleColor(ImGuiCol.Text, color);
-            ImGui.Text(frameIcon);
-            ImGui.PopStyleColor();
-            
-            var name = (frameSet.Name != string.Empty) ? frameSet.Name : "No name";
-            Widget.ImGuiWidget.TextTooltip($"{name} ({j})");
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) 
+            try 
             {
-              _animEditor.SelectFrame(j, i);
+              var frame = frameSet.Parts[i];
+              var color = (Animator.CurrentIndex == j) ? _animEditor.Editor.Settings.Colors.FrameActive : _animEditor.Editor.Settings.Colors.FrameInactive;
+              var frameIcon = IconFonts.FontAwesome5.Circle;
+              if (Animator.CurrentIndex == j) frameIcon = IconFonts.FontAwesome5.DotCircle; 
+
+              ImGui.PushStyleColor(ImGuiCol.Text, color);
+              ImGui.Text(frameIcon);
+              ImGui.PopStyleColor();
+
+              var name = (frameSet.Name != string.Empty) ? frameSet.Name : "No name";
+              Widget.ImGuiWidget.TextTooltip($"{name} ({j})");
+              if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) 
+              {
+                _animEditor.SelectFrame(j, i);
+              }
+              if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
+              {
+                _isOpenFrameOptions = true;
+                _frameOnOpenOptions = frameSet;
+              } 
             }
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
+            catch (Exception)
             {
-              _isOpenFrameOptions = true;
-              _frameOnOpenOptions = frameSet;
-            } 
+              ImGui.PushStyleColor(ImGuiCol.Text, _animEditor.Editor.Settings.Colors.FrameInactive);
+              ImGui.Text(IconFonts.FontAwesome5.Minus);
+              ImGui.PopStyleColor();
+            }
             Widget.ImGuiWidget.SpanX(10f);
           }
-
         }
         ImGui.EndTable();
       }

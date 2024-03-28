@@ -29,6 +29,8 @@ Rulers
 ~Delete, name, change parts~
 ~Transform whole body~
 ~Pick parts directly from canvas~
+~Interpolation animation~
+~Affect spritex when updating animation~
 Multiple select parts
 Rectangle multiple selection 
 Multiple delete & duplicate parts 
@@ -36,11 +38,10 @@ Multiple operations on selected parts
 Multiple transforms on selected parts
 Order parts
 Rotate parts on selection
-Interpolation animation
-Affect spritex when updating animation 
 Delete frames
 Duplicate frames 
 Delete animations
+Choose ease type
 
 ## Editor
 ~Variation of mouse curors~

@@ -35,14 +35,14 @@ namespace Raven
     }
     public void JumpTo(int index, bool resetTime=true)
     {
-      _currentKeyframe = Math.Max(0, index);
+      _currentKeyframe = index;
       if (resetTime) _frameTimer = 0;
 
       if (IsLooping) _currentKeyframe = _currentKeyframe % Animation.TotalFrames;
       // Never executes if IsLooping is enabled 
-      if (_currentKeyframe >= Animation.TotalFrames && !IsFinished) 
+      if ((_currentKeyframe >= Animation.TotalFrames || _currentKeyframe < 0) && !IsFinished) 
       {
-        _currentKeyframe = Animation.TotalFrames - 1;
+        _currentKeyframe = Math.Clamp(_currentKeyframe, 0, Animation.TotalFrames-1);
         Paused = true;
         IsFinished = true;
         if (OnFinished != null) OnFinished();
@@ -67,6 +67,7 @@ namespace Raven
 
       // Interpolate 
       var prevIndex = _currentKeyframe + Delta * -1;
+
       if (prevIndex >= 0 && prevIndex < Animation.TotalFrames)
         CurrentFrame.Interpolate(Animation.Frames[prevIndex], Animation.Target, ease);
 
