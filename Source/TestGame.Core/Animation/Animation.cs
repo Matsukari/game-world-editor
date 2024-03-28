@@ -1,14 +1,15 @@
-
+using Nez.Persistence;
 
 namespace Raven 
 {
-  // <summary>
-  // Basic implementation of animation frame. You only need to animate the spritexes (with transforms). 
-  // Some custom operations, if any, just add some properties
-  // </summary>
+  /// <summary>
+  /// Manages AnimationFrames. Set a Target for a context which would be called along when performing operations on a frame
+  /// </summary>
   public class Animation : IPropertied
   {
+    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
+
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name;
@@ -20,8 +21,9 @@ namespace Raven
     public bool IsContinous = false;
 
     public List<AnimationFrame> Frames = new List<AnimationFrame>();
-    public int TotalFrames { get => Frames.Count(); }
 
+    [JsonExclude]
+    public int TotalFrames { get => Frames.Count(); }
 
     public Animation(object target, string name = "") 
     {

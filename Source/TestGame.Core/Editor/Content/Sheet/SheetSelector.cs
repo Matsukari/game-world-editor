@@ -127,12 +127,6 @@ namespace Raven.Sheet
         _initialMouse = Vector2.Zero;
         if (count > 1) return;
 
-        // Selects multiple tiles
-        foreach (var sprite in _sheet.Sprites)
-        {
-          if (sheetView.GetRegionInSheet(sprite.Region.ToRectangleF()).Contains(Entity.Scene.Camera.MouseToWorldPoint())) 
-            Select(sprite);
-        }
         // Selects single tile
         if (sheetView.TileInMouse != null) 
         {

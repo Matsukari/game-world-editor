@@ -58,7 +58,7 @@ namespace Raven.Sheet.Sprites
     public bool HasSameSource(InstancedSprite instanced) => _spritex.Name == ((SpritexInstance)instanced)._spritex.Name;
     public void Draw(Batcher batcher, Camera camera, RectangleF dest)
     {
-      foreach (var sprite in _spritex.Body)
+      foreach (var sprite in _spritex.Parts)
       {
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,

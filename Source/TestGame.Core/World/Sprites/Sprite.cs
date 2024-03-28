@@ -3,6 +3,9 @@ using Microsoft.Xna.Framework;
 
 namespace Raven.Sheet.Sprites 
 {
+  /// <summary>
+  /// This is only a handle to a set of Tiles. Mulitple selection of Tiles.
+  /// </summary> 
   public class Sprite : IPropertied
   {
     string IPropertied.Name { get => Name; set => Name = value; }

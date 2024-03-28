@@ -1,20 +1,36 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven.Sheet.Sprites 
 {
+  /// <summary>
+  /// A render model with a Transform and other basic render options 
+  /// and a reference to a sprite in a Sheet.
+  /// </summary>
   public class SourcedSprite : IPropertied
   {
+    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
+
     public PropertyList Properties { get; set; } = new PropertyList();
+
     public string Name = "";
+
+    [JsonExclude]
     public Spritex Spritex;
+
+    [JsonExclude]
     public Sprite SourceSprite;
+
+    // Render options 
     public Sprites.Transform Transform = new Transform(); 
     public SpriteEffects SpriteEffects;
     public Vector2 Origin = new Vector2();
     public Color Color = Color.White;
+
+    // Some management options
     public bool IsVisible = true;
     public bool IsLocked = false;
 

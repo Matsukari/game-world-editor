@@ -117,7 +117,7 @@ namespace Raven.Sheet
       }
       else if (_worldEditor.SelectedSprite is Spritex spritex)
       {
-        foreach (var part in spritex.Body)
+        foreach (var part in spritex.Parts)
         {
           var min = part.SourceSprite.Region.Location.ToVector2() / part.SourceSprite.Texture.GetSize();
           var max = (part.SourceSprite.Region.Location + part.SourceSprite.Region.Size).ToVector2() / part.SourceSprite.Texture.GetSize();

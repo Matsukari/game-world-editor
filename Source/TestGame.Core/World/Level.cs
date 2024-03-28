@@ -2,9 +2,13 @@
 using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven.Sheet
 {
+  /// <summary>
+  /// Composed of Layers of the same size as this.
+  /// </summary>
   public class Level : RenderableComponent, IPropertied
   {
     string IPropertied.Name { get => Name; set => Name = value; }

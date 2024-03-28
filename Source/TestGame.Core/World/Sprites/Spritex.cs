@@ -1,32 +1,47 @@
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven.Sheet.Sprites 
 {
+  /// <summary>
+  /// Spritex is a set of Sprites with animations. 
+  /// </summary>
   public class Spritex : RenderableComponent, IPropertied
   {
+    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
+
     public PropertyList Properties { get; set; } = new PropertyList();
 
-    internal Sheet _sheet;
     public string Name = "";
+
     public List<Animation> Animations = new List<Animation>();
+
+    /// <summary>
+    /// All the Spritex operates on. Like a components that is attached to an Entity
+    /// </summary>
     public List<SourcedSprite> Parts = new List<SourcedSprite>();
-    public List<SourcedSprite> Body { get => Parts; }
-       
+
+    [JsonExclude]
+    internal Sheet _sheet;
+
     public Spritex(string name, SourcedSprite main, Sheet sheet) 
     {
       Name = name;
       AddSprite("Main component", main);
       _sheet = sheet;
     }
+    /// <summary>
+    /// Visually, putting a rectangle that exactly fits the bounds of all parts
+    /// </summary>
     public RectangleF EnclosingBounds
     {
       get 
       {
         var min = new Vector2(100000, 100000);
         var max = new Vector2(-10000, -10000);
-        foreach (var part in Body)
+        foreach (var part in Parts)
         {
           min.X = Math.Min(min.X, part.Transform.Position.X + part.Origin.X);
           min.Y = Math.Min(min.Y, part.Transform.Position.Y + part.Origin.Y);
@@ -95,7 +110,7 @@ namespace Raven.Sheet.Sprites
     }
     public override void Render(Batcher batcher, Camera camera)
     {
-      foreach (var sprite in Body)
+      foreach (var sprite in Parts)
       {
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,

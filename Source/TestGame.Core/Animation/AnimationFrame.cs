@@ -1,16 +1,20 @@
 using Nez.Tweens;
+using Nez.Persistence;
 
 
 namespace Raven 
 {
-  // <summary>
-  // Basic implementation of animation frame. You only need to animate the spritexes (with transforms). 
-  // Some custom operations, if any, just add some properties
-  // </summary>
+  /// <summary>
+  /// Basic implementation of animation frame. You only need to animate the spritexes (with transforms). 
+  /// Some custom operations, if any, just add some properties
+  /// </summary>
   public class AnimationFrame : IPropertied
   {
+    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
+
     public PropertyList Properties { get; set; } = new PropertyList();
+
     public string Name = "";
 
     // The ammmount of time before interpolatin ends

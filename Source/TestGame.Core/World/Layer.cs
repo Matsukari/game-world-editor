@@ -3,6 +3,9 @@ using Nez;
 
 namespace Raven.Sheet
 {
+  /// <summary>
+  /// Base class for the rendering of all the "paints" in the layer
+  /// </summary>
   public class Layer
   {
     public Level Level;

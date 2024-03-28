@@ -1,18 +1,21 @@
-using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Nez;
-using ImGuiNET;
+using Nez.Persistence;
 
 namespace Raven.Sheet
 {
-  // <summary>
-  // Composed of Levels.
-  // </summary>
+  /// <summary>
+  /// Composed of interconnected Levels. This is where all you should dump topdwon oriented rendering.
+  /// </summary>
   public class World : Entity, IPropertied
   {
+    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
+
+    [JsonExclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
+    [JsonExclude]
     public RectangleF Bounds 
     { 
       get 
@@ -31,6 +34,7 @@ namespace Raven.Sheet
     }
 
     public Level CurrentLevel = null;
+
     public List<Level> Levels { get => Components.GetComponents<Level>(); } 
     public Dictionary<string, Sheet> SpriteSheets = new Dictionary<string, Sheet>();
 

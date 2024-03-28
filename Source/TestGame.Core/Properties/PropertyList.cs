@@ -2,9 +2,13 @@
 
 namespace Raven 
 {
+  /// <summary>
+  /// A list of objects of arbitrary type. 
+  /// </summary>
   public class PropertyList
   {
     public Dictionary<string, object> Data = new Dictionary<string, object>();
+
     int _counter = 0;
     public void Add<T>(T obj)
     {

@@ -72,7 +72,7 @@ namespace Raven.Sheet
       // Draw spritex parts names
       else if (Editor.GetEditorComponent<SpritexView>().Enabled && ContentData.Selection is Sprites.Spritex spritex)
       {
-        foreach (var part in spritex.Body)
+        foreach (var part in spritex.Parts)
         {
           DrawText(part.Name, part.WorldBounds.BottomCenter(), Math.Clamp(1f/camera.RawZoom, 1f, 10f));
         }

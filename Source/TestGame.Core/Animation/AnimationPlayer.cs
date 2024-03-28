@@ -1,6 +1,10 @@
 
 namespace Raven 
 {
+  
+  /// <summary>
+  /// A component that handles, operate an Animation, interpolates and management.
+  /// </summary>
   public class AnimationPlayer : Nez.Component, Nez.IUpdatable
   {  
     public Animation Animation;

@@ -4,9 +4,10 @@ using Nez;
 
 namespace Raven.Sheet
 {
-  // <summary>
-  // Any tile size. Can accept tiles of arbitrary sizes; scales them to fit this layer's tile size
-  // </summary> 
+  /// <summary>
+  /// Arranges painted sprites in a grid-like manner.
+  /// Accepts changes in tile size later; cales tiles to fit this layer's tile size
+  /// </summary> 
   public class TileLayer : Layer
   {
     public TileLayer(Level level, int w, int h) : base(level) 

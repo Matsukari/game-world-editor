@@ -1,33 +1,50 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Nez.Persistence;
 using Nez;
 
 namespace Raven.Sheet
 { 
   /// <summary>
-  /// Tree layers:spritexes, sprites, both which is dynamic, and a virtual 
-  /// non-immutable in-there tiles of uniform size across the spritesheet image
+  /// Simply stores the divided sprites into either Tile or Spritex from a single texture
   /// </summary>
 	public class Sheet : IPropertied
 	{
     public string Name { get; set; } = "";
     public PropertyList Properties { get; set; } = new PropertyList();
 
-    public Texture2D Texture { get => _texture; }
+    /// <summary>
+    /// Only those with custom properties or name will be added in the list
+    /// </summary>
+    [JsonInclude] 
+    Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
+    
 		public List<Sprites.Spritex> Spritexes = new List<Sprites.Spritex>();
-		public List<Sprites.Sprite> Sprites = new List<Sprites.Sprite>();
-    public Dictionary<int, Sprites.Tile> TileMap { get=> _tiles;  }
-    // Only instanciated when a tile (primarily a rectangle) is assigned a property or anme
-		Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
 
-    public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
-    public Point TileSize { get => new Point(TileWidth, TileHeight); }
     public int TileWidth { get; private set; }
     public int TileHeight { get; private set; }
+
+    [JsonExclude] 
+    public Texture2D Texture { get => _texture; }
+
+    [JsonExclude] 
+    public Dictionary<int, Sprites.Tile> TileMap { get=> _tiles;  }
+    // Only instanciated when a tile (primarily a rectangle) is assigned a property or anme
+
+    [JsonExclude] 
+    public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
+
+    [JsonExclude] 
+    public Point TileSize { get => new Point(TileWidth, TileHeight); }
+
+    [JsonExclude] 
     public Point Tiles { get => new Point(_texture.Width/TileWidth, _texture.Height/TileHeight); }
 
     private Texture2D _texture;
+
+
+
     public Sheet(Texture2D texture) 
     {
       Insist.IsNotNull(texture); 
@@ -120,15 +137,6 @@ namespace Raven.Sheet
       for (int i = 0; i < Tiles.X * Tiles.Y; i++)
         list.Add(GetTile(i));
       return list;
-    }
-    bool IntersectSprite(Rectangle rect) 
-    {
-      bool result = false;
-      foreach (var sprite in Sprites)
-      {
-        if (rect.Intersects(sprite.Region)) result = true;
-      }
-      return result;
     }
 	}
 }

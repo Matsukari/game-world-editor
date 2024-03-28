@@ -98,7 +98,7 @@ namespace Raven.Sheet
       if (Nez.Input.RightMouseButtonPressed)
       {
         var hasSelection = false;
-        foreach (var part in _spritex.Spritex.Body)
+        foreach (var part in _spritex.Spritex.Parts)
         {
           var mouse = Entity.Scene.Camera.MouseToWorldPoint();
           if (part.WorldBounds.Contains(mouse))
@@ -129,7 +129,7 @@ namespace Raven.Sheet
       // select individual parts
       if (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed)
       {
-        foreach (var part in _spritex.Spritex.Body)
+        foreach (var part in _spritex.Spritex.Parts)
         {
           var mouse = Entity.Scene.Camera.MouseToWorldPoint();
           if (part.WorldBounds.Contains(mouse))
