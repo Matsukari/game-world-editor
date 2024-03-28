@@ -13,6 +13,7 @@ namespace Raven
     [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
 
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";

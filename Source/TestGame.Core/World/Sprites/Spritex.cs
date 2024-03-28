@@ -12,6 +12,7 @@ namespace Raven.Sheet.Sprites
     [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
 
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
@@ -35,6 +36,7 @@ namespace Raven.Sheet.Sprites
     /// <summary>
     /// Visually, putting a rectangle that exactly fits the bounds of all parts
     /// </summary>
+    [JsonExclude]
     public RectangleF EnclosingBounds
     {
       get 
@@ -51,6 +53,7 @@ namespace Raven.Sheet.Sprites
         return RectangleF.FromMinMax(min, max);
       }
     }
+    [JsonExclude]
     public override RectangleF Bounds
     {
       get 

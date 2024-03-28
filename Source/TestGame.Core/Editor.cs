@@ -1,5 +1,6 @@
 using Raven.Sheet;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven
 {
@@ -122,7 +123,27 @@ namespace Raven
       _tabs.Last().Data.ShapeContext = content;
       if (content is Entity entity && !Scene.Entities.Contains(entity)) Scene.AddEntity(entity);
     }
-    public void Save() {}
+    public void Save() 
+    {
+      var file = "Sample.sheet";
+      if (File.Exists(file)) 
+      {
+        Sheet.Sheet loaded = Json.FromJson<Sheet.Sheet>(File.ReadAllText(file));
+        Console.WriteLine(loaded.Name);
+        Console.WriteLine(loaded.Properties);
+        Console.WriteLine(loaded.TileSize);
+        Console.WriteLine(loaded.Filename);
+        Console.WriteLine(loaded.TileMap.Count);
+        Console.WriteLine(loaded.Spritexes.Count);
+        return;
+      }
+      var sheet = (GetContent().Content as Sheet.Sheet);
+      var settings = new JsonSettings { TypeConverters = new JsonTypeConverter[] 
+        { new Serializers.SpritexSerializer(), new Serializers.ColorJsonConverter() } };
+      settings.PrettyPrint = true;
+      var json = Json.ToJson(sheet, settings);
+      File.WriteAllText(file, json);
+    }
     public void OpenProjectSettings() {}
 	}
 }

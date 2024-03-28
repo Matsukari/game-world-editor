@@ -10,11 +10,13 @@ namespace Raven
     [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
 
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name;
 
     // The context of the play
+    [JsonExclude]
     public object Target;
 
     // This will make the previous frame of the first frame after it has run once 

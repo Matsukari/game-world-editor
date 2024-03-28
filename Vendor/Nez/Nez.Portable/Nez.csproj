@@ -31,7 +31,9 @@
 		<EmbeddedResource Include="Content\NezDefaultBMFont.xnb" />
 		<Compile Remove="Graphics\SVG\Shapes\Paths\SvgPathBuilder.cs" />
 	</ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="../Nez.Persistence/Nez.Persistence.csproj" />
+  </ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="System.Drawing.Common" Version="5.0.2" />
 		<PackageReference Include="MonoGame.Framework.Portable" Version="3.7.1.189" PrivateAssets="all" />

@@ -11,8 +11,13 @@ namespace Raven.Sheet
   /// </summary>
 	public class Sheet : IPropertied
 	{
+    [JsonInclude]
     public string Name { get; set; } = "";
+
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
+
+    public string Filename;
 
     /// <summary>
     /// Only those with custom properties or name will be added in the list
@@ -22,7 +27,10 @@ namespace Raven.Sheet
     
 		public List<Sprites.Spritex> Spritexes = new List<Sprites.Spritex>();
 
+    [JsonInclude]
     public int TileWidth { get; private set; }
+
+    [JsonInclude]
     public int TileHeight { get; private set; }
 
     [JsonExclude] 
@@ -43,17 +51,10 @@ namespace Raven.Sheet
 
     private Texture2D _texture;
 
-
-
-    public Sheet(Texture2D texture) 
-    {
-      Insist.IsNotNull(texture); 
-      _texture = texture;
-      SetTileSize(16, 16);
-    }
     public Sheet(string filename) 
     {
       Name = filename;
+      Filename = filename;
       var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
       texture.Name = filename;
       Insist.IsNotNull(texture); 

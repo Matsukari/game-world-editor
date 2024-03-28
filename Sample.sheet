@@ -1,0 +1,62 @@
+{
+	"Filename": "Assets/Raw/Unprocessed/export/test_canvas.png",
+	"_tiles": {
+
+	},
+	"Spritexes": [
+		{
+			"Name": "asd",
+			"Properties": {
+				"Data": {
+
+				}
+			},
+			"Animations": [
+
+			],
+			"Parts": [
+				{
+					"Name": "Main component",
+					"Transform": {
+						"Position": {
+							"X": 0,
+							"Y": 0
+						},
+						"Scale": {
+							"X": 1,
+							"Y": 1
+						},
+						"Skew": {
+							"X": 1,
+							"Y": 1
+						},
+						"Rotation": 0
+					},
+					"SpriteEffects": "None",
+					"Origin": {
+						"X": 0,
+						"Y": 0
+					},
+					"Color": {
+						"PackedValue": 4294967295
+					},
+					"IsVisible": true,
+					"IsLocked": false,
+					"Properties": {
+						"Data": {
+
+						}
+					}
+				}
+			]
+		}
+	],
+	"Name": "Assets/Raw/Unprocessed/export/test_canvas.png",
+	"Properties": {
+		"Data": {
+
+		}
+	},
+	"TileWidth": 16,
+	"TileHeight": 16
+}

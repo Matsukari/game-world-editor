@@ -14,6 +14,7 @@ namespace Raven.Sheet.Sprites
     [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
 
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
@@ -35,6 +36,7 @@ namespace Raven.Sheet.Sprites
     public bool IsLocked = false;
 
     // Local bounds
+    [JsonExclude]
     public RectangleF LocalBounds { 
       get => new RectangleF(
           Transform.Position.X - Origin.X * Transform.Scale.X, 
@@ -42,6 +44,8 @@ namespace Raven.Sheet.Sprites
           SourceSprite.Region.Width * Transform.Scale.X, 
           SourceSprite.Region.Height * Transform.Scale.Y);
     }
+
+    [JsonExclude]
     public RectangleF WorldBounds { 
       get 
       {
