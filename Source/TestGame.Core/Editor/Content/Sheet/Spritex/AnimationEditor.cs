@@ -23,7 +23,7 @@ namespace Raven.Sheet
     public void SelectFrame(int index, int part)
     {
       _frameInspector.IsOpen = true;
-      _player.CurrentIndex = index;
+      _player.JumpTo(index);
       var newFrame = Animation.Frames[index] as SpritexAnimationFrame;
       newFrame.Apply(Spritex);
       SelectedFrame = newFrame;
@@ -37,6 +37,10 @@ namespace Raven.Sheet
       _inspector.IsOpen = true;
       _player = new AnimationPlayer();
       _player.Animation = Animation;
+      // _player.OnKeyframeChanged += () =>
+      // {
+      //   ((SpritexAnimationFrame)_player.CurrentFrame).Apply(Spritex);
+      // };
     }
     public void Close() 
     {
@@ -49,7 +53,7 @@ namespace Raven.Sheet
       var frame = new SpritexAnimationFrame(Spritex);
       var index = _player.CurrentIndex;
       Spritex.InsertFrame(Animation.Name, index, frame);
-      _player.CurrentIndex++;
+      _player.Forward();
     }
     public override void OnContent()
     {

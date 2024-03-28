@@ -49,14 +49,14 @@ namespace Raven.Sheet
       ImGui.Text("Frame: ");
       ImGui.SameLine();
       ImGui.SetNextItemWidth(48f);
-      if (ImGui.DragInt("##4", ref currFrame) && currFrame >= 0 && currFrame < Animator.Animation.TotalFrames) Animator.CurrentIndex = currFrame;
+      if (ImGui.DragInt("##4", ref currFrame) && currFrame >= 0 && currFrame < Animator.Animation.TotalFrames) Animator.JumpTo(currFrame);
 
       Widget.ImGuiWidget.SpanX(10f);
       Widget.ImGuiWidget.ButtonSetFlat(0f,
         (IconFonts.FontAwesome5.Backward,       ()=>Animator.IsReversed = true),
-        (IconFonts.FontAwesome5.StepBackward,   ()=>Animator.CurrentIndex--),
+        (IconFonts.FontAwesome5.StepBackward,   ()=>Animator.Backward()),
         (GetPlayString(Animator),               ()=>Animator.TooglePlay()),
-        (IconFonts.FontAwesome5.StepForward,    ()=>Animator.CurrentIndex++),
+        (IconFonts.FontAwesome5.StepForward,    ()=>Animator.Forward()),
         (IconFonts.FontAwesome5.Forward,        ()=>Animator.IsReversed = false)
       );      
       Widget.ImGuiWidget.SpanX(10f);

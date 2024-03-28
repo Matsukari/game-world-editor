@@ -129,7 +129,7 @@ namespace Raven.Sheet.Sprites
       {
         if (ImGui.MenuItem("Create Animation"))
         {
-          Spritex.Animations.Add(new Animation("new-animation"));
+          Spritex.Animations.Add(new Animation(Spritex, "new-animation"));
         }
         ImGui.EndPopup();
       }

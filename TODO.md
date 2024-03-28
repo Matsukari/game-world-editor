@@ -10,6 +10,10 @@
 ~Fix shape property's inspector~
 ~Selectable shapes~
 Implement polygon shape
+Fix selection points
+Fix primitive rendering order
+Fix camera bounds culling
+Rulers 
 
 ## Multiple selection
 ~Fix sprite property naming~
@@ -100,10 +104,10 @@ Copy & paste:
 - layers
 - levels
 - properties
-Fix selection points
-Fix primitive rendering order
-Fix camera bounds culling
 Snapping mouse
-Rulers 
-Grid
+
+
+
+## Rendering 
+Game integration
 

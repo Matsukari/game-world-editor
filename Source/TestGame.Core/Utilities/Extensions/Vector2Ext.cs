@@ -13,6 +13,12 @@ namespace Raven
     {
       return $"{vec.X}, {vec.Y}";
     }
+    public static Vector2 EaseTo(Vector2 from, Vector2 to, float ease) => 
+      new Vector2(
+          from.X + ease * (to.X - from.X),
+          from.Y + ease * (to.Y - from.Y)
+          );
+
     public static Vector2 ToVector2(this Num.Vector2 numeric)
     {
       return new Vector2(numeric.X, numeric.Y);
