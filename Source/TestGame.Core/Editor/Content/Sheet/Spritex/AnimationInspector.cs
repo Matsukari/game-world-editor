@@ -34,7 +34,7 @@ namespace Raven.Sheet
       ImGui.Text("Frame: ");
       ImGui.SameLine();
       ImGui.SetNextItemWidth(48f);
-      ImGui.DragInt("##4", ref currFrame);
+      if (ImGui.DragInt("##4", ref currFrame) && currFrame >= 0 && currFrame < Animator.Animation.TotalFrames) Animator.CurrentIndex = currFrame;
 
       Widget.ImGuiWidget.SpanX(10f);
       Widget.ImGuiWidget.ButtonSetFlat(0f,
@@ -96,13 +96,23 @@ namespace Raven.Sheet
             var frame = frameSet.Parts[i];
 
             var color = (Animator.CurrentIndex == j) ? _animEditor.Editor.Settings.Colors.FrameActive : _animEditor.Editor.Settings.Colors.FrameInactive;
+            var frameIcon = IconFonts.FontAwesome5.Circle;
+            if (_modifiedFrame != -1) frameIcon = IconFonts.FontAwesome5.ExclamationCircle;
+            if (Animator.CurrentIndex == j) frameIcon = IconFonts.FontAwesome5.DotCircle; 
+
             ImGui.PushStyleColor(ImGuiCol.Text, color);
-            ImGui.Text(IconFonts.FontAwesome5.Circle);
+            ImGui.Text(frameIcon);
             ImGui.PopStyleColor();
             
             var name = (frameSet.Name != string.Empty) ? frameSet.Name : "No name";
             Widget.ImGuiWidget.TextTooltip($"{name} ({j})");
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) _animEditor.SelectFrame(j);
+            if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) 
+            {
+              var modified = (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left));
+              _animEditor.SelectFrame(j, i, modified);
+              _modifiedFrame = -1;
+              if (modified) _modifiedFrame = j;
+            }
             if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
             {
               _isOpenFrameOptions = true;
@@ -116,6 +126,7 @@ namespace Raven.Sheet
       }
       ImGui.PopStyleVar();
     }
+    int _modifiedFrame = -1;
     // Separator with frame numbers 
     void DrawFrameHeader()
     {

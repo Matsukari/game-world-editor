@@ -12,24 +12,37 @@ namespace Raven.Widget
     {
       var name = Name;
 
-      ImGui.Begin(GetIcon() + "   " + GetName(), Flags);
-      if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
-      Bounds.Location = ImGui.GetWindowPos();
-      Bounds.Size = ImGui.GetWindowSize();
-      OnRender(editor);
-
-      OnRenderBeforeName();
-      if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
+      void Draw()
       {
-        OnChangeName(Name, name);
-        Name = name;
+        if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
+        Bounds.Location = ImGui.GetWindowPos();
+        Bounds.Size = ImGui.GetWindowSize();
+        OnRender(editor);
+
+        OnRenderBeforeName();
+        if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
+        {
+          OnChangeName(Name, name);
+          Name = name;
+        }
+        OnRenderAfterName();
+        if (PropertiesRenderer.Render(editor, this)) OnChangeProperty(name);
+
+        if (PropertiesRenderer.HandleNewProperty(this, editor)) OnChangeProperty(name);
       }
-      OnRenderAfterName();
-      if (PropertiesRenderer.Render(editor, this)) OnChangeProperty(name);
-
-      if (PropertiesRenderer.HandleNewProperty(this, editor)) OnChangeProperty(name);
-
-      ImGui.End();
+      var windowname = GetIcon() + "   " + GetName();
+      if (NoClose) 
+      {
+        ImGui.Begin(windowname, Flags);
+        Draw();
+        ImGui.End();
+      }
+      else if (IsOpen)
+      {
+        ImGui.Begin(windowname, ref IsOpen, Flags);
+        Draw();
+        ImGui.End();
+      }
     }
     public bool HasName() => Name != null && Name != string.Empty;
     public virtual string GetIcon() => "";

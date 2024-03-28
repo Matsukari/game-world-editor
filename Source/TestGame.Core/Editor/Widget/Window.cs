@@ -19,8 +19,7 @@ namespace Raven.Widget
     }
     public virtual void Render(Editor editor)
     {
-      if (NoClose) ImGui.Begin(Name, Flags);
-      else if (ImGui.Begin(Name, ref IsOpen, Flags))
+      void Draw()
       {
         if (ImGui.IsWindowHovered()) 
         {
@@ -30,6 +29,17 @@ namespace Raven.Widget
         Bounds.Location = ImGui.GetWindowPos();
         Bounds.Size = ImGui.GetWindowSize();
         OnRender(editor);
+      }
+      if (NoClose) 
+      {
+        ImGui.Begin(Name, Flags);
+        Draw();
+        ImGui.End();
+      }
+      else if (IsOpen)
+      {
+        ImGui.Begin(Name, ref IsOpen, Flags);
+        Draw();
         ImGui.End();  
       }
     }

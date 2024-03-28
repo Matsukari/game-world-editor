@@ -13,23 +13,34 @@ namespace Raven.Sheet
     public Spritex Spritex;
     public bool IsOpen { get => _player != null; }
     public SpritexAnimationFrame SelectedFrame;
+    public SourcedSprite SelectedFramePart;
 
     public AnimationEditor()
     {
       _frameInspector = new AnimationFrameInspector(this);
       _inspector = new AnimationInspector(this);
     }
-    public void SelectFrame(int index)
+    public void SelectFrame(int index, int part, bool modify = false)
     {
+      _frameInspector.IsOpen = true;
       _player.CurrentIndex = index;
-      SelectedFrame = Animation.Frames[index] as SpritexAnimationFrame;
-      SelectedFrame.Apply(Spritex);
+      var newFrame = Animation.Frames[index] as SpritexAnimationFrame;
+      if (modify) newFrame.BeginReference(Spritex);
+      else 
+      {
+        // Previous frame
+        if (SelectedFrame != null) SelectedFrame.EndReference(Spritex);
+        newFrame.Apply(Spritex);
+      }
+      SelectedFrame = newFrame;
+      SelectedFramePart = SelectedFrame.Parts[part];
     }
     public void Open(Spritex spritex, Animation animation)
     {
       Enabled = true;
       Spritex = spritex;
       Animation = animation;
+      _inspector.IsOpen = true;
       _player = new AnimationPlayer();
       _player.Animation = Animation;
     }

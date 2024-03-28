@@ -44,6 +44,12 @@ namespace Raven.Sheet.Sprites
     {
       Spritex.RemoveSprite(Name);
     }
+    public int DeterminePreset()
+    {
+      if (Origin == LocalBounds.Size/2f) return 0;
+      else if (Origin == Vector2.Zero) return 1;
+      else return 2;
+    }
     public SourcedSprite Duplicate()
     {
       SourcedSprite sprite = new SourcedSprite();

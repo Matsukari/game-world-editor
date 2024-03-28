@@ -20,7 +20,6 @@ namespace Raven.Sheet.Sprites
     public float GuiZoom = 0.5f;
 
 
-    int _originType = 1;
     static string[] _originTypes = new string[] { "Center", "Topleft", "Custom" };
 
     public SpritexInspector(SpritexView view, Spritex spritex) 
@@ -32,10 +31,10 @@ namespace Raven.Sheet.Sprites
     {
       if (Spritex != null && Spritex.Enabled) base.Render(editor);
     }
-    void RenderSprite(SourcedSprite sprite)
+    public static void RenderSprite(SourcedSprite sprite, bool drawName = true)
     {
       string name = sprite.Name;
-      if (ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
+      if (drawName && ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
       {
         sprite.Name = name;
       }
@@ -46,15 +45,16 @@ namespace Raven.Sheet.Sprites
 
       sprite.Transform.RenderImGui();
       var origin = sprite.Origin.ToNumerics();
-    
+
+      var originType = sprite.DeterminePreset();
       // Preset origin
-      if (ImGui.Combo("Origin", ref _originType, _originTypes, _originTypes.Count()))
+      if (ImGui.Combo("Origin", ref originType, _originTypes, _originTypes.Count()))
       {
-             if (_originType == 0) sprite.Origin = sprite.LocalBounds.Size/2f;
-        else if (_originType == 1) sprite.Origin = new Vector2();
+        if (originType == 0) sprite.Origin = sprite.LocalBounds.Size/2f;
+        else if (originType == 1) sprite.Origin = new Vector2();
       }
       // Custom origin is selected
-      if (_originType == 2)
+      if (originType == 2)
       {
         if (ImGui.InputFloat2("Origin", ref origin)) sprite.Origin = origin;
       }
