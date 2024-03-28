@@ -25,9 +25,18 @@ Implement polygon shape
 ~Delete, name, change parts~
 ~Transform whole body~
 ~Pick parts directly from canvas~
+Multiple select parts
+Rectangle multiple selection 
+Multiple delete & duplicate parts 
+Multiple operations on selected parts
+Multiple transforms on selected parts
 Order parts
 Rotate parts on selection
-Implemente animation
+Interpolation animation
+Affect spritex when updating animation 
+Delete frames
+Duplicate frames 
+Delete animations
 
 ## Editor
 ~Variation of mouse curors~
@@ -71,6 +80,7 @@ Freeform layer
 ~Single level context~
 ~Current level maximize~
 Connect levels 
+LOD system
 
 
 ## Misc
@@ -82,11 +92,17 @@ Save & load to file
 Undo & redo
 Shape & tile separate selection
 Separate transform operations
-Copy & paste shapes & parts 
+Display appropriate mouse cursors
+Copy & paste: 
+- shapes
+- parts
+- animations
+- layers
+- levels
+- properties
 Fix selection points
 Fix primitive rendering order
 Fix camera bounds culling
-Optimize super big rendering
 Snapping mouse
 Rulers 
 Grid
