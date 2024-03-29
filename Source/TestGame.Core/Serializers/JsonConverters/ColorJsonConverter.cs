@@ -10,7 +10,7 @@ namespace Raven.Serializers
          
     public override void WriteJson( IJsonEncoder encoder, Color color)
     {
-      encoder.EncodeKeyValuePair("PackedValue", color.PackedValue);
+      encoder.EncodeKeyValuePair("_packedValue", color.PackedValue);
     }
     public override void OnFoundCustomData(Color instance, string key, object value )
     {

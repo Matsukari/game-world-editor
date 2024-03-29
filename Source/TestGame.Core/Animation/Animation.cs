@@ -1,4 +1,3 @@
-using Nez.Persistence;
 
 namespace Raven 
 {
@@ -7,16 +6,13 @@ namespace Raven
   /// </summary>
   public class Animation : IPropertied
   {
-    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
 
-    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name;
 
     // The context of the play
-    [JsonExclude]
     public object Target;
 
     // This will make the previous frame of the first frame after it has run once 
@@ -24,9 +20,11 @@ namespace Raven
 
     public List<AnimationFrame> Frames = new List<AnimationFrame>();
 
-    [JsonExclude]
     public int TotalFrames { get => Frames.Count(); }
 
+    private Animation()
+    {
+    }
     public Animation(object target, string name = "") 
     {
       Name = name;

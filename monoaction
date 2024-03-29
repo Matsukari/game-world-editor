@@ -7,19 +7,31 @@ LEVEL_EDITOR="/home/ark/Documents/game/tools/ldtk"
 DESKTOP="Source/$NAME.Desktop"
 CORE="Source/$NAME.Core"
 NEZ="Vendor/Nez"
+
+PROJECT_NAME=$NAME.Desktop
+PROJECT=$DESKTOP
+
 echo $NAME
 
 pkill dotnet
 
 if [[ $1 == "build" ]]; then
-	dotnet build -c Debug Source/$NAME.Desktop
-	dotnet run --project Source/$NAME.Desktop
+	dotnet build -c Debug $PROJECT
+	dotnet run --project $PROJECT
 elif [[ $1 == "run" ]]; then
   dotnet run --project $DESKTOP
 elif [[ $1 == "last" ]]; then
-    $DESKTOP/bin/Debug/net8.0/$NAME.Desktop
+    $DESKTOP/bin/Debug/net8.0/$PROJECT_NAME
 elif [[ $1 == "runlog" ]]; then
-  dotnet run --project $DESKTOP > ./Logs/stdout.txt 2> ./Logs/stderr.txt
+  dotnet run --project $PROJECT > ./Logs/stdout.txt 2> ./Logs/stderr.txt
+
+# Build the project in windows to be run with GDB and grant debuginfod in immediate mode
+elif [[ $1 == "debug" ]]; then
+  dotnet build --sc -c Release --os win $PROJECT
+  gdb gdb -ex "run" --args $PROJECT/bin/Release/net8.0/win-x64/$PROJECT_NAME.exe <<EOF
+y
+EOF
+
 elif [[ $1 == "content" ]]; then
   echo "Content pipeline $DESKTOP"
   cd $DESKTOP

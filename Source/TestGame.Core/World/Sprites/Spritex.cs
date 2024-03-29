@@ -1,6 +1,5 @@
 using Microsoft.Xna.Framework;
 using Nez;
-using Nez.Persistence;
 
 namespace Raven.Sheet.Sprites 
 {
@@ -9,24 +8,20 @@ namespace Raven.Sheet.Sprites
   /// </summary>
   public class Spritex : RenderableComponent, IPropertied
   {
-    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
-
-    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
-
-    public List<Animation> Animations = new List<Animation>();
 
     /// <summary>
     /// All the Spritex operates on. Like a components that is attached to an Entity
     /// </summary>
     public List<SourcedSprite> Parts = new List<SourcedSprite>();
+    public List<Animation> Animations = new List<Animation>();
 
-    [JsonExclude]
     internal Sheet _sheet;
 
+    private Spritex() {}
     public Spritex(string name, SourcedSprite main, Sheet sheet) 
     {
       Name = name;
@@ -36,7 +31,6 @@ namespace Raven.Sheet.Sprites
     /// <summary>
     /// Visually, putting a rectangle that exactly fits the bounds of all parts
     /// </summary>
-    [JsonExclude]
     public RectangleF EnclosingBounds
     {
       get 
@@ -53,7 +47,6 @@ namespace Raven.Sheet.Sprites
         return RectangleF.FromMinMax(min, max);
       }
     }
-    [JsonExclude]
     public override RectangleF Bounds
     {
       get 

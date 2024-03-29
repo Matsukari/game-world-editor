@@ -1,8 +1,8 @@
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Nez.Persistence;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven.Sheet
 { 
@@ -11,10 +11,7 @@ namespace Raven.Sheet
   /// </summary>
 	public class Sheet : IPropertied
 	{
-    [JsonInclude]
     public string Name { get; set; } = "";
-
-    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Filename;
@@ -22,35 +19,29 @@ namespace Raven.Sheet
     /// <summary>
     /// Only those with custom properties or name will be added in the list
     /// </summary>
-    [JsonInclude] 
-    Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
+    internal Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
     
 		public List<Sprites.Spritex> Spritexes = new List<Sprites.Spritex>();
 
-    [JsonInclude]
-    public int TileWidth { get; private set; }
+    public int TileWidth;
+    public int TileHeight; 
 
-    [JsonInclude]
-    public int TileHeight { get; private set; }
-
-    [JsonExclude] 
     public Texture2D Texture { get => _texture; }
 
-    [JsonExclude] 
-    public Dictionary<int, Sprites.Tile> TileMap { get=> _tiles;  }
     // Only instanciated when a tile (primarily a rectangle) is assigned a property or anme
+    public Dictionary<int, Sprites.Tile> TileMap { get=> _tiles;  }
 
-    [JsonExclude] 
     public Vector2 Size { get => new Vector2(_texture.Width, _texture.Height); }
 
-    [JsonExclude] 
     public Point TileSize { get => new Point(TileWidth, TileHeight); }
 
-    [JsonExclude] 
     public Point Tiles { get => new Point(_texture.Width/TileWidth, _texture.Height/TileHeight); }
 
-    private Texture2D _texture;
+    internal Texture2D _texture;
 
+    private Sheet()
+    {
+    }
     public Sheet(string filename) 
     {
       Name = filename;

@@ -11,24 +11,19 @@ namespace Raven.Sheet.Sprites
   /// </summary>
   public class SourcedSprite : IPropertied
   {
-    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
-
-    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
-
-    [JsonExclude]
     public Spritex Spritex;
-
-    [JsonExclude]
     public Sprite SourceSprite;
 
     // Render options 
     public Sprites.Transform Transform = new Transform(); 
     public SpriteEffects SpriteEffects;
     public Vector2 Origin = new Vector2();
+
+    [JsonInclude]
     public Color Color = Color.White;
 
     // Some management options
@@ -36,7 +31,6 @@ namespace Raven.Sheet.Sprites
     public bool IsLocked = false;
 
     // Local bounds
-    [JsonExclude]
     public RectangleF LocalBounds { 
       get => new RectangleF(
           Transform.Position.X - Origin.X * Transform.Scale.X, 
@@ -45,7 +39,6 @@ namespace Raven.Sheet.Sprites
           SourceSprite.Region.Height * Transform.Scale.Y);
     }
 
-    [JsonExclude]
     public RectangleF WorldBounds { 
       get 
       {
@@ -55,6 +48,8 @@ namespace Raven.Sheet.Sprites
         return bounds;
       }
     }
+    private SourcedSprite()
+    {}
     public SourcedSprite(Spritex spritex=null, Sprites.Sprite sprite=null) 
     {
       Spritex = spritex;

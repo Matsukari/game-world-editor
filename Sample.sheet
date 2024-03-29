@@ -1,6 +1,12 @@
 {
+	"Name": "Assets/Raw/Unprocessed/export/test_canvas.png",
+	"Properties": {
+		"Data": {
+
+		}
+	},
 	"Filename": "Assets/Raw/Unprocessed/export/test_canvas.png",
-	"_tiles": {
+	"TileMap": {
 
 	},
 	"Spritexes": [
@@ -11,16 +17,30 @@
 
 				}
 			},
-			"Animations": [
-
-			],
+			"Color": {
+				"_packedValue": 4294967295
+			},
+			"RenderLayer": 0,
 			"Parts": [
 				{
-					"Name": "Main component",
+					"Name": "fuck",
+					"Properties": {
+						"Data": {
+
+						}
+					},
+					"IsVisible": true,
+					"Color": {
+						"_packedValue": 4294967295
+					},
+					"Origin": {
+						"X": 0,
+						"Y": 0
+					},
 					"Transform": {
 						"Position": {
-							"X": 0,
-							"Y": 0
+							"X": 1.1333358,
+							"Y": -11.333359
 						},
 						"Scale": {
 							"X": 1,
@@ -32,31 +52,341 @@
 						},
 						"Rotation": 0
 					},
-					"SpriteEffects": "None",
-					"Origin": {
-						"X": 0,
-						"Y": 0
-					},
-					"Color": {
-						"PackedValue": 4294967295
-					},
-					"IsVisible": true,
 					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"Name": "",
+						"Properties": {
+							"Data": {
+
+							}
+						},
+						"Region": {
+							"X": 16,
+							"Y": 192,
+							"Width": 96,
+							"Height": 192
+						}
+					}
+				}
+			],
+			"Animations": [
+				{
+					"Name": "new-animation",
 					"Properties": {
 						"Data": {
 
 						}
-					}
+					},
+					"IsContinous": false,
+					"Frames": [
+						{
+							"Name": "",
+							"Properties": {
+								"Data": {
+
+								}
+							},
+							"Parts": [
+								{
+									"Name": "",
+									"Properties": {
+										"Data": {
+
+										}
+									},
+									"IsVisible": true,
+									"Color": {
+										"PackedValue": 4294967295
+									},
+									"Origin": {
+										"X": 0,
+										"Y": 0
+									},
+									"Transform": {
+										"Position": {
+											"X": 0,
+											"Y": 0
+										},
+										"Scale": {
+											"X": 1,
+											"Y": 1
+										},
+										"Skew": {
+											"X": 1,
+											"Y": 1
+										},
+										"Rotation": 0
+									},
+									"IsLocked": false,
+									"SpriteEffects": "None",
+									"SourceSprite": {
+										"Name": "",
+										"Properties": {
+											"Data": {
+
+											}
+										},
+										"Region": {
+											"X": 16,
+											"Y": 192,
+											"Width": 96,
+											"Height": 192
+										}
+									}
+								}
+							],
+							"Duration": 1,
+							"EaseType": "Linear"
+						},
+						{
+							"Name": "",
+							"Properties": {
+								"Data": {
+
+								}
+							},
+							"Parts": [
+								{
+									"Name": "",
+									"Properties": {
+										"Data": {
+
+										}
+									},
+									"IsVisible": true,
+									"Color": {
+										"PackedValue": 4294967295
+									},
+									"Origin": {
+										"X": 0,
+										"Y": 0
+									},
+									"Transform": {
+										"Position": {
+											"X": 2,
+											"Y": -20
+										},
+										"Scale": {
+											"X": 1,
+											"Y": 1
+										},
+										"Skew": {
+											"X": 1,
+											"Y": 1
+										},
+										"Rotation": 0
+									},
+									"IsLocked": false,
+									"SpriteEffects": "None",
+									"SourceSprite": {
+										"Name": "",
+										"Properties": {
+											"Data": {
+
+											}
+										},
+										"Region": {
+											"X": 16,
+											"Y": 192,
+											"Width": 96,
+											"Height": 192
+										}
+									}
+								}
+							],
+							"Duration": 1,
+							"EaseType": "Linear"
+						},
+						{
+							"Name": "",
+							"Properties": {
+								"Data": {
+
+								}
+							},
+							"Parts": [
+								{
+									"Name": "",
+									"Properties": {
+										"Data": {
+
+										}
+									},
+									"IsVisible": true,
+									"Color": {
+										"PackedValue": 4294967295
+									},
+									"Origin": {
+										"X": 0,
+										"Y": 0
+									},
+									"Transform": {
+										"Position": {
+											"X": -82,
+											"Y": -46
+										},
+										"Scale": {
+											"X": 1,
+											"Y": 1
+										},
+										"Skew": {
+											"X": 1,
+											"Y": 1
+										},
+										"Rotation": 0
+									},
+									"IsLocked": false,
+									"SpriteEffects": "None",
+									"SourceSprite": {
+										"Name": "",
+										"Properties": {
+											"Data": {
+
+											}
+										},
+										"Region": {
+											"X": 16,
+											"Y": 192,
+											"Width": 96,
+											"Height": 192
+										}
+									}
+								}
+							],
+							"Duration": 1,
+							"EaseType": "Linear"
+						},
+						{
+							"Name": "",
+							"Properties": {
+								"Data": {
+
+								}
+							},
+							"Parts": [
+								{
+									"Name": "",
+									"Properties": {
+										"Data": {
+
+										}
+									},
+									"IsVisible": true,
+									"Color": {
+										"PackedValue": 4294967295
+									},
+									"Origin": {
+										"X": 0,
+										"Y": 0
+									},
+									"Transform": {
+										"Position": {
+											"X": 54.5,
+											"Y": -51.5
+										},
+										"Scale": {
+											"X": 1,
+											"Y": 1
+										},
+										"Skew": {
+											"X": 1,
+											"Y": 1
+										},
+										"Rotation": 0
+									},
+									"IsLocked": false,
+									"SpriteEffects": "None",
+									"SourceSprite": {
+										"Name": "",
+										"Properties": {
+											"Data": {
+
+											}
+										},
+										"Region": {
+											"X": 16,
+											"Y": 192,
+											"Width": 96,
+											"Height": 192
+										}
+									}
+								}
+							],
+							"Duration": 1,
+							"EaseType": "Linear"
+						},
+						{
+							"Name": "",
+							"Properties": {
+								"Data": {
+
+								}
+							},
+							"Parts": [
+								{
+									"Name": "",
+									"Properties": {
+										"Data": {
+
+										}
+									},
+									"IsVisible": true,
+									"Color": {
+										"PackedValue": 4294967295
+									},
+									"Origin": {
+										"X": 0,
+										"Y": 0
+									},
+									"Transform": {
+										"Position": {
+											"X": 1,
+											"Y": -167
+										},
+										"Scale": {
+											"X": 1,
+											"Y": 1
+										},
+										"Skew": {
+											"X": 1,
+											"Y": 1
+										},
+										"Rotation": 0
+									},
+									"IsLocked": false,
+									"SpriteEffects": "None",
+									"SourceSprite": {
+										"Name": "",
+										"Properties": {
+											"Data": {
+
+											}
+										},
+										"Region": {
+											"X": 16,
+											"Y": 192,
+											"Width": 96,
+											"Height": 192
+										}
+									}
+								}
+							],
+							"Duration": 1,
+							"EaseType": "Linear"
+						}
+					]
 				}
-			]
+			],
+			"IsVisible": false,
+			"LocalOffset": {
+				"X": 0,
+				"Y": 0
+			},
+			"UpdateOrder": 0
 		}
 	],
-	"Name": "Assets/Raw/Unprocessed/export/test_canvas.png",
-	"Properties": {
-		"Data": {
-
-		}
-	},
 	"TileWidth": 16,
-	"TileHeight": 16
+	"TileHeight": 16,
+	"Filename": "Assets/Raw/Unprocessed/export/test_canvas.png"
 }

@@ -12,28 +12,25 @@ namespace Raven.Sheet.Sprites
   /// </summary>
   public class Tile : IPropertied
   { 
-    [JsonExclude]
     string IPropertied.Name { get => Name; set => Name = value; }
 
-    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
+
     public Point Coordinates;
 
-    [JsonExclude]
     public Rectangle Region { get=>_sheet.GetTile(Id); }
 
-    [JsonExclude]
     public int Id { get=>_sheet.GetTileId(Coordinates.X, Coordinates.Y); }
 
-    [JsonExclude]
     public Texture2D Texture { get => _sheet.Texture; }
 
-    [JsonExclude]
     internal Sheet _sheet;
 
-
+    private Tile() 
+    {
+    }
     public Tile(Point coord, Sheet sheet)
     {
       Coordinates = coord;

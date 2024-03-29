@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
+using Nez.Persistence;
 
 namespace Raven.Sheet.Sprites 
 {
@@ -12,6 +13,8 @@ namespace Raven.Sheet.Sprites
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
+
+    [JsonInclude]
     public Rectangle Region { get; private set; } = new Rectangle();
     public List<Tile> GetTiles { get => _createdTiles; }
     public Texture2D Texture { get => _sheet.Texture; }
@@ -20,6 +23,7 @@ namespace Raven.Sheet.Sprites
     internal List<Tile> _createdTiles = new List<Tile>();
 
     internal Sheet _sheet;
+    private Sprite() {}
     public Sprite(Rectangle region, Sheet sheet)
     {
       Region = region;

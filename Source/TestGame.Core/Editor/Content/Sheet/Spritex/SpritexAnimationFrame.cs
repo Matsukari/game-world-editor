@@ -13,6 +13,8 @@ namespace Raven.Sheet
   {
     public List<SourcedSprite> Parts = new List<SourcedSprite>();
 
+    private SpritexAnimationFrame()
+    {}
     public SpritexAnimationFrame(Spritex spritex)
     {
       Parts = spritex.DuplicateParts();
