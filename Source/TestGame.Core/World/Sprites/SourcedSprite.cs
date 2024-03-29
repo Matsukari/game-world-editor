@@ -12,6 +12,8 @@ namespace Raven.Sheet.Sprites
   public class SourcedSprite : IPropertied
   {
     string IPropertied.Name { get => Name; set => Name = value; }
+
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
@@ -23,8 +25,7 @@ namespace Raven.Sheet.Sprites
     public SpriteEffects SpriteEffects;
     public Vector2 Origin = new Vector2();
 
-    [JsonInclude]
-    public Color Color = Color.White;
+    public Vector4 Color = Vector4.One;
 
     // Some management options
     public bool IsVisible = true;
@@ -68,6 +69,8 @@ namespace Raven.Sheet.Sprites
     public SourcedSprite Duplicate()
     {
       SourcedSprite sprite = new SourcedSprite();
+      sprite.Name = Name;
+      sprite.Properties = Properties.Copy();
       sprite.Spritex = Spritex;
       sprite.SourceSprite = SourceSprite;
       sprite.Transform = Transform.Duplicate();

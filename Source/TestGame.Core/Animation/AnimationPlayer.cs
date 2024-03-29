@@ -40,7 +40,14 @@ namespace Raven
     public void JumpTo(int index, bool resetTime=true)
     {
       _currentKeyframe = index;
+
       if (resetTime) _frameTimer = 0;
+
+      if (Animation.TotalFrames == 0) 
+      {
+        _currentKeyframe = 0;
+        return;
+      } 
 
       if (IsLooping) _currentKeyframe = _currentKeyframe % Animation.TotalFrames;
       // Never executes if IsLooping is enabled 

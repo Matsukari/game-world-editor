@@ -6,7 +6,7 @@
 		}
 	},
 	"Filename": "Assets/Raw/Unprocessed/export/test_canvas.png",
-	"TileMap": {
+	"_tiles": {
 
 	},
 	"Spritexes": [
@@ -18,12 +18,12 @@
 				}
 			},
 			"Color": {
-				"_packedValue": 4294967295
+				"PackedValue": 4294967295
 			},
 			"RenderLayer": 0,
 			"Parts": [
 				{
-					"Name": "fuck",
+					"Name": "Main component",
 					"Properties": {
 						"Data": {
 
@@ -31,7 +31,10 @@
 					},
 					"IsVisible": true,
 					"Color": {
-						"_packedValue": 4294967295
+						"X": 1,
+						"Y": 1,
+						"Z": 1,
+						"W": 1
 					},
 					"Origin": {
 						"X": 0,
@@ -39,8 +42,8 @@
 					},
 					"Transform": {
 						"Position": {
-							"X": 1.1333358,
-							"Y": -11.333359
+							"X": 0,
+							"Y": 0
 						},
 						"Scale": {
 							"X": 1,
@@ -62,10 +65,10 @@
 							}
 						},
 						"Region": {
-							"X": 16,
+							"X": 0,
 							"Y": 192,
-							"Width": 96,
-							"Height": 192
+							"Width": 128,
+							"Height": 176
 						}
 					}
 				}
@@ -89,7 +92,7 @@
 							},
 							"Parts": [
 								{
-									"Name": "",
+									"Name": "Main component",
 									"Properties": {
 										"Data": {
 
@@ -97,7 +100,10 @@
 									},
 									"IsVisible": true,
 									"Color": {
-										"PackedValue": 4294967295
+										"X": 1,
+										"Y": 1,
+										"Z": 1,
+										"W": 1
 									},
 									"Origin": {
 										"X": 0,
@@ -128,10 +134,10 @@
 											}
 										},
 										"Region": {
-											"X": 16,
+											"X": 0,
 											"Y": 192,
-											"Width": 96,
-											"Height": 192
+											"Width": 128,
+											"Height": 176
 										}
 									}
 								}
@@ -148,7 +154,7 @@
 							},
 							"Parts": [
 								{
-									"Name": "",
+									"Name": "Main component",
 									"Properties": {
 										"Data": {
 
@@ -156,7 +162,10 @@
 									},
 									"IsVisible": true,
 									"Color": {
-										"PackedValue": 4294967295
+										"X": 1,
+										"Y": 1,
+										"Z": 1,
+										"W": 1
 									},
 									"Origin": {
 										"X": 0,
@@ -164,8 +173,8 @@
 									},
 									"Transform": {
 										"Position": {
-											"X": 2,
-											"Y": -20
+											"X": 128.56322,
+											"Y": 9.331202
 										},
 										"Scale": {
 											"X": 1,
@@ -187,10 +196,10 @@
 											}
 										},
 										"Region": {
-											"X": 16,
+											"X": 0,
 											"Y": 192,
-											"Width": 96,
-											"Height": 192
+											"Width": 128,
+											"Height": 176
 										}
 									}
 								}
@@ -207,7 +216,7 @@
 							},
 							"Parts": [
 								{
-									"Name": "",
+									"Name": "Main component",
 									"Properties": {
 										"Data": {
 
@@ -215,7 +224,10 @@
 									},
 									"IsVisible": true,
 									"Color": {
-										"PackedValue": 4294967295
+										"X": 1,
+										"Y": 1,
+										"Z": 1,
+										"W": 1
 									},
 									"Origin": {
 										"X": 0,
@@ -223,8 +235,8 @@
 									},
 									"Transform": {
 										"Position": {
-											"X": -82,
-											"Y": -46
+											"X": -174.18242,
+											"Y": 14.5152025
 										},
 										"Scale": {
 											"X": 1,
@@ -246,128 +258,10 @@
 											}
 										},
 										"Region": {
-											"X": 16,
+											"X": 0,
 											"Y": 192,
-											"Width": 96,
-											"Height": 192
-										}
-									}
-								}
-							],
-							"Duration": 1,
-							"EaseType": "Linear"
-						},
-						{
-							"Name": "",
-							"Properties": {
-								"Data": {
-
-								}
-							},
-							"Parts": [
-								{
-									"Name": "",
-									"Properties": {
-										"Data": {
-
-										}
-									},
-									"IsVisible": true,
-									"Color": {
-										"PackedValue": 4294967295
-									},
-									"Origin": {
-										"X": 0,
-										"Y": 0
-									},
-									"Transform": {
-										"Position": {
-											"X": 54.5,
-											"Y": -51.5
-										},
-										"Scale": {
-											"X": 1,
-											"Y": 1
-										},
-										"Skew": {
-											"X": 1,
-											"Y": 1
-										},
-										"Rotation": 0
-									},
-									"IsLocked": false,
-									"SpriteEffects": "None",
-									"SourceSprite": {
-										"Name": "",
-										"Properties": {
-											"Data": {
-
-											}
-										},
-										"Region": {
-											"X": 16,
-											"Y": 192,
-											"Width": 96,
-											"Height": 192
-										}
-									}
-								}
-							],
-							"Duration": 1,
-							"EaseType": "Linear"
-						},
-						{
-							"Name": "",
-							"Properties": {
-								"Data": {
-
-								}
-							},
-							"Parts": [
-								{
-									"Name": "",
-									"Properties": {
-										"Data": {
-
-										}
-									},
-									"IsVisible": true,
-									"Color": {
-										"PackedValue": 4294967295
-									},
-									"Origin": {
-										"X": 0,
-										"Y": 0
-									},
-									"Transform": {
-										"Position": {
-											"X": 1,
-											"Y": -167
-										},
-										"Scale": {
-											"X": 1,
-											"Y": 1
-										},
-										"Skew": {
-											"X": 1,
-											"Y": 1
-										},
-										"Rotation": 0
-									},
-									"IsLocked": false,
-									"SpriteEffects": "None",
-									"SourceSprite": {
-										"Name": "",
-										"Properties": {
-											"Data": {
-
-											}
-										},
-										"Region": {
-											"X": 16,
-											"Y": 192,
-											"Width": 96,
-											"Height": 192
+											"Width": 128,
+											"Height": 176
 										}
 									}
 								}
@@ -387,6 +281,5 @@
 		}
 	],
 	"TileWidth": 16,
-	"TileHeight": 16,
-	"Filename": "Assets/Raw/Unprocessed/export/test_canvas.png"
+	"TileHeight": 16
 }

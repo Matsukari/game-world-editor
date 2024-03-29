@@ -11,7 +11,10 @@ namespace Raven.Sheet
   /// </summary>
 	public class Sheet : IPropertied
 	{
+    [JsonInclude]
     public string Name { get; set; } = "";
+
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Filename;
@@ -19,6 +22,7 @@ namespace Raven.Sheet
     /// <summary>
     /// Only those with custom properties or name will be added in the list
     /// </summary>
+    [JsonInclude]
     internal Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
     
 		public List<Sprites.Spritex> Spritexes = new List<Sprites.Spritex>();

@@ -64,7 +64,7 @@ namespace Raven.Sheet.Sprites
             texture: sprite.SourceSprite.Texture,
             position: dest.Location + Transform.Position + _spritex.LocalOffset + sprite.Transform.Position,
             sourceRectangle: sprite.SourceSprite.Region,
-            color: sprite.Color,
+            color: sprite.Color.ToColor(),
             rotation: Transform.Rotation + sprite.Transform.Rotation,
             origin: sprite.Origin,
             scale: Transform.Scale * sprite.Transform.Scale,

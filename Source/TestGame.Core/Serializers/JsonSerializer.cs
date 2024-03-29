@@ -12,6 +12,8 @@ namespace Raven.Serializers
     public void Save(string file, T obj)
     {
       var settings = new JsonSettings();
+      settings.PreserveReferencesHandling = true;
+      settings.TypeNameHandling = TypeNameHandling.Auto;
       settings.TypeConverters = new JsonTypeConverter[] 
       {
         new AnimationJsonConverter(),

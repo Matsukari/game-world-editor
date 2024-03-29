@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven.Sheet.Sprites 
 {
@@ -9,6 +10,8 @@ namespace Raven.Sheet.Sprites
   public class Spritex : RenderableComponent, IPropertied
   {
     string IPropertied.Name { get => Name; set => Name = value; }
+
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
@@ -17,6 +20,7 @@ namespace Raven.Sheet.Sprites
     /// All the Spritex operates on. Like a components that is attached to an Entity
     /// </summary>
     public List<SourcedSprite> Parts = new List<SourcedSprite>();
+
     public List<Animation> Animations = new List<Animation>();
 
     internal Sheet _sheet;
@@ -112,7 +116,7 @@ namespace Raven.Sheet.Sprites
             texture: sprite.SourceSprite.Texture,
             position: Transform.Position + LocalOffset + sprite.Transform.Position,
             sourceRectangle: sprite.SourceSprite.Region,
-            color: sprite.Color,
+            color: sprite.Color.ToColor(),
             rotation: Transform.Rotation + sprite.Transform.Rotation,
             origin: sprite.Origin,
             scale: Transform.Scale * sprite.Transform.Scale,

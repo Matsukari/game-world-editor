@@ -26,7 +26,6 @@ namespace Raven.Serializers
           Console.WriteLine($"{part.IsVisible}");
           Console.WriteLine($"{part.SpriteEffects}");
           Console.WriteLine($"{part.LocalBounds}");
-          part.Color = Microsoft.Xna.Framework.Color.White;
           part.Spritex = spritex;
           part.SourceSprite._sheet = model;
         }

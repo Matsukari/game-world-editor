@@ -10,12 +10,15 @@ namespace Raven.Sheet.Sprites
   public class Sprite : IPropertied
   {
     string IPropertied.Name { get => Name; set => Name = value; }
+
+    [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
 
     [JsonInclude]
     public Rectangle Region { get; private set; } = new Rectangle();
+
     public List<Tile> GetTiles { get => _createdTiles; }
     public Texture2D Texture { get => _sheet.Texture; }
     public Point TileSize { get => _sheet.TileSize; }

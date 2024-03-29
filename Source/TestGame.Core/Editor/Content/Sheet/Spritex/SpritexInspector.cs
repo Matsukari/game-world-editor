@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 
 namespace Raven.Sheet.Sprites 
@@ -42,6 +43,14 @@ namespace Raven.Sheet.Sprites
         if (sprite.SourceSprite.Name != "") ImGui.LabelText("Source", sprite.SourceSprite.Name);
         ImGui.LabelText("Region", sprite.SourceSprite.Region.RenderStringFormat());
       ImGui.EndDisabled();
+
+      var color = sprite.Color.ToNumerics();
+      if (ImGui.ColorEdit4("Tint", ref color)) sprite.Color = color;
+
+      var flipH = sprite.SpriteEffects == SpriteEffects.FlipHorizontally;
+      var flipV = sprite.SpriteEffects == SpriteEffects.FlipVertically;
+      if (ImGui.Checkbox("Flip Horizontally", ref flipH)) sprite.SpriteEffects ^= SpriteEffects.FlipHorizontally;
+      if (ImGui.Checkbox("Flip Vertically", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
 
       sprite.Transform.RenderImGui();
       var origin = sprite.Origin.ToNumerics();
