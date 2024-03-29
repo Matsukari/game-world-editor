@@ -92,8 +92,9 @@ LOD system
 ~Fix zoom switching context~
 ~Fix zooming on mouse~
 ~Fix debug window~
+~Save sheet~
 Group workspaces
-Save & load to file
+Save world
 Undo & redo
 Shape & tile separate selection
 Separate transform operations

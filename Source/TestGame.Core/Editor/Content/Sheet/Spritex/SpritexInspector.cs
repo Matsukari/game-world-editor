@@ -44,14 +44,6 @@ namespace Raven.Sheet.Sprites
         ImGui.LabelText("Region", sprite.SourceSprite.Region.RenderStringFormat());
       ImGui.EndDisabled();
 
-      var color = sprite.Color.ToNumerics();
-      if (ImGui.ColorEdit4("Tint", ref color)) sprite.Color = color;
-
-      var flipH = sprite.SpriteEffects == SpriteEffects.FlipHorizontally;
-      var flipV = sprite.SpriteEffects == SpriteEffects.FlipVertically;
-      if (ImGui.Checkbox("Flip Horizontally", ref flipH)) sprite.SpriteEffects ^= SpriteEffects.FlipHorizontally;
-      if (ImGui.Checkbox("Flip Vertically", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
-
       sprite.Transform.RenderImGui();
       var origin = sprite.Origin.ToNumerics();
 
@@ -67,6 +59,15 @@ namespace Raven.Sheet.Sprites
       {
         if (ImGui.InputFloat2("Origin", ref origin)) sprite.Origin = origin;
       }
+      var color = sprite.Color.ToNumerics();
+      if (ImGui.ColorEdit4("Tint", ref color)) sprite.Color = color;
+
+      var flipBoth = sprite.SpriteEffects == (SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally);
+      var flipH = sprite.SpriteEffects == SpriteEffects.FlipHorizontally || flipBoth;
+      var flipV = sprite.SpriteEffects == SpriteEffects.FlipVertically || flipBoth;
+      if (ImGui.Checkbox("Flip X", ref flipH)) sprite.SpriteEffects ^= SpriteEffects.FlipHorizontally;
+      ImGui.SameLine();
+      if (ImGui.Checkbox("Flip Y", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
     }
     bool _isOpenComponentOptionPopup = false;
     SourcedSprite _compOnOptions = null;
@@ -79,12 +80,12 @@ namespace Raven.Sheet.Sprites
       }
       if (ImGui.BeginPopupContextItem("sprite-component-options") && _compOnOptions != null)
       {
-        var lockState = (_compOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
+        var lockState = (!_compOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
           _compOnOptions.IsLocked = !_compOnOptions.IsLocked;
         }
-        var visib = (_compOnOptions.IsVisible) ? IconFonts.FontAwesome5.EyeSlash + "  Hide" : IconFonts.FontAwesome5.Eye + "  Show";
+        var visib = (!_compOnOptions.IsVisible) ? IconFonts.FontAwesome5.EyeSlash + "  Hide" : IconFonts.FontAwesome5.Eye + "  Show";
         if (ImGui.MenuItem(visib))
         {
           _compOnOptions.IsVisible = !_compOnOptions.IsVisible;
@@ -92,6 +93,7 @@ namespace Raven.Sheet.Sprites
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
         {
           _compOnOptions.DetachFromSpritex();
+          _view.Editor.GetEditorComponent<Selection>().End();
         }
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate"))
         {

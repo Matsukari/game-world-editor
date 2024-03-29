@@ -97,27 +97,27 @@ namespace Raven.Sheet
 
       if (Nez.Input.RightMouseButtonPressed)
       {
-        var hasSelection = false;
+        // var hasSelection = false;
         foreach (var part in _spritex.Spritex.Parts)
         {
           var mouse = Entity.Scene.Camera.MouseToWorldPoint();
           if (part.WorldBounds.Contains(mouse))
           {
-            hasSelection = true;
+            // hasSelection = true;
           }
         }
-        if (!hasSelection)
-        {
-          ImGui.OpenPopup("spritex-canvas-options-popup");
-        }
+        // if (!hasSelection)
+        // {
+        //   ImGui.OpenPopup("spritex-canvas-options-popup");
+        // }
       }
-      if (ImGui.BeginPopup("spritex-canvas-options-popup"))
-      {
-        if (ImGui.MenuItem("Add new component here"))
-        {
-        }
-        ImGui.EndPopup();
-      }
+      // if (ImGui.BeginPopup("spritex-canvas-options-popup"))
+      // {
+      //   if (ImGui.MenuItem("Add new component here"))
+      //   {
+      //   }
+      //   ImGui.EndPopup();
+      // }
       Editor.GetEditorComponent<SheetView>()._inspector.Render(editor);
       _spritex.Render(editor);
     }

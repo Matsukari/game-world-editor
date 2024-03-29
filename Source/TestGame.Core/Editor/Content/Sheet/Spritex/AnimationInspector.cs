@@ -152,7 +152,7 @@ namespace Raven.Sheet
       {
         var frame = Animator.Animation.Frames[i];
         ImGui.Text(i.ToString());
-        Widget.ImGuiWidget.SpanX(10f);
+        Widget.ImGuiWidget.SpanX(12f);
 
       }
     }
