@@ -59,7 +59,7 @@ namespace Raven.Sheet
       RectangleF region = RectangleF.Empty;
       if (ContentData.Selection is Sprite sprite) region = sprite.Region.ToRectangleF();
       else if (ContentData.Selection is Tile tile) region = tile.Region.ToRectangleF();
-      if (region != RectangleF.Empty) batcher.DrawRect(GetRegionInSheet(region), Editor.Settings.Colors.SpriteRegionActiveFill);
+      if (region != RectangleF.Empty) batcher.DrawRect(GetRegionInSheet(region), Editor.Settings.Colors.PickFill.ToColor());
     }
     void SyncModifiedTiles()
     {
@@ -80,7 +80,7 @@ namespace Raven.Sheet
         if (worldTile.Contains(camera.MouseToWorldPoint())) TileInMouse = tile;
         if (IsDrawGrid)
         {
-          batcher.DrawRectOutline(camera, worldTile, Editor.Settings.Colors.SpriteRegionInactiveOutline);
+          batcher.DrawRectOutline(camera, worldTile, Editor.Settings.Colors.PickHoverOutline.ToColor());
         }
       }
       // Highlight the tile under mouse
@@ -88,7 +88,8 @@ namespace Raven.Sheet
       if (worldTileInMouse != null) 
       {
         worldTileInMouse.Location += _image.Bounds.Location;
-        batcher.DrawRectOutline(camera, worldTileInMouse, Editor.Settings.Colors.SpriteRegionActiveFill);
+        batcher.DrawRect(worldTileInMouse, Editor.Settings.Colors.PickHover.ToColor());
+        batcher.DrawRectOutline(camera, worldTileInMouse, Editor.Settings.Colors.PickSelectedOutline.ToColor());
       }
     }
 

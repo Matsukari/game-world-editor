@@ -11,7 +11,7 @@ namespace Raven.Serializers
     {
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
-      encoder.EncodeKeyValuePair("Filename", instance.Filename);
+      encoder.EncodeKeyValuePair("Source", instance.Source);
       encoder.EncodeKeyValuePair("_tiles", instance._tiles);
       encoder.EncodeKeyValuePair("Spritexes", instance.Spritexes);
       encoder.EncodeKeyValuePair("TileWidth", instance.TileWidth);

@@ -55,10 +55,7 @@ namespace Raven.Sheet
         WorldEditor._spritePicker.Sheets.Clear();
         foreach (var sheet in WorldEditor._world.SpriteSheets) 
         {
-          var data = new SheetPickerData(sheet.Value);
-          data.GridColor = _editor.Settings.Colors.SpriteRegionInactiveOutline.ToImColor();
-          data.HoverTileFillColor = _editor.Settings.Colors.SpriteRegionActiveFill.Add(new Color(0.7f, 0.7f, 0.7f, 0.4f)).ToImColor();
-          data.HoverTileBorderColor = _editor.Settings.Colors.SpriteRegionActiveOutline.ToImColor();
+          var data = new SheetPickerData(sheet.Value, _editor.Settings.Colors);
           WorldEditor._spritePicker.Sheets.Add(data);
         }
       }

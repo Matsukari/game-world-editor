@@ -9,7 +9,7 @@ namespace Raven.Serializers
   {
     protected override Sheet.Sheet Realize(Sheet.Sheet model)
     {
-      model._texture =Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(model.Filename));
+      model._texture =Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(model.Source));
       Insist.IsNotNull(model._texture);  
 
       foreach (var spritex in model.Spritexes)

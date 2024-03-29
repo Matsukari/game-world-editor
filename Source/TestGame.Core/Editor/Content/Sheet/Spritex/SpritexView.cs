@@ -74,6 +74,7 @@ namespace Raven.Sheet
     }
     void Clean()
     {
+      if (!Editor.HasContent) return;
       Editor.GetEditorComponent<SheetSelector>().RemoveSelection();
       Editor.GetEditorComponent<Selection>().End();
       Enabled = false;
@@ -89,7 +90,7 @@ namespace Raven.Sheet
     }
     public override void Render(Batcher batcher, Camera camera)
     {
-      Guidelines.OriginLinesRenderable.Render(batcher, camera, Editor.Settings.Colors.OriginLineX, Editor.Settings.Colors.OriginLineY);
+      Guidelines.OriginLinesRenderable.Render(batcher, camera, Editor.Settings.Colors.OriginLineX.ToColor(), Editor.Settings.Colors.OriginLineY.ToColor());
       _spritex.Spritex.Render(batcher, camera);
     }  
     public void Render(Editor editor) 

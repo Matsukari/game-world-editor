@@ -7,7 +7,7 @@ namespace Raven.Sheet
   {
     public Editor Editor { get => (Editor)Entity; }
     public EditorTabData ContentData { get => Editor.GetContent().Data; }
-    public IPropertied Content { get => Editor.GetContent().Content; }
+    public IPropertied Content { get => (Editor.HasContent) ? Editor.GetContent().Content : null; }
     public Camera Camera { get => Entity.Scene.Camera; }
 
     virtual public void Update() 
@@ -22,12 +22,17 @@ namespace Raven.Sheet
     // Only works on certain content
     public bool RestrictTo<T>() 
     {
-      if (Content is T) Enabled = true;
+      if (Editor.HasContent && Content is T) Enabled = true;
       else Enabled = false;
       return Enabled;
     }
     public bool RestrictTo(params Type[] types) 
     {
+      if (!Editor.HasContent) 
+      {
+        Enabled = false;
+        return false;
+      }
       var match = false;
       foreach (var type in types)
       {

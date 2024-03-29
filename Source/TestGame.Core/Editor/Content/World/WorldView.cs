@@ -81,7 +81,7 @@ namespace Raven.Sheet
     bool _isOpenLevelOptions = false;
     public override void Render(Batcher batcher, Camera camera)
     {
-      Guidelines.OriginLinesRenderable.Render(batcher, camera, Editor.Settings.Colors.OriginLineX, Editor.Settings.Colors.OriginLineY);
+      Guidelines.OriginLinesRenderable.Render(batcher, camera, Editor.Settings.Colors.OriginLineX.ToColor(), Editor.Settings.Colors.OriginLineY.ToColor());
       var worldEditor = Editor.GetEditorComponent<WorldEditor>();
       var selection = Editor.GetEditorComponent<Selection>();
       var input = Core.GetGlobalManager<Raven.Input.InputManager>();
@@ -91,7 +91,7 @@ namespace Raven.Sheet
         var levelInspector = worldEditor._levelInspectors[i];
         if (!level.Enabled) continue;
 
-        batcher.DrawRect(level.Bounds, Editor.Settings.Colors.LevelSheet);
+        batcher.DrawRect(level.Bounds, Editor.Settings.Colors.LevelSheet.ToColor());
 
         if (Nez.Input.LeftMouseButtonPressed && !input.IsImGuiBlocking)
         {
@@ -119,7 +119,7 @@ namespace Raven.Sheet
       }
       if (Editor.GetEditorComponent<WorldEditor>().SelectedLevel != -1)
       {
-        batcher.DrawRectOutline(camera, _world.CurrentLevel.Bounds, Editor.Settings.Colors.SpriteRegionActiveOutline);
+        batcher.DrawRectOutline(camera, _world.CurrentLevel.Bounds, Editor.Settings.Colors.LevelSelOutline.ToColor());
       }
     }
   }

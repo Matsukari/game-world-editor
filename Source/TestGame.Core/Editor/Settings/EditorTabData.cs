@@ -2,6 +2,11 @@ using Microsoft.Xna.Framework;
 
 namespace Raven.Sheet
 {
+  public class EditorTabMetadata
+  {
+    public string Filename;
+    public EditorContentType Type;
+  }
   public class EditorTabData
   {
     public Object Selection = null; 
@@ -10,5 +15,7 @@ namespace Raven.Sheet
 
     public Shape ShapeSelection = null;
     public IPropertied ShapeContext = null;
+
+    public string Filename = null;
   }
 }

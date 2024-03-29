@@ -12,8 +12,8 @@ namespace Raven.Sheet
 
     void ProjectOptions()
     {
-      if (ImGui.MenuItem("Save")) Editor.Save();
-      if (ImGui.MenuItem("Project Settings")) Editor.OpenProjectSettings();
+      if (ImGui.MenuItem("Save")) Editor.Component<Serializer>().SaveContent();
+      if (ImGui.MenuItem("Project Settings")) Editor.Component<Settings>().Enabled = true;
     }
     void WorldOptions()
     {
@@ -33,7 +33,6 @@ namespace Raven.Sheet
     }
     void ViewOptions() 
     {
-      Editor.GetComponent<Settings>().Enabled = true;
     }
     public override void OnAddedToEntity()
     {
@@ -191,7 +190,7 @@ namespace Raven.Sheet
         if (ImGui.Button(label)) Editor.GetEditorComponent<ShapeAnnotator>().Annotate(shapeInstance);
       }
 
-      if (Editor.GetContent().Content is World)
+      if (Content is World)
       {
         // Paint options
         ButtonSetFlat(4, 20);

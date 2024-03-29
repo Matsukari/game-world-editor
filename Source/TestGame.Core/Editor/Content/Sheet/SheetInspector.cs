@@ -32,7 +32,7 @@ namespace Raven.Sheet
     protected override void OnRenderAfterName()
     {
       int w = Sheet.TileWidth, h = Sheet.TileHeight;
-      ImGui.LabelText(IconFonts.FontAwesome5.File + " File", Sheet.Filename);
+      ImGui.LabelText(IconFonts.FontAwesome5.File + " File", Sheet.Source);
       if (ImGui.InputInt("TileWidth", ref w)) Sheet.SetTileSize(w, Sheet.TileHeight);
       if (ImGui.InputInt("TileHeight", ref h)) Sheet.SetTileSize(Sheet.TileWidth, h);
       ImGui.BeginDisabled();

@@ -5,7 +5,7 @@ using Nez.ImGuiTools;
 
 namespace Raven.Sheet
 {
-  public class Settings : Component
+  public class Settings : EditorComponent
   {
     Editor _editor;
     EditorColors _colors;
@@ -36,19 +36,24 @@ namespace Raven.Sheet
           foreach (var field in fields)
           {
             var colorField = field.GetValue(_colors);
-            if (colorField is Color color)
+            if (colorField is Vector4 vec)
             {
-              var numerics = ((Color)field.GetValue(_colors)).ToVector4().ToNumerics();
+              var numerics = ((Vector4)field.GetValue(_colors)).ToNumerics();
               if (ImGui.ColorEdit4(field.Name, ref numerics, 
-                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_colors, new Color(numerics));
+                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_colors, numerics.ToVector4());
             }
           }
           ImGui.EndTabItem();
         }
         ImGui.EndTabBar();
       }
-      if (ImGui.Button("Close"))
+      if (ImGui.Button("Cancel"))
       {
+        Enabled = false;
+      }
+      if (ImGui.Button("Save"))
+      {
+        Editor.Component<Serializer>().SaveSettings();
         Enabled = false;
       }
       ImGui.End();

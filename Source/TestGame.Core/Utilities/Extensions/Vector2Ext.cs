@@ -23,6 +23,10 @@ namespace Raven
     {
       return new Vector2(numeric.X, numeric.Y);
     }
+    public static Vector4 ToVector4(this Num.Vector4 numeric)
+    {
+      return new Vector4(numeric.X, numeric.Y, numeric.Z, numeric.W);
+    }
     public static Vector2 Divide(this Vector2 vec, int x, int y)
     {
       return new Vector2(vec.X/x, vec.Y/y);

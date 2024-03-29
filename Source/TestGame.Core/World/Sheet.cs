@@ -17,8 +17,6 @@ namespace Raven.Sheet
     [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
-    public string Filename;
-
     /// <summary>
     /// Only those with custom properties or name will be added in the list
     /// </summary>
@@ -29,6 +27,8 @@ namespace Raven.Sheet
 
     public int TileWidth;
     public int TileHeight; 
+
+    public string Source;
 
     public Texture2D Texture { get => _texture; }
 
@@ -48,10 +48,10 @@ namespace Raven.Sheet
     }
     public Sheet(string filename) 
     {
-      Name = filename;
-      Filename = filename;
+      Name = System.Environment.CurrentDirectory + "/Untitled.rvsheet";
       var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
       texture.Name = filename;
+      Source = filename;
       Insist.IsNotNull(texture); 
       _texture = texture;
       SetTileSize(16, 16); 

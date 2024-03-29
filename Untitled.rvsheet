@@ -1,0 +1,19 @@
+{
+	"@id": "1",
+	"Name": "/home/ark/Documents/game/projects/WorldEditor/Untitled.rvsheet",
+	"Properties": {
+		"@id": "2",
+		"Data": {
+
+		}
+	},
+	"Source": "/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/parts.png",
+	"_tiles": {
+
+	},
+	"Spritexes": [
+
+	],
+	"TileWidth": 16,
+	"TileHeight": 16
+}

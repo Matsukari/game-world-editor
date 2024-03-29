@@ -14,7 +14,10 @@ namespace Raven.Sheet
       ContentData.ShapeSelection = shape;
       Mouse.SetCursor(MouseCursor.Crosshair);
     }
-
+    public override void OnContent()
+    {
+      if (!Editor.HasContent) Enabled = false;
+    }
     Vector2 _initialMouse = Vector2.Zero;
     public override void Render(Batcher batcher, Camera camera)
     {
@@ -55,7 +58,7 @@ namespace Raven.Sheet
       else if (input.IsDrag && _initialMouse != Vector2.Zero) 
       {
         Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
-        ContentData.ShapeSelection.Render(Editor.PrimitiveBatch, batcher, camera, Editor.Settings.Colors.AnnotatedShapeActive);
+        ContentData.ShapeSelection.Render(Editor.PrimitiveBatch, batcher, camera, Editor.Settings.Colors.ShapeActive.ToColor());
         Editor.PrimitiveBatch.End(); 
       }
       // Released; add 

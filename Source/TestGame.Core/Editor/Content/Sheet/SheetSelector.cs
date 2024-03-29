@@ -10,8 +10,10 @@ namespace Raven.Sheet
     Sprites.Spritex _spritexOnName = null;
     public override void OnContent()
     {
-      RestrictTo<Sheet>();
-      _sheet = Content as Sheet;
+      if (RestrictTo<Sheet>())
+      {
+        _sheet = Content as Sheet;
+      }
     } 
     public void Render(Editor editor)
     {

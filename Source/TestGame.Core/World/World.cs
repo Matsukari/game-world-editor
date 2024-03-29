@@ -33,6 +33,7 @@ namespace Raven.Sheet
       }
     }
 
+
     public Level CurrentLevel = null;
 
     public List<Level> Levels { get => Components.GetComponents<Level>(); } 
@@ -40,8 +41,8 @@ namespace Raven.Sheet
 
     public World() 
     {
+      Name = System.Environment.CurrentDirectory + "/Untitled.rvworld";
       Level level = CreateLevel();
-      Name = "Default World";
       CurrentLevel = level;
     }
     public Level GetLevel(string name)

@@ -18,9 +18,9 @@ namespace Raven.Sheet
     public SheetPickerData(Sheet sheet, EditorColors colors) 
     {
       Sheet = sheet;
-      GridColor = colors.GridOutline.ToImColor();
+      GridColor = colors.LevelGrid.ToImColor();
       HoverTileBorderColor = colors.PickHoverOutline.ToImColor();
-      HoverTileFillColor = colors.PickHover.ToImColor();
+      HoverTileFillColor = colors.PickFill.ToImColor();
     }
 
   }

@@ -7,6 +7,11 @@ namespace Raven.Sheet
   {
     public Overlays() => RenderLayer = -1;
 
+    public override void OnContent()
+    {
+      if (!Editor.HasContent) Enabled = false;
+    }
+        
     public void Render(Editor editor) 
     { 
       // if (ContentData.Selection is IImGuiRenderable renderable) renderable.Render(editor);  
@@ -18,7 +23,7 @@ namespace Raven.Sheet
         // Draw annotated shapes
 
         Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
-        ShapeAnnotator.DrawPropertiesShapes(ContentData.ShapeContext, Editor.PrimitiveBatch, batcher, camera, Editor.Settings.Colors.AnnotatedShapeInactive);
+        ShapeAnnotator.DrawPropertiesShapes(ContentData.ShapeContext, Editor.PrimitiveBatch, batcher, camera, Editor.Settings.Colors.ShapeInactive.ToColor());
         Editor.PrimitiveBatch.End();
 
         // Check selection of shapes

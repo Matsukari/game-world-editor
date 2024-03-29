@@ -1,6 +1,5 @@
 using Raven.Sheet;
 using Nez;
-using Raven.Serializers;
 
 namespace Raven
 {
@@ -34,29 +33,20 @@ namespace Raven
 
     public static PrimitiveBatch PrimitiveBatch;
 
+    public bool HasContent { get => _tabs.Count() > 0; }
+
     public override void OnAddedToScene()
     {
       PrimitiveBatch = new PrimitiveBatch();
-
-      if (File.Exists(file)) 
-      {
-        var loaded = new SheetSerializer().Load(file);
-        AddTab(loaded);
-      }
-      else 
-        AddTab(new Sheet.Sheet("Assets/Raw/Unprocessed/export/test_canvas.png"));
-
       Scene.Camera.Position = -Screen.Center / 2;
-      var world = new World();
-      world.Name = "sample.world";
-      world.AddSheet(GetContent().Content as Sheet.Sheet);
-      AddTab(world);
+
+      AddEditorComponent(new Serializer(), new Settings(Settings), new Selection());
+      Component<Serializer>().LoadStartup();
+
       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().RegisterDrawCommand(RenderImGui);
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent()); 
-      AddComponent(new Settings(Settings));
       AddEditorComponent(
-          new Selection(),
           new SheetView(),
           new SheetSelector(),
           new Overlays(),
@@ -67,8 +57,11 @@ namespace Raven
           new AnimationEditor(),
           new WorldView(),
           new WorldEditor());
-      Switch(0); 
-      Console.WriteLine("After swtch");
+
+      foreach (var child in _children) 
+      {
+        child.OnContent();
+      }
     }
     void RenderImGui()
     {
@@ -83,7 +76,12 @@ namespace Raven
     public override void Update()
     {
       base.Update();
-      Scene.ClearColor = Settings.Colors.Background;
+      Scene.ClearColor = Settings.Colors.Background.ToColor();
+      if (HasContent)
+      {
+        Settings.LastFiles[_currentTab].Filename = GetContent().Content.Name;
+        GetContent().Data.Filename = GetContent().Content.Name;
+      }
     }
     public void AddEditorComponent(params EditorComponent[] components) 
     {
@@ -97,19 +95,26 @@ namespace Raven
     public EditorContent GetContent() => _tabs[_currentTab];
 
     public T GetEditorComponent<T>() where T: EditorComponent => (T)_children.OfType<T>().First();    
+    public T Component<T>() where T: EditorComponent => (T)_children.OfType<T>().First();    
+
 
     public void Switch(int index) 
     {
+      Console.WriteLine($"Switched to {index}");
       // Store last state
       GetContent().Data.Zoom = Scene.Camera.RawZoom;
       GetContent().Data.Position = Scene.Camera.Position;
 
-      GetComponent<Utils.Components.CameraMoveComponent>().Enabled = false;
-      GetComponent<Utils.Components.CameraZoomComponent>().Enabled = false;
+      try 
+      {
+        GetComponent<Utils.Components.CameraMoveComponent>().Enabled = false;
+        GetComponent<Utils.Components.CameraZoomComponent>().Enabled = false;
 
-      // Clean
-      GetEditorComponent<Selection>()?.End();
-      GetEditorComponent<SheetSelector>()?.RemoveSelection();
+        // Clean
+        GetEditorComponent<Selection>()?.End();
+        GetEditorComponent<SheetSelector>()?.RemoveSelection();
+      }
+      catch (Exception) {}
 
       _currentTab = Math.Clamp(index, 0, _tabs.Count()-1);
 
@@ -124,20 +129,33 @@ namespace Raven
       }
       GetContent().Data.ShapeContext = GetContent().Content;
 
+      Settings.LastFile = index;
+
     }
     public void AddTab(IPropertied content)
     {
       _tabs.Add(new EditorContent(content));
       _tabs.Last().Data.ShapeContext = content;
-      if (content is Entity entity && !Scene.Entities.Contains(entity)) Scene.AddEntity(entity);
-    }
-    string file = "Sample.sheet";
-    public void Save() 
-    {
 
-      new SheetSerializer().Save(file, GetContent().Content as Sheet.Sheet);
+      var meta = new EditorTabMetadata();
+      meta.Filename = content.Name; 
+      if (content is Sheet.Sheet) meta.Type = EditorContentType.Sheet;
+      else if (content is World) meta.Type = EditorContentType.World;
+      else throw new Exception();
+
+      if (Settings.LastFiles.Find((file)=>file.Filename == meta.Filename) == null)
+        Settings.LastFiles.Add(meta);
+
+      if (content is Entity entity && !Scene.Entities.Contains(entity)) Scene.AddEntity(entity);
+
+      // First tab in the list yet
+      if (_tabs.Count() == 1) Switch(0);
     }
-    public void OpenProjectSettings() {}
+    public override void OnRemovedFromScene()
+    {
+      Component<Serializer>().SaveSettings();
+    }
+        
 	}
 }
 

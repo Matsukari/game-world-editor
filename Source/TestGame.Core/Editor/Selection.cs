@@ -35,7 +35,7 @@ namespace Raven.Sheet
         {
           axis = i;
         }
-        batcher.DrawRectOutline(camera, ppoint, Editor.Settings.Colors.SelectionPoint);
+        batcher.DrawRectOutline(camera, ppoint, Editor.Settings.Colors.SelectionPoint.ToColor());
         i++;
       }
       // Enlargen the resizing point currently on hover
@@ -43,12 +43,12 @@ namespace Raven.Sheet
       {
         var point = Points[axis];
         point.Size /= camera.RawZoom;
-        batcher.DrawRect(point.GetCenterToStart(), Editor.Settings.Colors.SelectionPoint);
+        batcher.DrawRect(point.GetCenterToStart(), Editor.Settings.Colors.SelectionPoint.ToColor());
       }
 
       // Draw the selection area
-      batcher.DrawRect(ContentBounds, Editor.Settings.Colors.SelectionFill);
-      batcher.DrawRectOutline(camera, ContentBounds, Editor.Settings.Colors.SelectionOutline);
+      batcher.DrawRect(ContentBounds, Editor.Settings.Colors.SelectionFill.ToColor());
+      batcher.DrawRectOutline(camera, ContentBounds, Editor.Settings.Colors.SelectionOutline.ToColor());
 
       var selectionPoint = axis != -1 ? (SelectionAxis)axis : SelectionAxis.None;
 

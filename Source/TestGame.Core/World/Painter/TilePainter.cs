@@ -58,7 +58,7 @@ namespace Raven.Sheet
             {
               ImGui.GetForegroundDrawList().AddRectFilled(
                   input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
-                  _worldEditor.Editor.Settings.Colors.SpriteRegionActiveFill.Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
+                  _worldEditor.Editor.Settings.Colors.PickFill.ToColor().Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
             } 
             break;
         }
