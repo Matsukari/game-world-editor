@@ -31,6 +31,7 @@ namespace Raven.Sheet
         else if (file.Type == EditorContentType.World) Editor.AddTab(LoadContent<World>(file.Filename));
         else throw new Exception($"Error in file metadata. Cannot load {file.Type} content");
       }
+      Editor.Settings.Colors = loadedSettings.Colors;
       // Editor.Switch(Editor.Settings.LastFile);
     }
     public EditorSettings LoadSettings()
