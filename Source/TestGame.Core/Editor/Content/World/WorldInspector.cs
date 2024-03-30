@@ -32,6 +32,14 @@ namespace Raven.Sheet
       {
         if (ImGui.MenuItem("Add Sheet"))
         {
+          void AddSheet(string file)
+          {
+            if (Serializer.SheetStdExtensions.Contains(Path.GetExtension(file)))
+            {
+              World.AddSheet(WorldEditor.Editor.Component<Serializer>().LoadContent<Sheet>(file));
+            }
+          }
+          WorldEditor.Editor.FilePicker.Open(AddSheet);
         }
         ImGui.EndPopup();
       }

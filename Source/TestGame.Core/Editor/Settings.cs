@@ -8,13 +8,8 @@ namespace Raven.Sheet
   public class Settings : EditorComponent
   {
     Editor _editor;
-    EditorColors _colors;
-    EditorSettings _settings;
-    public Settings(EditorSettings settings) 
+    public Settings() 
     {
-      // _editor = editor;
-      _settings = settings;
-      _colors = settings.Colors;
     }
     public override void OnAddedToEntity()
     {
@@ -32,15 +27,15 @@ namespace Raven.Sheet
       {
         if (ImGui.BeginTabItem("Theme"))
         {
-          var fields = _colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+          var fields = Editor.Settings.Colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
           foreach (var field in fields)
           {
-            var colorField = field.GetValue(_colors);
+            var colorField = field.GetValue(Editor.Settings.Colors);
             if (colorField is Vector4 vec)
             {
-              var numerics = ((Vector4)field.GetValue(_colors)).ToNumerics();
+              var numerics = ((Vector4)field.GetValue(Editor.Settings.Colors)).ToNumerics();
               if (ImGui.ColorEdit4(field.Name, ref numerics, 
-                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_colors, numerics.ToVector4());
+                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(Editor.Settings.Colors, numerics.ToVector4());
             }
           }
           ImGui.EndTabItem();

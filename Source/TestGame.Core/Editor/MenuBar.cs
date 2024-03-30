@@ -17,7 +17,7 @@ namespace Raven.Sheet
     }
     void WorldOptions()
     {
-      if (ImGui.MenuItem("New World")) Editor.FilePicker.Open((name)=>Editor.AddTab(new World()));
+      if (ImGui.MenuItem("New World")) Editor.AddTab(new World());
       if (ImGui.BeginMenu("Worlds"))
       {
         ImGui.EndMenu();

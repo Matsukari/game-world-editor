@@ -40,7 +40,7 @@ namespace Raven
       PrimitiveBatch = new PrimitiveBatch();
       Scene.Camera.Position = -Screen.Center / 2;
 
-      AddEditorComponent(new Serializer(), new Settings(Settings), new Selection());
+      AddEditorComponent(new Serializer(), new Settings(), new Selection());
       Component<Serializer>().LoadStartup();
 
       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().RegisterDrawCommand(RenderImGui);
@@ -132,8 +132,9 @@ namespace Raven
       Settings.LastFile = index;
 
     }
-    public void AddTab(IPropertied content)
+    public void AddTab(IPropertied content, bool isSwitch=true)
     {
+      Console.WriteLine("Adding content on tabs");
       _tabs.Add(new EditorContent(content));
       _tabs.Last().Data.ShapeContext = content;
 
@@ -149,7 +150,7 @@ namespace Raven
       if (content is Entity entity && !Scene.Entities.Contains(entity)) Scene.AddEntity(entity);
 
       // First tab in the list yet
-      if (_tabs.Count() == 1) Switch(0);
+      if (_tabs.Count() == 1 || isSwitch) Switch(_tabs.Count()-1);
     }
     public override void OnRemovedFromScene()
     {

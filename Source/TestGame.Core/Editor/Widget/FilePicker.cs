@@ -6,10 +6,12 @@ namespace Raven.Widget
   {
     bool _isOpenFile = false;
     Action<string> _pickerCallback;
-    public void Open(Action<string> callback)
+    public string AcceptedExtensions = "";
+    public void Open(Action<string> callback, string ext=".png|.rvworld|.rvsheet")
     {
       _pickerCallback = callback;
       _isOpenFile = true;
+      AcceptedExtensions = ext;
     }
     public void Draw()
     {
@@ -21,7 +23,7 @@ namespace Raven.Widget
       var isOpen = true;
       if (ImGui.BeginPopupModal("file-picker-modal", ref isOpen, ImGuiWindowFlags.NoTitleBar))
       {
-        var picker = Nez.ImGuiTools.FilePicker.GetFilePicker(this, Path.Combine(Environment.CurrentDirectory, "Content"), ".png|.atlas");
+        var picker = Nez.ImGuiTools.FilePicker.GetFilePicker(this, Path.Combine(Environment.CurrentDirectory, "Content"), AcceptedExtensions);
         picker.DontAllowTraverselBeyondRootFolder = true;
         if (picker.Draw())
         {
