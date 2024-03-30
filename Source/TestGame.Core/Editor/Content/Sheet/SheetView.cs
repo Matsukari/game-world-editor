@@ -78,14 +78,14 @@ namespace Raven.Sheet
       {
         var worldTile = tile.ToRectangleF();
         worldTile.Location += _image.Bounds.Location;
-        if (worldTile.Contains(camera.MouseToWorldPoint())) TileInMouse = tile;
+        if (worldTile.Contains(camera.MouseToWorldPoint()) ) TileInMouse = tile;
         if (IsDrawGrid)
         {
           batcher.DrawRectOutline(camera, worldTile, Editor.Settings.Colors.PickHoverOutline.ToColor());
         }
       }
       // Highlight the tile under mouse
-      if (!TileInMouse.IsEmpty) 
+      if (!TileInMouse.IsEmpty && !Editor.Component<Selection>().HasBegun() && ContentData.ShapeSelection == null) 
       {
         var worldTileInMouse = TileInMouse.ToRectangleF();
         worldTileInMouse.Location += _image.Bounds.Location;
