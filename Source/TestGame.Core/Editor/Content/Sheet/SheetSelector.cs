@@ -10,6 +10,7 @@ namespace Raven.Sheet
     Sprites.Spritex _spritexOnName = null;
     public override void OnContent()
     {
+      RemoveSelection();
       if (RestrictTo<Sheet>())
       {
         _sheet = Content as Sheet;
@@ -130,7 +131,7 @@ namespace Raven.Sheet
         if (count > 1) return;
 
         // Selects single tile
-        if (sheetView.TileInMouse != null) 
+        if (!sheetView.TileInMouse.IsEmpty) 
         {
           var coord = _sheet.GetTile(sheetView.TileInMouse);
           var tileInCoord = _sheet.CustomTileExists(coord.X, coord.Y);

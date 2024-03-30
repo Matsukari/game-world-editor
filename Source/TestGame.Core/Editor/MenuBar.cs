@@ -153,10 +153,15 @@ namespace Raven.Sheet
       ImGui.BeginTabBar("files-tabs");
       for (int i = 0; i < Editor._tabs.Count(); i++)
       {
-        if (ImGui.BeginTabItem(Editor._tabs[i].Content.Name))
+        var open = true;
+        if (ImGui.BeginTabItem(Editor._tabs[i].Content.Name, ref open))
         {
           if (Editor.GetContent().Content.Name != Editor._tabs[i].Content.Name) Editor.Switch(i);
           ImGui.EndTabItem();
+        }
+        if (!open)
+        {
+
         }
       }
       ImGui.EndTabBar();

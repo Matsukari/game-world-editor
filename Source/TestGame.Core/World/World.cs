@@ -41,7 +41,7 @@ namespace Raven.Sheet
 
     public World() 
     {
-      Name = System.Environment.CurrentDirectory + "/Untitled.rvworld";
+      Name = Path.Combine(System.Environment.CurrentDirectory, "Untitled.rvworld").GetUniqueFileName();
       Level level = CreateLevel();
       CurrentLevel = level;
     }

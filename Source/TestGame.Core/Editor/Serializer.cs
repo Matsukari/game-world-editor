@@ -23,20 +23,20 @@ namespace Raven.Sheet
       {
         return;
       }
-      LoadSettings();
+      var loadedSettings = LoadSettings();
 
-      foreach (var file in Editor.Settings.LastFiles)
+      foreach (var file in loadedSettings.LastFiles)
       {
         if (file.Type == EditorContentType.Sheet) Editor.AddTab(LoadContent<Sheet>(file.Filename));
         else if (file.Type == EditorContentType.World) Editor.AddTab(LoadContent<World>(file.Filename));
         else throw new Exception($"Error in file metadata. Cannot load {file.Type} content");
       }
-      Editor.Switch(Editor.Settings.LastFile);
+      // Editor.Switch(Editor.Settings.LastFile);
     }
-    public void LoadSettings()
+    public EditorSettings LoadSettings()
     {
       Console.WriteLine($"Loading {ApplicationSavePath}");
-      Editor.Settings = new SettingsSerializer().Load(ApplicationSavePath);
+      return new SettingsSerializer().Load(ApplicationSavePath);
     }
     public void SaveSettings()
     {

@@ -135,17 +135,23 @@ namespace Raven
     public void AddTab(IPropertied content, bool isSwitch=true)
     {
       Console.WriteLine("Adding content on tabs");
-      _tabs.Add(new EditorContent(content));
-      _tabs.Last().Data.ShapeContext = content;
-
       var meta = new EditorTabMetadata();
       meta.Filename = content.Name; 
       if (content is Sheet.Sheet) meta.Type = EditorContentType.Sheet;
       else if (content is World) meta.Type = EditorContentType.World;
       else throw new Exception();
 
-      if (Settings.LastFiles.Find((file)=>file.Filename == meta.Filename) == null)
-        Settings.LastFiles.Add(meta);
+      // This file already exist within the tab files
+      if (Settings.LastFiles.Find((file)=>file.Filename == meta.Filename) != null)
+      {
+        Console.WriteLine("Cannot add Content. Already exist.");
+        return;
+      }
+      Settings.LastFiles.Add(meta);
+
+      _tabs.Add(new EditorContent(content));
+      _tabs.Last().Data.ShapeContext = content;
+
 
       if (content is Entity entity && !Scene.Entities.Contains(entity)) Scene.AddEntity(entity);
 

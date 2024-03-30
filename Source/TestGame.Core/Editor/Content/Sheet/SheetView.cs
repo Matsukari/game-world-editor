@@ -13,7 +13,7 @@ namespace Raven.Sheet
     public Rectangle TileInMouse;
     internal SheetInspector _inspector = new SheetInspector();
 
-    Point lastSize = Point.Zero;
+    string lastSheet = "";
     List<Rectangle> _tiles = new List<Rectangle>();
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
@@ -29,6 +29,7 @@ namespace Raven.Sheet
     public override void OnContent()
     {
       _inspector._editor  = Editor;
+      TileInMouse = Rectangle.Empty;
       RenderLayer = -1;
       if (_image != null) Entity.RemoveComponent(_image);
       if (RestrictTo<Sheet>())
@@ -63,9 +64,9 @@ namespace Raven.Sheet
     }
     void SyncModifiedTiles()
     {
-      if (lastSize != _sheet.TileSize)
+      if (lastSheet != _sheet.Name)
       {
-        lastSize = _sheet.TileSize;
+        lastSheet = _sheet.Name;
         _tiles = _sheet.GetTiles();
       }
     }
@@ -84,9 +85,9 @@ namespace Raven.Sheet
         }
       }
       // Highlight the tile under mouse
-      var worldTileInMouse = TileInMouse.ToRectangleF();
-      if (worldTileInMouse != null) 
+      if (!TileInMouse.IsEmpty) 
       {
+        var worldTileInMouse = TileInMouse.ToRectangleF();
         worldTileInMouse.Location += _image.Bounds.Location;
         batcher.DrawRect(worldTileInMouse, Editor.Settings.Colors.PickHover.ToColor());
         batcher.DrawRectOutline(camera, worldTileInMouse, Editor.Settings.Colors.PickSelectedOutline.ToColor());
