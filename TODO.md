@@ -1,99 +1,50 @@
 
 
+
+## Properties 
+Fix multiple tiles properties adding
+Remove properties 
+
 ## Sheet
-~Complete details on inspector~
-~fix grid view~
+Multiple selection tile
+Implement SpriteFrames
+Integrate SpriteFrames to SpriteScene
 
 ## Geometry
-~Geometry on spritex~
-~Correct position; relative to context~
-~Fix shape property's inspector~
-~Selectable shapes~
 Implement polygon shape
-Fix selection points
-Fix primitive rendering order
-Fix camera bounds culling
-Rulers 
+Implement ellipses
 
-## Multiple selection
-~Fix sprite property naming~
-~Fix sprite new property overriding~
-
-## Spritex
-~Complete inspector~
-~Correct positioning~
-~Position, scale, parts~
-~Selection on parts~
-~Parts picker~
-~Add other parts~
-~Delete, name, change parts~
-~Transform whole body~
-~Pick parts directly from canvas~
-~Interpolation animation~
-~Affect spritex when updating animation~
+## SpriteScene
 Multiple select parts
 Rectangle multiple selection 
 Multiple delete & duplicate parts 
 Multiple operations on selected parts
 Multiple transforms on selected parts
-Order parts
 Rotate parts on selection
-Delete frames
+Order parts
 Duplicate frames 
+Delete frames
 Delete animations
 Choose ease type
 
-## Editor
-~Variation of mouse curors~
-~Better name annotations~
-~File management / switching~
-~Editing state indicator~
-
 ## Level
-~Resizing, moving levels~
-~Painting tiles on Level~
-~Rectangle select on tiles~
-~Layer listings~
-~Level listings~
-~Delete level~
-~Enabled level~
-~Delete layer~
-~Paint preview on layer~
-~Painting spritexes on levels~
-~Create own layer~
-~Add, remove spritesheet~
-~Erase paint~
-~Bucket~
-~Rectangle~
-~Lock layer~
-~Scene state overlay~
+Fix paint previews
 Indicator for able and not able paint
-Fix paint previews on layer
-Spritex y-sorting
+Layer Y-sorting
 Order layers
-Line
+Toogled brushing
+Line painting
 Random painting 
-Transforms on instanced sprites 
-Layer management 
+Transforms on InstancedSprite
 Freeform layer 
 
 
-
 ## World
-~Add other spritesheet on world~
-~Create own level~
-~Single level context~
-~Current level maximize~
 Connect levels 
 LOD system
 
 
 ## Misc
-~Fix zoom switching context~
-~Fix zooming on mouse~
-~Fix debug window~
-~Save sheet~
-Group workspaces
 Save world
 Undo & redo
 Shape & tile separate selection
@@ -107,7 +58,6 @@ Copy & paste:
 - levels
 - properties
 Snapping mouse
-
 
 
 ## Rendering 

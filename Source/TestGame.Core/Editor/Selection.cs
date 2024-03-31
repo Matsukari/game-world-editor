@@ -15,7 +15,7 @@ namespace Raven.Sheet
     public RectangleF ContentBounds = new RectangleF();
     public RectangleF InitialBounds = new RectangleF();
     public object Capture = null;
-    public int Radius = 4;
+    public int Radius = 5;
     public int SafeBuffer = 3;
     public float SelectedSelectionPointSizeFactor = 1.5f;
     public List<RectangleF> Points = new List<RectangleF>();
@@ -27,28 +27,34 @@ namespace Raven.Sheet
     {
       int axis = -1, i = 0;
 
+            // Draw the selection area
+      batcher.DrawRect(ContentBounds, Editor.Settings.Colors.SelectionFill.ToColor());
+      batcher.DrawRectOutline(camera, ContentBounds, Editor.Settings.Colors.SelectionOutline.ToColor(), 2);
+
       // Determine which resize point i being handled
       foreach (var point in Points)
       {
-        var ppoint = point.GetCenterToStart();
-        if (ppoint.Contains(camera.MouseToWorldPoint())) 
+        var centerPoint = point;
+        centerPoint.Size /= camera.RawZoom;
+        centerPoint = centerPoint.GetCenterToStart();
+        if (centerPoint.Contains(camera.MouseToWorldPoint())) 
         {
           axis = i;
         }
-        batcher.DrawRectOutline(camera, ppoint, Editor.Settings.Colors.SelectionPoint.ToColor());
+        batcher.DrawRect(centerPoint, Editor.Settings.Colors.SelectionPoint.ToColor());
         i++;
       }
       // Enlargen the resizing point currently on hover
       if (axis >= 0 && axis < (int)SelectionAxis.None) 
       {
         var point = Points[axis];
-        point.Size /= camera.RawZoom;
-        batcher.DrawRect(point.GetCenterToStart(), Editor.Settings.Colors.SelectionPoint.ToColor());
+        var centerPoint = point;
+        centerPoint.Size *= 1.3f;
+        centerPoint.Size /= camera.RawZoom;
+        centerPoint = centerPoint.GetCenterToStart();
+        batcher.DrawRect(centerPoint, Editor.Settings.Colors.SelectionPoint.ToColor());
       }
 
-      // Draw the selection area
-      batcher.DrawRect(ContentBounds, Editor.Settings.Colors.SelectionFill.ToColor());
-      batcher.DrawRectOutline(camera, ContentBounds, Editor.Settings.Colors.SelectionOutline.ToColor());
 
       var selectionPoint = axis != -1 ? (SelectionAxis)axis : SelectionAxis.None;
 
