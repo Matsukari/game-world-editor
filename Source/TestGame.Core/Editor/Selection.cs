@@ -35,7 +35,7 @@ namespace Raven.Sheet
       foreach (var point in Points)
       {
         var centerPoint = point;
-        centerPoint.Size /= camera.RawZoom;
+        if (camera.RawZoom < 1) centerPoint.Size /= camera.RawZoom;
         centerPoint = centerPoint.GetCenterToStart();
         if (centerPoint.Contains(camera.MouseToWorldPoint())) 
         {

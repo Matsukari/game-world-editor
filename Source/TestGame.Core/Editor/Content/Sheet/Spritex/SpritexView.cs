@@ -92,6 +92,20 @@ namespace Raven.Sheet
     {
       Guidelines.OriginLinesRenderable.Render(batcher, camera, Editor.Settings.Colors.OriginLineX.ToColor(), Editor.Settings.Colors.OriginLineY.ToColor());
       _spritex.Spritex.Render(batcher, camera);
+      foreach (var part in _spritex.Spritex.Parts)
+      {
+        batcher.DrawString(
+            Graphics.Instance.BitmapFont, 
+            part.Name,
+            part.WorldBounds.BottomLeft(),
+            color: Color.DarkGray, 
+            rotation: 0f, 
+            origin: Vector2.Zero, 
+            scale: Math.Clamp(1f/camera.RawZoom, 1f, 10f), 
+            effects: Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 
+            layerDepth: 0f);
+      }
+
     }  
     public void Render(Editor editor) 
     {
@@ -121,6 +135,7 @@ namespace Raven.Sheet
       // }
       Editor.GetEditorComponent<SheetView>()._inspector.Render(editor);
       _spritex.Render(editor);
+
     }
     Vector2 _initialScale = new Vector2();
     void HandleSelection()
