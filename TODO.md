@@ -16,9 +16,6 @@ Implement ellipses
 
 ## SpriteScene
 Multiple select parts
-Rectangle multiple selection 
-Multiple delete & duplicate parts 
-Multiple operations on selected parts
 Multiple transforms on selected parts
 Rotate parts on selection
 Order parts
@@ -28,12 +25,10 @@ Delete animations
 Choose ease type
 
 ## Level
-Fix paint previews
 Indicator for able and not able paint
 Layer Y-sorting
 Order layers
 Toogled brushing
-Line painting
 Random painting 
 Transforms on InstancedSprite
 Freeform layer 

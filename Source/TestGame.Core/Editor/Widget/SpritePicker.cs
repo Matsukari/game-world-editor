@@ -71,6 +71,7 @@ namespace Raven.Sheet
       // The bounds of the picker itself
       Bounds.Location += barSize;
       Bounds.Size -= barSize;
+
       // Sync tiles
       if (_tiles.Count() == 0) RebuildTiles();
 
@@ -170,6 +171,7 @@ namespace Raven.Sheet
             }
           }
           else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;
+
 
           HandleMoveZoom();
           // Draws the spritesheet with zoom and fofset

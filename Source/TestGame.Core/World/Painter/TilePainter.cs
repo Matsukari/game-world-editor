@@ -24,7 +24,7 @@ namespace Raven.Sheet
       {
         var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
         var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
-        var tilePos = rawMouse.ToVector2().RoundFloor(sprite.TileSize).ToNumerics(); 
+        var tilePos = rawMouse; 
         var tilesToPaint = sprite.GetRectTiles();
 
         void PaintAtLayer(TileLayer tileLayer, Point tileInLayer)
@@ -66,7 +66,7 @@ namespace Raven.Sheet
         // Handle paint inputs; tile layer
         if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is TileLayer tileLayer && !input.IsImGuiBlocking)
         {
-          var spriteCenter = _world.Scene.Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize();
+          var spriteCenter = _world.Scene.Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
 
           // Single painting
           if (Nez.Input.LeftMouseButtonDown && _worldEditor.PaintType == PaintType.Single)
