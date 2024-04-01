@@ -142,6 +142,16 @@ namespace Raven.Sheet
             tilelayer.ReplaceTile(tileInLayer, new SpritexInstance(spritex));
           }
         }
+        else if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is FreeformLayer freeformLayer)
+        {
+          if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
+          { 
+            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - spritex.Bounds.Size/2f; 
+            var paint = freeformLayer.PaintSpritex(spritex);
+            paint.Entity  
+            paint.Transform.LocalPosition = _world.Scene.Camera.MouseToWorldPoint();
+          }
+        }
       }
     }
     Vector2 _mouseStart = Vector2.Zero;

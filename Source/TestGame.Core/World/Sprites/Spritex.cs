@@ -127,6 +127,8 @@ namespace Raven.Sheet.Sprites
     public override Component Clone()
     {
       Spritex spritex = base.Clone() as Spritex;
+      spritex.Parts = DuplicateParts();
+      spritex.Animations = Animations;
       spritex.Entity = Entity;
       spritex._sheet = _sheet;
       return spritex;

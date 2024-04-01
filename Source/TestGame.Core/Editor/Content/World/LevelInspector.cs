@@ -54,11 +54,14 @@ namespace Raven.Sheet
           if (ImGui.MenuItem("Tiled")) 
           {
             var layer = new TileLayer(_level, 16, 16);
-            layer.Name = $"Layer {_level.Layers.Count()+1}";
+            layer.Name = $"TiledLayer {_level.Layers.Count()+1}";
             _level.Layers.Add(layer);
           }
           if (ImGui.MenuItem("Freeform"))
-          { 
+          {  
+            var layer = new FreeformLayer(_level);
+            layer.Name = $"FreeLayer {_level.Layers.Count()+1}";
+            _level.Layers.Add(layer);
           }
           ImGui.EndMenu();
         }

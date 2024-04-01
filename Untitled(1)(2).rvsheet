@@ -12,7 +12,88 @@
 
 	},
 	"Spritexes": [
+		{
+			"@id": "3",
+			"Name": "tree",
+			"Properties": {
+				"@id": "4",
+				"Data": {
 
+				}
+			},
+			"Color": {
+				"@id": "5",
+				"PackedValue": 4294967295
+			},
+			"RenderLayer": 0,
+			"Parts": [
+				{
+					"@id": "6",
+					"Name": "Main component",
+					"Properties": {
+						"@id": "7",
+						"Data": {
+
+						}
+					},
+					"IsVisible": true,
+					"Color": {
+						"@id": "8",
+						"X": 1,
+						"Y": 1,
+						"Z": 1,
+						"W": 1
+					},
+					"Origin": {
+						"@id": "9",
+						"X": 0,
+						"Y": 0
+					},
+					"Transform": {
+						"@id": "10",
+						"Position": {
+							"@ref": "9"
+						},
+						"Scale": {
+							"@id": "11",
+							"X": 1,
+							"Y": 1
+						},
+						"Skew": {
+							"@ref": "11"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"@id": "12",
+						"Name": "",
+						"Properties": {
+							"@id": "13",
+							"Data": {
+
+							}
+						},
+						"Region": {
+							"@id": "14",
+							"X": 272,
+							"Y": 0,
+							"Width": 144,
+							"Height": 160
+						}
+					}
+				}
+			],
+			"Animations": [
+
+			],
+			"IsVisible": false,
+			"LocalOffset": {
+				"@ref": "9"
+			},
+			"UpdateOrder": 0
+		}
 	],
 	"TileWidth": 16,
 	"TileHeight": 16
