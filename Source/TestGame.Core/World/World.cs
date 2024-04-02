@@ -2,20 +2,16 @@ using Microsoft.Xna.Framework;
 using Nez;
 using Nez.Persistence;
 
-namespace Raven.Sheet
+namespace Raven
 {
-  /// <summary>
-  /// Composed of interconnected Levels. This is where all you should dump topdwon oriented rendering.
-  /// </summary>
-  public class World : Entity, IPropertied
+  public class WorldEntity : Entity
   {
-    [JsonExclude]
-    string IPropertied.Name { get => Name; set => Name = value; }
+    public readonly World World;
+    public List<LevelEntity> Levels = new List<LevelEntity>();
 
-    [JsonExclude]
-    public PropertyList Properties { get; set; } = new PropertyList();
-
-    [JsonExclude]
+    /// <summary>
+    /// Bounds containing all Levels
+    /// </summary>
     public RectangleF Bounds 
     { 
       get 
@@ -32,41 +28,84 @@ namespace Raven.Sheet
         return RectangleF.FromMinMax(min, max);
       }
     }
+    public void RemoveLevel(Level level)
+    {
+      World.RemoveLevel(level);
+      var index = Levels.FindIndex(item => item.Level.Name == level.Name);
+      if (index != -1)
+      {
+        Levels[index].DetachFromScene();
+        Levels.RemoveAt(index);
+      } 
+    }
+    public LevelEntity CreateLevel(string name) 
+    {
+      Level level = World.CreateLevel(name);
+      var levelEntity = new LevelEntity(level);
+      levelEntity.SetParent(this);
+      Levels.Add(levelEntity);
+      return levelEntity;
+    }
+  }
+  /// <summary>
+  /// Composed of interconnected Levels. This is where all you should dump topdwon oriented rendering.
+  /// </summary>
+  public class World : IPropertied
+  {
+    string IPropertied.Name { get => Name; set => Name = value; }
+
+    [JsonInclude]
+    public PropertyList Properties { get; set; } = new PropertyList();
+
+    public string Name;
+
+    /// <summary>
+    /// The content 
+    /// </summary>
+    public List<Level> Levels = new List<Level>();
+
+    /// <summary>
+    /// The only Sheets Levels can use
+    /// </summary>
+    public List<Sheet> Sheets = new List<Sheet>();
 
 
-    public Level CurrentLevel = null;
-
-    public List<Level> Levels { get => Components.GetComponents<Level>(); } 
-    public Dictionary<string, Sheet> SpriteSheets = new Dictionary<string, Sheet>();
 
     public World() 
     {
       Name = Path.Combine(System.Environment.CurrentDirectory, "Untitled.rvworld").GetUniqueFileName();
       Level level = CreateLevel();
-      CurrentLevel = level;
     }
-    public Level GetLevel(string name)
+
+    /// <summary>
+    /// Finds the last added Level attached to this World with the given Name
+    /// </summary>
+    public Level GetLevel(string name) => Levels.FindLast(item => item.Name == name);
+
+    /// <summary>
+    /// Removes the given level contained in this World
+    /// </summary>
+    public void RemoveLevel(Level level) => Levels.Remove(level);
+
+    /// <summary>
+    /// Creates a blank Level with the given name
+    /// </summary>
+    public Level CreateLevel(string name = "Level") 
     {
-      foreach (var level in Levels) if (level.Name == name) return level;
-      return null;
-    }
-    public void RemoveLevel(Level level) => RemoveComponent(level);
-    public void RemoveLevel(string level) => RemoveComponent(GetLevel(level));
- 
-    public Level CreateLevel(string name = "Level default") 
-    {
+      if (Levels.Find(item => item.Name == name) != null) 
+        name = name.EnsureNoRepeat();
+
       Level level = new Level(this);
       Layer layer = new TileLayer(level, 16, 16);
       level.Name = name;
       level.Layers.Add(layer);
-      level.CurrentLayer = layer;
-      AddComponent(level);
       return level;
     }
-    public void AddSheet(Sheet sheet) 
-    { 
-      SpriteSheets.Add(sheet.Name, sheet); 
-    }
+
+    /// <summary>
+    /// Adds a Sheet resource
+    /// </summary>
+    public void AddSheet(Sheet sheet) => Sheets.Add(sheet); 
   }
 }
 

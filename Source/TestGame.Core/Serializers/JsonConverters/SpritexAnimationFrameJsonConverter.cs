@@ -5,11 +5,11 @@ using Raven.Sheet;
 namespace Raven.Serializers
 {
 
-  class SpritexAnimationFrameJsonConverter : JsonTypeConverter<SpritexAnimationFrame>
+  class SpriteSceneAnimationFrameJsonConverter : JsonTypeConverter<SpriteSceneAnimationFrame>
   {
     public override bool WantsExclusiveWrite => true;
          
-    public override void WriteJson( IJsonEncoder encoder, SpritexAnimationFrame instance)
+    public override void WriteJson( IJsonEncoder encoder, SpriteSceneAnimationFrame instance)
     {
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
@@ -17,7 +17,7 @@ namespace Raven.Serializers
       encoder.EncodeKeyValuePair("Duration", instance.Duration);
       encoder.EncodeKeyValuePair("EaseType", instance.EaseType);
     }
-    public override void OnFoundCustomData(SpritexAnimationFrame instance, string key, object value )
+    public override void OnFoundCustomData(SpriteSceneAnimationFrame instance, string key, object value )
     {
     }
   }

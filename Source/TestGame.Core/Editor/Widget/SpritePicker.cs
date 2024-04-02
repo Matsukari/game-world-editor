@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Nez;
 using ImGuiNET;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class SheetPickerData
   {
@@ -184,7 +184,7 @@ namespace Raven.Sheet
           ImGui.EndTabItem();
         }
         var grid = false;
-        if (!isPickOnlyTile && ImGui.BeginTabItem("Spritexes"))
+        if (!isPickOnlyTile && ImGui.BeginTabItem("SpriteScenees"))
         {
           Widget.ImGuiWidget.ButtonSetFlat(new List<(string, Action)>{
               (IconFonts.FontAwesome5.ThLarge, ()=>{grid=true;}),
@@ -196,11 +196,11 @@ namespace Raven.Sheet
           else 
           {
             ImGui.Indent();
-            foreach (var spritex in OpenSheet.Sheet.Spritexes)
+            foreach (var spriteScene in OpenSheet.Sheet.SpriteScenees)
             {
-              if (ImGui.MenuItem(spritex.Name))
+              if (ImGui.MenuItem(spriteScene.Name))
               {
-                SelectedSprite = spritex;
+                SelectedSprite = spriteScene;
               }
             }
             ImGui.Unindent();

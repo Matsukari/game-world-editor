@@ -1,7 +1,7 @@
 using ImGuiNET;
 using System.Numerics;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public static partial class GuiStyles
   {

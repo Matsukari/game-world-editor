@@ -1,7 +1,7 @@
 using ImGuiNET;
 using Raven.Sheet.Sprites;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class SpriteInspector: Widget.PropertiedWindow
   {

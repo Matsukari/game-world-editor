@@ -2,12 +2,12 @@ using Microsoft.Xna.Framework;
 using Nez;
 using ImGuiNET;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class SheetSelector : EditorComponent, IImGuiRenderable
   {
     Sheet _sheet;
-    Sprites.Spritex _spritexOnName = null;
+    Sprites.SpriteScene _spriteSceneOnName = null;
     public override void OnContent()
     {
       RemoveSelection();
@@ -18,7 +18,7 @@ namespace Raven.Sheet
     } 
     public void Render(Editor editor)
     {
-      var spritexView = Editor.GetEditorComponent<SpritexView>();
+      var spriteSceneView = Editor.GetEditorComponent<SpriteSceneView>();
 
       // right-click; open options
       if (Nez.Input.RightMouseButtonPressed && ContentData.Selection != null) 
@@ -36,48 +36,48 @@ namespace Raven.Sheet
       // something is selected; render options
       if (ContentData.Selection is Sprites.Sprite sprite && ImGui.BeginPopup("sprite-popup"))
       {
-        // convert to new spritex
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to Spritex"))
+        // convert to new spriteScene
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to SpriteScene"))
         {
           Editor.NameModal.Open((name)=>
           {
-              var spritex = _sheet.CreateSpritex(name, ContentData.Selection as Sprites.Sprite);
-              _sheet.Spritexes.AddIfNotPresent(spritex);
-              Editor.GetEditorComponent<SpritexView>().Edit(spritex);
+              var spriteScene = _sheet.CreateSpriteScene(name, ContentData.Selection as Sprites.Sprite);
+              _sheet.SpriteScenees.AddIfNotPresent(spriteScene);
+              Editor.GetEditorComponent<SpriteSceneView>().Edit(spriteScene);
           });
         }
-        // add to exisiting spritex; select by list
-        if (_sheet.Spritexes.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to Spritex"))
+        // add to exisiting spriteScene; select by list
+        if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to SpriteScene"))
         {
-          foreach (var spritex in _sheet.Spritexes)
+          foreach (var spriteScene in _sheet.SpriteScenees)
           {
-            if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " " + spritex.Name)) 
+            if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " " + spriteScene.Name)) 
             {
-              _spritexOnName = spritex;
+              _spriteSceneOnName = spriteScene;
               Editor.NameModal.Open((name)=>
               {
-                _spritexOnName.AddSprite(name, new Sprites.SourcedSprite(sprite: ContentData.Selection as Sprites.Sprite));
+                _spriteSceneOnName.AddSprite(name, new Sprites.SourcedSprite(sprite: ContentData.Selection as Sprites.Sprite));
               });
             }
           }
           ImGui.EndMenu();
         }
-        // // Has opened and made operation to last spritex' part
-        // if (spritexView.LastSprite != null)
+        // // Has opened and made operation to last spriteScene' part
+        // if (spriteSceneView.LastSprite != null)
         // {
-        //   if (ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Add to last Spritex"))
+        //   if (ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Add to last SpriteScene"))
         //   {
-        //     _spritexOnName = spritexView.LastSprite.Spritex;
-        //     OpenPopup("spritex-part-name");
+        //     _spriteSceneOnName = spriteSceneView.LastSprite.SpriteScene;
+        //     OpenPopup("spriteScene-part-name");
         //     return;
         //   }
-        //   if (spritexView.LastSprite.ChangePart != null && ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Change last Spritex part"))
+        //   if (spriteSceneView.LastSprite.ChangePart != null && ImGui.MenuItem(IconFonts.FontAwesome5.UserPlus + " Change last SpriteScene part"))
         //   {
         //     ImGui.EndPopup();
         //     ImGui.CloseCurrentPopup();
-        //     spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name] = new Sprites.SourcedSprite(spritexView.LastSprite.Spritex, sprite);
-        //     spritexView.LastSprite.Spritex.Parts.Data[spritexView.LastSprite.ChangePart.Name].Name = spritexView.LastSprite.ChangePart.Name;
-        //     spritexView.Edit(spritexView.LastSprite.Spritex);
+        //     spriteSceneView.LastSprite.SpriteScene.Parts.Data[spriteSceneView.LastSprite.ChangePart.Name] = new Sprites.SourcedSprite(spriteSceneView.LastSprite.SpriteScene, sprite);
+        //     spriteSceneView.LastSprite.SpriteScene.Parts.Data[spriteSceneView.LastSprite.ChangePart.Name].Name = spriteSceneView.LastSprite.ChangePart.Name;
+        //     spriteSceneView.Edit(spriteSceneView.LastSprite.SpriteScene);
         //     return;
         //   }
         // }

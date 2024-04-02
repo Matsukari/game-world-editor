@@ -4,7 +4,7 @@ using Nez;
 using Microsoft.Xna.Framework;
 using System.Reflection;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class Menubar : EditorComponent, IImGuiRenderable
   {

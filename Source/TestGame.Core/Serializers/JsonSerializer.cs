@@ -22,8 +22,8 @@ namespace Raven.Serializers
         new SheetJsonConverter(),
         new SourcedSpriteJsonConverter(),
         new SpriteJsonConverter(),
-        new SpritexAnimationFrameJsonConverter(),
-        new SpritexJsonConverter(),
+        new SpriteSceneAnimationFrameJsonConverter(),
+        new SpriteSceneJsonConverter(),
         new TileJsonConverter(),
       };
       settings.PrettyPrint = PrettyPrint;

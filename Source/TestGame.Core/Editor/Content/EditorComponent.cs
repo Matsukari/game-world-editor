@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using Nez;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class EditorComponent : RenderableComponent, IUpdatable
   {

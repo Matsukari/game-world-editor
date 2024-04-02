@@ -1,12 +1,60 @@
 using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Nez;
 
-namespace Raven.Sheet
+namespace Raven
 {
+  public class RenderProperties 
+  {
+    public Transform Transform = new Transform();
+    public Vector4 Color = Vector4.One;
+    public SpriteEffects SpriteEffects = SpriteEffects.None;
+  }
+  public class TileLayerRenderer : LayerRenderer<TileLayer>
+  {
+    public override void Render(Batcher batcher, Camera camera)
+    {
+      foreach (var (tilePosition, tile) in Layer.Tiles)
+      {
+        var dest = new RectangleF(
+            tilePosition.X*Layer.TileWidth, 
+            tilePosition.Y*Layer.TileHeight, 
+            Layer.TileWidth, Layer.TileHeight);
+
+        dest.Location += Bounds.Location;
+        
+        var scale = Transform.Scale;
+        scale.X *= dest.Width / tile.Region.Width;
+        scale.Y *= dest.Height / tile.Region.Height;
+
+        var rot = Transform.Rotation;
+        var eff = SpriteEffects.None;
+        var color = Color.White;
+
+        RenderProperties renderProp;
+        if (Layer.TilesProp.TryGetValue(tilePosition, out renderProp)) 
+        {
+          rot *= renderProp.Transform.RotationRadians;
+          eff = renderProp.SpriteEffects;
+          color = renderProp.Color.ToColor();
+        }
+
+        batcher.Draw(
+            texture: tile.Texture,
+            position: dest.Location + Transform.Position,
+            sourceRectangle: tile.Region,
+            color: color,
+            rotation: rot,
+            origin: Vector2.Zero,
+            scale: scale,
+            effects: eff,
+            layerDepth: 0);
+      }
+    }
+  }
   /// <summary>
-  /// Arranges painted sprites in a grid-like manner.
-  /// Accepts changes in tile size later; cales tiles to fit this layer's tile size
+  /// A Layer that can only contains Tiles.
   /// </summary> 
   public class TileLayer : Layer
   {
@@ -15,61 +63,80 @@ namespace Raven.Sheet
       TileWidth = w;
       TileHeight = h;
     }
+    /// <summary>
+    // The width of an individual Tile
+    /// </summary> 
     public int TileWidth;
+
+    /// <summary>
+    // The height of an individual Tile
+    /// </summary> 
     public int TileHeight;
+
     public Point TileSize { get => new Point(TileWidth, TileHeight); }
+
+    /// <summary>
+    // The number of all Tiles horizontally and vertically
+    /// </summary> 
     public Point TilesQuantity { get => new Point(Level.ContentSize.X/TileWidth, Level.ContentSize.Y/TileHeight); }
-    public List<Tile> TileHighlights = new List<Tile>();
-    public Dictionary<Point, InstancedSprite> Tiles { get => _tiles; }
-    Dictionary<Point, InstancedSprite> _tiles = new Dictionary<Point, InstancedSprite>();
 
-    public Point GetTileCoordFromWorld(Vector2 point) => new Point(
-        (int)(point.X - Bounds.Location.X) / TileWidth, 
-        (int)(point.Y - Bounds.Location.Y) / TileHeight);
+    /// <summary>
+    // The list of all painted Tiles
+    /// </summary> 
+    public Dictionary<Point, Tile> Tiles { get => _tiles; }
+
+    /// <summary>
+    // The list of all custom render peoperties associated to a Tile
+    /// </summary> 
+    public Dictionary<Point, RenderProperties> TilesProp = new Dictionary<Point, RenderProperties>();
+
+    Dictionary<Point, Tile> _tiles = new Dictionary<Point, Tile>();
+
+    // public Point GetTileCoordFromWorld(Vector2 point) => new Point(
+    //     (int)(point.X - Bounds.Location.X) / TileWidth, 
+    //     (int)(point.Y - Bounds.Location.Y) / TileHeight);
     public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
+
+    /// <summary>
+    // Checks if the layer contains the given corrdinate 
+    /// </summary> 
     public bool IsTileValid(int x, int y) => !(x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y); 
-    public void ReplaceTile(Point point, InstancedSprite tile) => ReplaceTile(point.X, point.Y, tile);
-    public void RemoveTile(Point point) => RemoveTile(point.X, point.Y);
 
-    // <summary>
-    // Replaces the point with the spritex and consume all tiles that the spritex touches
-    // </summary>
-    public void ReplaceAndFillTiles(int x, int y, SpritexInstance tile)
-    {
 
-    }
-    public void ReplaceTile(int x, int y, InstancedSprite tile)
+    /// <summary>
+    /// Replaces tile that is contained in the coordinates provided
+    /// </summary>
+    public void ReplaceTile(int x, int y, Tile tile)
     {
-      if (!IsTileValid(x, y) || !IsVisible || IsLocked) return;
+      if (!IsTileValid(x, y)) return;
       var loc = new Point(x, y);
       _tiles[loc] = tile;
     }
+
+    /// <summary>
+    /// Replaces or create custom render properties (such as Transform, Color) for a specific Tile at the given position
+    /// </summary>
+    public RenderProperties ReplaceTileProperties(int x, int y)
+    {
+      if (!IsTileValid(x, y)) throw new Exception("Tile coordinates invalid");
+      var loc = new Point(x, y);
+      var prop = new RenderProperties();
+      TilesProp[loc] = prop;
+      return prop;
+    }
+
+
+    /// <summary>
+    /// Removed the tile that is contained in the coordinate provided
+    /// </summary>
     public void RemoveTile(int x, int y)
     {
-      if (!IsTileValid(x, y) || !IsVisible || IsLocked) return;
+      if (!IsTileValid(x, y)) return;
       var loc = new Point(x, y);
       _tiles.Remove(loc);
     }
-    public override void Draw(Batcher batcher, Camera camera)
-    {
-      foreach (var block in _tiles)
-      {
-        var bounds = new RectangleF(block.Key.X*TileWidth, block.Key.Y*TileHeight, TileWidth, TileHeight);
-        bounds.Location += Bounds.Location;
-        switch (block.Value)
-        {
-          case TileInstance tile: tile.Draw(batcher, camera, bounds); break;
-          case SpritexInstance spritex: spritex.Draw(batcher, camera, bounds); break;
-        }
-      }
-      foreach (var tile in TileHighlights)
-      {
-        var bounds = new RectangleF(tile.Region.X, tile.Region.Y, TileWidth, TileHeight);
-        bounds.Location += Bounds.Location;
-        var t = new TileInstance(tile);
-        t.Draw(batcher, camera, bounds);
-      }
-    }
 
+
+    public void RemoveTile(Point point) => RemoveTile(point.X, point.Y);
   }
 }

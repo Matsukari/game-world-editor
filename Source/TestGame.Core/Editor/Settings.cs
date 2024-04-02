@@ -3,7 +3,7 @@ using ImGuiNET;
 using Nez;
 using Nez.ImGuiTools;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class Settings : EditorComponent
   {

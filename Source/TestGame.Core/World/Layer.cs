@@ -1,27 +1,69 @@
 using Microsoft.Xna.Framework;
 using Nez;
 
-namespace Raven.Sheet
+namespace Raven
 {
+  public class LayerRenderer<T> : RenderableComponent where T: Layer
+  {
+    public T Layer;
+    public WorldEntity World;
+    public LevelEntity Level;
+
+    public void Initialize(T layer)
+    {
+      Layer = layer;
+    }
+    public override RectangleF Bounds 
+    { 
+      get 
+      {
+        _bounds.CalculateBounds(
+            Transform.Position, (Layer.Size.ToVector2()/2) + Layer.Offset / 2, 
+            Layer.Size.ToVector2()/2f, Transform.Scale, Transform.Rotation, Layer.Size.X, Layer.Size.Y);
+        return _bounds;
+      }
+    }
+    public override void Render(Batcher batcher, Camera camera) {}
+  }
   /// <summary>
-  /// Base class for the rendering of all the "paints" in the layer
+  /// The data that holds the information needed to be rendered
   /// </summary>
   public class Layer
   {
-    public Level Level;
-    public string Name = "Layer 1";
+    /// <summary>
+    /// The Level this Layer is attached to
+    /// </summary>
+    public readonly Level Level;
+
+    /// <summary>
+    /// The ID of this Layer, cannot be the same with other Layers on the Level
+    /// </summary>
+    public string Name = "Layer";
+
+    /// <summary>
+    /// Modifying this field should affects all renderables about to be rendered 
+    /// by a LayerRenderer
+    /// </summary>
     public float Opacity = 1f;
+
+    /// <summary>
+    /// Field to indicate if this Layer is to be rendered
+    /// </summary>
     public bool IsVisible = true;
-    public bool IsLocked = false;
+
+    /// <summary>
+    /// Position relative to Level
+    /// </summary>
     public Vector2 Offset = new Vector2();
-    public bool IsCurrentLayerInLevel { get => Level.CurrentLayer.Name == Name; }
-    public RectangleF Bounds { get => Level.Bounds.AddPosition(Offset); }
+
+    /// <summary>
+    /// Same as Level's size
+    /// </summary>
+    public Point Size { get => Level.ContentSize; }
+
     public Layer(Level level)
     {
       Level = level;
-    }
-    public virtual void Draw(Batcher batcher, Camera camera)
-    {
     }
   }
 

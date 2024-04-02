@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Nez;
 using Nez.Persistence;
 
-namespace Raven.Sheet.Sprites 
+namespace Raven 
 {
   /// <summary>
   /// A render model with a Transform and other basic render options 
@@ -17,7 +17,7 @@ namespace Raven.Sheet.Sprites
     public PropertyList Properties { get; set; } = new PropertyList();
 
     public string Name = "";
-    public Spritex Spritex;
+    public SpriteScene SpriteScene;
     public Sprite SourceSprite;
 
     // Render options 
@@ -44,21 +44,21 @@ namespace Raven.Sheet.Sprites
       get 
       {
         var bounds = LocalBounds;
-        bounds.Location += Spritex.Transform.Position;
-        bounds.Size *= Spritex.Transform.Scale;
+        bounds.Location += SpriteScene.Transform.Position;
+        bounds.Size *= SpriteScene.Transform.Scale;
         return bounds;
       }
     }
     private SourcedSprite()
     {}
-    public SourcedSprite(Spritex spritex=null, Sprites.Sprite sprite=null) 
+    public SourcedSprite(SpriteScene spriteScene=null, Sprites.Sprite sprite=null) 
     {
-      Spritex = spritex;
+      SpriteScene = spriteScene;
       SourceSprite = sprite;
     }
-    public void DetachFromSpritex()
+    public void DetachFromSpriteScene()
     {
-      Spritex.RemoveSprite(Name);
+      SpriteScene.RemoveSprite(Name);
     }
     public int DeterminePreset()
     {
@@ -71,7 +71,7 @@ namespace Raven.Sheet.Sprites
       SourcedSprite sprite = new SourcedSprite();
       sprite.Name = Name;
       sprite.Properties = Properties.Copy();
-      sprite.Spritex = Spritex;
+      sprite.SpriteScene = SpriteScene;
       sprite.SourceSprite = SourceSprite;
       sprite.Transform = Transform.Duplicate();
       sprite.SpriteEffects = SpriteEffects;

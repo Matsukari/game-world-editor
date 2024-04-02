@@ -4,10 +4,10 @@ using Microsoft.Xna.Framework.Graphics;
 using Nez;
 using Nez.Persistence;
 
-namespace Raven.Sheet
+namespace Raven
 { 
   /// <summary>
-  /// Simply stores the divided sprites into either Tile or Spritex from a single texture
+  /// Simply stores the divided sprites into either Tile or SpriteScene from a single texture
   /// </summary>
 	public class Sheet : IPropertied
 	{
@@ -23,7 +23,7 @@ namespace Raven.Sheet
     [JsonInclude]
     internal Dictionary<int, Sprites.Tile> _tiles = new Dictionary<int, Sprites.Tile>();
     
-		public List<Sprites.Spritex> Spritexes = new List<Sprites.Spritex>();
+		public List<Sprites.SpriteScene> SpriteScenees = new List<Sprites.SpriteScene>();
 
     public int TileWidth;
     public int TileHeight; 
@@ -61,7 +61,7 @@ namespace Raven.Sheet
       TileWidth = w;
       TileHeight = h;
     }
-    public Sprites.Spritex GetSpritex(string name) => Spritexes.Find((spritex)=>spritex.Name == name);
+    public Sprites.SpriteScene GetSpriteScene(string name) => SpriteScenees.Find((spriteScene)=>spriteScene.Name == name);
     public Sprites.Tile GetCreatedTile(int coord) => _tiles[coord];
     public Sprites.Tile GetTileData(int coord) 
     {
@@ -104,12 +104,12 @@ namespace Raven.Sheet
     }
     int _continousCounter = 0;
     public Sprites.Sprite CreateSprite(params int[] tiles) => CreateSprite($"Sprite_{_continousCounter++}", tiles);
-    public Sprites.Spritex CreateSpritex(Sprites.Sprite sprite) => CreateSpritex($"Spritex_{_continousCounter++}", sprite);
-    public Sprites.Spritex CreateSpritex(string name, Sprites.Sprite sprite)
+    public Sprites.SpriteScene CreateSpriteScene(Sprites.Sprite sprite) => CreateSpriteScene($"SpriteScene_{_continousCounter++}", sprite);
+    public Sprites.SpriteScene CreateSpriteScene(string name, Sprites.Sprite sprite)
     {
       var main = new Sprites.SourcedSprite(sprite: sprite);
-      var spritex = new Sprites.Spritex(name, main, this);
-      return spritex;
+      var spriteScene = new Sprites.SpriteScene(name, main, this);
+      return spriteScene;
     }
     public List<int> GetTiles(RectangleF container)
     {

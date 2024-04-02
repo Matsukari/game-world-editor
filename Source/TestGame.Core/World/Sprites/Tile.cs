@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Nez;
 using Nez.Persistence;
 
-namespace Raven.Sheet.Sprites 
+namespace Raven 
 {
   /// <summary>
   /// Simply an ID handle for a specific location in the Sheet's tilemap. 

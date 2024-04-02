@@ -82,7 +82,7 @@ namespace Raven.Sheet
       ImGui.EndChild();
    }
     bool _isOpenFrameOptions = false;
-    SpritexAnimationFrame _frameOnOpenOptions = null;
+    SpriteSceneAnimationFrame _frameOnOpenOptions = null;
     void DrawComponentsTrack()
     {
       ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(2, 2));
@@ -97,9 +97,9 @@ namespace Raven.Sheet
         DrawFrameHeader();
 
         // Draw components names in left side
-        for (int i = 0; i < _animEditor.Spritex.Parts.Count(); i++)
+        for (int i = 0; i < _animEditor.SpriteScene.Parts.Count(); i++)
         {
-          var part = _animEditor.Spritex.Parts[i];
+          var part = _animEditor.SpriteScene.Parts[i];
           ImGui.TableNextRow();
           ImGui.TableSetColumnIndex(0);
           ImGui.Text(part.Name);
@@ -107,7 +107,7 @@ namespace Raven.Sheet
           // Draw frames of each components in right side
           for (int j = 0; j < Animator.Animation.TotalFrames; j++)
           {
-            var frameSet = Animator.Animation.Frames[j] as SpritexAnimationFrame;
+            var frameSet = Animator.Animation.Frames[j] as SpriteSceneAnimationFrame;
             try 
             {
               var frame = frameSet.Parts[i];

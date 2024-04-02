@@ -4,7 +4,7 @@ using Nez.Persistence;
 namespace Raven 
 {
   /// <summary>
-  /// Basic implementation of animation frame. You only need to animate the spritexes (with transforms). 
+  /// Basic implementation of animation frame. You only need to animate the spriteScenees (with transforms). 
   /// Some custom operations, if any, just add some properties
   /// </summary>
   public class AnimationFrame : IPropertied

@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using ImGuiNET;
 using Raven.Sheet.Sprites;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class TilePainter
   {
@@ -115,9 +115,9 @@ namespace Raven.Sheet
           }
         }
       }
-      else if (_worldEditor.SelectedSprite is Spritex spritex)
+      else if (_worldEditor.SelectedSprite is SpriteScene spriteScene)
       {
-        foreach (var part in spritex.Parts)
+        foreach (var part in spriteScene.Parts)
         {
           var min = part.SourceSprite.Region.Location.ToVector2() / part.SourceSprite.Texture.GetSize();
           var max = (part.SourceSprite.Region.Location + part.SourceSprite.Region.Size).ToVector2() / part.SourceSprite.Texture.GetSize();
@@ -127,8 +127,8 @@ namespace Raven.Sheet
 
           ImGui.GetForegroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(part.SourceSprite.Texture),
-              tilePos - spritex.EnclosingBounds.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom, 
-              tilePos - spritex.EnclosingBounds.GetHalfSize().ToNumerics() + spritex.EnclosingBounds.Size.ToNumerics() * _world.Scene.Camera.RawZoom,
+              tilePos - spriteScene.EnclosingBounds.GetHalfSize().ToNumerics() * _world.Scene.Camera.RawZoom, 
+              tilePos - spriteScene.EnclosingBounds.GetHalfSize().ToNumerics() + spriteScene.EnclosingBounds.Size.ToNumerics() * _world.Scene.Camera.RawZoom,
               min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
 
         }
@@ -137,18 +137,18 @@ namespace Raven.Sheet
         {
           if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
           { 
-            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - spritex.Bounds.Size/2f; 
+            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - spriteScene.Bounds.Size/2f; 
             var tileInLayer = tilelayer.GetTileCoordFromWorld(tileApprox); 
-            tilelayer.ReplaceTile(tileInLayer, new SpritexInstance(spritex));
+            tilelayer.ReplaceTile(tileInLayer, new SpriteSceneInstance(spriteScene));
           }
         }
         else if (_world.CurrentLevel != null && _world.CurrentLevel.CurrentLayer is FreeformLayer freeformLayer)
         {
           if (Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
           { 
-            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - spritex.Bounds.Size/2f; 
-            var paint = freeformLayer.PaintSpritex(spritex);
-            paint.Entity  
+
+            var tileApprox = _world.Scene.Camera.MouseToWorldPoint() - spriteScene.Bounds.Size/2f; 
+            var paint = freeformLayer.PaintSpriteScene(spriteScene);
             paint.Transform.LocalPosition = _world.Scene.Camera.MouseToWorldPoint();
           }
         }

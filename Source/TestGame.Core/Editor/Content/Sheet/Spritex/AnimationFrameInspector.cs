@@ -12,7 +12,7 @@ namespace Raven.Sheet
 
     AnimationEditor _animEditor;
     public AnimationPlayer Animator;
-    public SpritexAnimationFrame Frame { get => _animEditor.SelectedFrame; }
+    public SpriteSceneAnimationFrame Frame { get => _animEditor.SelectedFrame; }
     public SourcedSprite  FramePart { get => _animEditor.SelectedFramePart; }
 
     public AnimationFrameInspector(AnimationEditor animEditor) 
@@ -29,7 +29,7 @@ namespace Raven.Sheet
       ImGui.LabelText("Frame", Animator.CurrentIndex.ToString());
       ImGui.InputFloat("Duration", ref Frame.Duration);
       // FramePart.Transform.RenderImGui();
-      SpritexInspector.RenderSprite(FramePart, false);
+      SpriteSceneInspector.RenderSprite(FramePart, false);
     }
   }
 }

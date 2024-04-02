@@ -4,6 +4,17 @@ namespace Raven
 {
   public static class StringExt
   {
+    static public string EnsureNoRepeat(this string name)
+    {
+      var last = name.Last();
+      if (Char.IsNumber(last)) 
+      {
+        name = name[..^1];
+        name += (last - '0') + 1;
+      }
+      else name += "-1";
+      return name;
+    }
     static public string GetUniqueFileName(this string fullpath)
     {
       string newPath = fullpath;
@@ -15,7 +26,6 @@ namespace Raven
         newPath = Path.Combine(Path.GetDirectoryName(newPath), newName);
         count++;
       }
-
       return newPath;
     }
   }

@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Nez.Persistence;
 
-namespace Raven.Sheet.Sprites 
+namespace Raven 
 {
   /// <summary>
   /// This is only a handle to a set of Tiles. Mulitple selection of Tiles.

@@ -3,7 +3,7 @@ using ImGuiNET;
 using Nez;
 using Microsoft.Xna.Framework;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class StatusBar : EditorComponent, IImGuiRenderable
   {

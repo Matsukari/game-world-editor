@@ -3,7 +3,7 @@ using Nez;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class WorldInspector : Widget.PropertiedWindow
   {

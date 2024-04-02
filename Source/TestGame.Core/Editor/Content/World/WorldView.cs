@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using Nez;
 using ImGuiNET;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class WorldView : EditorComponent, IImGuiRenderable
   {

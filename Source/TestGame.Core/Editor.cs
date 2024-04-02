@@ -52,7 +52,7 @@ namespace Raven
           new Overlays(),
           new Menubar(),
           new StatusBar(),
-          new SpritexView(),
+          new SpriteSceneView(),
           new ShapeAnnotator(),
           new AnimationEditor(),
           new WorldView(),

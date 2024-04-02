@@ -5,11 +5,11 @@ using Raven.Sheet.Sprites;
 namespace Raven.Serializers
 {
 
-  class SpritexJsonConverter : JsonTypeConverter<Spritex>
+  class SpriteSceneJsonConverter : JsonTypeConverter<SpriteScene>
   {
     public override bool WantsExclusiveWrite => true;
          
-    public override void WriteJson( IJsonEncoder encoder, Spritex instance)
+    public override void WriteJson( IJsonEncoder encoder, SpriteScene instance)
     {
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
@@ -21,7 +21,7 @@ namespace Raven.Serializers
       encoder.EncodeKeyValuePair("LocalOffset", instance.LocalOffset);
       encoder.EncodeKeyValuePair("UpdateOrder", instance.UpdateOrder);
     }
-    public override void OnFoundCustomData(Spritex instance, string key, object value )
+    public override void OnFoundCustomData(SpriteScene instance, string key, object value )
     {
     }
   }

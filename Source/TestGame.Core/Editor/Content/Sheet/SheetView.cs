@@ -3,7 +3,7 @@ using Nez;
 using Nez.Sprites;
 using Raven.Sheet.Sprites;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class SheetView : EditorComponent, IImGuiRenderable
   {

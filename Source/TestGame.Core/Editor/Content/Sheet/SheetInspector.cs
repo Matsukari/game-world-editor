@@ -1,7 +1,7 @@
 using ImGuiNET;
 using Nez;
 
-namespace Raven.Sheet
+namespace Raven
 { 
 	public class SheetInspector : Widget.PropertiedWindow
 	{
@@ -14,7 +14,7 @@ namespace Raven.Sheet
     }
     Sheet _sheet;
     internal Editor _editor;
-    Sprites.Spritex _spritexOnOption;
+    Sprites.SpriteScene _spriteSceneOnOption;
     public bool ShowPicker = false;
     public SpritePicker SpritePicker = new SpritePicker();
     SheetPickerData _sheetData;
@@ -71,36 +71,36 @@ namespace Raven.Sheet
           ImGui.Unindent();
         }
       }
-      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} Spritexes ({Sheet.Spritexes.Count})", ImGuiTreeNodeFlags.DefaultOpen))
+      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} SpriteScenees ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
-        ImGui.BeginChild("spritexes");
+        ImGui.BeginChild("spriteScenees");
         ImGui.Indent();
-        foreach (var spritex in Sheet.Spritexes)
+        foreach (var spriteScene in Sheet.SpriteScenees)
         {
-          if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {spritex.Name}")) 
+          if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {spriteScene.Name}")) 
           {
-            var spritexView = _editor.GetEditorComponent<SpritexView>();
-            spritexView.Edit(spritex);
+            var spriteSceneView = _editor.GetEditorComponent<SpriteSceneView>();
+            spriteSceneView.Edit(spriteScene);
           }
           if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
           {
-            ImGui.OpenPopup("spritex-options-popup");
-            _spritexOnOption = spritex;
+            ImGui.OpenPopup("spriteScene-options-popup");
+            _spriteSceneOnOption = spriteScene;
           }
         }
         ImGui.Unindent();
         ImGui.EndChild();
       }
-      if (ImGui.BeginPopupContextItem("spritex-options-popup"))
+      if (ImGui.BeginPopupContextItem("spriteScene-options-popup"))
       {
         if (ImGui.MenuItem("Rename"))
         {
-          _editor.NameModal.Open((name)=>{Sheet.GetSpritex(_spritexOnOption.Name).Name = name;});
+          _editor.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
         }
         if (ImGui.MenuItem("Delete"))
         {
-          Sheet.Spritexes.RemoveAll((spritex)=>spritex.Name == _spritexOnOption.Name);
-          if (Sheet.Spritexes.Count() == 0) _editor.GetEditorComponent<SpritexView>().UnEdit();
+          Sheet.SpriteScenees.RemoveAll((spriteScene)=>spriteScene.Name == _spriteSceneOnOption.Name);
+          if (Sheet.SpriteScenees.Count() == 0) _editor.GetEditorComponent<SpriteSceneView>().UnEdit();
         }
         ImGui.EndPopup();
       }

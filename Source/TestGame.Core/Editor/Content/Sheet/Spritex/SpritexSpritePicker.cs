@@ -6,12 +6,12 @@ using Microsoft.Xna.Framework;
 
 namespace Raven.Sheet
 { 
-  public class SpritexSpritePicker
+  public class SpriteSceneSpritePicker
   {
     public object SelectedSprite { get => _picker.SelectedSprite; }
-    SpritexView _view;
+    SpriteSceneView _view;
     SpritePicker _picker { get => _view.Editor.GetEditorComponent<SheetView>()._inspector.SpritePicker; }
-    public SpritexSpritePicker(SpritexView view)
+    public SpriteSceneSpritePicker(SpriteSceneView view)
     {
       _view = view;
     }
@@ -50,7 +50,7 @@ namespace Raven.Sheet
           // Pasted in the canvas 
           if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))
           {
-            var addedSprite = _view.LastSprite.Spritex.AddSprite("added-new", new SourcedSprite(_view.LastSprite.Spritex, sprite));
+            var addedSprite = _view.LastSprite.SpriteScene.AddSprite("added-new", new SourcedSprite(_view.LastSprite.SpriteScene, sprite));
             addedSprite.Transform.Position = _view.Entity.Scene.Camera.MouseToWorldPoint();
             _picker.SelectedSprite = null;
           }

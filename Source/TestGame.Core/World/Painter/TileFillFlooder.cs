@@ -2,7 +2,7 @@ using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Nez;
 
-namespace Raven.Sheet
+namespace Raven
 {
   // <summary>
   // Like a pathfinding, from a point, find all position in layer that has no painted tile, 

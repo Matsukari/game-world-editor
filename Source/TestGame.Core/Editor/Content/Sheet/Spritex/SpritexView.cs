@@ -5,28 +5,28 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework;
 
 
-namespace Raven.Sheet
+namespace Raven
 {
   // <summary>
-  // Handles state changes between sheet and spritex 
+  // Handles state changes between sheet and spriteScene 
   // </summary>
-  public class SpritexView : EditorComponent, IImGuiRenderable
+  public class SpriteSceneView : EditorComponent, IImGuiRenderable
   {
-    public SpritexInspector LastSprite { get => _spritex; }
-    SpritexInspector _spritex;
-    SpritexSpritePicker _picker;
+    public SpriteSceneInspector LastSprite { get => _spriteScene; }
+    SpriteSceneInspector _spriteScene;
+    SpriteSceneSpritePicker _picker;
 
     public override void OnContent()
     {
       if (RestrictTo<Sheet>())
       {
-        _picker = new SpritexSpritePicker(this);
+        _picker = new SpriteSceneSpritePicker(this);
         Editor.GetEditorComponent<SheetView>()._inspector.SpritePicker.HandleSelectedSprite = _picker.HandleSelectedSprite;
       }
       Clean();
     }        
     // Go to canvas and close spritesheet view
-    public void Edit(Sprites.Spritex spritex)
+    public void Edit(Sprites.SpriteScene spriteScene)
     {
 
       // came from sheet
@@ -40,20 +40,20 @@ namespace Raven.Sheet
       Clean();
 
       // Prepare
-      _spritex = new SpritexInspector(this, spritex);
+      _spriteScene = new SpriteSceneInspector(this, spriteScene);
       Enabled = true;
-      ContentData.Selection = spritex;
-      ContentData.ShapeContext = spritex;
+      ContentData.Selection = spriteScene;
+      ContentData.ShapeContext = spriteScene;
       Editor.GetEditorComponent<SheetView>().Enabled = false;
       Editor.GetEditorComponent<SheetView>()._inspector.ShowPicker = true; 
   
       // Rsetore last state
-      Entity.Scene.Camera.Position = _spritex.GuiPosition;
-      Entity.Scene.Camera.Zoom = _spritex.GuiZoom;
+      Entity.Scene.Camera.Position = _spriteScene.GuiPosition;
+      Entity.Scene.Camera.Zoom = _spriteScene.GuiZoom;
 
       Entity.GetComponent<Utils.Components.CameraMoveComponent>().Enabled = true;
       Entity.GetComponent<Utils.Components.CameraZoomComponent>().Enabled = true;
-      spritex.Entity = Entity;
+      spriteScene.Entity = Entity;
     }
 
     // back to spritesheet view
@@ -65,8 +65,8 @@ namespace Raven.Sheet
       Editor.GetEditorComponent<AnimationEditor>().Close();
 
       // Sotre last state
-      _spritex.GuiPosition = Entity.Scene.Camera.Position;
-      _spritex.GuiZoom = Entity.Scene.Camera.RawZoom;
+      _spriteScene.GuiPosition = Entity.Scene.Camera.Position;
+      _spriteScene.GuiZoom = Entity.Scene.Camera.RawZoom;
 
       // Enter sheet vew
       Entity.Scene.Camera.RawZoom = ContentData.Zoom;
@@ -91,8 +91,8 @@ namespace Raven.Sheet
     public override void Render(Batcher batcher, Camera camera)
     {
       Guidelines.OriginLinesRenderable.Render(batcher, camera, Editor.Settings.Colors.OriginLineX.ToColor(), Editor.Settings.Colors.OriginLineY.ToColor());
-      _spritex.Spritex.Render(batcher, camera);
-      foreach (var part in _spritex.Spritex.Parts)
+      _spriteScene.SpriteScene.Render(batcher, camera);
+      foreach (var part in _spriteScene.SpriteScene.Parts)
       {
         batcher.DrawString(
             Graphics.Instance.BitmapFont, 
@@ -113,7 +113,7 @@ namespace Raven.Sheet
       if (Nez.Input.RightMouseButtonPressed)
       {
         // var hasSelection = false;
-        foreach (var part in _spritex.Spritex.Parts)
+        foreach (var part in _spriteScene.SpriteScene.Parts)
         {
           var mouse = Entity.Scene.Camera.MouseToWorldPoint();
           if (part.WorldBounds.Contains(mouse))
@@ -123,10 +123,10 @@ namespace Raven.Sheet
         }
         // if (!hasSelection)
         // {
-        //   ImGui.OpenPopup("spritex-canvas-options-popup");
+        //   ImGui.OpenPopup("spriteScene-canvas-options-popup");
         // }
       }
-      // if (ImGui.BeginPopup("spritex-canvas-options-popup"))
+      // if (ImGui.BeginPopup("spriteScene-canvas-options-popup"))
       // {
       //   if (ImGui.MenuItem("Add new component here"))
       //   {
@@ -134,7 +134,7 @@ namespace Raven.Sheet
       //   ImGui.EndPopup();
       // }
       Editor.GetEditorComponent<SheetView>()._inspector.Render(editor);
-      _spritex.Render(editor);
+      _spriteScene.Render(editor);
 
     }
     Vector2 _initialScale = new Vector2();
@@ -145,7 +145,7 @@ namespace Raven.Sheet
       // select individual parts
       if (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed)
       {
-        foreach (var part in _spritex.Spritex.Parts)
+        foreach (var part in _spriteScene.SpriteScene.Parts)
         {
           var mouse = Entity.Scene.Camera.MouseToWorldPoint();
           if (part.WorldBounds.Contains(mouse))

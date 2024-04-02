@@ -1,7 +1,7 @@
 using Microsoft.Xna.Framework;
 using ImGuiNET;
 
-namespace Raven.Sheet.Sprites 
+namespace Raven 
 {
   public class Transform 
   {
@@ -9,6 +9,8 @@ namespace Raven.Sheet.Sprites
     public Vector2 Scale = new Vector2(1, 1);
     public Vector2 Skew = new Vector2(1, 1);
     public float Rotation = 0f;
+    public float RotationRadians { get => Nez.Mathf.Radians(Rotation); }
+
     public Transform() {}
     public void Apply(Nez.Transform transform)
     {

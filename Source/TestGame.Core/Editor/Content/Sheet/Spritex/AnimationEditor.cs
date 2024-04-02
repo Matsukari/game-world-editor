@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 using ImGuiNET;
 using Raven.Sheet.Sprites;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class AnimationEditor : EditorComponent, IImGuiRenderable
   {
@@ -10,9 +10,9 @@ namespace Raven.Sheet
     AnimationInspector _inspector;
     AnimationPlayer _player;
     public Animation Animation;
-    public Spritex Spritex;
+    public SpriteScene SpriteScene;
     public bool IsOpen { get => _player != null; }
-    public SpritexAnimationFrame SelectedFrame;
+    public SpriteSceneAnimationFrame SelectedFrame;
     public SourcedSprite SelectedFramePart;
 
     public AnimationEditor()
@@ -25,15 +25,15 @@ namespace Raven.Sheet
       Editor.GetEditorComponent<Selection>().End();
       _frameInspector.IsOpen = true;
       _player.JumpTo(index);
-      var newFrame = Animation.Frames[index] as SpritexAnimationFrame;
-      newFrame.Apply(Spritex);
+      var newFrame = Animation.Frames[index] as SpriteSceneAnimationFrame;
+      newFrame.Apply(SpriteScene);
       SelectedFrame = newFrame;
       SelectedFramePart = SelectedFrame.Parts[part];
     }
-    public void Open(Spritex spritex, Animation animation)
+    public void Open(SpriteScene spriteScene, Animation animation)
     {
       Enabled = true;
-      Spritex = spritex;
+      SpriteScene = spriteScene;
       Animation = animation;
       _inspector.IsOpen = true;
       _player = new AnimationPlayer();
@@ -47,9 +47,9 @@ namespace Raven.Sheet
     public void AddFrameFromCurrentState()
     {
       if (!IsOpen) return;
-      var frame = new SpritexAnimationFrame(Spritex);
+      var frame = new SpriteSceneAnimationFrame(SpriteScene);
       var index = _player.CurrentIndex;
-      Spritex.InsertFrame(Animation.Name, index, frame);
+      SpriteScene.InsertFrame(Animation.Name, index, frame);
       _player.Forward();
     }
     public override void OnContent()

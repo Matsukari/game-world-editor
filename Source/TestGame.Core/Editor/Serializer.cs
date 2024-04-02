@@ -1,6 +1,6 @@
 using Raven.Serializers;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class Serializer : EditorComponent
   {

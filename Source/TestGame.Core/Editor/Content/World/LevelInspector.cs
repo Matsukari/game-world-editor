@@ -2,7 +2,7 @@ using Microsoft.Xna.Framework;
 using Nez;
 using ImGuiNET;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class LevelInspector : Widget.PropertiedWindow
   {

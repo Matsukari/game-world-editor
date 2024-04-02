@@ -1,7 +1,7 @@
 using Raven.Sheet.Sprites;
 using ImGuiNET;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class TileInspector : Widget.PropertiedWindow
   { 

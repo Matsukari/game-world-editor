@@ -2,35 +2,35 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 
-namespace Raven.Sheet.Sprites 
+namespace Raven 
 {
   // <summary>
-  // ImGui window for editing spritex properties
+  // ImGui window for editing spriteScene properties
   // </summary>
-  public class SpritexInspector : Widget.PropertiedWindow
+  public class SpriteSceneInspector : Widget.PropertiedWindow
   {
-    public override string Name { get => Spritex.Name; set => Spritex.Name = value; }
-    public override PropertyList Properties { get => Spritex.Properties; set => Spritex.Properties = value; }
+    public override string Name { get => SpriteScene.Name; set => SpriteScene.Name = value; }
+    public override PropertyList Properties { get => SpriteScene.Properties; set => SpriteScene.Properties = value; }
     
     public SourcedSprite ChangePart = null;
-    SourcedSprite  _spritexPart;
-    SpritexView _view;
+    SourcedSprite  _spriteScenePart;
+    SpriteSceneView _view;
     // Gui state data
-    public Spritex Spritex;
+    public SpriteScene SpriteScene;
     public Vector2 GuiPosition = new Vector2();
     public float GuiZoom = 0.5f;
 
 
     static string[] _originTypes = new string[] { "Center", "Topleft", "Custom" };
 
-    public SpritexInspector(SpritexView view, Spritex spritex) 
+    public SpriteSceneInspector(SpriteSceneView view, SpriteScene spriteScene) 
     {
       _view = view;
-      Spritex = spritex;
+      SpriteScene = spriteScene;
     }
     public override void Render(Editor editor)
     {
-      if (Spritex != null && Spritex.Enabled) base.Render(editor);
+      if (SpriteScene != null && SpriteScene.Enabled) base.Render(editor);
     }
     public static void RenderSprite(SourcedSprite sprite, bool drawName = true)
     {
@@ -92,7 +92,7 @@ namespace Raven.Sheet.Sprites
         }
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
         {
-          _compOnOptions.DetachFromSpritex();
+          _compOnOptions.DetachFromSpriteScene();
           _view.Editor.GetEditorComponent<Selection>().End();
         }
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate"))
@@ -108,7 +108,7 @@ namespace Raven.Sheet.Sprites
       ImGui.SameLine();
       ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(sprite.Name).X - 140, 0f));
       ImGui.SameLine();
-      ImGui.PushID($"spritex-component-{sprite.Name}-options");
+      ImGui.PushID($"spriteScene-component-{sprite.Name}-options");
       var visibState = (!sprite.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
       if (ImGui.SmallButton(visibState))
       {
@@ -140,7 +140,7 @@ namespace Raven.Sheet.Sprites
       {
         if (ImGui.MenuItem("Create Animation"))
         {
-          Spritex.Animations.Add(new Animation(Spritex, "new-animation"));
+          SpriteScene.Animations.Add(new Animation(SpriteScene, "new-animation"));
         }
         ImGui.EndPopup();
       }
@@ -150,10 +150,10 @@ namespace Raven.Sheet.Sprites
     bool _isOpenAnimationOptionPopup = false;
     protected override void OnRenderAfterName()
     {
-      _selectedSprites.EqualFalseRange(Spritex.Parts.Count());      
-      _selectedAnims.EqualFalseRange(Spritex.Animations.Count());
+      _selectedSprites.EqualFalseRange(SpriteScene.Parts.Count());      
+      _selectedAnims.EqualFalseRange(SpriteScene.Animations.Count());
 
-      Transform.RenderImGui(Spritex.Transform);
+      Transform.RenderImGui(SpriteScene.Transform);
       var animheader = ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap);
       if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
       {
@@ -162,16 +162,16 @@ namespace Raven.Sheet.Sprites
       if (animheader)
       {
 
-        ImGui.BeginChild($"spritex-anim-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
-        for (int i = 0; i < Spritex.Animations.Count(); i++)
+        ImGui.BeginChild($"spriteScene-anim-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        for (int i = 0; i < SpriteScene.Animations.Count(); i++)
         {
-          var animation = Spritex.Animations[i];
+          var animation = SpriteScene.Animations[i];
           var isSelected = _selectedAnims[i];
           if (ImGui.Selectable($"{i+1}. {animation.Name}", ref isSelected, ImGuiSelectableFlags.AllowItemOverlap))
           {
             if (!ImGui.GetIO().KeyCtrl) _selectedAnims.FalseRange(_selectedAnims.Count());
             _selectedAnims[i] = true;
-            _view.Editor.GetEditorComponent<AnimationEditor>().Open(Spritex, animation);
+            _view.Editor.GetEditorComponent<AnimationEditor>().Open(SpriteScene, animation);
           }
         }
 
@@ -179,12 +179,12 @@ namespace Raven.Sheet.Sprites
       }
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
-        ImGui.BeginChild($"spritex-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
 
         SourcedSprite removeSprite = null;
         for (int i = 0; i < _selectedSprites.Count; i++)
         {
-          var part = Spritex.Parts[i];
+          var part = SpriteScene.Parts[i];
           var isSelected = _selectedSprites[i];
           var flags = ImGuiTreeNodeFlags.AllowItemOverlap | ImGuiTreeNodeFlags.NoTreePushOnOpen 
             | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick; 
@@ -211,7 +211,7 @@ namespace Raven.Sheet.Sprites
               _isOpenComponentOptionPopup = true;
               _compOnOptions = part;
             }
-            ImGui.PushID("spritex-component-content-" + part.Name);
+            ImGui.PushID("spriteScene-component-content-" + part.Name);
             RenderSprite(part);
             ImGui.PopID();
 
@@ -226,7 +226,7 @@ namespace Raven.Sheet.Sprites
         ImGui.EndChild();
         DrawOptions();
         DrawAnimationOptionPopup();
-        if (removeSprite != null) removeSprite.DetachFromSpritex();
+        if (removeSprite != null) removeSprite.DetachFromSpriteScene();
       }
     }
     public override string GetIcon()
