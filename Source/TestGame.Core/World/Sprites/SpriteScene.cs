@@ -14,6 +14,9 @@ namespace Raven
     [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
+    /// <summary>
+    /// Name to idenity this SpriteScene
+    /// </summary>
     public string Name;
 
     /// <summary>
@@ -27,16 +30,6 @@ namespace Raven
     public List<Animation> Animations = new List<Animation>();
 
     internal Sheet _sheet;
-
-    private SpriteScene() {}
-
-    public SpriteScene(string name, SourcedSprite main, Sheet sheet) 
-    {
-      Name = name;
-      _sheet = sheet;
-      AddSprite("Main component", main);
-    }
-
 
     /// <summary>
     /// Visually, putting a rectangle that exactly fits the bounds of all parts
@@ -59,6 +52,21 @@ namespace Raven
     }
 
 
+    private SpriteScene() 
+    {
+    }
+
+    public SpriteScene(string name, SourcedSprite main, Sheet sheet) 
+    {
+      Name = name;
+      _sheet = sheet;
+      AddSprite("Main component", main);
+    }
+
+    public void PutToFront()
+    {
+
+    }
     /// <summary>
     /// Creates another set of parts with different instanec
     /// </summary>

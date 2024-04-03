@@ -1,10 +1,9 @@
 
 using ImGuiNET;
 using Nez;
-using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 
-namespace Raven.Sheet
+namespace Raven
 { 
   public class SpriteSceneSpritePicker
   {

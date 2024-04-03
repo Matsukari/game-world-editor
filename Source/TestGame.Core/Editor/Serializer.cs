@@ -2,17 +2,18 @@ using Raven.Serializers;
 
 namespace Raven
 {
-  public class Serializer : EditorComponent
+  public class Serializer 
   {
     public static string[] SheetStdExtensions = new [] {".rvsheet", ".rv"};
     public static string[] WorldStdExtensions = new [] {".rvworld", ".rvw"};
     public string ApplicationSaveFolder;
     public string ApplicationSaveFilename;
     public string ApplicationSavePath { get => ApplicationSaveFolder + "/" + ApplicationSaveFilename; }
+    readonly ContentManager _contentManager;
 
-
-    public Serializer()
+    public Serializer(ContentManager contentManager)
     {
+      _contentManager = contentManager;
       ApplicationSaveFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
       ApplicationSaveFilename = "moneditor.app-settings";
     }
@@ -27,12 +28,11 @@ namespace Raven
 
       foreach (var file in loadedSettings.LastFiles)
       {
-        if (file.Type == EditorContentType.Sheet) Editor.AddTab(LoadContent<Sheet>(file.Filename));
-        else if (file.Type == EditorContentType.World) Editor.AddTab(LoadContent<World>(file.Filename));
+             if (file.Type == EditorContentType.Sheet) _contentManager.AddTab(LoadContent<Sheet>(file.Filename));
+        else if (file.Type == EditorContentType.World) _contentManager.AddTab(LoadContent<World>(file.Filename));
         else throw new Exception($"Error in file metadata. Cannot load {file.Type} content");
       }
-      Editor.Settings.Colors = loadedSettings.Colors;
-      // Editor.Switch(Editor.Settings.LastFile);
+      _contentManager.Settings.Colors = loadedSettings.Colors;
     }
     public EditorSettings LoadSettings()
     {
@@ -42,7 +42,7 @@ namespace Raven
     public void SaveSettings()
     {
       Console.WriteLine($"Saving at {ApplicationSavePath}");
-      new SettingsSerializer().Save(ApplicationSavePath, Editor.Settings);
+      new SettingsSerializer().Save(ApplicationSavePath, _contentManager.Settings);
     }
     public T LoadContent<T>(string file) where T: class
     {
@@ -54,8 +54,8 @@ namespace Raven
     }
     public void SaveContent()
     {
-      var content = Editor.GetContent().Content;
-      var filepath = Editor.GetContent().Data.Filename;
+      var content = _contentManager.GetContent().Content;
+      var filepath = _contentManager.GetContent().Data.Filename;
       if (filepath == null) filepath = "Sample.content";
       if (content is Sheet sheet) new SheetSerializer().Save(filepath, sheet);
       else 

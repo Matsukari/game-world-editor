@@ -43,7 +43,7 @@ namespace Raven
       Level level = World.CreateLevel(name);
       var levelEntity = new LevelEntity(level);
       levelEntity.SetParent(this);
-      Levels.Add(levelEntity);
+      Levels.Add(levelEntity); 
       return levelEntity;
     }
   }
@@ -57,6 +57,9 @@ namespace Raven
     [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
+    /// <summary>
+    /// ID used for indentidying World
+    /// </summary>
     public string Name;
 
     /// <summary>

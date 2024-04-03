@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 using ImGuiNET;
 using Nez;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class AnimationInspector : Widget.Window
   {

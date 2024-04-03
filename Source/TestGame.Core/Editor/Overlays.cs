@@ -3,28 +3,19 @@ using Microsoft.Xna.Framework;
 
 namespace Raven
 {
-  public class Overlays : EditorComponent, IImGuiRenderable
+  public class Overlays : RenderableComponent
   {
     public Overlays() => RenderLayer = -1;
+    readonly EditorSettings _settings;
+    readonly Selection _selection;
 
-    public override void OnContent()
-    {
-      if (!Editor.HasContent) Enabled = false;
-    }
-        
-    public void Render(Editor editor) 
-    { 
-      // if (ContentData.Selection is IImGuiRenderable renderable) renderable.Render(editor);  
-    }
+    public Overlays()
+
     public override void Render(Batcher batcher, Camera camera)
     {
       if (ContentData.ShapeContext != null)
       {
-        // Draw annotated shapes
-
-        Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
-        ShapeAnnotator.DrawPropertiesShapes(ContentData.ShapeContext, Editor.PrimitiveBatch, batcher, camera, Editor.Settings.Colors.ShapeInactive.ToColor());
-        Editor.PrimitiveBatch.End();
+        ShapeAnnotator.DrawPropertiesShapes(ContentData.ShapeContext, batcher, camera, Editor.Settings.Colors.ShapeInactive.ToColor());
 
         // Check selection of shapes
         var selectionRect = Editor.GetEditorComponent<Selection>();

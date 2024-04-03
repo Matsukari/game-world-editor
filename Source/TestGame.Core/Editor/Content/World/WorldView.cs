@@ -5,7 +5,7 @@ using ImGuiNET;
 
 namespace Raven
 {
-  public class WorldView : EditorComponent, IImGuiRenderable
+  public class WorldView : ContentView
   {
     World _world;
     public bool IsEditFree = false;

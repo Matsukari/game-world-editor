@@ -2,7 +2,7 @@ using Nez;
 
 namespace TestGame
 {
-  public class SpriteSheetEditorScene : Scene
+  public class EditorScene : Scene
   {
     public override void Initialize()
     {

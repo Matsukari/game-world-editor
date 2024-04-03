@@ -1,41 +1,30 @@
 using Microsoft.Xna.Framework;
 using ImGuiNET;
-using Nez;
-using Nez.ImGuiTools;
 
 namespace Raven
 {
-  public class Settings : EditorComponent
+  public class Settings : Widget.Window
   {
-    Editor _editor;
-    public Settings() 
+    readonly EditorSettings _settings;
+    public Settings(EditorSettings settings) 
     {
+      _settings = settings;
     }
-    public override void OnAddedToEntity()
+    public override void OnRender(Editor editor)
     {
-      Core.GetGlobalManager<ImGuiManager>().RegisterDrawCommand(RenderImGui);
-      Enabled = false;
-    }
-    bool _isOpenColor = false;
-    System.Reflection.FieldInfo _fieldOnOpenColor;
-    void RenderImGui()
-    {
-      if (!Enabled) return;  
-      ImGui.Begin("Settings");
-
       if (ImGui.BeginTabBar("settings-tab"))
       {
         if (ImGui.BeginTabItem("Theme"))
         {
-          var fields = Editor.Settings.Colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+          var fields = _settings.Colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
           foreach (var field in fields)
           {
-            var colorField = field.GetValue(Editor.Settings.Colors);
+            var colorField = field.GetValue(_settings.Colors);
             if (colorField is Vector4 vec)
             {
-              var numerics = ((Vector4)field.GetValue(Editor.Settings.Colors)).ToNumerics();
+              var numerics = ((Vector4)field.GetValue(_settings.Colors)).ToNumerics();
               if (ImGui.ColorEdit4(field.Name, ref numerics, 
-                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(Editor.Settings.Colors, numerics.ToVector4());
+                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_settings.Colors, numerics.ToVector4());
             }
           }
           ImGui.EndTabItem();
@@ -44,14 +33,13 @@ namespace Raven
       }
       if (ImGui.Button("Cancel"))
       {
-        Enabled = false;
+        IsOpen = false;
       }
       if (ImGui.Button("Save"))
       {
-        Editor.Component<Serializer>().SaveSettings();
-        Enabled = false;
+        editor.Serializer.SaveSettings();
+        IsOpen = false;
       }
-      ImGui.End();
     }
   }
 }

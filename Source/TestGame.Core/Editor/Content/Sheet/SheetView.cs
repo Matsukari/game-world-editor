@@ -1,11 +1,17 @@
 using Microsoft.Xna.Framework;
 using Nez;
 using Nez.Sprites;
-using Raven.Sheet.Sprites;
 
 namespace Raven
 {
-  public class SheetView : EditorComponent, IImGuiRenderable
+  public class ContentView : IImGuiRenderable
+  {
+    public virtual void OnContent() {}
+    public virtual void Render(Editor editor) {}
+    public virtual void Render(Batcher batcher, Camera camera) {}
+    public virtual void Update() {}
+  }
+  public class SheetView : ContentView
   {
     Sheet _sheet;
     SpriteRenderer _image;
@@ -18,14 +24,6 @@ namespace Raven
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
 
-    public override void OnDisabled()
-    {
-      if (_image != null) _image.Enabled = false;
-    }
-    public override void OnEnabled()
-    {
-      if (_image != null) _image.Enabled = true;
-    }
     public override void OnContent()
     {
       _inspector._editor  = Editor;
@@ -102,11 +100,6 @@ namespace Raven
     {
       rectangle.Location += _image.Bounds.Location;
       return rectangle;
-    }
-    public Vector2 GetOffRegionInSheet(Vector2 vector)
-    {
-      vector -= _image.Bounds.Location;
-      return vector;
     }
   }
 }

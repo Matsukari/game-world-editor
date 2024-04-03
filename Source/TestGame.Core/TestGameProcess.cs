@@ -11,6 +11,7 @@ public class TestGameProcess : Core
         base.Initialize();
         RegisterGlobalManager(new Raven.Input.InputManager());
         ExitOnEscapeKeypress = false;
+
         Window.IsBorderless = true; 
         IsFixedTimeStep = true;
         var imGuiOptions = new ImGuiOptions();
@@ -23,10 +24,9 @@ public class TestGameProcess : Core
         NezImGuiThemes.HighContrast();
         Raven.Sheet.GuiStyles.StyleViolet();
         ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
+
         imGuiManager.ShowMenuBar = false;
-        Scene = new SpriteSheetEditorScene();
-
-
+        Scene = new EditorScene();
     }
     [Nez.Console.Command( "show", "Shows something which would be otherwise hidden." )]
     static void ShowCommand( string which = "imdemo" )

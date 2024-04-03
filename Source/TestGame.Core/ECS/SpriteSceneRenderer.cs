@@ -1,4 +1,5 @@
 using Nez;
+using Microsoft.Xna.Framework;
 
 namespace Raven 
 {
@@ -29,6 +30,17 @@ namespace Raven
           return SpriteScene.EnclosingBounds;
         }
       }
+    }
+    public bool GetSpriteComponentAtWorld(Vector2 position)
+    {
+      for (int i = SpriteScene.Parts.Count()-1; i >= 0; i--)
+      {
+        var bounds = SpriteScene.Parts[i].Bounds;
+        bounds.Location += Transform.Position;
+        bounds.Size *= Transform.Scale;
+        if (bounds.Contains(position)) return true;
+      }
+      return false;
     }
     public override void Render(Batcher batcher, Camera camera)
     {

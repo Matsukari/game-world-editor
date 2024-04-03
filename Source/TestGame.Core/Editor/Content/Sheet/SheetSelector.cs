@@ -7,7 +7,7 @@ namespace Raven
   public class SheetSelector : EditorComponent, IImGuiRenderable
   {
     Sheet _sheet;
-    Sprites.SpriteScene _spriteSceneOnName = null;
+    SpriteScene _spriteSceneOnName = null;
     public override void OnContent()
     {
       RemoveSelection();

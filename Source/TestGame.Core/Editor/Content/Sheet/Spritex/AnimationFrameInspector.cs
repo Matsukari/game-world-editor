@@ -3,7 +3,7 @@ using ImGuiNET;
 using Nez;
 using Raven.Sheet.Sprites;
 
-namespace Raven.Sheet
+namespace Raven
 {
   public class AnimationFrameInspector : Widget.PropertiedWindow
   {

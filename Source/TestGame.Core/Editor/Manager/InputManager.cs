@@ -1,10 +1,22 @@
 using ImGuiNET;
 using Nez;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Num = System.Numerics;
 
-namespace Raven.Input
+namespace Raven
 {
+  public interface IInputHandler
+  {
+    /// <summary>
+    /// Hihger numbers go first
+    /// </summary> 
+    public int Priority() => 0;
+
+    public bool OnHandleInput() => false;
+
+    protected InputManager Input { get => Core.GetGlobalManager<InputManager>(); }
+  }
   public class InputManager : GlobalManager
   {
     public bool IsDrag = false;
@@ -16,9 +28,23 @@ namespace Raven.Input
     public RectangleF MouseDragArea = new RectangleF();
     public Num.Vector2 MouseDragStart = new Num.Vector2();
 
+    List<IInputHandler> _inputHandlers = new List<IInputHandler>();
+
+    public void RegisterInputhandler(IInputHandler handler)
+    {
+      _inputHandlers.Add(handler);
+      _inputHandlers.OrderByDescending(item => item.Priority());
+    }
     public override void Update()
     {
       HandleGuiDrags();
+
+      if (IsImGuiBlocking) return;
+
+      foreach (var input in _inputHandlers)
+      {
+        if (input.OnHandleInput()) break;
+      }
     }
     void HandleGuiDrags() 
     {
@@ -32,7 +58,6 @@ namespace Raven.Input
         MouseDragArea = MouseDragArea.ConsumePoint(pos.ToVector2().ToNumerics());
       }
       if (!IsDrag && (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed || Nez.Input.MiddleMouseButtonPressed))
-      // if (!IsDrag && (ImGui.GetIO().MouseDown[0] || ImGui.GetIO().MouseDown[1] || ImGui.GetIO().MouseDown[3]))
       {
         IsDrag = true;
         IsDragFirst = true;
@@ -43,15 +68,12 @@ namespace Raven.Input
         MouseDragArea.Y = pos.Y;
         MouseDragStart.X = pos.X;
         MouseDragStart.Y = pos.Y;
-        // Console.WriteLine("first");
       }
       IsDragLast = false;
       if (IsDrag && (Nez.Input.LeftMouseButtonReleased || Nez.Input.RightMouseButtonReleased || Nez.Input.MiddleMouseButtonReleased))
-      // if (IsDrag && (ImGui.GetIO().MouseReleased[0] || ImGui.GetIO().MouseReleased[1] || ImGui.GetIO().MouseReleased[3]))
       {
         IsDrag = false;
         IsDragLast = true;
-        // Console.WriteLine("last");
       }
     }
   }

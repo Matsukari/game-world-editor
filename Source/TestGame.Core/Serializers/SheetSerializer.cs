@@ -1,13 +1,12 @@
 using Microsoft.Xna.Framework.Graphics;
 using Nez;
-using Raven.Sheet;
 
 namespace Raven.Serializers
 {
 
-  class SheetSerializer : JsonSerializer<Sheet.Sheet>
+  class SheetSerializer : JsonSerializer<Sheet>
   {
-    protected override Sheet.Sheet Realize(Sheet.Sheet model)
+    protected override Sheet Realize(Sheet model)
     {
       model._texture =Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(model.Source));
       Insist.IsNotNull(model._texture);  

@@ -21,7 +21,7 @@ namespace Raven
     public Sprite SourceSprite;
 
     // Render options 
-    public Sprites.Transform Transform = new Transform(); 
+    public Transform Transform = new Transform(); 
     public SpriteEffects SpriteEffects;
     public Vector2 Origin = new Vector2();
 
@@ -32,26 +32,19 @@ namespace Raven
     public bool IsLocked = false;
 
     // Local bounds
-    public RectangleF LocalBounds { 
+    public RectangleF Bounds 
+    { 
       get => new RectangleF(
           Transform.Position.X - Origin.X * Transform.Scale.X, 
           Transform.Position.Y - Origin.Y * Transform.Scale.Y, 
           SourceSprite.Region.Width * Transform.Scale.X, 
           SourceSprite.Region.Height * Transform.Scale.Y);
     }
-
-    public RectangleF WorldBounds { 
-      get 
-      {
-        var bounds = LocalBounds;
-        bounds.Location += SpriteScene.Transform.Position;
-        bounds.Size *= SpriteScene.Transform.Scale;
-        return bounds;
-      }
-    }
     private SourcedSprite()
-    {}
-    public SourcedSprite(SpriteScene spriteScene=null, Sprites.Sprite sprite=null) 
+    {
+    }
+
+    public SourcedSprite(SpriteScene spriteScene=null, Sprite sprite=null) 
     {
       SpriteScene = spriteScene;
       SourceSprite = sprite;
@@ -62,7 +55,7 @@ namespace Raven
     }
     public int DeterminePreset()
     {
-      if (Origin == LocalBounds.Size/2f) return 0;
+      if (Origin == Bounds.Size/2f) return 0;
       else if (Origin == Vector2.Zero) return 1;
       else return 2;
     }
