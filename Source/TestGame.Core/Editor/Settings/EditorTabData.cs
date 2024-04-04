@@ -2,20 +2,17 @@ using Microsoft.Xna.Framework;
 
 namespace Raven
 {
-  public class EditorTabMetadata
+  public class EditorContentData
   {
     public string Filename;
-    public EditorContentType Type;
-  }
-  public class EditorTabData
-  {
-    public Object Selection = null; 
-    public Vector2 Position = new Vector2();
-    public float Zoom = 1;
-
-    public Shape ShapeSelection = null;
-    public IPropertied ShapeContext = null;
-
-    public string Filename = null;
+    public string Type;
+    public Vector2 Position = Vector2.Zero;
+    public float Zoom = 1f;
+    public List<object> Selections = new List<object>();
+    public EditorContentData(string filename, string type)
+    {
+      Filename = filename;
+      Type = type;
+    }
   }
 }

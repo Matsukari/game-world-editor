@@ -3,94 +3,72 @@ using Nez;
 using Microsoft.Xna.Framework;
 
 namespace Raven
-{
-  // public enum ShapeType { Circle, Rectangle, Ellipse, Point, Polygon, None };
-  public abstract class Shape : ICloneable
+{ 
+  public class RectangleModel
+  {  
+    public static string Icon = IconFonts.FontAwesome5.SquareFull;
+    public RectangleF Bounds = new RectangleF();
+
+    public RectangleModel() {}
+
+    public void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
+    {
+      primitiveBatch.DrawRectangle(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height, color);
+      batcher.DrawRectOutline(camera, Bounds, color);
+    } 
+  }
+  public class EllipseModel
   {
-    public string Name { get; set; } = "";
-    [PropertiedInput("Bounds")]
-    public RectangleF Bounds { get; set; } = new RectangleF();
-  
-    // Must always use primitiveBatch because .begin is called every frame
-    public abstract void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color);
-    public object Clone()
-    {
-      var shape = System.Convert.ChangeType(System.Activator.CreateInstance(GetType()), GetType()) as Shape;
-      shape.Bounds = Bounds;
-      return shape;
-    }
-    public Shape() {}
+    public static string Icon = IconFonts.FontAwesome5.Circle;
+    public Vector2 Center = new Vector2();
+    public float Width = 0;
+    public float Height = 0;
 
-    public class Rectangle : Shape
-    {  
-      public static string Icon = IconFonts.FontAwesome5.SquareFull;
-      public override void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
-      {
-        primitiveBatch.DrawRectangle(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height, color);
-        batcher.DrawRectOutline(camera, Bounds, color * 3);
-      } 
-    }
-    public class Circle : Shape
-    {
-      public static string Icon = IconFonts.FontAwesome5.Circle;
-      [PropertiedInput("Center")]
-      public Vector2 Center 
-      { 
-        get => Bounds.Location+Bounds.Size/2; 
-        set => Bounds = new RectangleF(value.X-Bounds.Size.X/2, value.Y-Bounds.Size.Y/2, Bounds.Width, Bounds.Height);  
-      }
-      [PropertiedInput("Radius")]
-      public float Radius
-      { 
-        get => Bounds.Width/2; 
-        set 
-        {
-          Bounds = new RectangleF(Center.X - value, Center.Y - value/2, value, value);
-        }
-      }
-      public override void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
-      {
-        primitiveBatch.DrawCircle(Center, Radius, color);
-        batcher.DrawCircle(Center, Radius, color * 3);
-      } 
-    }
+    public EllipseModel() {}
 
-    public class Point : Shape
+    public void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
     {
-      public static string Icon = IconFonts.FontAwesome5.MapMarkerAlt;
-      [PropertiedInput("Position")]
-      public Vector2 Position 
-      { 
-        get => Bounds.BottomCenter(); 
-        set => Bounds = new RectangleF(value.X-Bounds.Location.X/2, value.Y-Bounds.Size.Y, Bounds.Width, Bounds.Height);  
-      }
-      public override void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
-      {
-        primitiveBatch.DrawPolygon(new []{
-            Bounds.Location + Bounds.Location-Bounds.Location, 
-            Bounds.Location + Bounds.TopRight()-Bounds.Location, 
-            Bounds.Location + Bounds.BottomCenter()-Bounds.Location}, 
-            3,
-            color);
-        batcher.DrawPolygon(Bounds.Location, new []{
-            Bounds.Location-Bounds.Location, 
-            Bounds.TopRight()-Bounds.Location, 
-            Bounds.BottomCenter()-Bounds.Location}, 
-            color, 
-            true,
-            2f);
+      primitiveBatch.DrawCircle(Center, Width, color, circleSegments: (int)(32*camera.RawZoom));
+      batcher.DrawCircle(Center, Width, color, thickness: 1/camera.RawZoom, resolution: (int)(32*camera.RawZoom));
+    } 
+  }
 
-      } 
-    }
-    public class Polygon : Shape
-    { 
-      public static string Icon = IconFonts.FontAwesome5.DrawPolygon;
-      public List<Vector2> Points = new List<Vector2>();
-      public override void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
-      {
-        primitiveBatch.DrawPolygon(Vector2Ext.AddPositionVertices(Points, Bounds.Location), Points.Count(), color);
-        batcher.DrawPolygon(Bounds.Location, Points.ToArray(), color * 3);
-      }       
-    }
+  public class PointModel 
+  {
+    public static string Icon = IconFonts.FontAwesome5.MapMarkerAlt;
+    public static Vector2 Size = new Vector2(20, 30);
+    public Vector2 Position = new Vector2();
+
+    public PointModel() {}
+
+    public void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
+    {
+      var left = Position;
+      left.X -= Size.X/2;
+      left.Y -= Size.Y/2;
+
+      var right = Position;
+      right.X += Size.X/2;
+      right.Y -= Size.Y/2;
+
+      var vertices = new []{ left, right, Position };
+
+      primitiveBatch.DrawPolygon(Position.AddAsPositionToVertices(vertices), vertices.Count(), color);
+      batcher.DrawPolygon(Position, vertices, color,  true, 1/camera.RawZoom);
+    } 
+  }
+  public class PolygonModel
+  { 
+    public static string Icon = IconFonts.FontAwesome5.DrawPolygon;
+    public List<Vector2> Points = new List<Vector2>();
+    public Vector2 Position = new Vector2();
+
+    public PolygonModel() {}
+
+    public void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
+    {
+      primitiveBatch.DrawPolygon(Position.AddAsPositionToVertices(Points), Points.Count(), color);
+      batcher.DrawPolygon(Position, Points.ToArray(), color, thickness: 1/camera.RawZoom);
+    }       
   }
 }

@@ -87,6 +87,7 @@ namespace Raven
       Insist.IsNotNull(texture); 
       _texture = texture;
       SetTileSize(16, 16); 
+      
     }
     /// <summary>
     /// Sets the tile size

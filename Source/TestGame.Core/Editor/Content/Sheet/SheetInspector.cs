@@ -8,12 +8,12 @@ namespace Raven
     public override string Name { get => Sheet.Name; set => Sheet.Name = value;}
     public override PropertyList Properties { get => Sheet.Properties; set => Sheet.Properties = value; }
 
-    public Sheet Sheet { 
+    public Sheet Sheet 
+    { 
       get => _sheet; 
       set { _sheet = value; _sheetData = new SheetPickerData(_sheet, _editor.Settings.Colors); } 
     }
     Sheet _sheet;
-    internal Editor _editor;
     Sprites.SpriteScene _spriteSceneOnOption;
     public bool ShowPicker = false;
     public SpritePicker SpritePicker = new SpritePicker();

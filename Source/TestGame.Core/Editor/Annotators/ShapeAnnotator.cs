@@ -5,64 +5,103 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Raven
 {
-  public class ShapeAnnotator : EditorComponent
+  public class ShapeAnnotator : IInputHandler
   {
-    public ShapeAnnotator() => RenderLayer = -1;
-    public void Annotate(Shape shape)
+    PrimitiveBatch _primitiveBatch;
+    IPropertied _propertied;
+    bool _annotating;
+    object _shape;
+
+    public bool IsAnnotating { get => _annotating; }
+   
+    public event Action OnAnnotateStart;
+    public event Action OnAnnotateEnd;
+
+    public ShapeAnnotator()
     {
-      if (ContentData.ShapeContext == null) throw new MissingFieldException();
-      ContentData.ShapeSelection = shape;
-      Mouse.SetCursor(MouseCursor.Crosshair);
+      _primitiveBatch = new PrimitiveBatch();
+      _annotating = false;
     }
-    public override void OnContent()
+
+    public static bool IsShape(object shape) =>
+         shape is RectangleModel
+      || shape is PointModel
+      || shape is PolygonModel
+      || shape is EllipseModel;
+
+    public void Annotate(IPropertied property, object shape)
     {
-      if (!Editor.HasContent) Enabled = false;
+      if (!IsShape(shape)) throw new Exception();
+      Mouse.SetCursor(MouseCursor.Crosshair);
+      _shape = shape;
     }
     Vector2 _initialMouse = Vector2.Zero;
-    public override void Render(Batcher batcher, Camera camera)
+
+    bool IInputHandler.OnHandleInput(InputManager input)
     {
-      var input = Core.GetGlobalManager<Raven.Input.InputManager>();
-      if (ContentData.ShapeContext == null || input.IsImGuiBlocking || ContentData.ShapeSelection == null) return;
+      if (input.IsDragFirst && _shape != null) 
+      {
+        _annotating = true;
+      } 
+      return _annotating;
+    }
+
+    public void Render(Batcher batcher, Camera camera, Color color)
+    {
+      if (!_annotating) return;
+
+      var input = Core.GetGlobalManager<InputManager>();
 
       // calculate position of area between mous drag
       var rect = input.MouseDragArea;
-      rect.Location = _initialMouse;
-      rect.Size = camera.MouseToWorldPoint() - _initialMouse;
-      ContentData.ShapeSelection.Bounds = rect;
+
+      if (_shape is RectangleModel rectangle)
+      {
+        rect.Location = _initialMouse;
+        rect.Size = camera.MouseToWorldPoint() - _initialMouse;
+        rectangle.Bounds = rect;
+      }
+      else if (_shape is EllipseModel ellipse)
+      {
+        ellipse.Center = _initialMouse;
+        ellipse.Width = camera.MouseToWorldPoint().X - _initialMouse.X; 
+      }
 
       // Adds to current context
       void Add()
       {
-        ContentData.ShapeContext.Properties.Add(ContentData.ShapeSelection);
-        ContentData.ShapeSelection = null;
-        _initialMouse = Vector2.Zero;
         Mouse.SetCursor(MouseCursor.Arrow);
+        _propertied.Properties.Add(_shape);
+        _initialMouse = Vector2.Zero;
+        _annotating = false;
+        _shape = null;
       }
 
       // start point
-      if (input.IsDragFirst && _initialMouse == Vector2.Zero)
+      if (_initialMouse == Vector2.Zero)
       {
-        Editor.GetEditorComponent<SheetSelector>().RemoveSelection();
         _initialMouse = camera.MouseToWorldPoint();
-        if (ContentData.ShapeSelection is Shape.Point)
+        if (OnAnnotateStart != null) OnAnnotateStart();
+        if (_shape is PointModel shape)
         {
-          rect.Location = _initialMouse;
-          rect.Size = new Vector2(20, 30);
-          rect.X -= rect.Width/2;
-          rect.Y -= rect.Height;
-          ContentData.ShapeSelection.Bounds = rect;
+          shape.Position = _initialMouse;
           Add();
         }
       }
       // Dragging
       else if (input.IsDrag && _initialMouse != Vector2.Zero) 
       {
-        Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
-        ContentData.ShapeSelection.Render(Editor.PrimitiveBatch, batcher, camera, Editor.Settings.Colors.ShapeActive.ToColor());
-        Editor.PrimitiveBatch.End(); 
+        _primitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.ViewProjectionMatrix);
+        if (_shape is RectangleModel m1) m1.Render(_primitiveBatch, batcher, camera, color);
+        else if (_shape is EllipseModel m2) m2.Render(_primitiveBatch, batcher, camera, color);
+        else if (_shape is PointModel m3) m3.Render(_primitiveBatch, batcher, camera, color);
+        else if (_shape is PolygonModel m4) m4.Render(_primitiveBatch, batcher, camera, color);
+        batcher.FlushBatch();
+        _primitiveBatch.End();
       }
       // Released; add 
-      else if (input.IsDragLast && _initialMouse != Vector2.Zero && !(ContentData.ShapeSelection is Shape.Polygon)) Add();
+      else if (input.IsDragLast && _initialMouse != Vector2.Zero && !(_shape is PolygonModel)) 
+        Add();
     }
 
     // Draws all shapes in the properties

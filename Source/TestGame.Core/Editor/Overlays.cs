@@ -3,36 +3,32 @@ using Microsoft.Xna.Framework;
 
 namespace Raven
 {
-  public class Overlays : RenderableComponent
+  public class Overlays
   {
-    public Overlays() => RenderLayer = -1;
     readonly EditorSettings _settings;
     readonly Selection _selection;
 
-    public Overlays()
+    public Overlays() {}
 
-    public override void Render(Batcher batcher, Camera camera)
+    public void Render(Batcher batcher, Camera camera)
     {
-      if (ContentData.ShapeContext != null)
+      ShapeAnnotator.DrawPropertiesShapes(ContentData.ShapeContext, batcher, camera, Editor.Settings.Colors.ShapeInactive.ToColor());
+
+      // Check selection of shapes
+      var selectionRect = Editor.GetEditorComponent<Selection>();
+      foreach (var shape in ContentData.ShapeContext.Properties)
       {
-        ShapeAnnotator.DrawPropertiesShapes(ContentData.ShapeContext, batcher, camera, Editor.Settings.Colors.ShapeInactive.ToColor());
-
-        // Check selection of shapes
-        var selectionRect = Editor.GetEditorComponent<Selection>();
-        foreach (var shape in ContentData.ShapeContext.Properties)
+        if (Nez.Input.LeftMouseButtonPressed 
+            && shape.Value is Shape propShape 
+            && propShape.Bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
         {
-          if (Nez.Input.LeftMouseButtonPressed 
-              && shape.Value is Shape propShape 
-              && propShape.Bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
-          {
-            selectionRect.Begin(propShape.Bounds, propShape);
+          selectionRect.Begin(propShape.Bounds, propShape);
 
-            // Remove any tiles selected; aren't of significance
-            if (Editor.GetEditorComponent<SheetView>().Enabled) 
-              Editor.GetEditorComponent<SheetSelector>().RemoveSelection();
-            break;
-          }
-        } 
+          // Remove any tiles selected; aren't of significance
+          if (Editor.GetEditorComponent<SheetView>().Enabled) 
+            Editor.GetEditorComponent<SheetSelector>().RemoveSelection();
+          break;
+        }
         // update selection
         if (selectionRect.Capture is Shape theShape)
         {

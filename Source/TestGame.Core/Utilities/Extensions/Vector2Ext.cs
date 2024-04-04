@@ -51,7 +51,13 @@ namespace Raven
       vec.Y = (int)(vec.Y / point.Y) * point.Y;
       return vec;
     }
-    public static Vector2[] AddPositionVertices(List<Vector2> vertices, Vector2 offset)
+    public static Vector2[] AddAsPositionToVertices(this Vector2 offset, List<Vector2> vertices)
+    {
+      var s = new List<Vector2>();
+      foreach (var vertex in vertices) s.Add(offset + vertex);
+      return s.ToArray();
+    }
+    public static Vector2[] AddAsPositionToVertices(this Vector2 offset, Vector2[] vertices)
     {
       var s = new List<Vector2>();
       foreach (var vertex in vertices) s.Add(offset + vertex);

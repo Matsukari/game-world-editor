@@ -4,12 +4,17 @@ using Nez.Sprites;
 
 namespace Raven
 {
-  public class ContentView : IImGuiRenderable
+  public abstract class ContentView
   {
-    public virtual void OnContent() {}
-    public virtual void Render(Editor editor) {}
-    public virtual void Render(Batcher batcher, Camera camera) {}
-    public virtual void Update() {}
+    public virtual IInputHandler InputHandler { get; }
+    public virtual IImGuiRenderable ImGuiHandler { get; }
+
+    public abstract bool CanDealWithType(object content);
+
+    public virtual void OnContentOpen(IPropertied content) {}
+    public virtual void OnContentClose() {}
+
+    public virtual void Render(Batcher batcher, Camera camera, EditorSettings settings) {}
   }
   public class SheetView : ContentView
   {
@@ -24,41 +29,62 @@ namespace Raven
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
 
-    public override void OnContent()
+    public List<object> Selections = new List<object>();
+
+    public override bool CanDealWithType(object content) => content is Sheet;
+
+    public override void OnContentOpen(IPropertied content)
     {
-      _inspector._editor  = Editor;
       TileInMouse = Rectangle.Empty;
-      RenderLayer = -1;
-      if (_image != null) Entity.RemoveComponent(_image);
-      if (RestrictTo<Sheet>())
-      {
-        _sheet = Content as Sheet;
-        _image = Entity.AddComponent(new SpriteRenderer(_sheet.Texture));
-        Entity.GetComponent<Utils.Components.CameraMoveComponent>().Enabled = true;
-        Entity.GetComponent<Utils.Components.CameraZoomComponent>().Enabled = true;
-      }
+      _sheet = content as Sheet;
+      _image = new SpriteRenderer(_sheet.Texture);
     }
     public void Render(Editor editor)
     {
       _inspector.Sheet = _sheet;
       _inspector.Render(editor);
       // Evaluate to either one; 
-      _tileInspector.Tile = ContentData.Selection as Tile;
+      _tileInspector.Tile = Selections.Last() as Tile;
       _tileInspector.Render(editor);
 
-      _spriteInspector.Sprite = ContentData.Selection as Sprite;
+      _spriteInspector.Sprite = Selections.Last() as Sprite;
       _spriteInspector.Render(editor);
     }
-    public override void Render(Batcher batcher, Camera camera)
+    public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
       SyncModifiedTiles();
-      DrawArtifacts(batcher, camera);
+
+      // Draw tiles grid
+      foreach (var tile in _tiles) 
+      {
+        var worldTile = tile.ToRectangleF();
+        worldTile.Location += _image.Bounds.Location;
+        if (worldTile.Contains(camera.MouseToWorldPoint()) ) TileInMouse = tile;
+        if (IsDrawGrid)
+        {
+          batcher.DrawRectOutline(camera, worldTile, settings.Colors.PickHoverOutline.ToColor());
+        }
+      }
+      // Highlight the tile under mouse
+      if (!TileInMouse.IsEmpty && !settings.IsEditorBusy) 
+      {
+        var worldTileInMouse = TileInMouse.ToRectangleF();
+        worldTileInMouse.Location += _image.Bounds.Location;
+        batcher.DrawRect(worldTileInMouse, settings.Colors.PickHover.ToColor());
+        batcher.DrawRectOutline(camera, worldTileInMouse, settings.Colors.PickSelectedOutline.ToColor());
+      }
 
       // Draw last selected sprite
-      RectangleF region = RectangleF.Empty;
-      if (ContentData.Selection is Sprite sprite) region = sprite.Region.ToRectangleF();
-      else if (ContentData.Selection is Tile tile) region = tile.Region.ToRectangleF();
-      if (region != RectangleF.Empty) batcher.DrawRect(GetRegionInSheet(region), Editor.Settings.Colors.PickFill.ToColor());
+      foreach (var selection in Selections)
+      {
+        RectangleF region = RectangleF.Empty;
+        if (selection is Sprite sprite) region = sprite.Region.ToRectangleF();
+        else if (selection is Tile tile) region = tile.Region.ToRectangleF();
+
+        if (region != RectangleF.Empty) 
+          batcher.DrawRect(GetRegionInSheet(region), settings.Colors.PickFill.ToColor());
+
+      }
     }
     void SyncModifiedTiles()
     {
@@ -67,34 +93,6 @@ namespace Raven
         lastSheet = _sheet.Name;
         _tiles = _sheet.GetTiles();
       }
-    }
-    // Rectangles & highlights
-    void DrawArtifacts(Batcher batcher, Camera camera)
-    {
-      // Draw tiles' grid
-      foreach (var tile in _tiles) 
-      {
-        var worldTile = tile.ToRectangleF();
-        worldTile.Location += _image.Bounds.Location;
-        if (worldTile.Contains(camera.MouseToWorldPoint()) ) TileInMouse = tile;
-        if (IsDrawGrid)
-        {
-          batcher.DrawRectOutline(camera, worldTile, Editor.Settings.Colors.PickHoverOutline.ToColor());
-        }
-      }
-      // Highlight the tile under mouse
-      if (!TileInMouse.IsEmpty && !Editor.Component<Selection>().HasBegun() && ContentData.ShapeSelection == null) 
-      {
-        var worldTileInMouse = TileInMouse.ToRectangleF();
-        worldTileInMouse.Location += _image.Bounds.Location;
-        batcher.DrawRect(worldTileInMouse, Editor.Settings.Colors.PickHover.ToColor());
-        batcher.DrawRectOutline(camera, worldTileInMouse, Editor.Settings.Colors.PickSelectedOutline.ToColor());
-      }
-    }
-
-    public override void Update()
-    {
-      base.Update();
     }
     public RectangleF GetRegionInSheet(RectangleF rectangle)
     {

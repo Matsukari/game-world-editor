@@ -13,9 +13,8 @@ namespace Raven
     /// </summary> 
     public int Priority() => 0;
 
-    public bool OnHandleInput() => false;
+    public bool OnHandleInput(InputManager input) => false;
 
-    protected InputManager Input { get => Core.GetGlobalManager<InputManager>(); }
   }
   public class InputManager : GlobalManager
   {
@@ -28,9 +27,11 @@ namespace Raven
     public RectangleF MouseDragArea = new RectangleF();
     public Num.Vector2 MouseDragStart = new Num.Vector2();
 
+    public List<IInputHandler> InputHandlers { get => _inputHandlers; }
+
     List<IInputHandler> _inputHandlers = new List<IInputHandler>();
 
-    public void RegisterInputhandler(IInputHandler handler)
+    public void RegisterInputHandler(IInputHandler handler)
     {
       _inputHandlers.Add(handler);
       _inputHandlers.OrderByDescending(item => item.Priority());
@@ -43,7 +44,7 @@ namespace Raven
 
       foreach (var input in _inputHandlers)
       {
-        if (input.OnHandleInput()) break;
+        if (input.OnHandleInput(this)) break;
       }
     }
     void HandleGuiDrags() 

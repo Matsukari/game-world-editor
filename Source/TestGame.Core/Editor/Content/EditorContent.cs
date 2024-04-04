@@ -8,8 +8,12 @@ namespace Raven
   }
   public class EditorContent
   {
-    public EditorTabData Data = new EditorTabData();
-    public IPropertied Content;
-    public EditorContent(IPropertied content) => Content = content;
+    public EditorContentData Data { get; private set; }
+    public IPropertied Content { get; private set; }
+    public EditorContent(IPropertied content, EditorContentData data)   
+    {
+      Content = content;
+      Data = data;
+    }
   }
 }
