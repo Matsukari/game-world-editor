@@ -30,19 +30,22 @@ namespace Raven
     /// Call this only once! From am object of this type, this root EditorInterface will 
     /// check for any childs of the same type and Initialize() them altogether
     /// </summary>
-    public void Initialize(Selection selection, Camera camera, EditorContentData data)
+    public void Initialize(Editor editor)
     {
       foreach (var (intfObject, intfField) in ReflectionUtils.FindFields(this, typeof(EditorInterface)))
       {
         var editorInterface = intfField.GetValue(intfObject) as EditorInterface;
-        editorInterface.SetInitialize(selection, camera, data);
+        editorInterface.SetInitialize(editor);
       }
     }
-    internal void SetInitialize(Selection selection, Camera camera, EditorContentData data)
+    internal void SetInitialize(Editor editor)
     {
-      Selection = selection;
-      Camera = camera;
-      ContentData = data;
+      Selection = editor.Selection;
+      Camera = editor.Scene.Camera;
+      ContentData = editor.ContentManager.ContentData;
+      Content = editor.ContentManager.Content;
+      Serializer = editor.Serializer;
+      Settings = editor.Settings;
     }
   }
   public abstract class ContentView : EditorInterface

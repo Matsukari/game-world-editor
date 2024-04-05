@@ -42,12 +42,13 @@ namespace Raven
     }
     void OnAddContent()
     {
-      ContentManager.View.Initialize(Selection, Scene.Camera, ContentManager.ContentData);
+      ContentManager.View.Initialize(this);
     }
     public override void OnAddedToScene()
     {
       Scene.Camera.Position = -Screen.Center / 2;
 
+      ContentManager = new ContentManager();
       ContentManager.OnBeforeSwitch += OnCloseContent;
       ContentManager.OnAfterSwitch += OnOpenContent;
       ContentManager.OnAddContent += OnAddContent;

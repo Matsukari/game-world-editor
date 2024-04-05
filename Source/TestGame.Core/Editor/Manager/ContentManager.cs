@@ -5,9 +5,9 @@ namespace Raven
 	  public class ContentManager 
   {
     public bool HasContent { get => _tabs.Count() > 0; }
-    public ContentView View { get => _views[_currentTab]; }
-    public IPropertied Content { get => _tabs[_currentTab].Content; }
-    public EditorContentData ContentData { get => _tabs[_currentTab].Data; }
+    public ContentView View { get => _views.GetAtOrNull(_currentTab); }
+    public IPropertied Content { get => _tabs.GetAtOrNull(_currentTab).Content; }
+    public EditorContentData ContentData { get => _tabs.GetAtOrNull(_currentTab).Data; }
     public int CurrentIndex { get => _currentTab; }
 
     public EditorSettings Settings;
