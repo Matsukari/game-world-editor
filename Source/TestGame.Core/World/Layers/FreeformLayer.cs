@@ -1,4 +1,3 @@
-using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Nez;
 

@@ -14,23 +14,24 @@ namespace Raven
     
     public SourcedSprite ChangePart = null;
     SourcedSprite  _spriteScenePart;
-    SpriteSceneView _view;
     // Gui state data
     public SpriteScene SpriteScene;
     public Vector2 GuiPosition = new Vector2();
     public float GuiZoom = 0.5f;
 
+    public event Action<SpriteScene, Animation> OnOpenAnimation;
+    public event Action<SourcedSprite> OnAddPart;
+    public event Action<SourcedSprite> OnDelPart;
 
     static string[] _originTypes = new string[] { "Center", "Topleft", "Custom" };
 
-    public SpriteSceneInspector(SpriteSceneView view, SpriteScene spriteScene) 
+    public SpriteSceneInspector(SpriteScene spriteScene) 
     {
-      _view = view;
       SpriteScene = spriteScene;
     }
-    public override void Render(Editor editor)
+    public override void Render(ImGuiWinManager imgui)
     {
-      if (SpriteScene != null && SpriteScene.Enabled) base.Render(editor);
+      if (SpriteScene != null) base.Render(imgui);
     }
     public static void RenderSprite(SourcedSprite sprite, bool drawName = true)
     {
@@ -51,7 +52,7 @@ namespace Raven
       // Preset origin
       if (ImGui.Combo("Origin", ref originType, _originTypes, _originTypes.Count()))
       {
-        if (originType == 0) sprite.Origin = sprite.LocalBounds.Size/2f;
+        if (originType == 0) sprite.Origin = sprite.Bounds.Size/2f;
         else if (originType == 1) sprite.Origin = new Vector2();
       }
       // Custom origin is selected
@@ -69,8 +70,8 @@ namespace Raven
       ImGui.SameLine();
       if (ImGui.Checkbox("Flip Y", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
     }
-    bool _isOpenComponentOptionPopup = false;
-    SourcedSprite _compOnOptions = null;
+    internal bool _isOpenComponentOptionPopup = false;
+    internal SourcedSprite _compOnOptions = null;
     void DrawOptions()
     {
       if (_isOpenComponentOptionPopup)
@@ -93,7 +94,7 @@ namespace Raven
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
         {
           _compOnOptions.DetachFromSpriteScene();
-          _view.Editor.GetEditorComponent<Selection>().End();
+          if (OnDelPart != null) OnDelPart(_compOnOptions);
         }
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate"))
         {
@@ -140,7 +141,7 @@ namespace Raven
       {
         if (ImGui.MenuItem("Create Animation"))
         {
-          SpriteScene.Animations.Add(new Animation(SpriteScene, "new-animation"));
+          SpriteScene.Animations.Add(new Animation(SpriteScene, "Animation"));
         }
         ImGui.EndPopup();
       }
@@ -153,7 +154,7 @@ namespace Raven
       _selectedSprites.EqualFalseRange(SpriteScene.Parts.Count());      
       _selectedAnims.EqualFalseRange(SpriteScene.Animations.Count());
 
-      Transform.RenderImGui(SpriteScene.Transform);
+      SpriteScene.Transform.RenderImGui();
       var animheader = ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap);
       if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
       {
@@ -171,7 +172,7 @@ namespace Raven
           {
             if (!ImGui.GetIO().KeyCtrl) _selectedAnims.FalseRange(_selectedAnims.Count());
             _selectedAnims[i] = true;
-            _view.Editor.GetEditorComponent<AnimationEditor>().Open(SpriteScene, animation);
+            if (OnOpenAnimation != null) OnOpenAnimation(SpriteScene, animation);
           }
         }
 
@@ -217,11 +218,7 @@ namespace Raven
 
             ImGui.TreePop();
           }
-          if (part.WorldBounds.Contains(_view.Entity.Scene.Camera.MouseToWorldPoint()) && Nez.Input.RightMouseButtonPressed)
-          {
-            _isOpenComponentOptionPopup = true;
-            _compOnOptions = part;
-          }
+
         }
         ImGui.EndChild();
         DrawOptions();

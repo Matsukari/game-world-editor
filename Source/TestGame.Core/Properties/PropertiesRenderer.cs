@@ -56,7 +56,7 @@ namespace Raven
         }
       }
     }
-    public static bool Render(Editor editor, IPropertied propertied)
+    public static bool Render(ImGuiWinManager manager, IPropertied propertied)
     {
       string changedName = null;
       object changedProperty = null;
@@ -190,7 +190,7 @@ namespace Raven
 
 
     static Type _pickedPropertyType = null;
-    public static bool HandleNewProperty(IPropertied propertied, Editor editor)
+    public static bool HandleNewProperty(IPropertied propertied, ImGuiWinManager manager)
     {
       if (ImGui.BeginPopupContextItem("prop-popup"))
       {
@@ -214,7 +214,7 @@ namespace Raven
       }
       if (_pickedPropertyType != null)
       {
-        editor.NameModal.Open((name)=>NameProperty(propertied, name));
+        manager.NameModal.Open((name)=>NameProperty(propertied, name));
         return true;
       }
       return false;

@@ -1,4 +1,3 @@
-using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Nez;
 using ImGuiNET;
@@ -43,7 +42,7 @@ namespace Raven
     Vector2 _initialMouseOnDrag = Vector2.Zero;
     public void Draw(RectangleF preBounds)
     {
-      var input = Core.GetGlobalManager<Input.InputManager>();
+      var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
       if (SelectedSprite != null && Nez.Input.RightMouseButtonReleased) SelectedSprite = null;
@@ -231,7 +230,7 @@ namespace Raven
     }
     void HandleMoveZoom()
     {
-      var input = Core.GetGlobalManager<Input.InputManager>();
+      var input = Core.GetGlobalManager<InputManager>();
       var mouse = ImGui.GetMousePos();
       // zooms
       if (ImGui.GetIO().MouseWheel != 0)

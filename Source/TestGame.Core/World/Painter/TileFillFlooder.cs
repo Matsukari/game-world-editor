@@ -1,14 +1,13 @@
-using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Nez;
 
 namespace Raven
 {
-  // <summary>
-  // Like a pathfinding, from a point, find all position in layer that has no painted tile, 
-  // and assume that the each node path (point) to be travelled is as large as the give size.
-  // This is called in the game loop, just restart to start
-  // </summary>
+  /// <summary>
+  /// Like a pathfinding, from a point, find all position in layer that has no painted tile, 
+  /// and assume that the each node path (point) to be travelled is as large as the give size.
+  /// This is called in the game loop, just restart to start
+  /// </summary>
   public class TileFillFlooder
   {
     TileLayer _layer;
@@ -16,21 +15,22 @@ namespace Raven
     Queue<Point> _frontier = new Queue<Point>();
     Dictionary<Point, bool> _visited = new Dictionary<Point, bool>();
     static readonly (int, int)[] _dirs = new (int, int)[]{(1, 0), (-1, 0), (0, 1), (0, -1)};
-    public int MaxIterations = 200;
     Action<List<Point>> _callback;
-    InstancedSprite _flood;
     bool _isCleared = true;
+    Tile _flood;
 
-    // public TileFillFlooder(TileLayer layer)
-    // {
-    //   _layer = layer;
-    // }
+    /// <summary>
+    /// Number of times Update will fill a tile
+    /// </summary>
+    public int MaxIterations = 200;
+
     public void Start(Action<List<Point>> callback) 
     {
       Clear(); 
       _callback = callback;
     }
     public bool IsFloodComplete()  => _frontier.Count() == 0 && _fill.Count() != 0; 
+
     public List<Point> Update(TileLayer layer, Point point, Point size)
     {
       _layer = layer;
@@ -55,7 +55,7 @@ namespace Raven
           next.X += dir.Item1;
           next.Y += dir.Item2;
           if (_layer.IsTileValid(next.X, next.Y) 
-              && (!_layer.Tiles.ContainsKey(next) || (_flood != null && _layer.Tiles[next].HasSameSource(_flood)))
+              && (!_layer.Tiles.ContainsKey(next) || (_flood != null && _layer.Tiles[next].Id == _flood.Id))
               && !_visited.ContainsKey(next))
           {
             _frontier.Enqueue(next);

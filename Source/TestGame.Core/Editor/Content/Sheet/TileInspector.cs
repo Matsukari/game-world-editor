@@ -1,4 +1,3 @@
-using Raven.Sheet.Sprites;
 using ImGuiNET;
 
 namespace Raven
@@ -9,9 +8,9 @@ namespace Raven
     public override PropertyList Properties { get => Tile.Properties; set => Tile.Properties = value; }
 
     public Tile Tile;
-    public override void Render(Editor editor)
+    public override void Render(ImGuiWinManager imgui)
     {
-      if (Tile != null) base.Render(editor);
+      if (Tile != null) base.Render(imgui);
     }    
     public override string GetIcon()
     {

@@ -9,7 +9,7 @@ public class TestGameProcess : Core
     protected override void Initialize()
     {
         base.Initialize();
-        RegisterGlobalManager(new Raven.Input.InputManager());
+        RegisterGlobalManager(new Raven.InputManager());
         ExitOnEscapeKeypress = false;
 
         Window.IsBorderless = true; 
@@ -22,7 +22,7 @@ public class TestGameProcess : Core
         var imGuiManager = new ImGuiManager(imGuiOptions);
         Core.RegisterGlobalManager( imGuiManager );
         NezImGuiThemes.HighContrast();
-        Raven.Sheet.GuiStyles.StyleViolet();
+        Raven.GuiStyles.StyleViolet();
         ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
 
         imGuiManager.ShowMenuBar = false;

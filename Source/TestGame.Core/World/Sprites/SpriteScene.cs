@@ -29,6 +29,11 @@ namespace Raven
     /// </summary>
     public List<Animation> Animations = new List<Animation>();
 
+    /// <summary>
+    /// Root transform that affects all parts
+    /// </summary>
+    public Transform Transform = new Transform();
+
     internal Sheet _sheet;
 
     /// <summary>
@@ -107,6 +112,7 @@ namespace Raven
     public SourcedSprite AddSprite(string name, SourcedSprite sprite=null) 
     {
       if (sprite == null) sprite = new SourcedSprite();
+
       if (Parts.Find(item => item.Name == name) != null) 
         name = name.EnsureNoRepeat();
 

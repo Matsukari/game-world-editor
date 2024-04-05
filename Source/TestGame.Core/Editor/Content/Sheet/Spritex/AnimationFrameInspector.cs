@@ -1,7 +1,4 @@
-using Microsoft.Xna.Framework;
 using ImGuiNET;
-using Nez;
-using Raven.Sheet.Sprites;
 
 namespace Raven
 {
@@ -20,9 +17,9 @@ namespace Raven
       _animEditor = animEditor;
       NoClose = false;
     } 
-    public override void Render(Editor editor)
+    public override void Render(ImGuiWinManager imgui)
     {
-      if (Animator != null) base.Render(editor);
+      if (Animator != null) base.Render(imgui);
     }
     protected override void OnRenderAfterName()
     {

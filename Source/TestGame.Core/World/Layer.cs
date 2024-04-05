@@ -8,7 +8,6 @@ namespace Raven
     public T Layer;
     public WorldEntity World;
     public LevelEntity Level;
-
     public void Initialize(T layer)
     {
       Layer = layer;
@@ -18,7 +17,7 @@ namespace Raven
       get 
       {
         _bounds.CalculateBounds(
-            Transform.Position, (Layer.Size.ToVector2()/2) + Layer.Offset / 2, 
+            Transform.Position + Layer.Level.Bounds.Location, (Layer.Size.ToVector2()/2) + Layer.Offset / 2, 
             Layer.Size.ToVector2()/2f, Transform.Scale, Transform.Rotation, Layer.Size.X, Layer.Size.Y);
         return _bounds;
       }
@@ -26,7 +25,7 @@ namespace Raven
     public override void Render(Batcher batcher, Camera camera) {}
   }
   /// <summary>
-  /// The data that holds the information needed to be rendered
+  /// The data that holds the information needed to be rendered. Leaf in world hierarcy;  
   /// </summary>
   public class Layer
   {
@@ -52,9 +51,19 @@ namespace Raven
     public bool IsVisible = true;
 
     /// <summary>
+    /// Field to indicate if this Layer can accept any modifications
+    /// </summary>
+    public bool IsLocked = true;
+
+    /// <summary>
     /// Position relative to Level
     /// </summary>
     public Vector2 Offset = new Vector2();
+
+    /// <summary>
+    /// Boudns soly of this layer with an offset
+    /// </summary>
+    public RectangleF Bounds { get => Level.Bounds.AddPosition(Offset); }
 
     /// <summary>
     /// Same as Level's size

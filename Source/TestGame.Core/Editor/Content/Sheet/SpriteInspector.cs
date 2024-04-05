@@ -1,5 +1,4 @@
 using ImGuiNET;
-using Raven.Sheet.Sprites;
 
 namespace Raven
 {
@@ -9,9 +8,9 @@ namespace Raven
     public override PropertyList Properties { get => Sprite.Properties; set => Sprite.Properties = value; }
 
     public Sprite Sprite;
-    public override void Render(Editor editor)
+    public override void Render(ImGuiWinManager imgui)
     {
-      if (Sprite != null) base.Render(editor);
+      if (Sprite != null) base.Render(imgui);
     }    
     public override string GetIcon()
     {

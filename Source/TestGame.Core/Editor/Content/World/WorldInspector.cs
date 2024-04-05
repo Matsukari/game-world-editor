@@ -1,7 +1,6 @@
 
 using Nez;
 using ImGuiNET;
-using Microsoft.Xna.Framework;
 
 namespace Raven
 {
@@ -9,19 +8,21 @@ namespace Raven
   {
     public override string Name { get => World.Name; set => World.Name = value;}
     public override PropertyList Properties { get => World.Properties; set => World.Properties = value; }
+    readonly WorldViewImGui _viewImGui;
 
-    Editor _editor;
-    public World World;
-    public WorldEditor WorldEditor;
+    World World { get => _viewImGui.Content as World; }
+    SpritePicker _spritePicker { get => _viewImGui.SpritePicker; }
+    List<LevelInspector> _levelInspectors { get => _viewImGui.LevelInspectors;}
+
+    public WorldInspector(WorldViewImGui imgui) => _viewImGui = imgui;
+
+    public event Action<string> OnAddSheet;
+    public event Action<Level> OnRemoveLevel;
+
     bool _isOpenSheetHeaderPopup = false;
-    public override void Render(Editor editor)
+    public override void Render(ImGuiWinManager imgui)
     {
-      _editor = editor;
-      if (WorldEditor != null)
-      {
-        World = WorldEditor._world;
-        base.Render(editor);
-      }
+      base.Render(imgui);
 
       if (_isOpenSheetHeaderPopup)
       {
@@ -34,12 +35,12 @@ namespace Raven
         {
           void AddSheet(string file)
           {
-            if (Serializer.SheetStdExtensions.Contains(Path.GetExtension(file)))
+            if (Serializer.SheetStdExtensions.Contains(Path.GetExtension(file)) && OnAddSheet != null)
             {
-              World.AddSheet(WorldEditor.Editor.Component<Serializer>().LoadContent<Sheet>(file));
+              OnAddSheet(file);
             }
           }
-          WorldEditor.Editor.FilePicker.Open(AddSheet);
+          imgui.FilePicker.Open(AddSheet);
         }
         ImGui.EndPopup();
       }
@@ -58,52 +59,42 @@ namespace Raven
       if (World.Levels.Count() > 0) levelFlags = ImGuiTreeNodeFlags.DefaultOpen;
 
 
-      if (WorldEditor._spritePicker.Sheets.Count() != WorldEditor._world.SpriteSheets.Count())
-      {
-        WorldEditor._spritePicker.Sheets.Clear();
-        foreach (var sheet in WorldEditor._world.SpriteSheets) 
-        {
-          var data = new SheetPickerData(sheet.Value, _editor.Settings.Colors);
-          WorldEditor._spritePicker.Sheets.Add(data);
-        }
-      }
+
       // Levels listings
       if (ImGui.CollapsingHeader(IconFonts.FontAwesome5.ObjectGroup + "   Levels", levelFlags))
       {
         var size = 200;
         stack.Y += size;
         ImGui.BeginChild("levels-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
-        for (int i = 0; i < WorldEditor._levelInspectors.Count(); i++)
+        for (int i = 0; i < _levelInspectors.Count(); i++)
         {
-          var level = WorldEditor._levelInspectors[i];
+          var level = _levelInspectors[i];
           if (ImGui.Selectable($"{i+1}. {level.Name}", ref level.Selected, ImGuiSelectableFlags.AllowItemOverlap))
           {
             // Clear selection if not held with CTRL
             if (!ImGui.GetIO().KeyCtrl)
             {
-              foreach (var levelGui in WorldEditor._levelInspectors)
+              foreach (var levelGui in _levelInspectors)
               {
                 levelGui.Selected = false;
               }
             }
-            WorldEditor.SelectedLevel = i;
             level.Selected = true;
           }
           ImGui.SameLine();
           ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(level.Name).X - 100, 0f));
           ImGui.SameLine();
           ImGui.PushID($"level-{level.Name}-id");
-          var visibState = (!level._level.Enabled) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
+          var visibState = (!level.Level.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
           if (ImGui.SmallButton(visibState))
           {
-            level._level.Enabled = !level._level.Enabled;
+            level.Level.IsVisible = !level.Level.IsVisible;
           }
           ImGui.SameLine();
           if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
           {
-            World.RemoveLevel(level._level);
-            WorldEditor.Editor.GetEditorComponent<Selection>().End();
-            WorldEditor.SelectedLevel = -1;
+            World.RemoveLevel(level.Level);
+            OnRemoveLevel(level.Level);
           }
           ImGui.PopID();
           stack.Y += ImGui.GetItemRectSize().Y;
@@ -119,9 +110,9 @@ namespace Raven
         var size = 140;
         stack.Y += size;
         ImGui.BeginChild("spritesheets-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
-        for (int i = 0; i < WorldEditor._spritePicker.Sheets.Count(); i++)
+        for (int i = 0; i < _spritePicker.Sheets.Count(); i++)
         {
-          var sheet = WorldEditor._spritePicker.Sheets[i];
+          var sheet = _spritePicker.Sheets[i];
           
           var flags = ImGuiTreeNodeFlags.AllowItemOverlap | ImGuiTreeNodeFlags.NoTreePushOnOpen 
             | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick; 
@@ -138,7 +129,7 @@ namespace Raven
             // Reset selection
             if (!ImGui.GetIO().KeyCtrl)
             {
-              foreach (var sheetJ in WorldEditor._spritePicker.Sheets) sheetJ.Selected = false;
+              foreach (var sheetJ in _spritePicker.Sheets) sheetJ.Selected = false;
             }
             sheet.Selected = true;
           }
@@ -153,20 +144,20 @@ namespace Raven
 
           if (sheetNode)
           {
-            WorldEditor._spritePicker.SelectedSheet = sheet;
+            _spritePicker.SelectedSheet = sheet;
             // Draw preview spritesheet
             float previewHeight = 100;
             float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
             float ratio = (previewWidth) / previewHeight;
 
             // Draws the selected spritesheet
-            var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(WorldEditor._spritePicker.SelectedSheet.Sheet.Texture);
+            var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_spritePicker.SelectedSheet.Sheet.Texture);
             ImGui.Image(texture, new System.Numerics.Vector2(previewWidth, previewHeight*ratio), 
-                WorldEditor._spritePicker.GetUvMin(WorldEditor._spritePicker.SelectedSheet), 
-                WorldEditor._spritePicker.GetUvMax(WorldEditor._spritePicker.SelectedSheet));
-            if (WorldEditor._spritePicker.OpenSheet == null && ImGui.IsItemHovered())
+                _spritePicker.GetUvMin(_spritePicker.SelectedSheet), 
+                _spritePicker.GetUvMax(_spritePicker.SelectedSheet));
+            if (_spritePicker.OpenSheet == null && ImGui.IsItemHovered())
             {
-              WorldEditor._spritePicker.OpenSheet = WorldEditor._spritePicker.SelectedSheet;
+              _spritePicker.OpenSheet = _spritePicker.SelectedSheet;
             }
           }
         }
@@ -174,9 +165,11 @@ namespace Raven
       }
       if (removeSheet != null)
       {
-        WorldEditor._spritePicker.Sheets.Remove(removeSheet);
-        World.SpriteSheets.Remove(removeSheet.Sheet.Name);
+        _spritePicker.Sheets.Remove(removeSheet);
+        World.Sheets.Remove(removeSheet.Sheet);
       }
+
+      _spritePicker.Draw(new Nez.RectangleF(0f, Screen.Height-450-28, 450, 450));
     }      
   }
 

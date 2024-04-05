@@ -28,8 +28,8 @@ namespace Raven
 
       foreach (var file in loadedSettings.LastFiles)
       {
-             if (file.Type == EditorContentType.Sheet) _contentManager.AddTab(LoadContent<Sheet>(file.Filename));
-        else if (file.Type == EditorContentType.World) _contentManager.AddTab(LoadContent<World>(file.Filename));
+             if (file.Type == "Sheet") _contentManager.AddTab(new SheetView(), LoadContent<Sheet>(file.Filename));
+        else if (file.Type == "World") _contentManager.AddTab(new WorldView(), LoadContent<World>(file.Filename));
         else throw new Exception($"Error in file metadata. Cannot load {file.Type} content");
       }
       _contentManager.Settings.Colors = loadedSettings.Colors;

@@ -1,6 +1,5 @@
 
 using Nez.Persistence;
-using Raven.Sheet.Sprites;
 
 namespace Raven.Serializers
 {
@@ -13,13 +12,9 @@ namespace Raven.Serializers
     {
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
-      encoder.EncodeKeyValuePair("Color", instance.Color);
-      encoder.EncodeKeyValuePair("RenderLayer", instance.RenderLayer);
       encoder.EncodeKeyValuePair("Parts", instance.Parts);
       encoder.EncodeKeyValuePair("Animations", instance.Animations);
-      encoder.EncodeKeyValuePair("IsVisible", instance.IsVisible);
-      encoder.EncodeKeyValuePair("LocalOffset", instance.LocalOffset);
-      encoder.EncodeKeyValuePair("UpdateOrder", instance.UpdateOrder);
+      encoder.EncodeKeyValuePair("Transform", instance.Transform);
     }
     public override void OnFoundCustomData(SpriteScene instance, string key, object value )
     {

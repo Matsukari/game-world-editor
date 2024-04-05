@@ -1,7 +1,6 @@
 
 using Microsoft.Xna.Framework;
 using ImGuiNET;
-using Nez;
 
 namespace Raven
 {
@@ -16,10 +15,10 @@ namespace Raven
       _animEditor = animEditor;
       NoClose = false;
     }
-    public override void Render(Editor editor)
+    public override void Render(ImGuiWinManager imgui)
     {
       if (Animator == null) return;
-      base.Render(editor);
+      base.Render(imgui);
       DrawFrameOptions();
     }
     void DrawFrameOptions()
@@ -37,7 +36,7 @@ namespace Raven
       }
     }
     Vector2 _trackContentMin = Vector2.Zero;
-    public override void OnRender(Editor editor)
+    public override void OnRender(ImGuiWinManager imgui)
     {
       ImGui.Text("Animation: ");
       ImGui.SameLine();
@@ -111,7 +110,7 @@ namespace Raven
             try 
             {
               var frame = frameSet.Parts[i];
-              var color = (Animator.CurrentIndex == j) ? _animEditor.Editor.Settings.Colors.FrameActive : _animEditor.Editor.Settings.Colors.FrameInactive;
+              var color = (Animator.CurrentIndex == j) ? _animEditor.Settings.Colors.FrameActive : _animEditor.Settings.Colors.FrameInactive;
               var frameIcon = IconFonts.FontAwesome5.Circle;
               if (Animator.CurrentIndex == j) frameIcon = IconFonts.FontAwesome5.DotCircle; 
 
@@ -133,7 +132,7 @@ namespace Raven
             }
             catch (Exception)
             {
-              ImGui.PushStyleColor(ImGuiCol.Text, _animEditor.Editor.Settings.Colors.FrameInactive);
+              ImGui.PushStyleColor(ImGuiCol.Text, _animEditor.Settings.Colors.FrameInactive);
               ImGui.Text(IconFonts.FontAwesome5.Minus);
               ImGui.PopStyleColor();
             }

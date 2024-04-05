@@ -1,6 +1,4 @@
 
-using Raven.Sheet.Sprites;
-using Nez.Tweens;
 
 namespace Raven
 {

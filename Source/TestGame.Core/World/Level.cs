@@ -12,7 +12,7 @@ namespace Raven
     { 
       get 
       {
-        _bounds.CalculateBounds(Transform.Position, Vector2.Zero, 
+        _bounds.CalculateBounds(Transform.Position + Level.Bounds.Location, Vector2.Zero, 
             Level.ContentSize.ToVector2()/2f, Transform.Scale, Transform.Rotation, Level.ContentSize.X, Level.ContentSize.Y);
         return _bounds;
       }
@@ -77,6 +77,25 @@ namespace Raven
     /// </summary>
     public List<Layer> Layers = new List<Layer>();
 
+    /// <summary>
+    /// Position offset from World
+    /// </summary>
+    public Vector2 LocalOffset = Vector2.Zero;
+
+    /// <summary>
+    /// Determines whether to draw this Level or not
+    /// </summary>
+    public bool IsVisible = true;
+
+    /// <summary>
+    /// Absolute bounds of the Level
+    /// </summary>
+    public RectangleF Bounds { get => new RectangleF(
+        World.Position.X + LocalOffset.X, 
+        World.Position.Y + LocalOffset.Y,
+        ContentSize.X,
+        ContentSize.Y);
+    }
 
 
     public Level(World world)
@@ -93,6 +112,12 @@ namespace Raven
     /// Remoes the layer with the given name
     /// </summary>
     public void RemoveLayer(string name) => Layers.Remove(Layers.Find(item => item.Name == name));
+
+    /// <summary>
+    /// Remoes this layer from its parent World; the World can no longer refenrece this level but 
+    /// this level could in reverse
+    /// </summary>
+    public void DetachFromWorld() => World.RemoveLevel(this);
 
   }
 }

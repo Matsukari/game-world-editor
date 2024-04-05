@@ -8,26 +8,7 @@ namespace Raven
   {
     public readonly World World;
     public List<LevelEntity> Levels = new List<LevelEntity>();
-
-    /// <summary>
-    /// Bounds containing all Levels
-    /// </summary>
-    public RectangleF Bounds 
-    { 
-      get 
-      {
-        var min = new Vector2(100000, 100000);
-        var max = new Vector2(-10000, -10000);
-        foreach (var level in Levels)
-        {
-          min.X = Math.Min(min.X, level.Bounds.X);
-          min.Y = Math.Min(min.Y, level.Bounds.Y);
-          max.X = Math.Max(max.X, level.Bounds.Right);
-          max.Y = Math.Max(max.Y, level.Bounds.Bottom);
-        }
-        return RectangleF.FromMinMax(min, max);
-      }
-    }
+    public WorldEntity(World world) => World = world;
     public void RemoveLevel(Level level)
     {
       World.RemoveLevel(level);
@@ -72,7 +53,30 @@ namespace Raven
     /// </summary>
     public List<Sheet> Sheets = new List<Sheet>();
 
+    /// <summary>
+    /// Absolute position of the World affecting all objects in the hierarchy
+    /// </summary>
+    public Vector2 Position = Vector2.Zero;
 
+     /// <summary>
+    /// Bounds containing all Levels
+    /// </summary>
+    public RectangleF Bounds 
+    { 
+      get 
+      {
+        var min = new Vector2(100000, 100000);
+        var max = new Vector2(-10000, -10000);
+        foreach (var level in Levels)
+        {
+          min.X = Math.Min(min.X, level.Bounds.X);
+          min.Y = Math.Min(min.Y, level.Bounds.Y);
+          max.X = Math.Max(max.X, level.Bounds.Right);
+          max.Y = Math.Max(max.Y, level.Bounds.Bottom);
+        }
+        return RectangleF.FromMinMax(min, max);
+      }
+    }
 
     public World() 
     {

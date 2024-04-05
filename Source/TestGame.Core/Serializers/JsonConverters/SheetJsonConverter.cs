@@ -3,11 +3,11 @@ using Nez.Persistence;
 namespace Raven.Serializers
 {
 
-  class SheetJsonConverter : JsonTypeConverter<Sheet.Sheet>
+  class SheetJsonConverter : JsonTypeConverter<Sheet>
   {
     public override bool WantsExclusiveWrite => true;
          
-    public override void WriteJson( IJsonEncoder encoder, Sheet.Sheet instance)
+    public override void WriteJson( IJsonEncoder encoder, Sheet instance)
     {
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
@@ -17,7 +17,7 @@ namespace Raven.Serializers
       encoder.EncodeKeyValuePair("TileWidth", instance.TileWidth);
       encoder.EncodeKeyValuePair("TileHeight", instance.TileHeight);
     }
-    public override void OnFoundCustomData(Sheet.Sheet instance, string key, object value )
+    public override void OnFoundCustomData(Sheet instance, string key, object value )
     {
     }
   }

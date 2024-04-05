@@ -2,22 +2,22 @@
 using ImGuiNET;
 using Nez;
 using Microsoft.Xna.Framework;
-using System.Reflection;
 
 namespace Raven
 {
-  public class Menubar : EditorComponent, IImGuiRenderable
+  public class Menubar : IImGuiRenderable
   {
     (string, Action)[][] _buttons; 
+    readonly Editor _editor;
 
     void ProjectOptions()
     {
-      if (ImGui.MenuItem("Save")) Editor.Component<Serializer>().SaveContent();
-      if (ImGui.MenuItem("Project Settings")) Editor.Component<Settings>().Enabled = true;
+      if (ImGui.MenuItem("Save")) _editor.Serializer.SaveContent();
+      if (ImGui.MenuItem("Project Settings")) _editor.WindowManager.GetWindow<Settings>().IsOpen = true;
     }
     void WorldOptions()
     {
-      if (ImGui.MenuItem("New World")) Editor.AddTab(new World());
+      if (ImGui.MenuItem("New World")) _editor.ContentManager.AddTab(new WorldView(), new World());
       if (ImGui.BeginMenu("Worlds"))
       {
         ImGui.EndMenu();
@@ -25,7 +25,7 @@ namespace Raven
     }
     void SheetOptions()
     {
-      if (ImGui.MenuItem("New Sheet")) Editor.FilePicker.Open((filename)=> Editor.AddTab(new Sheet(filename))); 
+      if (ImGui.MenuItem("New Sheet")) _editor.WindowManager.FilePicker.Open((filename)=> _editor.ContentManager.AddTab(new SheetView(), new Sheet(filename))); 
       if (ImGui.BeginMenu("Sheets"))
       {
         ImGui.EndMenu();
@@ -34,8 +34,9 @@ namespace Raven
     void ViewOptions() 
     {
     }
-    public override void OnAddedToEntity()
+    public Menubar(Editor editor)
     {
+      _editor = editor;
       _buttons = new (string, Action)[][]{
         // 0, main menu buttons
         new (string, Action)[]
@@ -66,25 +67,14 @@ namespace Raven
             (IconFonts.FontAwesome5.User, ()=>{}),
             (IconFonts.FontAwesome5.Shapes, ()=>{})
           },
-          // 4, paint type options
-          new (string, Action)[]
-          {
-            (IconFonts.FontAwesome5.PaintBrush, ()=>Editor.GetEditorComponent<WorldEditor>().PaintMode = PaintMode.Pen),
-            (IconFonts.FontAwesome5.Eraser, ()=>Editor.GetEditorComponent<WorldEditor>().PaintMode = PaintMode.Eraser),
-            ("/",                           ()=>Editor.GetEditorComponent<WorldEditor>().PaintType = PaintType.Line),
-            (IconFonts.FontAwesome5.Square, ()=>Editor.GetEditorComponent<WorldEditor>().PaintType = PaintType.Rectangle),
-            (IconFonts.FontAwesome5.Fill,   ()=>Editor.GetEditorComponent<WorldEditor>().PaintType = PaintType.Fill),
-            (IconFonts.FontAwesome5.Dice,   ()=>Editor.GetEditorComponent<WorldEditor>().IsRandomPaint = !Editor.GetEditorComponent<WorldEditor>().IsRandomPaint),            
-          }
       };
 
     }
     bool _isDrawSnappingPopup = false;
     void ToogleGrid()
     {
-      if (Content is Sheet sheet) Editor.GetEditorComponent<SheetView>().IsDrawGrid = !Editor.GetEditorComponent<SheetView>().IsDrawGrid;
-      else if (Editor.GetEditorComponent<WorldEditor>().Enabled) 
-        Editor.GetEditorComponent<WorldEditor>().IsDrawTileLayerGrid = !Editor.GetEditorComponent<WorldEditor>().IsDrawTileLayerGrid;
+      if (_editor.ContentManager.View is SheetView sheet) sheet.IsDrawGrid = !sheet.IsDrawGrid;
+      else if (_editor.ContentManager.View is WorldView world) world.IsDrawTileLayerGrid = !world.IsDrawTileLayerGrid;
     }
     void DrawSnappingPopup()
     {
@@ -104,7 +94,7 @@ namespace Raven
         ImGui.EndPopup();
       }
     }
-    public void Render(Editor editor)
+    void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {
       Vector2 stackSize = new Vector2();
       void BeginStackBar(string name, float height)
@@ -151,12 +141,13 @@ namespace Raven
       ImGui.Dummy(new System.Numerics.Vector2(250f, 0));
       ImGui.SameLine();
       ImGui.BeginTabBar("files-tabs");
-      for (int i = 0; i < Editor._tabs.Count(); i++)
+      var tabs = _editor.ContentManager._tabs;
+      for (int i = 0; i < tabs.Count(); i++)
       {
         var open = true;
-        if (ImGui.BeginTabItem(Editor._tabs[i].Content.Name, ref open))
+        if (ImGui.BeginTabItem(tabs[i].Content.Name, ref open))
         {
-          if (Editor.GetContent().Content.Name != Editor._tabs[i].Content.Name) Editor.Switch(i);
+          if (_editor.ContentManager.Content.Name != tabs[i].Content.Name) _editor.ContentManager.Switch(i);
           ImGui.EndTabItem();
         }
         if (!open)
@@ -183,27 +174,55 @@ namespace Raven
       // Geometry opeionts
       ImGui.SameLine();
       ImGui.Dummy(new System.Numerics.Vector2(20, 0)); 
+
       // Draw shape annotators
-      foreach (var shapeType in typeof(Shape).GetNestedTypes())
+      for (int i = 0; i < ShapeModelUtils.ModelsIcon.Count(); i++)
       {
         ImGui.SameLine();
-        var shapeInstance = System.Convert.ChangeType(System.Activator.CreateInstance(shapeType), shapeType) as Shape;
-        var icon = shapeType.GetField("Icon", BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly).GetValue(shapeInstance);
-        string label = (icon == null) ? shapeType.Name : icon as string;
+        var shapeInstance = ShapeModelUtils.ModelsInstance[i];
+        var icon = ShapeModelUtils.ModelsIcon[i];
 
         // pressed; begin annotation
-        if (ImGui.Button(label)) Editor.GetEditorComponent<ShapeAnnotator>().Annotate(shapeInstance);
+        if (ImGui.Button(icon)) _editor.ShapeAnnotator.Annotate(_editor.ContentManager.ContentData.PropertiedContext, shapeInstance);
       }
 
-      if (Content is World)
+
+      Widget.ImGuiWidget.SpanX(20);
+      if (_editor.ContentManager.View is WorldView worldView)
       {
         // Paint options
-        ButtonSetFlat(4, 20);
+        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.PaintBrush, ref _paintModeToggled[0]))
+        {
+           worldView.PaintMode = PaintMode.Pen;
+        }
+        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.Eraser, ref _paintModeToggled[1]))
+        {
+           worldView.PaintMode = PaintMode.Eraser;
+        }
+
+        Widget.ImGuiWidget.ToggleButtonGroup(
+            ids: new []{"/", IconFonts.FontAwesome5.Square, IconFonts.FontAwesome5.Fill},
+            toggles: ref _paintTypeToggled,
+            actions: new []{
+              ()=>{worldView.PaintType = PaintType.Line; }, 
+              ()=>{worldView.PaintType = PaintType.Rectangle; }, 
+              ()=>{worldView.PaintType = PaintType.Fill; }, 
+            },
+            fallback: ()=>{worldView.PaintType = PaintType.Single;},
+            color: EditorColors.Get(ImGuiCol.ButtonHovered));
+            
+        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.Dice, ref _isRandomPaint))
+        {
+          worldView.IsRandomPaint = !worldView.IsRandomPaint;
+        }
       }
 
       DrawSnappingPopup();
 
       ImGui.End();
     }
+    bool[] _paintModeToggled = new []{false, false};
+    bool[] _paintTypeToggled = new []{false, false, false};
+    bool _isRandomPaint = false;
   }
 }

@@ -7,17 +7,19 @@ namespace Raven.Widget
     public virtual PropertyList Properties { get; set; } = new PropertyList();
     public virtual new string Name { get; set; } = "";
     public PropertiedWindow() => Flags = ImGuiWindowFlags.NoFocusOnAppearing;
+    protected ImGuiWinManager ImGuiManager;
 
-    public override void Render(Editor editor)
+    public override void Render(ImGuiWinManager imgui)
     {
       var name = Name;
+      ImGuiManager = imgui;
 
       void Draw()
       {
         if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
         Bounds.Location = ImGui.GetWindowPos();
         Bounds.Size = ImGui.GetWindowSize();
-        OnRender(editor);
+        OnRender(imgui);
 
         OnRenderBeforeName();
         if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
@@ -26,9 +28,9 @@ namespace Raven.Widget
           Name = name;
         }
         OnRenderAfterName();
-        if (PropertiesRenderer.Render(editor, this)) OnChangeProperty(name);
+        if (PropertiesRenderer.Render(imgui, this)) OnChangeProperty(name);
 
-        if (PropertiesRenderer.HandleNewProperty(this, editor)) OnChangeProperty(name);
+        if (PropertiesRenderer.HandleNewProperty(this, imgui)) OnChangeProperty(name);
       }
       var windowname = GetIcon() + "   " + GetName();
       if (NoClose) 

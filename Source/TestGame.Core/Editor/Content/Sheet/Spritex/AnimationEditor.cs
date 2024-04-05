@@ -1,10 +1,7 @@
-using Microsoft.Xna.Framework;
-using ImGuiNET;
-using Raven.Sheet.Sprites;
 
 namespace Raven
 {
-  public class AnimationEditor : EditorComponent, IImGuiRenderable
+  public class AnimationEditor : EditorInterface, IImGuiRenderable
   {
     AnimationFrameInspector _frameInspector;
     AnimationInspector _inspector;
@@ -15,6 +12,8 @@ namespace Raven
     public SpriteSceneAnimationFrame SelectedFrame;
     public SourcedSprite SelectedFramePart;
 
+    public event Action<int, int> OnSelectFrame;
+
     public AnimationEditor()
     {
       _frameInspector = new AnimationFrameInspector(this);
@@ -22,7 +21,7 @@ namespace Raven
     }
     public void SelectFrame(int index, int part)
     {
-      Editor.GetEditorComponent<Selection>().End();
+      // Editor.GetEditorComponent<Selection>().End();
       _frameInspector.IsOpen = true;
       _player.JumpTo(index);
       var newFrame = Animation.Frames[index] as SpriteSceneAnimationFrame;
@@ -32,7 +31,6 @@ namespace Raven
     }
     public void Open(SpriteScene spriteScene, Animation animation)
     {
-      Enabled = true;
       SpriteScene = spriteScene;
       Animation = animation;
       _inspector.IsOpen = true;
@@ -41,7 +39,6 @@ namespace Raven
     }
     public void Close() 
     {
-      Enabled = false;
       _player = null;
     }
     public void AddFrameFromCurrentState()
@@ -52,19 +49,15 @@ namespace Raven
       SpriteScene.InsertFrame(Animation.Name, index, frame);
       _player.Forward();
     }
-    public override void OnContent()
-    {
-      RestrictTo<Sheet>();
-    }
-    public void Render(Editor editor)
+    void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {
       _inspector.Animator = _player;
-      _inspector.Render(editor);  
+      _inspector.Render(imgui);  
 
       if (SelectedFrame != null)
       {
         _frameInspector.Animator = _player;
-        _frameInspector.Render(editor);
+        _frameInspector.Render(imgui);
       }
 
       if (_player != null) _player.Update();

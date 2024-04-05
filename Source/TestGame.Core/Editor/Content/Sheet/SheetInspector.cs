@@ -11,19 +11,33 @@ namespace Raven
     public Sheet Sheet 
     { 
       get => _sheet; 
-      set { _sheet = value; _sheetData = new SheetPickerData(_sheet, _editor.Settings.Colors); } 
+      set 
+      { 
+        _sheet = value; 
+        _sheetData = new SheetPickerData(_sheet, _settings.Colors); 
+      } 
     }
     Sheet _sheet;
-    Sprites.SpriteScene _spriteSceneOnOption;
+    SpriteScene _spriteSceneOnOption;
+    SheetPickerData _sheetData;
+    SpriteSceneView _spriteSceneView;
+
     public bool ShowPicker = false;
     public SpritePicker SpritePicker = new SpritePicker();
-    SheetPickerData _sheetData;
+    readonly internal EditorSettings _settings;
 
-    public override void Render(Editor editor)
+    public event Action<SpriteScene> OnClickScene;
+    public event Action<SpriteScene> OnDeleteScene;
+
+    public SheetInspector(EditorSettings settings)
     {
-      _editor = editor;
+      _settings = settings;
+    }
+    public override void Render(ImGuiWinManager imgui)
+    {
       SpritePicker.EnableReselect = false;
-      if (Sheet != null) base.Render(editor);
+      if (Sheet != null) base.Render(imgui);
+      if (_spriteSceneView.IsEditing) _spriteSceneView.SceneInspector.Render(imgui);
     }
     public override string GetIcon()
     {
@@ -39,6 +53,7 @@ namespace Raven
       ImGui.LabelText("Width", $"{Sheet.Tiles.X} tiles");
       ImGui.LabelText("Height", $"{Sheet.Tiles.Y} tiles");
       ImGui.EndDisabled();
+
 
       if (ShowPicker && ImGui.CollapsingHeader("Preview", ImGuiTreeNodeFlags.DefaultOpen))
       {
@@ -77,10 +92,9 @@ namespace Raven
         ImGui.Indent();
         foreach (var spriteScene in Sheet.SpriteScenees)
         {
-          if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {spriteScene.Name}")) 
+          if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {spriteScene.Name}") && OnClickScene != null) 
           {
-            var spriteSceneView = _editor.GetEditorComponent<SpriteSceneView>();
-            spriteSceneView.Edit(spriteScene);
+            OnClickScene(spriteScene);
           }
           if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
           {
@@ -95,12 +109,13 @@ namespace Raven
       {
         if (ImGui.MenuItem("Rename"))
         {
-          _editor.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
+          ImGuiManager.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
         }
         if (ImGui.MenuItem("Delete"))
         {
           Sheet.SpriteScenees.RemoveAll((spriteScene)=>spriteScene.Name == _spriteSceneOnOption.Name);
-          if (Sheet.SpriteScenees.Count() == 0) _editor.GetEditorComponent<SpriteSceneView>().UnEdit();
+          if (Sheet.SpriteScenees.Count() == 0 && OnDeleteScene != null) 
+            OnDeleteScene(_spriteSceneOnOption);
         }
         ImGui.EndPopup();
       }

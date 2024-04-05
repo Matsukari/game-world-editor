@@ -9,7 +9,7 @@ namespace Raven.Utils.Components
     Vector2 _initialSheetPosition = new Vector2();
     void IUpdatable.Update()
     {
-      var input = Core.GetGlobalManager<Raven.Input.InputManager>();
+      var input = Core.GetGlobalManager<Raven.InputManager>();
       if (input.IsImGuiBlocking) return;
       if (input.IsDragFirst)
       {

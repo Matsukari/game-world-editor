@@ -7,7 +7,6 @@ namespace Raven
 {
   public class ShapeAnnotator : IInputHandler
   {
-    PrimitiveBatch _primitiveBatch;
     IPropertied _propertied;
     bool _annotating;
     object _shape;
@@ -19,19 +18,12 @@ namespace Raven
 
     public ShapeAnnotator()
     {
-      _primitiveBatch = new PrimitiveBatch();
       _annotating = false;
     }
 
-    public static bool IsShape(object shape) =>
-         shape is RectangleModel
-      || shape is PointModel
-      || shape is PolygonModel
-      || shape is EllipseModel;
-
     public void Annotate(IPropertied property, object shape)
     {
-      if (!IsShape(shape)) throw new Exception();
+      if (!ShapeModelUtils.IsShape(shape)) throw new Exception();
       Mouse.SetCursor(MouseCursor.Crosshair);
       _shape = shape;
     }
@@ -91,26 +83,13 @@ namespace Raven
       // Dragging
       else if (input.IsDrag && _initialMouse != Vector2.Zero) 
       {
-        _primitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.ViewProjectionMatrix);
-        if (_shape is RectangleModel m1) m1.Render(_primitiveBatch, batcher, camera, color);
-        else if (_shape is EllipseModel m2) m2.Render(_primitiveBatch, batcher, camera, color);
-        else if (_shape is PointModel m3) m3.Render(_primitiveBatch, batcher, camera, color);
-        else if (_shape is PolygonModel m4) m4.Render(_primitiveBatch, batcher, camera, color);
-        batcher.FlushBatch();
-        _primitiveBatch.End();
+        Editor.PrimitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.ViewProjectionMatrix);
+        ShapeModelUtils.RenderShapeModel(_shape, Editor.PrimitiveBatch, batcher, camera, color);
+        Editor.PrimitiveBatch.End();
       }
       // Released; add 
       else if (input.IsDragLast && _initialMouse != Vector2.Zero && !(_shape is PolygonModel)) 
         Add();
-    }
-
-    // Draws all shapes in the properties
-    public static void DrawPropertiesShapes(IPropertied propertied, PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
-    {
-      foreach (var prop in propertied.Properties)
-      {
-        if (prop.Value is Shape shape) shape.Render(primitiveBatch, batcher, camera, color);
-      }
     }
   }
 }

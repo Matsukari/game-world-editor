@@ -6,11 +6,12 @@ namespace Raven
   public class Settings : Widget.Window
   {
     readonly EditorSettings _settings;
+    public event Action OnSaveSettings;
     public Settings(EditorSettings settings) 
     {
       _settings = settings;
     }
-    public override void OnRender(Editor editor)
+    public override void OnRender(ImGuiWinManager imgui)
     {
       if (ImGui.BeginTabBar("settings-tab"))
       {
@@ -37,7 +38,7 @@ namespace Raven
       }
       if (ImGui.Button("Save"))
       {
-        editor.Serializer.SaveSettings();
+        if (OnSaveSettings != null) OnSaveSettings();
         IsOpen = false;
       }
     }

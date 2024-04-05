@@ -1,4 +1,3 @@
-using Raven.Sheet.Sprites;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Nez;
@@ -92,9 +91,10 @@ namespace Raven
 
     Dictionary<Point, Tile> _tiles = new Dictionary<Point, Tile>();
 
-    // public Point GetTileCoordFromWorld(Vector2 point) => new Point(
-    //     (int)(point.X - Bounds.Location.X) / TileWidth, 
-    //     (int)(point.Y - Bounds.Location.Y) / TileHeight);
+    public Point GetTileCoordFromWorld(Vector2 point) => new Point(
+        (int)(point.X - Bounds.Location.X) / TileWidth, 
+        (int)(point.Y - Bounds.Location.Y) / TileHeight);
+
     public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
 
     /// <summary>
@@ -106,12 +106,17 @@ namespace Raven
     /// <summary>
     /// Replaces tile that is contained in the coordinates provided
     /// </summary>
-    public void ReplaceTile(int x, int y, Tile tile)
+    public void ReplaceTile(int x, int y, Tile tile) => ReplaceTile(new Point(x, y), tile);
+
+    /// <summary>
+    /// Replaces tile that is contained in the coordinates provided
+    /// </summary>
+    public void ReplaceTile(Point coord, Tile tile)
     {
-      if (!IsTileValid(x, y)) return;
-      var loc = new Point(x, y);
-      _tiles[loc] = tile;
+      if (!IsTileValid(coord.X, coord.Y)) return;
+      _tiles[coord] = tile;
     }
+
 
     /// <summary>
     /// Replaces or create custom render properties (such as Transform, Color) for a specific Tile at the given position

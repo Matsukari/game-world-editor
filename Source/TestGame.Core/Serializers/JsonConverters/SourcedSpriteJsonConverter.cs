@@ -1,6 +1,5 @@
 
 using Nez.Persistence;
-using Raven.Sheet.Sprites;
 
 namespace Raven.Serializers
 {

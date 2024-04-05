@@ -11,13 +11,13 @@ namespace Raven.Widget
     public bool IsOpen = true;
     public bool NoClose = true;
 
-    public virtual void OnRender(Editor editor)
+    public virtual void OnRender(ImGuiWinManager imgui)
     {
     }
     public virtual void OnHovered() 
     {
     }
-    public virtual void Render(Editor editor)
+    public virtual void Render(ImGuiWinManager imgui)
     {
       void Draw()
       {
@@ -28,7 +28,7 @@ namespace Raven.Widget
         }
         Bounds.Location = ImGui.GetWindowPos();
         Bounds.Size = ImGui.GetWindowSize();
-        OnRender(editor);
+        OnRender(imgui);
       }
       if (NoClose) 
       {

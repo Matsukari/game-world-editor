@@ -1,42 +1,26 @@
-using Microsoft.Xna.Framework;
-using Nez;
 using ImGuiNET;
 
 namespace Raven
 {
   public class LevelInspector : Widget.PropertiedWindow
   {
-    public override string Name { get => _level.Name; set => _level.Name = value;}
-    public override PropertyList Properties { get => _level.Properties; set => _level.Properties = value; }
-
-    internal Level _level;
-    internal WorldEditor _worldEditor;
-    internal List<bool> _levelSelected = new List<bool>();
+    public override string Name { get => Level.Name; set => Level.Name = value;}
+    public override PropertyList Properties { get => Level.Properties; set => Level.Properties = value; }
+    public readonly Level Level;
     public bool Selected = false;
-    
-    public LevelInspector(Level level, WorldEditor gui)
+
+    int _currentLayer = 0;
+    List<bool> _layerSelected = new List<bool>();
+    public Layer CurrentLayer { get => Level.Layers.GetAtOrNull(_currentLayer); }
+
+    public LevelInspector(Level level) => Level = level;
+
+    public override string GetIcon() => IconFonts.FontAwesome5.ObjectGroup;
+    public override string GetName() => "Level";   
+
+    public override void Render(ImGuiWinManager imgui)
     {
-      _level = level;
-      _worldEditor = gui;
-    }
-    public override string GetIcon()
-    {
-      return IconFonts.FontAwesome5.ObjectGroup;
-    }
-    public override string GetName()
-    {
-      return "Level";
-    }
-        
-    public void Render(Batcher batcher, Camera camera)
-    {
-      if (_level.CurrentLayer is TileLayer tileLayer)
-        Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, _worldEditor.Editor.Settings.Colors.LevelGrid.ToColor(), 
-            tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
-    }
-    public override void Render(Editor editor)
-    {
-      base.Render(editor);
+      base.Render(imgui);
       DrawLayerOptionsPopup();
       DrawLayerHeaderPopup();
     }
@@ -53,15 +37,15 @@ namespace Raven
         {
           if (ImGui.MenuItem("Tiled")) 
           {
-            var layer = new TileLayer(_level, 16, 16);
-            layer.Name = $"TiledLayer {_level.Layers.Count()+1}";
-            _level.Layers.Add(layer);
+            var layer = new TileLayer(Level, 16, 16);
+            layer.Name = $"TiledLayer {Level.Layers.Count()+1}";
+            Level.Layers.Add(layer);
           }
           if (ImGui.MenuItem("Freeform"))
           {  
-            var layer = new FreeformLayer(_level);
-            layer.Name = $"FreeLayer {_level.Layers.Count()+1}";
-            _level.Layers.Add(layer);
+            var layer = new FreeformLayer(Level);
+            layer.Name = $"FreeLayer {Level.Layers.Count()+1}";
+            Level.Layers.Add(layer);
           }
           ImGui.EndMenu();
         }
@@ -89,7 +73,7 @@ namespace Raven
         }
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
         {
-          _level.Layers.Remove(_layerOnOptions);  
+          Level.Layers.Remove(_layerOnOptions);  
         }
         ImGui.EndPopup();
       }
@@ -136,21 +120,23 @@ namespace Raven
     }
     void DrawLevelContent()
     {
-      ImGui.LabelText("Width", $"{_level.ContentSize.X} px");
-      ImGui.LabelText("Height", $"{_level.ContentSize.Y} px");
-      var levelOffset = _level.LocalOffset.ToNumerics();
-      if (ImGui.InputFloat2("Position", ref levelOffset)) _level.LocalOffset = levelOffset;
+      ImGui.LabelText("Width", $"{Level.ContentSize.X} px");
+      ImGui.LabelText("Height", $"{Level.ContentSize.Y} px");
+      var levelOffset = Level.LocalOffset.ToNumerics();
+      if (ImGui.InputFloat2("Position", ref levelOffset)) Level.LocalOffset = levelOffset;
     }
     void SyncLayersGui()
     {
-      if (_levelSelected.Count() != _level.Layers.Count())
+      _layerSelected.EqualFalseRange(Level.Layers.Count());
+      try 
       {
-        _levelSelected.Clear();
-        foreach (var layer in _level.Layers)
-        {
-          _levelSelected.Add(false);
-          if (layer.IsCurrentLayerInLevel) _levelSelected[_levelSelected.Count()-1] = true;
-        }
+        _layerSelected[_currentLayer] = true;
+      }
+      catch (Exception) 
+      {
+        if (_layerSelected.Count() == 0) return;
+        _currentLayer = 0;
+        _layerSelected[0] = true; 
       }
     }
     Layer _layerOnOptions = null;
@@ -172,13 +158,13 @@ namespace Raven
         ImGui.BeginChild($"level-layers-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
         // Draw layers
         Layer removeLayer = null;
-        for (int i = 0; i < _level.Layers.Count(); i++)
+        for (int i = 0; i < Level.Layers.Count(); i++)
         {
-          var layer = _level.Layers[i];
+          var layer = Level.Layers[i];
           var flags = ImGuiTreeNodeFlags.AllowItemOverlap 
             | ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.OpenOnDoubleClick; 
 
-          if (_levelSelected[i]) flags |= ImGuiTreeNodeFlags.Selected;
+          if (_layerSelected[i]) flags |= ImGuiTreeNodeFlags.Selected;
 
           var layerNode = (ImGui.TreeNodeEx(layer.Name, flags));
 
@@ -188,10 +174,9 @@ namespace Raven
             // Reset selection
             if (!ImGui.GetIO().KeyCtrl)
             {
-              for (int j = 0; j < _levelSelected.Count(); j++) _levelSelected[j] = false;
+              for (int j = 0; j < _layerSelected.Count(); j++) _layerSelected[j] = false;
             }
-            _levelSelected[i] = true;
-            _level.CurrentLayer = layer;
+            _layerSelected[i] = true;
           }
 
           // Layer options; select
@@ -213,8 +198,7 @@ namespace Raven
         }
         if (removeLayer != null)
         {
-          _level.Layers.Remove(removeLayer);
-          _level.CurrentLayer = null;
+          Level.Layers.Remove(removeLayer);
         }
         ImGui.EndChild();
       }

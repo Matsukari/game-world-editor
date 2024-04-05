@@ -5,19 +5,21 @@ using Microsoft.Xna.Framework;
 
 namespace Raven
 { 
-  public class SpriteSceneSpritePicker
+  public class SpriteSceneSpritePicker : EditorInterface
   {
+    readonly SpritePicker _picker;
+
     public object SelectedSprite { get => _picker.SelectedSprite; }
-    SpriteSceneView _view;
-    SpritePicker _picker { get => _view.Editor.GetEditorComponent<SheetView>()._inspector.SpritePicker; }
-    public SpriteSceneSpritePicker(SpriteSceneView view)
+    public event Action<SourcedSprite> OnDropSource; 
+
+    public SpriteSceneSpritePicker(SpritePicker picker)
     {
-      _view = view;
+      _picker = picker;
     }
     bool _isStartDrag = false;
     public void HandleSelectedSprite()
     {
-      var input = Core.GetGlobalManager<Input.InputManager>();
+      var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
       if (SelectedSprite is Sprite sprite)
@@ -31,9 +33,9 @@ namespace Raven
         { 
           ImGui.GetForegroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
-              screenPos - sprite.Region.GetHalfSize().ToNumerics() * _view.Entity.Scene.Camera.RawZoom, 
-              screenPos - sprite.Region.GetHalfSize().ToNumerics() * _view.Entity.Scene.Camera.RawZoom + sprite.Region.Size.ToVector2().ToNumerics() 
-              * _view.Entity.Scene.Camera.RawZoom,
+              screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom, 
+              screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom + sprite.Region.Size.ToVector2().ToNumerics() 
+              * Camera.RawZoom,
               min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
 
         }
@@ -46,12 +48,15 @@ namespace Raven
         else if (_isStartDrag && input.IsDragLast)
         {
           _isStartDrag = false;
+
           // Pasted in the canvas 
           if (!ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow))
           {
-            var addedSprite = _view.LastSprite.SpriteScene.AddSprite("added-new", new SourcedSprite(_view.LastSprite.SpriteScene, sprite));
-            addedSprite.Transform.Position = _view.Entity.Scene.Camera.MouseToWorldPoint();
+            var part = new SourcedSprite(sprite);
+            part.Transform.Position = Camera.MouseToWorldPoint();
             _picker.SelectedSprite = null;
+            OnDropSource(part);
+            // var addedSprite = _view.LastSprite.SpriteScene.AddSprite("added-new", new SourcedSprite(_view.LastSprite.SpriteScene, sprite));
           }
         }
       }

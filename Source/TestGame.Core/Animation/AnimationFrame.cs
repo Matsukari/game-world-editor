@@ -14,16 +14,23 @@ namespace Raven
     [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
+
     public string Name = "";
 
-    // The ammmount of time before interpolatin ends
+    /// <summary>
+    /// The ammount of time this frame interpolates towards the next frame
+    /// </summary>
     public float Duration = 1f;
 
-    // Type of ease to be used in interpolaation
+    /// <summary>
+    /// Type of ease to be used to interpolate the frame
+    /// </summary>
     public EaseType EaseType = EaseType.Linear;
 
-    // AnimationPlayer will only interpolate when there is a previous frame in the animtion 
-    // Last frame will be the previous frame if IsContinous is set
+    /// <summary>
+    /// AnimationPlayer will only interpolate when there is a previous frame in the animtion 
+    /// Last frame will be the previous frame if IsContinous is set
+    /// </summary>
     public virtual void Interpolate(AnimationFrame prevFrame, object target, float ease) {}
 
     public virtual void OnEnter(object target) {}

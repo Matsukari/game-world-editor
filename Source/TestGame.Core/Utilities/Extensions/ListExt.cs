@@ -6,6 +6,25 @@ namespace Raven
 {
   public static class ListExt
   {
+    public static T GetAtOrNull<T>(this List<T> list, int index) where T : class
+    {
+      try 
+      {
+        return list[index];
+      }
+      catch (Exception)
+      {
+        return null;
+      }
+    }
+    public static bool[] FalseRange(this bool[] list, int except=-1)
+    {
+      for (int i = 0; i < list.Count(); i++) 
+      {
+        if (i != except) list[i] = false;
+      }
+      return list;
+    }
     public static List<bool> FalseRange(this List<bool> list, int count)
     {
       list.Clear();

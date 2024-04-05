@@ -6,7 +6,7 @@ namespace Raven.Widget
   {
     public static void BreadCrumb(params string[] labels)
     {
-      ImGui.PushStyleColor(ImGuiCol.Text, Raven.Sheet.EditorColors.Get(ImGuiCol.TextDisabled));
+      ImGui.PushStyleColor(ImGuiCol.Text, Raven.EditorColors.Get(ImGuiCol.TextDisabled));
       for (int i = 0; i < labels.Count()-1; i++)
       {
         ImGui.Text(labels[i]);

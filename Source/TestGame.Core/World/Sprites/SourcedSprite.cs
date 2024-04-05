@@ -49,6 +49,10 @@ namespace Raven
       SpriteScene = spriteScene;
       SourceSprite = sprite;
     }
+    public SourcedSprite(Sprite sprite) 
+    {
+      SourceSprite = sprite;
+    }
     public void DetachFromSpriteScene()
     {
       SpriteScene.RemoveSprite(Name);

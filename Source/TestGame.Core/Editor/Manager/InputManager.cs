@@ -1,7 +1,6 @@
 using ImGuiNET;
 using Nez;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Input;
 using Num = System.Numerics;
 
 namespace Raven

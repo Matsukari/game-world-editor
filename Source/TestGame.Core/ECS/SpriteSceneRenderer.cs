@@ -31,16 +31,23 @@ namespace Raven
         }
       }
     }
-    public bool GetSpriteComponentAtWorld(Vector2 position)
+    public SourcedSprite GetPartAtWorld(Vector2 position)
     {
       for (int i = SpriteScene.Parts.Count()-1; i >= 0; i--)
       {
         var bounds = SpriteScene.Parts[i].Bounds;
         bounds.Location += Transform.Position;
         bounds.Size *= Transform.Scale;
-        if (bounds.Contains(position)) return true;
+        if (bounds.Contains(position)) return SpriteScene.Parts[i];
       }
-      return false;
+      return null;
+    }
+    public RectangleF GetPartWorldBounds(SourcedSprite sprite)
+    {
+      var bounds = new RectangleF();
+      bounds.Location = Transform.Position + LocalOffset + sprite.Transform.Position;
+      bounds.Size = (Transform.Scale * sprite.Transform.Scale) * sprite.Bounds.Size;
+      return bounds;
     }
     public override void Render(Batcher batcher, Camera camera)
     {

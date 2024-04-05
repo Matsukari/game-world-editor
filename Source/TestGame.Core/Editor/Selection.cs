@@ -17,7 +17,7 @@ namespace Raven
       _selection = selection;
       _colors = colors;
     }
-    bool IInputHandler.OnHandleInput()
+    bool IInputHandler.OnHandleInput(InputManager input)
     {
       if (Nez.Input.LeftMouseButtonPressed) 
         _selected = true;
@@ -156,10 +156,8 @@ namespace Raven
     RectangleF _selectionInitial = new RectangleF();
     bool _isDragInsideArea = false;
 
-    bool IInputHandler.OnHandleInput()   
+    bool IInputHandler.OnHandleInput(InputManager input)   
     {
-      var input = Core.GetGlobalManager<InputManager>();
-
       // The distance between the movement of the mouse
       var _bounds = ContentBounds;
       var mouse = Nez.Input.RawMousePosition.ToVector2();
