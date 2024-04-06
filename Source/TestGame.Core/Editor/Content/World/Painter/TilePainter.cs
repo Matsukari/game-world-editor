@@ -4,11 +4,12 @@ using ImGuiNET;
 
 namespace Raven
 {
-  public class TilePainter : EditorInterface, IInputHandler
+  public class TilePainter : SpritePicker, IInputHandler
   {
     World _world;
     WorldView _view;
     List<Point> _canFillTiles = new List<Point>();
+    Camera Camera { get => _view.Camera; }
 
     public TilePainter(WorldView view)
     {
@@ -107,7 +108,7 @@ namespace Raven
     {
 
     }
-    public void HandleSelectedSprite()
+    public override void OnHandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
@@ -137,7 +138,7 @@ namespace Raven
             {
               ImGui.GetForegroundDrawList().AddRectFilled(
                   input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
-                  Settings.Colors.PickFill.ToColor().Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
+                  _view.Settings.Colors.PickFill.ToColor().Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
             } 
             break;
         }

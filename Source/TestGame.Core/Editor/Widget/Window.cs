@@ -11,6 +11,7 @@ namespace Raven.Widget
     public bool IsOpen = true;
     public bool NoClose = true;
 
+    public Window() => Name = GetType().Name;
     public virtual void OnRender(ImGuiWinManager imgui)
     {
     }
@@ -30,13 +31,15 @@ namespace Raven.Widget
         Bounds.Size = ImGui.GetWindowSize();
         OnRender(imgui);
       }
+      if (!IsOpen) return;
+
       if (NoClose) 
       {
         ImGui.Begin(Name, Flags);
         Draw();
         ImGui.End();
       }
-      else if (IsOpen)
+      else
       {
         ImGui.Begin(Name, ref IsOpen, Flags);
         Draw();

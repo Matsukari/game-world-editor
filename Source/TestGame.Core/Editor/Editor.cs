@@ -48,7 +48,7 @@ namespace Raven
     {
       Scene.Camera.Position = -Screen.Center / 2;
 
-      ContentManager = new ContentManager();
+      ContentManager = new ContentManager(Settings);
       ContentManager.OnBeforeSwitch += OnCloseContent;
       ContentManager.OnAfterSwitch += OnOpenContent;
       ContentManager.OnAddContent += OnAddContent;
@@ -64,15 +64,18 @@ namespace Raven
 
       WindowManager.GetWindow<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
 
-      Serializer.LoadStartup();
-
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent()); 
       AddComponent(new SelectionRenderer(Selection, Settings.Colors));
+      AddComponent(new ContentRenderer(ContentManager));
 
       var input = Core.GetGlobalManager<InputManager>();
       input.RegisterInputHandler(ShapeAnnotator);
       input.RegisterInputHandler(Selection);
+
+      Serializer.LoadStartup();
+
+      ContentManager.AddTab(new SheetView(), new Sheet("/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png"));
 
       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().RegisterDrawCommand(WindowManager.Render);
     }

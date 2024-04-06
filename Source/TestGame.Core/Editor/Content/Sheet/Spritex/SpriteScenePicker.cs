@@ -5,18 +5,13 @@ using Microsoft.Xna.Framework;
 
 namespace Raven
 { 
-  public class SpriteSceneSpritePicker : EditorInterface
+  public class SpriteSceneSpritePicker : SpritePicker
   {
-    readonly SpritePicker _picker;
-
-    public object SelectedSprite { get => _picker.SelectedSprite; }
     public event Action<SourcedSprite> OnDropSource; 
-
-    public SpriteSceneSpritePicker(SpritePicker picker)
-    {
-      _picker = picker;
-    }
+    readonly Camera Camera;
     bool _isStartDrag = false;
+
+    public SpriteSceneSpritePicker(Camera camera) => Camera = camera;
     public void HandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<InputManager>();
@@ -39,7 +34,7 @@ namespace Raven
               min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
 
         }
-        if (_picker.IsHoverSelected && Nez.Input.LeftMouseButtonDown) _isStartDrag = true;
+        if (IsHoverSelected && Nez.Input.LeftMouseButtonDown) _isStartDrag = true;
 
         if (_isStartDrag && input.IsDrag)
         {
@@ -54,7 +49,7 @@ namespace Raven
           {
             var part = new SourcedSprite(sprite);
             part.Transform.Position = Camera.MouseToWorldPoint();
-            _picker.SelectedSprite = null;
+            SelectedSprite = null;
             OnDropSource(part);
             // var addedSprite = _view.LastSprite.SpriteScene.AddSprite("added-new", new SourcedSprite(_view.LastSprite.SpriteScene, sprite));
           }

@@ -2,7 +2,17 @@ using Nez;
 
 namespace Raven
 {
-	  public class ContentManager 
+  public class ContentRenderer : RenderableComponent 
+  {
+    readonly ContentManager _contentManager;
+    public ContentRenderer(ContentManager contentManager) => _contentManager = contentManager;
+    public override bool IsVisibleFromCamera(Camera camera) => true;
+    public override void Render(Batcher batcher, Camera camera)
+    {
+      _contentManager.Render(batcher, camera);
+    }
+  }
+  public class ContentManager 
   {
     public bool HasContent { get => _tabs.Count() > 0; }
     public ContentView View { get => _views.GetAtOrNull(_currentTab); }
@@ -15,13 +25,12 @@ namespace Raven
     public event Action OnAfterSwitch;
     public event Action OnAddContent;
 
-    SheetView sheetView;
-    WorldView worldView;
-
     // Either world or sheet; these are the objects that can be switch in and out
     internal List<EditorContent> _tabs = new List<EditorContent>();
     internal List<ContentView> _views = new List<ContentView>();
     int _currentTab = 0;
+
+    public ContentManager(EditorSettings settings) => Settings = settings;
 
     public void Render(Batcher batcher, Camera camera) => View.Render(batcher, camera, Settings);
     public void Update()
@@ -66,9 +75,9 @@ namespace Raven
       _tabs.Add(new EditorContent(content, contentData));
       _views.Add(contentView);
 
-      View.OnInitialize(Settings);
-
       OnAddContent();
+
+      View.OnInitialize(Settings);
 
       // First tab in the list yet
       if (_tabs.Count() == 1 || isSwitch) Switch(_tabs.Count()-1);

@@ -11,6 +11,8 @@ namespace Raven
     public event Action OnSelected;
    
     // SpriteScene _spriteSceneOnName = null;
+    
+    public SheetViewInputHandler(SheetView view) => _view = view;
 
     public void Render(Editor editor)
     {

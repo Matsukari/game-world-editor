@@ -32,7 +32,6 @@ namespace Raven
     public RectangleF Bounds = new RectangleF(0, 0, 1, 1);
     Vector2 _initialPosition = Vector2.Zero;
     List<RectangleF> _tiles = new List<RectangleF>();
-    public Action HandleSelectedSprite = null;
     public Action OnSelectRightMouseClick = null;
 
     public bool isPickOnlyTile = false;
@@ -40,6 +39,9 @@ namespace Raven
     public bool EnableReselect = true;
 
     Vector2 _initialMouseOnDrag = Vector2.Zero;
+    public virtual void OnHandleSelectedSprite()
+    {
+    }
     public void Draw(RectangleF preBounds)
     {
       var input = Core.GetGlobalManager<InputManager>();
@@ -49,8 +51,8 @@ namespace Raven
 
       if (OpenSheet == null) 
       {
-        if (SelectedSprite != null && HandleSelectedSprite != null && _initialMouseOnDrag == Vector2.Zero)
-          HandleSelectedSprite.Invoke();
+        if (SelectedSprite != null && _initialMouseOnDrag == Vector2.Zero)
+          OnHandleSelectedSprite();
         return;
       }
 
@@ -207,8 +209,8 @@ namespace Raven
           ImGui.EndTabItem();
         }
       }
-      if (SelectedSprite != null && HandleSelectedSprite != null && _initialMouseOnDrag == Vector2.Zero)
-          HandleSelectedSprite.Invoke();
+      if (SelectedSprite != null && _initialMouseOnDrag == Vector2.Zero)
+          OnHandleSelectedSprite();
 
       // Mouse is outside the enlargened picker
       if (!totalBounds.Contains(ImGui.GetMousePos()) && !input.IsDrag) 

@@ -151,14 +151,21 @@ namespace Raven
 
     public override bool CanDealWithType(object content) => content is World;
 
-    public override void OnContentOpen(IPropertied content)
+    public override void Initialize(Editor editor)
     {
-      _worldEntity = new WorldEntity(content as World); 
       _input = new WorldViewInputHandler(this);
       _input.OnLeftClickLevel += SelectLevel;
       _input.OnRightClickLevel += OpenLevelOptions;
+      _input.Initialize(editor);
+      _imgui = new WorldViewImGui(_input.Painter); 
+      _imgui.Initialize(editor);
+      _imgui.Popups.Initialize(editor);
+      base.Initialize(editor);
+    }
 
-      SpritePicker.HandleSelectedSprite = _input.Painter.HandleSelectedSprite;
+    public override void OnContentOpen(IPropertied content)
+    {
+      _worldEntity = new WorldEntity(content as World); 
     }   
     void SelectLevel(LevelEntity level, int i)
     {
@@ -169,6 +176,7 @@ namespace Raven
     {
       _imgui.Popups.OpenLevelOptions(level.Level);
     }
+
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
       Guidelines.OriginLinesRenderable.Render(batcher, camera, settings.Colors.OriginLineX.ToColor(), settings.Colors.OriginLineY.ToColor());

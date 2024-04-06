@@ -1,11 +1,11 @@
 
 namespace Raven
 {
-	  // Implement along with EditorComponent to render imgui content
   public interface IImGuiRenderable 
   {
     public void Render(ImGuiWinManager imgui);
   }
+
   
 	public class ImGuiWinManager
   {

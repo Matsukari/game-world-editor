@@ -10,7 +10,6 @@ namespace Raven
   // </summary>
   public class SpriteSceneView : EditorInterface
   {
-    public SheetInspector Inspector { get => _sheetView.Inspector; }
     public SpriteSceneInspector SceneInspector { get => _sceneInspector; }
     public SpriteSceneInspector LastSprite { get => _sceneInspector; }
     public SpriteSceneRenderer Renderer { get => _renderer; }
@@ -21,10 +20,18 @@ namespace Raven
     SpriteSceneRenderer _renderer;
     public bool IsEditing;
 
+    public event Action OnEdit;
+    public event Action OnUnEdit;
+
     public SpriteSceneView(SheetView view)
     {
       _sheetView = view;
       IsEditing = false;
+    }
+    public override void Initialize(Editor editor)
+    {
+      base.Initialize(editor);
+      _animationEditor.Initialize(editor);
     }
     // Go to canvas and close spritesheet view
     public void Edit(SpriteScene spriteScene)
@@ -32,21 +39,19 @@ namespace Raven
       Clean();
       IsEditing = true;
 
-      _sheetView.Inspector.SpritePicker.HandleSelectedSprite = new SpriteSceneSpritePicker(_sheetView.Inspector.SpritePicker).HandleSelectedSprite;
-
       // Prepare
       _sceneInspector = new SpriteSceneInspector(spriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => _animationEditor.Open(scene, anim);
       _renderer = new SpriteSceneRenderer(spriteScene);
       ContentData.PropertiedContext = spriteScene;
-      Inspector.ShowPicker = true; 
+      if (OnEdit != null) OnEdit();
     }
 
     // back to spritesheet view
     public void UnEdit()
     {
       Clean();
-      Inspector.ShowPicker = false; 
+      if (OnUnEdit != null) OnUnEdit();
 
       // Sotre last state
       _sceneInspector.GuiPosition = Camera.Position;
@@ -66,8 +71,8 @@ namespace Raven
       if (Nez.Input.IsKeyReleased(Keys.Escape)) UnEdit(); 
 
       Guidelines.OriginLinesRenderable.Render(batcher, camera, 
-          Inspector._settings.Colors.OriginLineX.ToColor(), 
-          Inspector._settings.Colors.OriginLineY.ToColor());
+          Settings.Colors.OriginLineX.ToColor(), 
+          Settings.Colors.OriginLineY.ToColor());
 
       _renderer.Render(batcher, camera);
 

@@ -25,21 +25,11 @@ namespace Raven
     public Serializer Serializer { get; private set; }
     public EditorContentData ContentData { get; private set; }
     public EditorSettings Settings { get; private set; }
+    public Entity Entity { get; private set; }
 
-    /// <summary>
-    /// Call this only once! From am object of this type, this root EditorInterface will 
-    /// check for any childs of the same type and Initialize() them altogether
-    /// </summary>
-    public void Initialize(Editor editor)
+    public virtual void Initialize(Editor editor)
     {
-      foreach (var (intfObject, intfField) in ReflectionUtils.FindFields(this, typeof(EditorInterface)))
-      {
-        var editorInterface = intfField.GetValue(intfObject) as EditorInterface;
-        editorInterface.SetInitialize(editor);
-      }
-    }
-    internal void SetInitialize(Editor editor)
-    {
+      Entity = editor;
       Selection = editor.Selection;
       Camera = editor.Scene.Camera;
       ContentData = editor.ContentManager.ContentData;
@@ -65,15 +55,17 @@ namespace Raven
   {
     readonly EditorSettings _settings;
     public readonly SheetInspector Inspector;
+    public SpriteSceneView SceneView;
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
+
     SelectionList _list;
     Sheet _sheet;
 
-    public SheetViewImGui(EditorSettings settings)
+    public SheetViewImGui(EditorSettings settings, Camera camera)
     {
       _settings = settings;
-      Inspector = new SheetInspector(settings);
+      Inspector = new SheetInspector(settings, camera);
     }
     public void Update(Sheet sheet, SelectionList list) 
     {
@@ -82,14 +74,24 @@ namespace Raven
     }
     void IImGuiRenderable.Render(ImGuiWinManager imgui)
     {
+      if (SceneView != null && SceneView.IsEditing)
+      {
+        SceneView.SceneInspector.Render(imgui);
+        return;
+      }
       Inspector.Sheet = _sheet;
       Inspector.Render(imgui);
-      // Evaluate to either one; 
-      _tileInspector.Tile = _list.Selections.Last() as Tile;
-      _tileInspector.Render(imgui);
 
-      _spriteInspector.Sprite = _list.Selections.Last() as Sprite;
-      _spriteInspector.Render(imgui);
+      if (_list != null && _list.Selections.Count() > 0)
+      {
+        // Evaluate to either one; 
+        _tileInspector.Tile = _list.Selections.Last() as Tile;
+        _tileInspector.Render(imgui);
+
+        _spriteInspector.Sprite = _list.Selections.Last() as Sprite;
+        _spriteInspector.Render(imgui);
+      }
+
     }
   }
 
@@ -115,17 +117,32 @@ namespace Raven
 
     public override bool CanDealWithType(object content) => content is Sheet;
 
+    public override void Initialize(Editor editor)
+    {
+      _input = new SheetViewInputHandler(this);
+      _scene = new SpriteSceneView(this);
+      _input.Initialize(editor);
+      _scene.Initialize(editor);
+      base.Initialize(editor);
+    }
     public override void OnInitialize(EditorSettings settings)
     {
-      _imgui = new SheetViewImGui(settings);
-      _input = new SheetViewInputHandler();
-      _scene = new SpriteSceneView(this);
+      _imgui = new SheetViewImGui(settings, Camera);
+
+      Inspector.OnClickScene += scene => _scene.Edit(scene);
+      Inspector.OnDeleteScene += scene => _scene.UnEdit();
+
+      _scene.OnEdit += () => Inspector.ShowPicker = true;
+      _scene.OnUnEdit += () => Inspector.ShowPicker = false;
+
+      _imgui.SceneView = _scene;
     }
     public override void OnContentOpen(IPropertied content)
     {
       TileInMouse = Rectangle.Empty;
       _sheet = content as Sheet;
       _image = new SpriteRenderer(_sheet.Texture);
+      _image.Entity = Entity;
     }
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
@@ -137,6 +154,8 @@ namespace Raven
         _scene.Render(batcher, camera);
         return;
       }
+
+      _image.Render(batcher, camera);
 
       // Draw tiles grid
       foreach (var tile in _tiles) 

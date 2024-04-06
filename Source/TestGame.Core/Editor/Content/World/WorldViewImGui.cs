@@ -11,7 +11,7 @@ namespace Raven
     public WorldViewPopup Popups { get => _popups;  }
 
     List<LevelInspector> _levelInspectors = new List<LevelInspector>();
-    SpritePicker _spritePicker = new SpritePicker();
+    TilePainter _spritePicker;
     WorldInspector _inspector;
     WorldViewPopup _popups;
 
@@ -19,7 +19,7 @@ namespace Raven
     WorldEntity _worldEntity;
     int _selectedLevel = -1;
 
-    public WorldViewImGui()
+    public WorldViewImGui(TilePainter painter)
     {
       _popups = new WorldViewPopup();
       _inspector = new WorldInspector(this);
