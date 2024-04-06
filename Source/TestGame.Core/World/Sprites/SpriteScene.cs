@@ -122,6 +122,8 @@ namespace Raven
       return sprite;
     }
 
+    public SourcedSprite AddSprite(SourcedSprite sprite) => AddSprite("Component", sprite);
+
     /// <summary>
     /// Removes a part with the same name as the given name
     /// </summary>

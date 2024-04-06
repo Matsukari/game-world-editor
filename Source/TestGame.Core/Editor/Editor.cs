@@ -21,8 +21,7 @@ namespace Raven
       ContentManager.GetContent().Data.Zoom = Scene.Camera.RawZoom;
       ContentManager.GetContent().Data.Position = Scene.Camera.Position;
 
-      if (ContentManager.View.ImGuiHandler != null) 
-        WindowManager.Renderables.Remove(ContentManager.View.ImGuiHandler);
+      WindowManager.RemoveRenderable(ContentManager.View.ImGuiHandler);
 
       if (ContentManager.View.InputHandler != null)
         Core.GetGlobalManager<InputManager>().InputHandlers.Remove(ContentManager.View.InputHandler);
@@ -33,8 +32,7 @@ namespace Raven
       Scene.Camera.RawZoom = ContentManager.GetContent().Data.Zoom;
       Scene.Camera.Position = ContentManager.GetContent().Data.Position;
 
-      if (ContentManager.View.ImGuiHandler != null) 
-        WindowManager.Renderables.Add(ContentManager.View.ImGuiHandler);
+      WindowManager.AddRenderable(ContentManager.View.ImGuiHandler);
 
       if (ContentManager.View.InputHandler != null)
         Core.GetGlobalManager<InputManager>().InputHandlers.Add(ContentManager.View.InputHandler);
@@ -58,11 +56,11 @@ namespace Raven
       ShapeAnnotator = new ShapeAnnotator();
 
       WindowManager = new ImGuiWinManager();
-      WindowManager.Windows.Add(new Settings(Settings));
+      WindowManager.Renderables.Add(new Settings(Settings));
       WindowManager.Renderables.Add(new StatusBar(this));
       WindowManager.Renderables.Add(new Menubar(this));
 
-      WindowManager.GetWindow<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
+      WindowManager.GetRenderable<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
 
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent()); 
@@ -72,6 +70,7 @@ namespace Raven
       var input = Core.GetGlobalManager<InputManager>();
       input.RegisterInputHandler(ShapeAnnotator);
       input.RegisterInputHandler(Selection);
+      input.RegisterInputHandler(GetComponent<SelectionRenderer>());
 
       Serializer.LoadStartup();
 

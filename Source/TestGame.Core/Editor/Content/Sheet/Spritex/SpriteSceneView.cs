@@ -14,6 +14,8 @@ namespace Raven
     public SpriteSceneInspector LastSprite { get => _sceneInspector; }
     public SpriteSceneRenderer Renderer { get => _renderer; }
     public SpriteScene SpriteScene { get => _sceneInspector.SpriteScene; }
+    public AnimationEditor AnimationEditor { get => _animationEditor; }
+
     public AnimationEditor _animationEditor = new AnimationEditor();
     readonly SheetView _sheetView;
     SpriteSceneInspector _sceneInspector;
@@ -32,6 +34,7 @@ namespace Raven
     {
       base.Initialize(editor);
       _animationEditor.Initialize(editor);
+      _animationEditor.OnClose += () => Selection.End();
     }
     // Go to canvas and close spritesheet view
     public void Edit(SpriteScene spriteScene)
@@ -42,6 +45,7 @@ namespace Raven
       // Prepare
       _sceneInspector = new SpriteSceneInspector(spriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => _animationEditor.Open(scene, anim);
+      _sceneInspector.OnDelPart += part => Selection.End();
       _renderer = new SpriteSceneRenderer(spriteScene);
       _renderer.Entity = Entity;
       ContentData.PropertiedContext = spriteScene;
@@ -96,8 +100,6 @@ namespace Raven
           (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
         selPart.Transform.Position = Selection.ContentBounds.Location + (selPart.Origin * selPart.Transform.Scale);
       }
-
-
     }  
     Vector2 _initialScale = new Vector2();
     public bool HandleInput(InputManager input)

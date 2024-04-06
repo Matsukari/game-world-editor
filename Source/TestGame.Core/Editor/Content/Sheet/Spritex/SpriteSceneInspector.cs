@@ -4,9 +4,9 @@ using ImGuiNET;
 
 namespace Raven 
 {
-  // <summary>
-  // ImGui window for editing spriteScene properties
-  // </summary>
+  /// <summary>
+  /// ImGui window for editing spriteScene properties
+  /// </summary>
   public class SpriteSceneInspector : Widget.PropertiedWindow
   {
     public override string Name { get => SpriteScene.Name; set => SpriteScene.Name = value; }
@@ -81,12 +81,12 @@ namespace Raven
       }
       if (ImGui.BeginPopupContextItem("sprite-component-options") && _compOnOptions != null)
       {
-        var lockState = (!_compOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
+        var lockState = (_compOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
           _compOnOptions.IsLocked = !_compOnOptions.IsLocked;
         }
-        var visib = (!_compOnOptions.IsVisible) ? IconFonts.FontAwesome5.EyeSlash + "  Hide" : IconFonts.FontAwesome5.Eye + "  Show";
+        var visib = (_compOnOptions.IsVisible) ? IconFonts.FontAwesome5.EyeSlash + "  Hide" : IconFonts.FontAwesome5.Eye + "  Show";
         if (ImGui.MenuItem(visib))
         {
           _compOnOptions.IsVisible = !_compOnOptions.IsVisible;

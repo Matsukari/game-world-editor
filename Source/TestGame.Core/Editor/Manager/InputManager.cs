@@ -14,6 +14,11 @@ namespace Raven
 
     public bool OnHandleInput(InputManager input) => false;
 
+    /// <summary>
+    /// Called when some IInputHandler returns true and cannot handle any further events
+    /// </summary> 
+    public void OnInputBlocked(InputManager input) {}
+
   }
   public class InputManager : GlobalManager
   {
@@ -41,9 +46,17 @@ namespace Raven
 
       if (IsImGuiBlocking) return;
 
-      foreach (var input in _inputHandlers)
+      for (int i = 0; i < _inputHandlers.Count; i++)
       {
-        if (input.OnHandleInput(this)) break;
+        if (_inputHandlers[i].OnHandleInput(this)) 
+        {
+          Console.WriteLine($"{_inputHandlers[i].GetType().Name} blocks");
+          for (int j = 0; j < _inputHandlers.Count; j++)
+          {
+            if (i != j) _inputHandlers[j].OnInputBlocked(this);
+          }
+          break;
+        }
       }
     }
     void HandleGuiDrags() 

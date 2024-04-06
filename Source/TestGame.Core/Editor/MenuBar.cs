@@ -13,7 +13,7 @@ namespace Raven
     void ProjectOptions()
     {
       if (ImGui.MenuItem("Save")) _editor.Serializer.SaveContent();
-      if (ImGui.MenuItem("Project Settings")) _editor.WindowManager.GetWindow<Settings>().IsOpen = true;
+      if (ImGui.MenuItem("Project Settings")) _editor.WindowManager.GetRenderable<Settings>().IsOpen = true;
     }
     void WorldOptions()
     {

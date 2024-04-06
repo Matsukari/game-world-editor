@@ -56,6 +56,10 @@ namespace Raven
     }
     public EditorContent GetContent() => _tabs[_currentTab];
 
+    public void RemoveTab()
+    {
+
+    }
     public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=true)
     {
       Console.WriteLine("Adding content on tabs");

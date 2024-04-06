@@ -12,6 +12,7 @@ namespace Raven
     public SpriteSceneAnimationFrame SelectedFrame;
     public SourcedSprite SelectedFramePart;
 
+    public event Action OnClose;
     public event Action<int, int> OnSelectFrame;
 
     public AnimationEditor()
@@ -40,6 +41,7 @@ namespace Raven
     public void Close() 
     {
       _player = null;
+      if (OnClose != null) OnClose(); 
     }
     public void AddFrameFromCurrentState()
     {

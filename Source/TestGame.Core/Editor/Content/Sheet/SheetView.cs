@@ -4,103 +4,6 @@ using Nez.Sprites;
 
 namespace Raven
 {
-  public class SelectionList 
-  {
-    public List<object> Selections = new List<object>();
-
-    // public Enumerable
-    public void Add(object sel)
-    {
-      if (!Nez.InputUtils.IsShiftDown())
-        Selections.Clear();
-      Selections.Add(sel);
-    }
-    public object Last() => Selections.Last();
-    public bool NotEmpty() => Selections.Count() > 0;
-}
-  public class EditorInterface
-  {
-    public Camera Camera { get; private set; }
-    public Selection Selection { get; private set; }
-    public IPropertied Content { get; private set; }
-    public Serializer Serializer { get; private set; }
-    public EditorContentData ContentData { get; private set; }
-    public EditorSettings Settings { get; private set; }
-    public Entity Entity { get; private set; }
-
-    public virtual void Initialize(Editor editor)
-    {
-      Entity = editor;
-      Selection = editor.Selection;
-      Camera = editor.Scene.Camera;
-      ContentData = editor.ContentManager.ContentData;
-      Content = editor.ContentManager.Content;
-      Serializer = editor.Serializer;
-      Settings = editor.Settings;
-    }
-  }
-  public abstract class ContentView : EditorInterface
-  {
-    public virtual IInputHandler InputHandler { get => null; }
-    public virtual IImGuiRenderable ImGuiHandler { get => null; }
-
-    public abstract bool CanDealWithType(object content);
-
-    public virtual void OnInitialize(EditorSettings settings) {}
-    public virtual void OnContentOpen(IPropertied content) {}
-    public virtual void OnContentClose() {}
-
-    public virtual void Render(Batcher batcher, Camera camera, EditorSettings settings) {}
-  }
-  public class SheetViewImGui : IImGuiRenderable
-  {
-    readonly EditorSettings _settings;
-    public readonly SheetInspector Inspector;
-    public readonly SheetViewPopup Popups;
-    public SpriteSceneView SceneView;
-    TileInspector _tileInspector = new TileInspector();
-    SpriteInspector _spriteInspector = new SpriteInspector();
-
-    SelectionList _list;
-    Sheet _sheet;
-
-    public SheetViewImGui(EditorSettings settings, Camera camera)
-    {
-      _settings = settings;
-      Inspector = new SheetInspector(settings, camera);
-      Popups = new SheetViewPopup();
-
-    }
-    public void Update(Sheet sheet, SelectionList list) 
-    {
-      _list = list;
-      _sheet = sheet;
-    }
-    void IImGuiRenderable.Render(ImGuiWinManager imgui)
-    {
-      Inspector.Sheet = _sheet;
-      Inspector.Render(imgui);
-
-      if (SceneView != null && SceneView.IsEditing)
-      {
-        SceneView.SceneInspector.Render(imgui);
-        return;
-      }
-      else if (_list != null && _list.Selections.Count() > 0)
-      {
-        // Evaluate to either one; 
-        _tileInspector.Tile = _list.Selections.Last() as Tile;
-        _tileInspector.Render(imgui);
-
-        _spriteInspector.Sprite = _list.Selections.Last() as Sprite;
-        _spriteInspector.Render(imgui);
-      }
-
-      var popup = Popups as IImGuiRenderable;
-      popup.Render(imgui);
-    }
-  }
-
   public class SheetView : ContentView
   {
     public override IImGuiRenderable ImGuiHandler => _imgui;
@@ -134,6 +37,7 @@ namespace Raven
       _scene.OnUnEdit += () => Inspector.ShowPicker = false;
 
       _imgui = new SheetViewImGui(Settings, Camera);
+      _imgui.Initialize(editor);
       _imgui.SceneView = _scene;
 
       _imgui.Popups.Initialize(editor);

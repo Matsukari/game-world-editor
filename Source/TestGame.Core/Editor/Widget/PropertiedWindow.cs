@@ -2,6 +2,7 @@ using ImGuiNET;
 
 namespace Raven.Widget
 {
+
   public class PropertiedWindow : Window, IPropertied, IImGuiRenderable
   {
     public virtual PropertyList Properties { get; set; } = new PropertyList();
@@ -11,40 +12,35 @@ namespace Raven.Widget
 
     public override void Render(ImGuiWinManager imgui)
     {
+      if (!IsOpen) return;
+
       var name = Name;
       ImGuiManager = imgui;
 
-      void Draw()
-      {
-        if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
-        Bounds.Location = ImGui.GetWindowPos();
-        Bounds.Size = ImGui.GetWindowSize();
-        OnRender(imgui);
-
-        OnRenderBeforeName();
-        if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
-        {
-          OnChangeName(Name, name);
-          Name = name;
-        }
-        OnRenderAfterName();
-        if (PropertiesRenderer.Render(imgui, this)) OnChangeProperty(name);
-
-        if (PropertiesRenderer.HandleNewProperty(this, imgui)) OnChangeProperty(name);
-      }
       var windowname = GetIcon() + "   " + GetName();
+
       if (NoClose) 
-      {
         ImGui.Begin(windowname, Flags);
-        Draw();
-        ImGui.End();
-      }
-      else if (IsOpen)
+      else
+        ImGui.Begin(windowname, ref _isOpen, Flags);
+      
+      if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
+      Bounds.Location = ImGui.GetWindowPos();
+      Bounds.Size = ImGui.GetWindowSize();
+      OnRender(imgui);
+
+      OnRenderBeforeName();
+      if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
       {
-        ImGui.Begin(windowname, ref IsOpen, Flags);
-        Draw();
-        ImGui.End();
+        OnChangeName(Name, name);
+        Name = name;
       }
+      OnRenderAfterName();
+
+      if (PropertiesRenderer.Render(imgui, this)) OnChangeProperty(name);
+      if (PropertiesRenderer.HandleNewProperty(this, imgui)) OnChangeProperty(name);
+
+      ImGui.End();
     }
     public bool HasName() => Name != null && Name != string.Empty;
     public virtual string GetIcon() => "";

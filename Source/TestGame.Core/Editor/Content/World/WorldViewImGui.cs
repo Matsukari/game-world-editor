@@ -28,6 +28,7 @@ namespace Raven
     }
 
     public LevelInspector SelectedLevelInspector { get => _levelInspectors.GetAtOrNull(SelectedLevel); }
+
     public int SelectedLevel 
     { 
       get => _selectedLevel; 
@@ -42,6 +43,7 @@ namespace Raven
         _levelInspectors[_selectedLevel].Selected = true;
       }
     }
+    
     void SyncLevelInspectors()
     {
       if (_levelInspectors.Count() != _world.Levels.Count())
@@ -70,6 +72,8 @@ namespace Raven
         }
       }
     }
+
+    bool IImGuiRenderable.IsVisible() => Content is World;
     void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {
       SyncSpritePicker();

@@ -12,7 +12,7 @@ namespace Raven
     bool _isStartDrag = false;
 
     public SpriteSceneSpritePicker(Camera camera) => Camera = camera;
-    public void HandleSelectedSprite()
+    public override void OnHandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
@@ -51,7 +51,6 @@ namespace Raven
             part.Transform.Position = Camera.MouseToWorldPoint();
             SelectedSprite = null;
             OnDropSource(part);
-            // var addedSprite = _view.LastSprite.SpriteScene.AddSprite("added-new", new SourcedSprite(_view.LastSprite.SpriteScene, sprite));
           }
         }
       }

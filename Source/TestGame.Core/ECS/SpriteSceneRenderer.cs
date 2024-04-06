@@ -54,6 +54,7 @@ namespace Raven
     {
       foreach (var sprite in SpriteScene.Parts)
       {
+        if (!sprite.IsVisible) return;
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,
             position: Transform.Position + LocalOffset + sprite.Transform.Position,

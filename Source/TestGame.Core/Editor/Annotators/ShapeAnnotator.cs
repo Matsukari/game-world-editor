@@ -23,7 +23,7 @@ namespace Raven
 
     public void Annotate(IPropertied property, object shape)
     {
-      if (!ShapeModelUtils.IsShape(shape)) throw new Exception();
+      if (shape == null || !ShapeModelUtils.IsShape(shape)) throw new Exception();
       Mouse.SetCursor(MouseCursor.Crosshair);
       _shape = shape;
     }
@@ -35,20 +35,47 @@ namespace Raven
     {
       if (input.IsDragFirst && _shape != null) 
       {
+        Console.WriteLine("Started annotating");
         _annotating = true;
       } 
       return _annotating;
     }
-
+    // Adds to current context
+    void Finish()
+    {
+      Mouse.SetCursor(MouseCursor.Arrow);
+      _propertied.Properties.Add(_shape);
+      _initialMouse = Vector2.Zero;
+      _annotating = false;
+      _shape = null;
+    }
     public void Render(Batcher batcher, Camera camera, Color color)
     {
       if (!_annotating) return;
 
       var input = Core.GetGlobalManager<InputManager>();
 
+
+      // start point
+      if (_initialMouse == Vector2.Zero)
+      {
+        _initialMouse = camera.MouseToWorldPoint();
+        if (OnAnnotateStart != null) OnAnnotateStart();
+      }
+      // Dragging
+      else if (input.IsDrag && _initialMouse != Vector2.Zero) 
+      {
+        Editor.PrimitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.ViewProjectionMatrix);
+        ShapeModelUtils.RenderShapeModel(_shape, Editor.PrimitiveBatch, batcher, camera, color);
+        Editor.PrimitiveBatch.End();
+      }
+      // Released; add 
+      else if (input.IsDragLast && _initialMouse != Vector2.Zero && !(_shape is PolygonModel)) 
+        Finish();
+
+
       // calculate position of area between mous drag
       var rect = input.MouseDragArea;
-
       if (_shape is RectangleModel rectangle)
       {
         rect.Location = _initialMouse;
@@ -60,38 +87,11 @@ namespace Raven
         ellipse.Center = _initialMouse;
         ellipse.Width = camera.MouseToWorldPoint().X - _initialMouse.X; 
       }
-
-      // Adds to current context
-      void Add()
+      else if (_shape is PointModel shape)
       {
-        Mouse.SetCursor(MouseCursor.Arrow);
-        _propertied.Properties.Add(_shape);
-        _initialMouse = Vector2.Zero;
-        _annotating = false;
-        _shape = null;
+        shape.Position = camera.MouseToWorldPoint();
+        Finish();
       }
-
-      // start point
-      if (_initialMouse == Vector2.Zero)
-      {
-        _initialMouse = camera.MouseToWorldPoint();
-        if (OnAnnotateStart != null) OnAnnotateStart();
-        if (_shape is PointModel shape)
-        {
-          shape.Position = _initialMouse;
-          Add();
-        }
-      }
-      // Dragging
-      else if (input.IsDrag && _initialMouse != Vector2.Zero) 
-      {
-        Editor.PrimitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.ViewProjectionMatrix);
-        ShapeModelUtils.RenderShapeModel(_shape, Editor.PrimitiveBatch, batcher, camera, color);
-        Editor.PrimitiveBatch.End();
-      }
-      // Released; add 
-      else if (input.IsDragLast && _initialMouse != Vector2.Zero && !(_shape is PolygonModel)) 
-        Add();
     }
   }
 }

@@ -8,43 +8,48 @@ namespace Raven.Widget
     public string Name = "";
     public ImGuiWindowFlags Flags = ImGuiWindowFlags.None;
     public RectangleF Bounds = new RectangleF();
-    public bool IsOpen = true;
+    public bool IsOpen 
+    { 
+      get => _isOpen; 
+      set 
+      { 
+        if (value == _isOpen) return;
+        _isOpen = value;
+        if (_isOpen && OnOpen != null) OnOpen();
+        else if (OnClose != null) OnClose();
+      }
+    }
     public bool NoClose = true;
 
-    public Window() => Name = GetType().Name;
-    public virtual void OnRender(ImGuiWinManager imgui)
-    {
-    }
-    public virtual void OnHovered() 
-    {
-    }
+    protected bool _isOpen = true;
+
+    public event Action OnClose;
+    public event Action OnOpen;
+
+    public Window() => Name = GetType().Name
+      ;
+    public virtual void OnRender(ImGuiWinManager imgui) {}
+
+    public virtual void OnHovered() {}
+
     public virtual void Render(ImGuiWinManager imgui)
     {
-      void Draw()
-      {
-        if (ImGui.IsWindowHovered()) 
-        {
-          OnHovered();
-          ImGui.SetWindowFocus();
-        }
-        Bounds.Location = ImGui.GetWindowPos();
-        Bounds.Size = ImGui.GetWindowSize();
-        OnRender(imgui);
-      }
       if (!IsOpen) return;
 
       if (NoClose) 
-      {
         ImGui.Begin(Name, Flags);
-        Draw();
-        ImGui.End();
-      }
-      else
+      else 
+        ImGui.Begin(Name, ref _isOpen, Flags);
+
+      if (ImGui.IsWindowHovered()) 
       {
-        ImGui.Begin(Name, ref IsOpen, Flags);
-        Draw();
-        ImGui.End();  
+        OnHovered();
+        ImGui.SetWindowFocus();
       }
+      Bounds.Location = ImGui.GetWindowPos();
+      Bounds.Size = ImGui.GetWindowSize();
+      OnRender(imgui);
+      ImGui.End();  
     }
   }
 }
