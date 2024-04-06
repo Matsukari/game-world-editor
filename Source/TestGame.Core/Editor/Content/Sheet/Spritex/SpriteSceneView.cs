@@ -43,6 +43,7 @@ namespace Raven
       _sceneInspector = new SpriteSceneInspector(spriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => _animationEditor.Open(scene, anim);
       _renderer = new SpriteSceneRenderer(spriteScene);
+      _renderer.Entity = Entity;
       ContentData.PropertiedContext = spriteScene;
       if (OnEdit != null) OnEdit();
     }
@@ -89,17 +90,26 @@ namespace Raven
             effects: Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 
             layerDepth: 0f);
       }
+      if (Selection.Capture is SourcedSprite selPart)
+      {
+        selPart.Transform.Scale = _initialScale + 
+          (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
+        selPart.Transform.Position = Selection.ContentBounds.Location + (selPart.Origin * selPart.Transform.Scale);
+      }
+
 
     }  
     Vector2 _initialScale = new Vector2();
-    public bool HandleInput()
+    public bool HandleInput(InputManager input)
     {
       if (!IsEditing) return false;
 
-      var selectionRect = Selection;
       var mouse = Camera.MouseToWorldPoint();
       var part = _renderer.GetPartAtWorld(mouse);
-      if (Nez.Input.RightMouseButtonPressed && part != null)
+
+      if (part == null) return false;
+
+      if (Nez.Input.RightMouseButtonPressed)
       {
         _sceneInspector._isOpenComponentOptionPopup = true;
         _sceneInspector._compOnOptions = part;
@@ -108,14 +118,7 @@ namespace Raven
       if (Nez.Input.LeftMouseButtonPressed)
       {
         _initialScale = part.Transform.Scale;
-        selectionRect.Begin(_renderer.GetPartWorldBounds(part), part);
-        return true;
-      }
-      if (selectionRect.Capture is SourcedSprite selPart)
-      {
-        selPart.Transform.Scale = _initialScale + 
-          (selectionRect.ContentBounds.Size - selectionRect.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
-        selPart.Transform.Position = selectionRect.ContentBounds.Location + (selPart.Origin * selPart.Transform.Scale);
+        Selection.Begin(_renderer.GetPartWorldBounds(part), part);
         return true;
       }
       return false;

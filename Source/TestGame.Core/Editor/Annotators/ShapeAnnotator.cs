@@ -29,6 +29,8 @@ namespace Raven
     }
     Vector2 _initialMouse = Vector2.Zero;
 
+    int IInputHandler.Priority() => 10;
+
     bool IInputHandler.OnHandleInput(InputManager input)
     {
       if (input.IsDragFirst && _shape != null) 

@@ -15,8 +15,9 @@ namespace Raven
         Selections.Clear();
       Selections.Add(sel);
     }
-    public void Last() => Selections.Last();
-  }
+    public object Last() => Selections.Last();
+    public bool NotEmpty() => Selections.Count() > 0;
+}
   public class EditorInterface
   {
     public Camera Camera { get; private set; }
@@ -55,6 +56,7 @@ namespace Raven
   {
     readonly EditorSettings _settings;
     public readonly SheetInspector Inspector;
+    public readonly SheetViewPopup Popups;
     public SpriteSceneView SceneView;
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
@@ -66,6 +68,8 @@ namespace Raven
     {
       _settings = settings;
       Inspector = new SheetInspector(settings, camera);
+      Popups = new SheetViewPopup();
+
     }
     public void Update(Sheet sheet, SelectionList list) 
     {
@@ -74,15 +78,15 @@ namespace Raven
     }
     void IImGuiRenderable.Render(ImGuiWinManager imgui)
     {
+      Inspector.Sheet = _sheet;
+      Inspector.Render(imgui);
+
       if (SceneView != null && SceneView.IsEditing)
       {
         SceneView.SceneInspector.Render(imgui);
         return;
       }
-      Inspector.Sheet = _sheet;
-      Inspector.Render(imgui);
-
-      if (_list != null && _list.Selections.Count() > 0)
+      else if (_list != null && _list.Selections.Count() > 0)
       {
         // Evaluate to either one; 
         _tileInspector.Tile = _list.Selections.Last() as Tile;
@@ -92,6 +96,8 @@ namespace Raven
         _spriteInspector.Render(imgui);
       }
 
+      var popup = Popups as IImGuiRenderable;
+      popup.Render(imgui);
     }
   }
 
@@ -108,6 +114,7 @@ namespace Raven
     SpriteRenderer _image;
     List<Rectangle> _tiles;
     SpriteSceneView _scene;
+    
     string lastSheet = "";
 
     public bool IsDrawGrid = true;
@@ -119,23 +126,27 @@ namespace Raven
 
     public override void Initialize(Editor editor)
     {
-      _input = new SheetViewInputHandler(this);
-      _scene = new SpriteSceneView(this);
-      _input.Initialize(editor);
-      _scene.Initialize(editor);
       base.Initialize(editor);
-    }
-    public override void OnInitialize(EditorSettings settings)
-    {
-      _imgui = new SheetViewImGui(settings, Camera);
+
+      _scene = new SpriteSceneView(this);
+      _scene.Initialize(editor);
+      _scene.OnEdit += () => Inspector.ShowPicker = true;
+      _scene.OnUnEdit += () => Inspector.ShowPicker = false;
+
+      _imgui = new SheetViewImGui(Settings, Camera);
+      _imgui.SceneView = _scene;
+
+      _imgui.Popups.Initialize(editor);
+      _imgui.Popups.OnConvertToScene += scene => _scene.Edit(scene);
+
+      _input = new SheetViewInputHandler(this);
+      _input.Initialize(editor);
+      _input.OnSelectionRightClick += () => _imgui.Popups.OpenSpriteOptions();
 
       Inspector.OnClickScene += scene => _scene.Edit(scene);
       Inspector.OnDeleteScene += scene => _scene.UnEdit();
 
-      _scene.OnEdit += () => Inspector.ShowPicker = true;
-      _scene.OnUnEdit += () => Inspector.ShowPicker = false;
-
-      _imgui.SceneView = _scene;
+      ContentData.PropertiedContext = _sheet;
     }
     public override void OnContentOpen(IPropertied content)
     {

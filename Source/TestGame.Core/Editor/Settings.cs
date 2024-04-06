@@ -10,6 +10,7 @@ namespace Raven
     public Settings(EditorSettings settings) 
     {
       _settings = settings;
+      IsOpen = false;
     }
     public override void OnRender(ImGuiWinManager imgui)
     {

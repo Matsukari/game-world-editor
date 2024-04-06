@@ -49,6 +49,7 @@ namespace Raven
       bounds.Size = (Transform.Scale * sprite.Transform.Scale) * sprite.Bounds.Size;
       return bounds;
     }
+    
     public override void Render(Batcher batcher, Camera camera)
     {
       foreach (var sprite in SpriteScene.Parts)

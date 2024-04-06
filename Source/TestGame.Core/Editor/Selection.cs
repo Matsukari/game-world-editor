@@ -17,6 +17,9 @@ namespace Raven
       _selection = selection;
       _colors = colors;
     }
+
+    int IInputHandler.Priority() => 9;
+
     bool IInputHandler.OnHandleInput(InputManager input)
     {
       if (Nez.Input.LeftMouseButtonPressed) 
@@ -149,6 +152,7 @@ namespace Raven
     {
       Capture = null;
       SelAxis = SelectionAxis.None;
+      ContentBounds = new RectangleF();
       _started = false;
     }
     public bool HasBegun() => _started;

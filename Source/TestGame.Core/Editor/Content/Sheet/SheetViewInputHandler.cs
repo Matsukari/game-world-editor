@@ -1,71 +1,72 @@
 using Microsoft.Xna.Framework;
 using Nez;
+using ImGuiNET;
 
 namespace Raven
 {
+  public class SheetViewPopup : EditorInterface, IImGuiRenderable
+  {
+    Sheet _sheet { get => Content as Sheet; }
+    SpriteScene _spriteSceneOnName;
+    bool _isOpenSpriteOptions = false;
+
+    public event Action<SpriteScene> OnConvertToScene;
+
+    public void OpenSpriteOptions() => _isOpenSpriteOptions = true;
+
+    void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
+    {
+      if (_isOpenSpriteOptions)
+      {
+        _isOpenSpriteOptions = false;
+        ImGui.OpenPopup("sprite-popup");
+      }
+
+      // something is selected; render options
+      if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Sprite sprite && ImGui.BeginPopup("sprite-popup"))
+      {
+        // convert to new spriteScene
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to SpriteScene"))
+        {
+          imgui.NameModal.Open((name)=>
+          {
+              var spriteScene = _sheet.CreateSpriteScene(name, ContentData.SelectionList.Last() as Sprite);
+              _sheet.SpriteScenees.AddIfNotPresent(spriteScene);
+              if (OnConvertToScene != null) OnConvertToScene(spriteScene);
+          });
+        }
+        // add to exisiting spriteScene; select by list
+        if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to SpriteScene"))
+        {
+          foreach (var spriteScene in _sheet.SpriteScenees)
+          {
+            if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " " + spriteScene.Name)) 
+            {
+              _spriteSceneOnName = spriteScene;
+              imgui.NameModal.Open((name)=>
+              {
+                _spriteSceneOnName.AddSprite(name, new SourcedSprite(sprite as Sprite));
+              });
+            }
+          }
+          ImGui.EndMenu();
+        }
+        ImGui.EndPopup();
+      } 
+    }
+  }
+
   public class SheetViewInputHandler : EditorInterface, IInputHandler
   {
-    Sheet _sheet { get => _view.Sheet; }
     readonly SheetView _view;
+    Sheet _sheet { get => _view.Sheet; }
+    List<int> _selectedTiles = new List<int>();
+    Vector2 _initialMouse = Vector2.Zero;
 
-    public event Action OnSelected;
-   
-    // SpriteScene _spriteSceneOnName = null;
+    public event Action OnSelectionRightClick;
     
     public SheetViewInputHandler(SheetView view) => _view = view;
 
-    public void Render(Editor editor)
-    {
-      // right-click; open options
-      if (Nez.Input.RightMouseButtonPressed && ContentData.SelectionList.Selections != null) 
-      {
-        OnSelected();
-        // ImGui.OpenPopup("sprite-popup");
-      }
-
-      // void OpenPopup(string name)
-      // {
-      //   ImGui.EndPopup();
-      //   ImGui.CloseCurrentPopup();
-      //   ImGui.OpenPopup(name);
-      // }
-     
-      // something is selected; render options
-      // if (ContentData.Selection is Sprites.Sprite sprite && ImGui.BeginPopup("sprite-popup"))
-      // {
-      //   // convert to new spriteScene
-      //   if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to SpriteScene"))
-      //   {
-      //     Editor.NameModal.Open((name)=>
-      //     {
-      //         var spriteScene = _sheet.CreateSpriteScene(name, ContentData.Selection as Sprites.Sprite);
-      //         _sheet.SpriteScenees.AddIfNotPresent(spriteScene);
-      //         Editor.GetEditorComponent<SpriteSceneView>().Edit(spriteScene);
-      //     });
-      //   }
-      //   // add to exisiting spriteScene; select by list
-      //   if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to SpriteScene"))
-      //   {
-      //     foreach (var spriteScene in _sheet.SpriteScenees)
-      //     {
-      //       if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " " + spriteScene.Name)) 
-      //       {
-      //         _spriteSceneOnName = spriteScene;
-      //         Editor.NameModal.Open((name)=>
-      //         {
-      //           _spriteSceneOnName.AddSprite(name, new Sprites.SourcedSprite(sprite: ContentData.Selection as Sprites.Sprite));
-      //         });
-      //       }
-      //     }
-      //     ImGui.EndMenu();
-      //   }
-      //   ImGui.EndPopup();
-      // }
-
-
-    } 
-    List<int> _selectedTiles = new List<int>();
-    Vector2 _initialMouse = Vector2.Zero;
     public void RemoveSelection()
     {
       _selectedTiles.Clear(); 
@@ -74,6 +75,18 @@ namespace Raven
     }
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
+      if (_view.ImGuiHandler is SheetViewImGui imgui && imgui.SceneView.IsEditing)
+      {
+        return imgui.SceneView.HandleInput(input);
+      }
+
+      // right-click; open options
+      if (Nez.Input.RightMouseButtonPressed && ContentData.SelectionList.Selections.Count > 0 && OnSelectionRightClick != null) 
+      {
+        OnSelectionRightClick();
+        return true;
+      }
+
       // Foundation for multiple tile selection
       if (input.IsDragFirst && _initialMouse == Vector2.Zero && Nez.Input.LeftMouseButtonDown) 
       {

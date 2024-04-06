@@ -66,8 +66,8 @@ namespace Raven
 
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent()); 
-      AddComponent(new SelectionRenderer(Selection, Settings.Colors));
       AddComponent(new ContentRenderer(ContentManager));
+      AddComponent(new SelectionRenderer(Selection, Settings.Colors));
 
       var input = Core.GetGlobalManager<InputManager>();
       input.RegisterInputHandler(ShapeAnnotator);
