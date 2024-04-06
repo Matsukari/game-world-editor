@@ -16,6 +16,8 @@ namespace Raven
     bool _isOpenLevelOptions = false;
     Vector2 _mouseWhenLevelAdd = Vector2.Zero;
 
+    public event Action<Level> OnDeleteLevel;
+
     public void Update(Layer layer) => Layer = layer;
 
     public void OpenWorldOptions(World world) 
@@ -60,6 +62,7 @@ namespace Raven
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete")) 
         {
           _levelOnOpt.DetachFromWorld();
+          if (OnDeleteLevel != null) OnDeleteLevel(_levelOnOpt);
         }
         ImGui.EndPopup();
       }

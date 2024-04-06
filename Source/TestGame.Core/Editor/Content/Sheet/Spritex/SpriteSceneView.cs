@@ -30,10 +30,10 @@ namespace Raven
       _sheetView = view;
       IsEditing = false;
     }
-    public override void Initialize(Editor editor)
+    public override void Initialize(Editor editor, EditorContent content)
     {
-      base.Initialize(editor);
-      _animationEditor.Initialize(editor);
+      base.Initialize(editor, content);
+      _animationEditor.Initialize(editor, content);
       _animationEditor.OnClose += () => Selection.End();
     }
     // Go to canvas and close spritesheet view

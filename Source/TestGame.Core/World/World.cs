@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Nez;
 using Nez.Persistence;
 
@@ -26,6 +27,62 @@ namespace Raven
       levelEntity.SetParent(this);
       Levels.Add(levelEntity); 
       return levelEntity;
+    }
+  }
+
+  public class WorldRenderer
+  {
+    public static void RenderLayer(Batcher batcher, Camera camera, Layer layer)
+    {
+      if (layer is TileLayer tileLayer && layer.IsVisible)
+      {
+        foreach (var (tilePosition, tile) in tileLayer.Tiles)
+        {
+          var dest = new RectangleF(
+              tilePosition.X*tileLayer.TileWidth, 
+              tilePosition.Y*tileLayer.TileHeight, 
+              tileLayer.TileWidth, tileLayer.TileHeight);
+
+          dest.Location += tileLayer.Bounds.Location;
+
+          var scale = Vector2.One;
+          scale.X *= dest.Width / tile.Region.Width;
+          scale.Y *= dest.Height / tile.Region.Height;
+
+          var rot = 0f;
+          var eff = SpriteEffects.None;
+          var color = Color.White;
+
+          RenderProperties renderProp;
+          if (tileLayer.TilesProp.TryGetValue(tilePosition, out renderProp)) 
+          {
+            rot *= renderProp.Transform.RotationRadians;
+            eff = renderProp.SpriteEffects;
+            color = renderProp.Color.ToColor();
+          }
+
+          batcher.Draw(
+              texture: tile.Texture,
+              position: dest.Location,
+              sourceRectangle: tile.Region,
+              color: color,
+              rotation: rot,
+              origin: Vector2.Zero,
+              scale: scale,
+              effects: eff,
+              layerDepth: 0);
+        }
+      }
+    }
+    public static void Render(Batcher batcher, Camera camera, World world) 
+    {
+      foreach (var level in world.Levels) 
+      {
+        foreach (var layer in level.Layers)
+        {
+          RenderLayer(batcher, camera, layer);
+        }
+      }
     }
   }
   /// <summary>
@@ -106,6 +163,7 @@ namespace Raven
       Layer layer = new TileLayer(level, 16, 16);
       level.Name = name;
       level.Layers.Add(layer);
+      Levels.Add(level);
       return level;
     }
 

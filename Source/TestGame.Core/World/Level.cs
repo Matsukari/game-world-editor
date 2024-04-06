@@ -50,6 +50,10 @@ namespace Raven
           RemoveComponent(Components[i]);
       }
     }
+    public void RemoveFromWorld()
+    {
+      WorldEntity.RemoveLevel(Level);
+    }
   }
 
   /// <summary>

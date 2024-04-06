@@ -21,6 +21,8 @@ namespace Raven
       _initialMouse = Vector2.Zero;
       ContentData.SelectionList.Selections.Clear();
     }
+
+
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
       if (_view.ImGuiHandler is SheetViewImGui imgui && imgui.SceneView.IsEditing)

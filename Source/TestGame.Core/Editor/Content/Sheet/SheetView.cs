@@ -27,24 +27,24 @@ namespace Raven
 
     public override bool CanDealWithType(object content) => content is Sheet;
 
-    public override void Initialize(Editor editor)
+    public override void Initialize(Editor editor, EditorContent content)
     {
-      base.Initialize(editor);
+      base.Initialize(editor, content);
 
       _scene = new SpriteSceneView(this);
-      _scene.Initialize(editor);
+      _scene.Initialize(editor, content);
       _scene.OnEdit += () => Inspector.ShowPicker = true;
       _scene.OnUnEdit += () => Inspector.ShowPicker = false;
 
       _imgui = new SheetViewImGui(Settings, Camera);
-      _imgui.Initialize(editor);
+      _imgui.Initialize(editor, content);
       _imgui.SceneView = _scene;
 
-      _imgui.Popups.Initialize(editor);
+      _imgui.Popups.Initialize(editor, content);
       _imgui.Popups.OnConvertToScene += scene => _scene.Edit(scene);
 
       _input = new SheetViewInputHandler(this);
-      _input.Initialize(editor);
+      _input.Initialize(editor, content);
       _input.OnSelectionRightClick += () => _imgui.Popups.OpenSpriteOptions();
 
       Inspector.OnClickScene += scene => _scene.Edit(scene);

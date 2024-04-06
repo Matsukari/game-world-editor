@@ -23,7 +23,7 @@ namespace Raven
     public EditorSettings Settings;
     public event Action OnBeforeSwitch;
     public event Action OnAfterSwitch;
-    public event Action OnAddContent;
+    public event Action<EditorContent, ContentView> OnAddContent;
 
     // Either world or sheet; these are the objects that can be switch in and out
     internal List<EditorContent> _tabs = new List<EditorContent>();
@@ -60,7 +60,7 @@ namespace Raven
     {
 
     }
-    public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=true)
+    public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=false)
     {
       Console.WriteLine("Adding content on tabs");
 
@@ -76,10 +76,11 @@ namespace Raven
 
       Settings.LastFiles.Add(contentData);
 
-      _tabs.Add(new EditorContent(content, contentData));
+      var tab = new EditorContent(content, contentData);
+      _tabs.Add(tab);
       _views.Add(contentView);
 
-      OnAddContent();
+      if (OnAddContent != null) OnAddContent(tab, contentView);
 
       View.OnInitialize(Settings);
 

@@ -29,7 +29,6 @@ namespace Raven
       _list = list;
       _sheet = sheet;
     }
-    bool IImGuiRenderable.IsVisible() => Content is Sheet;
 
     void IImGuiRenderable.Render(ImGuiWinManager imgui)
     {
@@ -55,6 +54,7 @@ namespace Raven
       var popup = Popups as IImGuiRenderable;
       popup.Render(imgui);
     }
+
   }
 
 }

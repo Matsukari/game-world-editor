@@ -14,7 +14,7 @@ namespace Raven
     public TilePainter(WorldView view)
     {
       _view = view;
-      _world = view.WorldEntity.World;
+      _world = view.Content as World;
     }
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {

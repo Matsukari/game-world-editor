@@ -13,16 +13,27 @@ namespace Raven
     public EditorSettings Settings { get; private set; }
     public Entity Entity { get; private set; }
 
-    public virtual void Initialize(Editor editor)
+    public virtual void Initialize(Editor editor, EditorContent content)
     {
       Entity = editor;
       Selection = editor.Selection;
       Camera = editor.Scene.Camera;
-      ContentData = editor.ContentManager.ContentData;
-      Content = editor.ContentManager.Content;
+      ContentData = content.Data;
+      Content = content.Content;
       Serializer = editor.Serializer;
       Settings = editor.Settings;
     }
+
+    public override bool Equals(object obj)
+    {
+      if (obj is EditorInterface inf) return Content.Name == inf.Content.Name;
+      return false;
+    }
+    public override int GetHashCode()
+    {
+      return base.GetHashCode();
+    }
+      
   }
 }
 

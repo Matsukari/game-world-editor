@@ -54,5 +54,16 @@ namespace Raven
       Console.WriteLine("Size: " + Region.Size);
       _tiles = _sheet.GetTiles(Region.ToRectangleF());
     }
+    // public override bool Equals(object obj)
+    // {
+    //   if (obj is Sprite sprite) sprite.
+    // }
+    // public override int GetHashCode()
+    // {
+    //   return base.GetHashCode();
+    // }
+
+      
+      
   }
 }

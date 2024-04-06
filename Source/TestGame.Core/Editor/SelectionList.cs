@@ -11,7 +11,8 @@ namespace Raven
     {
       if (!Nez.InputUtils.IsShiftDown())
         Selections.Clear();
-      Selections.Add(sel);
+
+      Selections.AddIfNotPresent(sel);
     }
     public object Last() => Selections.Last();
     public bool NotEmpty() => Selections.Count() > 0;

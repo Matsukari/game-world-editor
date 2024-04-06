@@ -195,7 +195,7 @@ namespace Raven
         {
            worldView.PaintMode = PaintMode.Pen;
         }
-        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.Eraser, ref _paintModeToggled[1]))
+        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.Eraser, ref _paintModeToggled[0]))
         {
            worldView.PaintMode = PaintMode.Eraser;
         }

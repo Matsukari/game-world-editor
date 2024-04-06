@@ -35,12 +35,12 @@ namespace Raven
       WindowManager.AddRenderable(ContentManager.View.ImGuiHandler);
 
       if (ContentManager.View.InputHandler != null)
-        Core.GetGlobalManager<InputManager>().InputHandlers.Add(ContentManager.View.InputHandler);
+        Core.GetGlobalManager<InputManager>().InputHandlers.AddIfNotPresent(ContentManager.View.InputHandler);
 
     }
-    void OnAddContent()
+    void OnAddContent(EditorContent content, ContentView view)
     {
-      ContentManager.View.Initialize(this);
+      view.Initialize(this, content);
     }
     public override void OnAddedToScene()
     {

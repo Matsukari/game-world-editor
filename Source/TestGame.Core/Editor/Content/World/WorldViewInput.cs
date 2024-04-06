@@ -1,14 +1,13 @@
 using Microsoft.Xna.Framework;
 using Nez;
-using ImGuiNET;
 
 namespace Raven
 {
 	  public class WorldViewInputHandler : EditorInterface, IInputHandler
   {
     readonly WorldView _view;
-    public event Action<LevelEntity, int> OnLeftClickLevel;
-    public event Action<LevelEntity, int> OnRightClickLevel;
+    public event Action<Level, int> OnLeftClickLevel;
+    public event Action<Level, int> OnRightClickLevel;
     public event Action<Vector2> OnRightClickWorld;
     public readonly TilePainter Painter;
 
@@ -18,16 +17,18 @@ namespace Raven
       Painter = new TilePainter(_view);
     }
 
+
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
       IInputHandler paintInput = Painter;
       if (paintInput.OnHandleInput(input)) return true;
 
       var selectLevel = false;
-      for (var i = 0; i < _view.WorldEntity.Levels.Count(); i++)
+      for (var i = 0; i < _view.World.Levels.Count(); i++)
       {
-        var level = _view.WorldEntity.Levels[i];
-        if (!level.Enabled) continue;
+        // Console.WriteLine("as");
+        var level = _view.World.Levels[i];
+        if (!level.IsVisible) continue;
 
         if (Nez.Input.LeftMouseButtonPressed 
             && level.Bounds.Contains(Camera.MouseToWorldPoint()) 

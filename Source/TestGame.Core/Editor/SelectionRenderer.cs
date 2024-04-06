@@ -21,7 +21,7 @@ namespace Raven
 
       return _selected;
     }
-    public override bool IsVisibleFromCamera(Camera camera) => true;      
+    public override bool IsVisibleFromCamera(Camera camera) => _selection.HasBegun();      
 
     public override void Render(Batcher batcher, Camera camera)
     {

@@ -12,6 +12,8 @@ namespace Raven
     /// </summary> 
     public int Priority() => 0;
 
+    public bool CanHandleInput() => true;
+
     public bool OnHandleInput(InputManager input) => false;
 
     /// <summary>
@@ -33,6 +35,8 @@ namespace Raven
 
     public List<IInputHandler> InputHandlers { get => _inputHandlers; }
 
+    public IInputHandler ContentInput;
+
     List<IInputHandler> _inputHandlers = new List<IInputHandler>();
 
     public void RegisterInputHandler(IInputHandler handler)
@@ -48,7 +52,7 @@ namespace Raven
 
       for (int i = 0; i < _inputHandlers.Count; i++)
       {
-        if (_inputHandlers[i].OnHandleInput(this)) 
+        if (_inputHandlers[i].CanHandleInput() && _inputHandlers[i].OnHandleInput(this)) 
         {
           Console.WriteLine($"{_inputHandlers[i].GetType().Name} blocks");
           for (int j = 0; j < _inputHandlers.Count; j++)
