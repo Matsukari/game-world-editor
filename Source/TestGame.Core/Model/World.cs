@@ -40,7 +40,7 @@ namespace Raven
         if (!sprite.IsVisible) return;
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,
-            position: position + SpriteScene.Transform.Position + sprite.Transform.Position,
+            position: position + SpriteScene.Transform.Position + sprite.Bounds.Location,
             sourceRectangle: sprite.SourceSprite.Region,
             color: sprite.Color.ToColor(),
             rotation: SpriteScene.Transform.Rotation + sprite.Transform.Rotation,
@@ -96,17 +96,7 @@ namespace Raven
       {
         if (freeform.IsYSorted) 
         {
-          Console.WriteLine("Before------------------");
-          for (int i = 0; i < freeform.SpriteScenees.Count(); i++)
-          {
-            Console.WriteLine($"{i}. {freeform.SpriteScenees[i].Bounds}");
-          }
           freeform.SpriteScenees.Sort(new SceneYComparer());
-          Console.WriteLine("--------------------After");
-          for (int i = 0; i < freeform.SpriteScenees.Count(); i++)
-          {
-            Console.WriteLine($"{i}. {freeform.SpriteScenees[i].Bounds}");
-          }
         }
         foreach (var spriteScene in freeform.SpriteScenees)
         {

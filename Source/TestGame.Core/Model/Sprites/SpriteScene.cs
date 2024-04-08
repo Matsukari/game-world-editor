@@ -128,7 +128,6 @@ namespace Raven
 
       sprite.SpriteScene = this;
       sprite.Name = name;
-      sprite.Origin = sprite.Bounds.Size/2f;
       Parts.Add(sprite);
       return sprite;
     }

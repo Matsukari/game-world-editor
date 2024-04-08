@@ -103,5 +103,10 @@ namespace Raven
     {
       SpriteScenees.Remove(spriteScene);
     }
+    public void RemoveSpriteSceneAt(Vector2 position)
+    {
+      var index = SpriteScenees.FindLastIndex(scene => scene.Bounds.Contains(position));
+      if (index != -1) SpriteScenees.RemoveAt(index);
+    }
   }
 }

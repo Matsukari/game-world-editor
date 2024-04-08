@@ -26,16 +26,13 @@ Choose ease type
 
 ## Level
 Indicator for able and not able paint
-Layer Y-sorting
 Order layers
-Toogled brushing
-Random painting 
-Transforms on InstancedSprite
-Freeform layer 
+Transforms on Scenes
 
 
 ## World
 Connect levels 
+Magnet levels
 LOD system
 
 
@@ -49,9 +46,6 @@ Copy & paste:
 - shapes
 - parts
 - animations
-- layers
-- levels
-- properties
 Snapping mouse
 
 

@@ -24,7 +24,10 @@ namespace Raven
           && _view.Window.SelectedLevelInspector.CurrentLayer is FreeformLayer freeformLayer 
           && _view.SpritePicker.SelectedSprite is SpriteScene spriteScene)
       {
-        PaintSpriteScene(freeformLayer, spriteScene);
+
+        if (_view.PaintType == PaintType.Single)
+          PaintSpriteScene(freeformLayer, spriteScene);
+
         return true;
       }
 
@@ -91,9 +94,10 @@ namespace Raven
     void PaintAtLayer(List<Tile> tilesToPaint, TileLayer tileLayer, Point tileInLayer)
     {
       var tileStart = tilesToPaint.First();
-      foreach (var tile in tilesToPaint)
+      for (int i = 0; i < tilesToPaint.Count(); i++)
       {
-        var delta = tile.Coordinates - tileStart.Coordinates;
+        var delta = tilesToPaint[i].Coordinates - tileStart.Coordinates;
+        var tile = (_view.IsRandomPaint) ? tilesToPaint.RandomItem() : tilesToPaint[i];
         if (_view.PaintMode == PaintMode.Pen) tileLayer.ReplaceTile(tileInLayer + delta, tile);
         else if (_view.PaintMode == PaintMode.Eraser) tileLayer.RemoveTile(tileInLayer + delta);
       }
@@ -101,9 +105,15 @@ namespace Raven
     void PaintSpriteScene(FreeformLayer freeformLayer, SpriteScene scene)
     {
       var tileApprox = Camera.MouseToWorldPoint() - scene.EnclosingBounds.Size/2f; 
-      var paint = freeformLayer.PaintSpriteScene(scene);
-      paint.Transform.Position = Camera.MouseToWorldPoint();
-      Console.WriteLine("Painting spritescene");
+      if (_view.PaintMode == PaintMode.Pen)
+      {
+        var paint = freeformLayer.PaintSpriteScene(scene);
+        paint.Transform.Position = Camera.MouseToWorldPoint();
+      }
+      else if (_view.PaintMode == PaintMode.Eraser)
+      {
+        freeformLayer.RemoveSpriteSceneAt(Camera.MouseToWorldPoint());
+      }
     }
     void PaintTile(Point coord)
     {
