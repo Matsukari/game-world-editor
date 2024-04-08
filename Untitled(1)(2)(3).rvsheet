@@ -1,0 +1,19 @@
+{
+	"@id": "1",
+	"Name": "/home/ark/Documents/game/projects/WorldEditor/Untitled(1)(2)(3).rvsheet",
+	"Properties": {
+		"@id": "2",
+		"Data": {
+
+		}
+	},
+	"Source": "/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png",
+	"_tiles": {
+
+	},
+	"SpriteScenees": [
+
+	],
+	"TileWidth": 16,
+	"TileHeight": 16
+}
