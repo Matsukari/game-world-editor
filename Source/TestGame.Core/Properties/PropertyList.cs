@@ -5,7 +5,7 @@ namespace Raven
   /// <summary>
   /// A list of objects of arbitrary type. 
   /// </summary>
-  public class PropertyList
+  public class PropertyList : ICloneable
   {
     public Dictionary<string, object> Data = new Dictionary<string, object>();
 
@@ -38,6 +38,8 @@ namespace Raven
       list._counter = _counter;
       return list;
     }
+    object ICloneable.Clone() => Copy();
+
     public void OverrideOrAddAll(PropertyList properties) 
     {
       foreach (var prop in properties)

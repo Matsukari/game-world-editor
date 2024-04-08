@@ -33,6 +33,7 @@ namespace Raven
       _input = new WorldViewInputHandler(this);
       _input.OnLeftClickLevel += SelectLevel;
       _input.OnRightClickLevel += OpenLevelOptions;
+      _input.OnRightClickWorld += (position) =>_imgui.Popups.OpenWorldOptions(World);
       _input.Initialize(editor, content);
 
       _imgui = new WorldViewImGui(_input.Painter); 
@@ -40,6 +41,7 @@ namespace Raven
       _imgui.Popups.Initialize(editor, content);
       _imgui.Popups.OnDeleteLevel += level => _imgui.SelectedLevel = -1;
       _imgui.Popups.OnDeleteLevel += level => Selection.End();
+      _imgui.Popups.OnCutLevel += level => Selection.End();
 
     }
 
@@ -73,8 +75,10 @@ namespace Raven
         {
           WorldRenderer.RenderLayer(batcher, camera, layer);
           if (layer is TileLayer tileLayer && layer.IsVisible)
-            Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Level.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
+          {
+            Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
               tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
+          }
         }
       }
 

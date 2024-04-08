@@ -59,7 +59,7 @@ namespace Raven
   /// <summary>
   /// Composed of Layers of the same size as this.
   /// </summary>
-  public class Level : IPropertied
+  public class Level : IPropertied, ICloneable
   {
     string IPropertied.Name { get => Name; set => Name = value; }
     public PropertyList Properties { get; set; } = new PropertyList();
@@ -101,6 +101,7 @@ namespace Raven
         ContentSize.Y);
     }
 
+    static int _idGenerator = 0;
 
     public Level(World world)
     {
@@ -122,6 +123,22 @@ namespace Raven
     /// this level could in reverse
     /// </summary>
     public void DetachFromWorld() => World.RemoveLevel(this);
+
+    /// <summary>
+    /// Creates a full copy of this Level with each new transform and layers.
+    /// </summary>
+    public Level Copy() 
+    {
+      Level level = MemberwiseClone() as Level;
+      level.Name += " " + (++_idGenerator).ToString();
+      level.Properties = Properties.Copy();
+      level.Layers = Layers.CloneItems();
+      for (int i = 0; i < level.Layers.Count(); i++) level.Layers[i].Level = level;
+      level.Properties = Properties.Copy();
+      return level;
+    }
+
+    object ICloneable.Clone() => Copy();
 
   }
 }

@@ -48,12 +48,12 @@ namespace Raven
           }
         }
       }
-      if (Nez.Input.RightMouseButtonPressed && !selectLevel && OnRightClickWorld != null)
+      if (Nez.Input.RightMouseButtonPressed && OnRightClickWorld != null)
       {
         OnRightClickWorld(Camera.MouseToWorldPoint());
         return true;
       }
-      return false;
+      return selectLevel;
     }
   }
 }

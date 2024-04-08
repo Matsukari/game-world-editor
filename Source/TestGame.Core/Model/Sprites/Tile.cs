@@ -64,5 +64,11 @@ namespace Raven
     {
       return base.GetHashCode();
     }
+    public Tile Copy() 
+    {
+      var tile = MemberwiseClone() as Tile;
+      tile.Properties = Properties.Copy();
+      return tile;
+    }
   }   
 }

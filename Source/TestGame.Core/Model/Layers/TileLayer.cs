@@ -4,11 +4,12 @@ using Nez;
 
 namespace Raven
 {
-  public class RenderProperties 
+  public class RenderProperties
   {
     public Transform Transform = new Transform();
     public Vector4 Color = Vector4.One;
     public SpriteEffects SpriteEffects = SpriteEffects.None;
+    public RenderProperties Copy() => MemberwiseClone() as RenderProperties;
   }
   public class TileLayerRenderer : LayerRenderer<TileLayer>
   {
@@ -82,7 +83,7 @@ namespace Raven
     /// <summary>
     // The list of all painted Tiles
     /// </summary> 
-    public Dictionary<Point, Tile> Tiles { get => _tiles; }
+    public Dictionary<Point, Tile> Tiles { get => _tiles; private set => _tiles = value; }
 
     /// <summary>
     // The list of all custom render peoperties associated to a Tile
@@ -143,5 +144,25 @@ namespace Raven
 
 
     public void RemoveTile(Point point) => RemoveTile(point.X, point.Y);
+
+    public override Layer Copy()
+    {
+      var layer = MemberwiseClone() as TileLayer;
+      layer._tiles = new Dictionary<Point, Tile>();
+      foreach (var item in _tiles)
+      {
+        layer._tiles.Add(item.Key, item.Value.Copy());
+      }
+      layer.TilesProp = new Dictionary<Point, RenderProperties>();
+      foreach (var item in TilesProp)
+      {
+        layer.TilesProp.Add(item.Key, item.Value.Copy());
+      }
+
+      return layer;
+    }
+
+      
+
   }
 }

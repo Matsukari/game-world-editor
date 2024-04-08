@@ -1,6 +1,3 @@
-using Nez;
-using Microsoft.Xna.Framework;
-using Num = System.Numerics;
 
 namespace Raven
 {
@@ -16,6 +13,15 @@ namespace Raven
       {
         return null;
       }
+    }
+    public static List<T> CloneItems<T>(this List<T> list) where T: class
+    {
+      List<T> newList = new List<T>();
+      foreach (var item in list)
+      {
+        if (item is ICloneable cloner) newList.Add(cloner.Clone() as T);
+      }
+      return newList;
     }
     public static bool[] FalseRange(this bool[] list, int except=-1)
     {

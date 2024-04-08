@@ -27,12 +27,12 @@ namespace Raven
   /// <summary>
   /// The data that holds the information needed to be rendered. Leaf in world hierarcy;  
   /// </summary>
-  public class Layer
+  public class Layer : ICloneable
   {
     /// <summary>
     /// The Level this Layer is attached to
     /// </summary>
-    public readonly Level Level;
+    public Level Level { get; internal set; }
 
     /// <summary>
     /// The ID of this Layer, cannot be the same with other Layers on the Level
@@ -74,6 +74,13 @@ namespace Raven
     {
       Level = level;
     }
+
+    /// <summary>
+    /// Creates a full copy of this Layer
+    /// </summary>
+    public virtual Layer Copy() => MemberwiseClone() as Layer;
+
+    object ICloneable.Clone() => Copy();
   }
 
 }

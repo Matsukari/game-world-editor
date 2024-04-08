@@ -1,4 +1,5 @@
 using ImGuiNET;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
@@ -15,7 +16,7 @@ namespace Raven
 
     public LevelInspector(Level level) => Level = level;
 
-    public override string GetIcon() => IconFonts.FontAwesome5.ObjectGroup;
+    public override string GetIcon() => Icon.ObjectGroup;
     public override string GetName() => "Level";   
 
     public override void Render(ImGuiWinManager imgui)
@@ -33,7 +34,7 @@ namespace Raven
       }
       if (ImGui.BeginPopupContextItem("layer-header-options-popup"))
       {
-        if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + "  Create Layer"))
+        if (ImGui.BeginMenu(Icon.Plus + "  Create Layer"))
         {
           if (ImGui.MenuItem("Tiled")) 
           {
@@ -61,17 +62,17 @@ namespace Raven
       }
       if (ImGui.BeginPopupContextItem("layer-options-popup") && _layerOnOptions != null)
       {
-        var lockState = (_layerOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
+        var lockState = (!_layerOnOptions.IsLocked) ? Icon.LockOpen + "  Unlock" : Icon.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
           _layerOnOptions.IsLocked = !_layerOnOptions.IsLocked;
         }
-        var visib = (_layerOnOptions.IsVisible) ? IconFonts.FontAwesome5.EyeSlash + "  Hide" : IconFonts.FontAwesome5.Eye + "  Show";
+        var visib = (_layerOnOptions.IsVisible) ? Icon.EyeSlash + "  Hide" : Icon.Eye + "  Show";
         if (ImGui.MenuItem(visib))
         {
           _layerOnOptions.IsVisible = !_layerOnOptions.IsVisible;
         }
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
+        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {
           Level.Layers.Remove(_layerOnOptions);  
         }
@@ -85,19 +86,19 @@ namespace Raven
       ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(layer.Name).X - 140, 0f));
       ImGui.SameLine();
       ImGui.PushID($"level-{layer.Name}-id");
-      var visibState = (!layer.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
+      var visibState = (!layer.IsVisible) ? Icon.EyeSlash : Icon.Eye;
       if (ImGui.SmallButton(visibState))
       {
         layer.IsVisible = !layer.IsVisible;
       }
       ImGui.SameLine();
-      var lockState = (!layer.IsLocked) ? IconFonts.FontAwesome5.LockOpen: IconFonts.FontAwesome5.Lock;
+      var lockState = (layer.IsLocked) ? Icon.LockOpen: Icon.Lock;
       if (ImGui.SmallButton(lockState))
       {
         layer.IsLocked = !layer.IsLocked;
       }
       ImGui.SameLine();
-      if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
+      if (ImGui.SmallButton(Icon.Times))
       {
         removeLayer = layer;
       }

@@ -168,6 +168,16 @@ namespace Raven
     }
 
     /// <summary>
+    /// Adds an exisiting Level without or with a parent to this World. 
+    /// If given level is attached to a world, then remove it from that world 
+    /// and put it here.
+    /// </summary>
+    public void PutLevel(Level level)
+    {
+      level.DetachFromWorld();
+      Levels.Add(level);
+    }
+    /// <summary>
     /// Adds a Sheet resource
     /// </summary>
     public void AddSheet(Sheet sheet) => Sheets.Add(sheet); 

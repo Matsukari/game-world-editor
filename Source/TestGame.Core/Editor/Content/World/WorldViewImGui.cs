@@ -65,7 +65,7 @@ namespace Raven
       {
         _levelInspectors[SelectedLevel].Selected = true;
       }
-      catch (Exception) {}
+      catch (Exception) {_selectedLevel = -1;}
     }
     void SyncSpritePicker()
     {
