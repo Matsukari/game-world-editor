@@ -19,7 +19,7 @@ namespace Raven
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
       // Handles spriteScene
-      if (Nez.Input.LeftMouseButtonDown 
+      if (Nez.Input.LeftMouseButtonPressed 
           && _view.Window.SelectedLevelInspector != null 
           && _view.Window.SelectedLevelInspector.CurrentLayer is FreeformLayer freeformLayer 
           && _view.SpritePicker.SelectedSprite is SpriteScene spriteScene)
@@ -103,6 +103,7 @@ namespace Raven
       var tileApprox = Camera.MouseToWorldPoint() - scene.EnclosingBounds.Size/2f; 
       var paint = freeformLayer.PaintSpriteScene(scene);
       paint.Transform.Position = Camera.MouseToWorldPoint();
+      Console.WriteLine("Painting spritescene");
     }
     void PaintTile(Point coord)
     {
@@ -151,14 +152,12 @@ namespace Raven
         {
           var min = part.SourceSprite.Region.Location.ToVector2() / part.SourceSprite.Texture.GetSize();
           var max = (part.SourceSprite.Region.Location + part.SourceSprite.Region.Size).ToVector2() / part.SourceSprite.Texture.GetSize();
-          var tilePos = rawMouse + part.Bounds.Location.ToNumerics();
-          tilePos.X = (int)(tilePos.X / part.SourceSprite.TileSize.X) * part.SourceSprite.TileSize.X;
-          tilePos.Y = (int)(tilePos.Y / part.SourceSprite.TileSize.Y) * part.SourceSprite.TileSize.Y; 
+          var pos = rawMouse + part.Bounds.Location.ToNumerics();
 
           ImGui.GetForegroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(part.SourceSprite.Texture),
-              tilePos - spriteScene.EnclosingBounds.GetHalfSize().ToNumerics() * Camera.RawZoom, 
-              tilePos - spriteScene.EnclosingBounds.GetHalfSize().ToNumerics() + spriteScene.EnclosingBounds.Size.ToNumerics() * Camera.RawZoom,
+              pos - part.Bounds.GetHalfSize().ToNumerics() * Camera.RawZoom, 
+              pos - part.Bounds.GetHalfSize().ToNumerics() * Camera.RawZoom + part.Bounds.Size.ToNumerics() * Camera.RawZoom,
               min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
         }
       }

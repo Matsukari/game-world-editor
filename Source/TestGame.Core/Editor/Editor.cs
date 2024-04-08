@@ -75,7 +75,11 @@ namespace Raven
 
       Serializer.LoadStartup();
 
-      ContentManager.AddTab(new SheetView(), new Sheet("/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png"));
+      var sheet = new Sheet("/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png");
+      ContentManager.AddTab(new SheetView(), sheet);
+      var world = new World();
+      world.AddSheet(sheet);
+      ContentManager.AddTab(new WorldView(), world);
 
       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().RegisterDrawCommand(WindowManager.Render);
     }

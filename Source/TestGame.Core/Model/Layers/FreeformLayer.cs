@@ -19,6 +19,17 @@ namespace Raven
       return res;
     }
   }
+  /// <summary>
+  /// Sorts the Renderables based on their Y corrdinates; bottom are in the front, upper is sent to back
+  /// </summary>
+  class SceneYComparer : IComparer<SpriteScene>
+  {
+    public int Compare(SpriteScene self, SpriteScene other)
+    {
+      var res = other.Bounds.Bottom > self.Bounds.Bottom ? -1 : other.Bounds.Bottom < self.Bounds.Bottom ? 1 : 0;
+      return res;
+    }
+  }
   public class FreeformLayerRenderer : LayerRenderer<FreeformLayer>
   {
     public List<SpriteSceneRenderer> SpriteScenes = new List<SpriteSceneRenderer>();

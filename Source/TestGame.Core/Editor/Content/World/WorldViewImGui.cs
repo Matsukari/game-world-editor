@@ -60,12 +60,15 @@ namespace Raven
         {
           _levelInspectors.Add(new LevelInspector(level));
         }
+        try
+        {
+          _levelInspectors[SelectedLevel].Selected = true;
+        }
+        catch (Exception) 
+        {
+          _selectedLevel = -1;
+        }
       }
-      try
-      {
-        _levelInspectors[SelectedLevel].Selected = true;
-      }
-      catch (Exception) {_selectedLevel = -1;}
     }
     void SyncSpritePicker()
     {
@@ -93,6 +96,7 @@ namespace Raven
 
       _popups.Update(SelectedLevelInspector?.CurrentLayer);
       (_popups as IImGuiRenderable).Render(imgui);
+
 
     }
   }

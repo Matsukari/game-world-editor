@@ -128,16 +128,19 @@ namespace Raven
     }
     void SyncLayersGui()
     {
-      _layerSelected.EqualFalseRange(Level.Layers.Count());
-      try 
+      if (_layerSelected.Count() != Level.Layers.Count())
       {
-        _layerSelected[_currentLayer] = true;
-      }
-      catch (Exception) 
-      {
-        if (_layerSelected.Count() == 0) return;
-        _currentLayer = 0;
-        _layerSelected[0] = true; 
+        _layerSelected.FalseRange(Level.Layers.Count());
+        try 
+        {
+          _layerSelected[_currentLayer] = true;
+        }
+        catch (Exception) 
+        {
+          if (_layerSelected.Count() == 0) return;
+          _currentLayer = 0;
+          _layerSelected[_currentLayer] = true;
+        }
       }
     }
     Layer _layerOnOptions = null;
@@ -178,6 +181,7 @@ namespace Raven
               for (int j = 0; j < _layerSelected.Count(); j++) _layerSelected[j] = false;
             }
             _layerSelected[i] = true;
+            _currentLayer = i;
           }
 
           // Layer options; select

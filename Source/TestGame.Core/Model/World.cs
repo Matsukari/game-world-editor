@@ -32,6 +32,25 @@ namespace Raven
 
   public class WorldRenderer
   {
+    
+    public static void RenderScene(SpriteScene SpriteScene, Vector2 position, Batcher batcher, Camera camera)
+    {
+      foreach (var sprite in SpriteScene.Parts)
+      {
+        if (!sprite.IsVisible) return;
+        batcher.Draw(
+            texture: sprite.SourceSprite.Texture,
+            position: position + SpriteScene.Transform.Position + sprite.Transform.Position,
+            sourceRectangle: sprite.SourceSprite.Region,
+            color: sprite.Color.ToColor(),
+            rotation: SpriteScene.Transform.Rotation + sprite.Transform.Rotation,
+            origin: sprite.Origin,
+            scale: SpriteScene.Transform.Scale * sprite.Transform.Scale,
+            effects: sprite.SpriteEffects,
+            layerDepth: 0);
+      }
+    }    
+ 
     public static void RenderLayer(Batcher batcher, Camera camera, Layer layer)
     {
       if (layer is TileLayer tileLayer && layer.IsVisible)
@@ -72,6 +91,28 @@ namespace Raven
               effects: eff,
               layerDepth: 0);
         }
+      }
+      else if (layer is FreeformLayer freeform)
+      {
+        if (freeform.IsYSorted) 
+        {
+          Console.WriteLine("Before------------------");
+          for (int i = 0; i < freeform.SpriteScenees.Count(); i++)
+          {
+            Console.WriteLine($"{i}. {freeform.SpriteScenees[i].Bounds}");
+          }
+          freeform.SpriteScenees.Sort(new SceneYComparer());
+          Console.WriteLine("--------------------After");
+          for (int i = 0; i < freeform.SpriteScenees.Count(); i++)
+          {
+            Console.WriteLine($"{i}. {freeform.SpriteScenees[i].Bounds}");
+          }
+        }
+        foreach (var spriteScene in freeform.SpriteScenees)
+        {
+          RenderScene(spriteScene, freeform.Bounds.Location, batcher, camera);
+        }
+ 
       }
     }
     public static void Render(Batcher batcher, Camera camera, World world) 

@@ -49,7 +49,6 @@ namespace Raven
       bounds.Size = (Transform.Scale * sprite.Transform.Scale) * sprite.Bounds.Size;
       return bounds;
     }
-    
     public override void Render(Batcher batcher, Camera camera)
     {
       foreach (var sprite in SpriteScene.Parts)
@@ -57,12 +56,12 @@ namespace Raven
         if (!sprite.IsVisible) return;
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,
-            position: Transform.Position + LocalOffset + sprite.Transform.Position,
+            position: Transform.Position + LocalOffset + SpriteScene.Transform.Position + sprite.Transform.Position,
             sourceRectangle: sprite.SourceSprite.Region,
             color: sprite.Color.ToColor(),
-            rotation: Transform.Rotation + sprite.Transform.Rotation,
+            rotation: Transform.Rotation + SpriteScene.Transform.Rotation + sprite.Transform.Rotation,
             origin: sprite.Origin,
-            scale: Transform.Scale * sprite.Transform.Scale,
+            scale: Transform.Scale * SpriteScene.Transform.Scale * sprite.Transform.Scale,
             effects: sprite.SpriteEffects,
             layerDepth: _layerDepth);
       }

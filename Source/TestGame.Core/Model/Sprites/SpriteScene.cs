@@ -36,6 +36,16 @@ namespace Raven
 
     internal Sheet _sheet;
 
+    public RectangleF Bounds 
+    {
+      get
+      {
+        var bounds = EnclosingBounds;
+        bounds = bounds.AddPosition(Transform.Position);
+        return bounds;
+      }
+    }
+
     /// <summary>
     /// Visually, putting a rectangle that exactly fits the bounds of all parts
     /// </summary>
@@ -118,6 +128,7 @@ namespace Raven
 
       sprite.SpriteScene = this;
       sprite.Name = name;
+      sprite.Origin = sprite.Bounds.Size/2f;
       Parts.Add(sprite);
       return sprite;
     }

@@ -22,7 +22,7 @@ namespace Raven
 
       while (File.Exists(newPath))
       {
-        string newName = $"{Path.GetFileNameWithoutExtension(newPath)}({count}){Path.GetExtension(newPath)}";
+        string newName = $"{Path.GetFileNameWithoutExtension(fullpath)}({count}){Path.GetExtension(fullpath)}";
         newPath = Path.Combine(Path.GetDirectoryName(newPath), newName);
         count++;
       }
