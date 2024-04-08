@@ -5,40 +5,53 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Raven
 {
-  public class ShapeAnnotator : IInputHandler
+  public class ShapeAnnotator : RenderableComponent, IInputHandler
   {
+    EditorSettings _settings;
     IPropertied _propertied;
+    ShapeModel _shape;
     bool _annotating;
-    object _shape;
 
     public bool IsAnnotating { get => _annotating; }
    
     public event Action OnAnnotateStart;
     public event Action OnAnnotateEnd;
 
-    public ShapeAnnotator()
+    public ShapeAnnotator(EditorSettings settings)
     {
+      _settings = settings;
       _annotating = false;
     }
 
-    public void Annotate(IPropertied property, object shape)
+    public override bool IsVisibleFromCamera(Camera camera) => true;
+        
+    public void Annotate(IPropertied property, ShapeModel shape)
     {
-      if (shape == null || !ShapeModelUtils.IsShape(shape)) throw new Exception();
       Mouse.SetCursor(MouseCursor.Crosshair);
-      _shape = shape;
+      _propertied = property;
+      _shape = shape.Duplicate() as ShapeModel;
+      Insist.IsNotNull(_propertied);
+      Insist.IsNotNull(_shape);
     }
     Vector2 _initialMouse = Vector2.Zero;
+    bool _isDrag = false;
 
     int IInputHandler.Priority() => 10;
 
     bool IInputHandler.OnHandleInput(InputManager input)
     {
-      if (input.IsDragFirst && _shape != null) 
+      if (_shape == null) return false;
+      if (input.IsDragFirst) 
       {
         Console.WriteLine("Started annotating");
+        _initialMouse = Vector2.Zero;
         _annotating = true;
-      } 
-      return _annotating;
+        _isDrag = true;
+
+      }
+      if (input.IsDragLast) Finish();
+
+      return true;
     }
     // Adds to current context
     void Finish()
@@ -48,9 +61,12 @@ namespace Raven
       _initialMouse = Vector2.Zero;
       _annotating = false;
       _shape = null;
+      _isDrag = false;
+      Console.WriteLine("Finished");
     }
-    public void Render(Batcher batcher, Camera camera, Color color)
+    public override void Render(Batcher batcher, Camera camera)
     {
+
       if (!_annotating) return;
 
       var input = Core.GetGlobalManager<InputManager>();
@@ -61,37 +77,26 @@ namespace Raven
       {
         _initialMouse = camera.MouseToWorldPoint();
         if (OnAnnotateStart != null) OnAnnotateStart();
+        if (_shape is PointModel shape)
+        {
+          shape.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
+          Finish();
+        }
       }
       // Dragging
-      else if (input.IsDrag && _initialMouse != Vector2.Zero) 
+      if (_isDrag) 
       {
-        Editor.PrimitiveBatch.Begin(projection: camera.ProjectionMatrix, view: camera.ViewProjectionMatrix);
-        ShapeModelUtils.RenderShapeModel(_shape, Editor.PrimitiveBatch, batcher, camera, color);
+        Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
+        _shape.Render(Editor.PrimitiveBatch, batcher, camera, (Entity as Editor).Settings.Colors.ShapeActive.ToColor());
         Editor.PrimitiveBatch.End();
       }
-      // Released; add 
-      else if (input.IsDragLast && _initialMouse != Vector2.Zero && !(_shape is PolygonModel)) 
-        Finish();
-
 
       // calculate position of area between mous drag
       var rect = input.MouseDragArea;
-      if (_shape is RectangleModel rectangle)
-      {
-        rect.Location = _initialMouse;
-        rect.Size = camera.MouseToWorldPoint() - _initialMouse;
-        rectangle.Bounds = rect;
-      }
-      else if (_shape is EllipseModel ellipse)
-      {
-        ellipse.Center = _initialMouse;
-        ellipse.Width = camera.MouseToWorldPoint().X - _initialMouse.X; 
-      }
-      else if (_shape is PointModel shape)
-      {
-        shape.Position = camera.MouseToWorldPoint();
-        Finish();
-      }
+      rect.Location = _initialMouse;
+      rect.Size = camera.MouseToWorldPoint() - _initialMouse; 
+      _shape.Bounds = rect;
+
     }
   }
 }

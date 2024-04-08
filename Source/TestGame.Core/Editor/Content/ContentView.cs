@@ -14,5 +14,18 @@ namespace Raven
     public virtual void OnContentClose() {}
 
     public virtual void Render(Batcher batcher, Camera camera, EditorSettings settings) {}
+
+    protected void RenderAnnotations(IPropertied propertied, Batcher batcher, Camera camera, EditorSettings settings)
+    {
+      batcher.FlushBatch();
+      Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
+      foreach (var shape in propertied.Properties)
+      {
+        if (shape.Value is ShapeModel model)
+          model.Render(Editor.PrimitiveBatch, batcher, camera, settings.Colors.ShapeInactive.ToColor()); 
+      }
+      Editor.PrimitiveBatch.End();
+    }
+
   }
 }

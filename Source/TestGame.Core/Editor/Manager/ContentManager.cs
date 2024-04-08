@@ -76,6 +76,8 @@ namespace Raven
 
       Settings.LastFiles.Add(contentData);
 
+      contentData.PropertiedContext = content;
+
       var tab = new EditorContent(content, contentData);
       _tabs.Add(tab);
       _views.Add(contentView);

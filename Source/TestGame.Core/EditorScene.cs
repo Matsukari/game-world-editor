@@ -12,7 +12,6 @@ namespace TestGame
       Content.RootDirectory = "Assets";
        
       var editor = AddEntity(new Raven.Editor());
-
     }   
   }
 }

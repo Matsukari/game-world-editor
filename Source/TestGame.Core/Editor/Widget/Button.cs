@@ -17,7 +17,7 @@ namespace Raven.Widget
 
 
       return pressed;
-    }
+    } 
     public static void ToggleButtonGroup(string[] ids, ref bool[] toggles, Action[] actions, Action fallback, uint color, int spacing = 0)
     {
       for (int i = 0; i < ids.Count(); i++)
@@ -26,14 +26,18 @@ namespace Raven.Widget
         if (ToggleButton(ids[i], ref toggles[i], color))
         {
           toggles.FalseRange(i);
-          if (!toggles[i]) 
+
+          if (!toggles[i] && fallback != null) 
             fallback.Invoke();
+          else if (!toggles[i])
+            toggles[i] = true;
           else
             actions[i].Invoke();
         }
       }
     }
     public static bool ToggleButton(string id, ref bool toggled) => ToggleButton(id, ref toggled, ImGui.GetColorU32(ImGuiCol.ButtonHovered));
+
     public static bool DelegateToggleButton(string id, Action callback) => DelegateToogleButton(id, ImGui.GetColorU32(ImGuiCol.ButtonHovered), callback);
 
     public static void TextTooltip(string descr)

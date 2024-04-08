@@ -12,6 +12,7 @@ namespace Raven
     Vector2 _initialMouse = Vector2.Zero;
 
     public event Action OnSelectionRightClick;
+    public bool IsBlocked = false;
     
     public SheetViewInputHandler(SheetView view) => _view = view;
 
@@ -23,8 +24,13 @@ namespace Raven
     }
 
 
+    void IInputHandler.OnInputBlocked(Raven.InputManager input)
+    {
+      IsBlocked = true;
+    }
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
+      IsBlocked = false;
       if (_view.ImGuiHandler is SheetViewImGui imgui && imgui.SceneView.IsEditing)
       {
         return imgui.SceneView.HandleInput(input);
@@ -41,23 +47,29 @@ namespace Raven
       if (input.IsDragFirst && _initialMouse == Vector2.Zero && Nez.Input.LeftMouseButtonDown) 
       {
         _initialMouse = Camera.MouseToWorldPoint();
-        return true;
+        
+        foreach (var shape in _sheet.Properties)
+        {
+          if (Nez.Input.LeftMouseButtonPressed && shape.Value is ShapeModel model && model.CollidesWith(Camera.MouseToWorldPoint()))
+          {
+            RemoveSelection();
+            Selection.Begin(model.Bounds, model.Icon);
+            return true;
+          }
+        }
+ 
       }
-      else if (input.IsDrag && _initialMouse != Vector2.Zero)
+      else if (input.IsDrag && _initialMouse != Vector2.Zero && Nez.Input.LeftMouseButtonDown)
       {
         var mouseDragArea = new RectangleF();
         mouseDragArea.Location = _view.GetOffRegionInSheet(_initialMouse);
         mouseDragArea.Size = Camera.MouseToWorldPoint() - _initialMouse;
         mouseDragArea = mouseDragArea.AlwaysPositive();
         _selectedTiles = _view.Sheet.GetTiles(mouseDragArea);
-        if (_selectedTiles.Count > 1) 
-        {
-          var sprite = _sheet.CreateSprite(_selectedTiles.ToArray());
-          Select(sprite);
-        }
-        return true;
+        var sprite = _sheet.CreateSprite(_selectedTiles.ToArray());
+        Select(sprite);
       }
-      else if (input.IsDragLast)
+      else if (input.IsDragLast && Nez.Input.LeftMouseButtonReleased)
       {
         var count = _selectedTiles.Count;
         _selectedTiles.Clear();
@@ -72,9 +84,8 @@ namespace Raven
           if (tileInCoord != null) Select(tileInCoord);
           else Select(new Tile(coord, _sheet));
         }
-        return true;
       }
-      return false;
+      return ContentData.SelectionList.NotEmpty();
     }
     public void Select(IPropertied sel)
     {

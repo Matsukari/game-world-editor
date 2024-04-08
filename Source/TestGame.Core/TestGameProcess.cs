@@ -27,6 +27,7 @@ public class TestGameProcess : Core
 
         imGuiManager.ShowMenuBar = false;
         Scene = new EditorScene();
+        
     }
     [Nez.Console.Command( "show", "Shows something which would be otherwise hidden." )]
     static void ShowCommand( string which = "imdemo" )

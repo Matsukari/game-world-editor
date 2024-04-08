@@ -61,6 +61,8 @@ namespace Raven
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
       Guidelines.OriginLinesRenderable.Render(batcher, camera, settings.Colors.OriginLineX.ToColor(), settings.Colors.OriginLineY.ToColor());
+
+      RenderAnnotations(ContentData.PropertiedContext, batcher, camera, settings);
       for (var i = 0; i < _world.Levels.Count(); i++)
       {
         var level = _world.Levels[i];

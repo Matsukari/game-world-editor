@@ -35,6 +35,7 @@ namespace Raven
       _scene.Initialize(editor, content);
       _scene.OnEdit += () => Inspector.ShowPicker = true;
       _scene.OnUnEdit += () => Inspector.ShowPicker = false;
+      _scene.OnUnEdit += () => ContentData.PropertiedContext = _sheet;
 
       _imgui = new SheetViewImGui(Settings, Camera);
       _imgui.Initialize(editor, content);
@@ -49,8 +50,6 @@ namespace Raven
 
       Inspector.OnClickScene += scene => _scene.Edit(scene);
       Inspector.OnDeleteScene += scene => _scene.UnEdit();
-
-      ContentData.PropertiedContext = _sheet;
     }
     public override void OnContentOpen(IPropertied content)
     {
@@ -64,6 +63,7 @@ namespace Raven
       SyncModifiedTiles();
       _imgui.Update(_sheet, ContentData.SelectionList);
 
+      RenderAnnotations(ContentData.PropertiedContext, batcher, camera, settings);
       if (_scene.IsEditing) 
       {
         _scene.Render(batcher, camera);
@@ -71,6 +71,8 @@ namespace Raven
       }
 
       _image.Render(batcher, camera);
+
+      TileInMouse = Rectangle.Empty;
 
       // Draw tiles grid
       foreach (var tile in _tiles) 
@@ -84,7 +86,7 @@ namespace Raven
         }
       }
       // Highlight the tile under mouse
-      if (!TileInMouse.IsEmpty && !settings.IsEditorBusy) 
+      if (!TileInMouse.IsEmpty && !_input.IsBlocked) 
       {
         var worldTileInMouse = TileInMouse.ToRectangleF();
         worldTileInMouse.Location += _image.Bounds.Location;

@@ -27,7 +27,7 @@ namespace Raven
     public bool IsDrag = false;
     public bool IsDragFirst = false;
     public bool IsDragLast = false; 
-    public bool IsImGuiBlocking { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) || ImGui.IsWindowFocused(ImGuiFocusedFlags.AnyWindow); }
+    public bool IsImGuiBlocking { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow); }
 
     public int MouseDragButton = -1; 
     public RectangleF MouseDragArea = new RectangleF();
@@ -42,7 +42,7 @@ namespace Raven
     public void RegisterInputHandler(IInputHandler handler)
     {
       _inputHandlers.Add(handler);
-      _inputHandlers.OrderByDescending(item => item.Priority());
+      _inputHandlers = _inputHandlers.OrderByDescending(item => item.Priority()).ToList();
     }
     public override void Update()
     {

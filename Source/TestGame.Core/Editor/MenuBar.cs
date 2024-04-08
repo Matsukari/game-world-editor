@@ -2,6 +2,7 @@
 using ImGuiNET;
 using Nez;
 using Microsoft.Xna.Framework;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
@@ -49,23 +50,23 @@ namespace Raven
           // 1, operationButton
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.MousePointer, ()=>{}),
-            (IconFonts.FontAwesome5.ArrowsAlt, ()=>{}),
-            (IconFonts.FontAwesome5.HandSpock, ()=>{}),
-            (IconFonts.FontAwesome5.Expand, ()=>{}),
-            (IconFonts.FontAwesome5.SyncAlt, ()=>{}),
+            (Icon.MousePointer, ()=>{}),
+            (Icon.ArrowsAlt, ()=>{}),
+            (Icon.HandSpock, ()=>{}),
+            (Icon.Expand, ()=>{}),
+            (Icon.SyncAlt, ()=>{}),
           },
           // 2, view options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.BorderAll, ToogleGrid),
-            (IconFonts.FontAwesome5.EllipsisV, ()=>_isDrawSnappingPopup = !_isDrawSnappingPopup),
+            (Icon.BorderAll, ToogleGrid),
+            (Icon.EllipsisV, ()=>_isDrawSnappingPopup = !_isDrawSnappingPopup),
           },
           // 3, select type options
           new (string, Action)[]
           {
-            (IconFonts.FontAwesome5.User, ()=>{}),
-            (IconFonts.FontAwesome5.Shapes, ()=>{})
+            (Icon.User, ()=>{}),
+            (Icon.Shapes, ()=>{})
           },
       };
 
@@ -176,11 +177,11 @@ namespace Raven
       ImGui.Dummy(new System.Numerics.Vector2(20, 0)); 
 
       // Draw shape annotators
-      for (int i = 0; i < ShapeModelUtils.ModelsIcon.Count(); i++)
+      foreach (var shapeModel in _shapeModels)
       {
         ImGui.SameLine();
-        var shapeInstance = ShapeModelUtils.ModelsInstance[i];
-        var icon = ShapeModelUtils.ModelsIcon[i];
+        var shapeInstance = shapeModel;
+        var icon = shapeModel.Icon;
 
         // pressed; begin annotation
         if (ImGui.Button(icon)) _editor.ShapeAnnotator.Annotate(_editor.ContentManager.ContentData.PropertiedContext, shapeInstance);
@@ -190,18 +191,19 @@ namespace Raven
       Widget.ImGuiWidget.SpanX(20);
       if (_editor.ContentManager.View is WorldView worldView)
       {
-        // Paint options
-        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.PaintBrush, ref _paintModeToggled[0]))
-        {
-           worldView.PaintMode = PaintMode.Pen;
-        }
-        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.Eraser, ref _paintModeToggled[0]))
-        {
-           worldView.PaintMode = PaintMode.Eraser;
-        }
+        Widget.ImGuiWidget.ToggleButtonGroup(
+            ids: new []{Icon.PaintBrush, Icon.Eraser},
+            toggles: ref _paintModeToggled,
+            actions: new []{
+              ()=>{worldView.PaintMode = PaintMode.Pen; }, 
+              ()=>{worldView.PaintMode = PaintMode.Eraser; }, 
+            },
+            fallback: null,
+            color: EditorColors.Get(ImGuiCol.ButtonHovered));
+
 
         Widget.ImGuiWidget.ToggleButtonGroup(
-            ids: new []{"/", IconFonts.FontAwesome5.Square, IconFonts.FontAwesome5.Fill},
+            ids: new []{"/", Icon.Square, Icon.Fill},
             toggles: ref _paintTypeToggled,
             actions: new []{
               ()=>{worldView.PaintType = PaintType.Line; }, 
@@ -210,8 +212,10 @@ namespace Raven
             },
             fallback: ()=>{worldView.PaintType = PaintType.Single;},
             color: EditorColors.Get(ImGuiCol.ButtonHovered));
-            
-        if (Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.Dice, ref _isRandomPaint))
+
+        ImGui.SameLine();
+
+        if (Widget.ImGuiWidget.ToggleButton(Icon.Dice, ref _isRandomPaint))
         {
           worldView.IsRandomPaint = !worldView.IsRandomPaint;
         }
@@ -221,6 +225,7 @@ namespace Raven
 
       ImGui.End();
     }
+    ShapeModel[] _shapeModels = new ShapeModel[]{new RectangleModel(), new EllipseModel(), new PointModel(), new PolygonModel()};
     bool[] _paintModeToggled = new []{false, false};
     bool[] _paintTypeToggled = new []{false, false, false};
     bool _isRandomPaint = false;

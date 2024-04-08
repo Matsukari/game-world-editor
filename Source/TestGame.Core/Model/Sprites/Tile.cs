@@ -54,5 +54,15 @@ namespace Raven
       _sheet = sheet;
       Insist.IsTrue(_sheet.IsTileValid(_sheet.GetTileId(coord.X, coord.Y)));
     }
+    public override bool Equals(object obj)
+    {
+      if (obj is Tile tile && tile.Name == Name) 
+        return tile.Id == Id;
+      return false;
+    }
+    public override int GetHashCode()
+    {
+      return base.GetHashCode();
+    }
   }   
 }

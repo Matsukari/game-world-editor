@@ -51,6 +51,8 @@ namespace Raven
     RectangleF _selectionInitial = new RectangleF();
     bool _isDragInsideArea = false;
 
+    int IInputHandler.Priority() => 9;
+
     bool IInputHandler.OnHandleInput(InputManager input)   
     {
       // The distance between the movement of the mouse

@@ -53,7 +53,7 @@ namespace Raven
 
       Selection = AddComponent(new Selection());
       Serializer = new Serializer(ContentManager);
-      ShapeAnnotator = new ShapeAnnotator();
+      ShapeAnnotator = new ShapeAnnotator(Settings);
 
       WindowManager = new ImGuiWinManager();
       WindowManager.Renderables.Add(new Settings(Settings));
@@ -66,6 +66,7 @@ namespace Raven
       AddComponent(new Utils.Components.CameraZoomComponent()); 
       AddComponent(new ContentRenderer(ContentManager));
       AddComponent(new SelectionRenderer(Selection, Settings.Colors));
+      AddComponent(ShapeAnnotator);
 
       var input = Core.GetGlobalManager<InputManager>();
       input.RegisterInputHandler(ShapeAnnotator);
@@ -84,6 +85,12 @@ namespace Raven
       Scene.ClearColor = Settings.Colors.Background.ToColor();
       Settings.IsEditorBusy = Selection.HasBegun() || ShapeAnnotator.IsAnnotating;
       ContentManager.Update();
+      UpdateSelections();
+    }
+    public void UpdateSelections()
+    {
+      if (Selection.Capture is ShapeModel shapeSel)
+        shapeSel.Bounds = Selection.ContentBounds;
     }
     public override void OnRemovedFromScene()
     {
