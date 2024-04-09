@@ -49,7 +49,7 @@ namespace Raven
     private Animation()
     {
     }
-    public Animation(object target, string name = "") 
+    public Animation(object target, string name = "Animation") 
     {
       Name = name;
       Target = target;

@@ -101,8 +101,6 @@ namespace Raven
         ContentSize.Y);
     }
 
-    static int _idGenerator = 0;
-
     public Level(World world)
     {
       World = world;
@@ -111,7 +109,11 @@ namespace Raven
     /// <summary>
     /// Adds a layer at the forefront
     /// </summary>
-    public void AddLayer(Layer layer) => Layers.Add(layer);
+    public void AddLayer(Layer layer)
+    {
+      Layers.Add(layer);
+      Layers = Layers.EnsureNoRepeatNameField();
+    }
 
     /// <summary>
     /// Remoes the layer with the given name
@@ -130,7 +132,6 @@ namespace Raven
     public Level Copy() 
     {
       Level level = MemberwiseClone() as Level;
-      level.Name += " " + (++_idGenerator).ToString();
       level.Properties = Properties.Copy();
       level.Layers = Layers.CloneItems();
       for (int i = 0; i < level.Layers.Count(); i++) level.Layers[i].Level = level;

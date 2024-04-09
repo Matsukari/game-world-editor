@@ -214,7 +214,7 @@ namespace Raven
       {
         if (ImGui.MenuItem("Create Animation"))
         {
-          SpriteScene.Animations.Add(new Animation(SpriteScene, "Animation"));
+          SpriteScene.AddAnimation(new Animation(SpriteScene));
         }
         ImGui.EndPopup();
       }
@@ -227,7 +227,7 @@ namespace Raven
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
-          SpriteScene.Animations.Add(_onOpenAnimtaionOperations.Copy());
+          SpriteScene.AddAnimation(_onOpenAnimtaionOperations.Copy());
         }
         ImGui.EndPopup();
       }

@@ -122,7 +122,7 @@ namespace Raven
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
-          Sheet.SpriteScenees.Add(_spriteSceneOnOption.Copy());
+          Sheet.AddScene(_spriteSceneOnOption.Copy());
         }
         ImGui.EndPopup();
       }

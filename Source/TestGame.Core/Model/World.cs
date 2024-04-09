@@ -26,6 +26,7 @@ namespace Raven
       var levelEntity = new LevelEntity(level);
       levelEntity.SetParent(this);
       Levels.Add(levelEntity); 
+      Levels = Levels.EnsureNoRepeatNameField();
       return levelEntity;
     }
   }

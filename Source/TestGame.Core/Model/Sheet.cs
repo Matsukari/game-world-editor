@@ -150,6 +150,11 @@ namespace Raven
     /// </summary>
     public bool IsTileValid(int index) => index >= 0 && index < Tiles.X * Tiles.Y;
 
+    public void AddScene(SpriteScene scene)
+    {
+      SpriteScenees.Add(scene);
+      SpriteScenees = SpriteScenees.EnsureNoRepeatNameField();
+    }
     
     public Tile CustomTileExists(int x, int y) 
     {

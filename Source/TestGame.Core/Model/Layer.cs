@@ -73,6 +73,7 @@ namespace Raven
     public Layer(Level level)
     {
       Level = level;
+      Name = GetType().Name;
     }
 
     /// <summary>

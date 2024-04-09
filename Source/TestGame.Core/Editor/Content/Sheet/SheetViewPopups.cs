@@ -31,7 +31,7 @@ namespace Raven
           imgui.NameModal.Open((name)=>
           {
               var spriteScene = _sheet.CreateSpriteScene(name, ContentData.SelectionList.Last() as Sprite);
-              _sheet.SpriteScenees.AddIfNotPresent(spriteScene);
+              _sheet.AddScene(spriteScene);
               if (OnConvertToScene != null) OnConvertToScene(spriteScene);
           });
         }

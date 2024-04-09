@@ -39,14 +39,12 @@ namespace Raven
           if (ImGui.MenuItem("Tiled")) 
           {
             var layer = new TileLayer(Level, 16, 16);
-            layer.Name = $"TiledLayer {Level.Layers.Count()+1}";
-            Level.Layers.Add(layer);
+            Level.AddLayer(layer);
           }
           if (ImGui.MenuItem("Freeform"))
           {  
             var layer = new FreeformLayer(Level);
-            layer.Name = $"FreeLayer {Level.Layers.Count()+1}";
-            Level.Layers.Add(layer);
+            Level.AddLayer(layer);
           }
           ImGui.EndMenu();
         }

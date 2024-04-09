@@ -88,8 +88,7 @@ namespace Raven
       {
         animation.Frames.Add(frame);
         animation.Frames = animation.Frames.EnsureNoRepeatNameField();
-      }
-      
+      }  
     }
 
     /// <summary>
