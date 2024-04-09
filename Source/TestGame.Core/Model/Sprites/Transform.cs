@@ -10,6 +10,7 @@ namespace Raven
     public Vector2 Skew = new Vector2(1, 1);
     public float Rotation = 0f;
     public float RotationRadians { get => Nez.Mathf.Radians(Rotation); }
+    public float RotationDegrees { get => Rotation * 360f; set => Rotation = value / 360f; }
 
     public Transform() {}
     public void Apply(Nez.Transform transform)
@@ -23,10 +24,11 @@ namespace Raven
       var pos = Position.ToNumerics();
       var scale = Scale.ToNumerics();
       var skew = Skew.ToNumerics();
+      var rot = RotationDegrees;
       if (ImGui.InputFloat2("Position", ref pos)) Position = pos.ToVector2();
       if (ImGui.InputFloat2("Scale", ref scale)) Scale = scale.ToVector2();
       if (ImGui.InputFloat2("Skew", ref skew)) Skew = skew.ToVector2();
-      ImGui.SliderFloat("Rotation", ref Rotation, 0, 360);
+      if (ImGui.SliderFloat("Rotation", ref rot, 0, 360)) RotationDegrees = rot;
     }
     public static void RenderImGui(Nez.Transform transform)
     {
@@ -35,8 +37,8 @@ namespace Raven
       var rot = transform.RotationDegrees;
       if (ImGui.InputFloat2("Position", ref pos)) transform.LocalPosition = pos.ToVector2();
       if (ImGui.InputFloat2("Scale", ref scale)) transform.LocalScale = scale.ToVector2();
-      // if (ImGui.InputFloat2("Skew", ref skew)) transform.loca = skew.ToVector2();
       if (ImGui.SliderFloat("Rotation", ref rot, 0, 360)) transform.RotationDegrees = rot;
+      // if (ImGui.InputFloat2("Skew", ref skew)) transform.loca = skew.ToVector2();
 
     }
     public Transform Duplicate()

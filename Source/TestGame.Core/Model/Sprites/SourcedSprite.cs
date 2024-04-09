@@ -31,14 +31,35 @@ namespace Raven
     public bool IsVisible = true;
     public bool IsLocked = false;
 
-    // Local bounds
+    /// <summary>
+    /// Scene bounds plus local bounds. Takes origin
+    /// </summary>
+    public RectangleF SceneBounds
+    { 
+      get 
+      {
+        var bounds = Bounds;
+        bounds.Location += SpriteScene.Bounds.Location;
+        bounds.Size *= SpriteScene.Transform.Scale;
+        return bounds;
+      }
+    }
+
+    /// <summary>
+    /// Local bounds; relative to scene. Takes accounts the origin and local scale.
+    /// </summary>
     public RectangleF Bounds 
     { 
       get => new RectangleF(
-          Transform.Position.X - Origin.X * Transform.Scale.X, 
-          Transform.Position.Y - Origin.Y * Transform.Scale.Y, 
+          Transform.Position.X - Origin.X, 
+          Transform.Position.Y - Origin.Y, 
           SourceSprite.Region.Width * Transform.Scale.X, 
           SourceSprite.Region.Height * Transform.Scale.Y);
+      set 
+      {
+        Transform.Position = value.Location + Origin;
+        Transform.Scale = value.Size / SourceSprite.Region.Size.ToVector2();
+      }
     }
     private SourcedSprite()
     {

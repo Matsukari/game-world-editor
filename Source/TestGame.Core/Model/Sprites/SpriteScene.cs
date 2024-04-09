@@ -57,10 +57,10 @@ namespace Raven
         var max = new Vector2(-10000, -10000);
         foreach (var part in Parts)
         {
-          min.X = Math.Min(min.X, part.Transform.Position.X + part.Origin.X);
-          min.Y = Math.Min(min.Y, part.Transform.Position.Y + part.Origin.Y);
-          max.X = Math.Max(max.X, part.Transform.Position.X + part.SourceSprite.Region.Size.ToVector2().X + part.Origin.X);
-          max.Y = Math.Max(max.Y, part.Transform.Position.Y + part.SourceSprite.Region.Size.ToVector2().Y + part.Origin.Y);
+          min.X = Math.Min(min.X, part.Bounds.X);
+          min.Y = Math.Min(min.Y, part.Bounds.Y);
+          max.X = Math.Max(max.X, part.Bounds.Right);
+          max.Y = Math.Max(max.Y, part.Bounds.Bottom);
         }
         return RectangleF.FromMinMax(min, max);
       }

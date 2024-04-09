@@ -44,7 +44,6 @@ Separate transform operations
 Display appropriate mouse cursors
 Copy & paste: 
 - shapes
-- parts
 - animations
 Snapping mouse
 

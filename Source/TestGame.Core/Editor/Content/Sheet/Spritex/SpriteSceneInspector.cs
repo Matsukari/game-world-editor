@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven 
 {
@@ -71,7 +72,11 @@ namespace Raven
       if (ImGui.Checkbox("Flip Y", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
     }
     internal bool _isOpenComponentOptionPopup = false;
+    internal bool _isOpenSceneOnSpritePopup = false;
     internal SourcedSprite _compOnOptions = null;
+    internal SourcedSprite _copiedSprite; 
+    internal Vector2 _posOnOpenCanvas = Vector2.Zero;
+
     void DrawOptions()
     {
       if (_isOpenComponentOptionPopup)
@@ -79,29 +84,69 @@ namespace Raven
         _isOpenComponentOptionPopup = false;
         ImGui.OpenPopup("sprite-component-options");
       }
-      if (ImGui.BeginPopupContextItem("sprite-component-options") && _compOnOptions != null)
+      if (_isOpenSceneOnSpritePopup)
       {
-        var lockState = (_compOnOptions.IsLocked) ? IconFonts.FontAwesome5.LockOpen + "  Unlock" : IconFonts.FontAwesome5.Lock + "  Lock";
+        _isOpenSceneOnSpritePopup = false;
+        ImGui.OpenPopup("scene-canvas-component-options");
+      }
+      if (ImGui.BeginPopup("sprite-component-options") && _compOnOptions != null)
+      {
+        var lockState = (_compOnOptions.IsLocked) ? Icon.LockOpen + "  Unlock" : Icon.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
           _compOnOptions.IsLocked = !_compOnOptions.IsLocked;
         }
-        var visib = (_compOnOptions.IsVisible) ? IconFonts.FontAwesome5.EyeSlash + "  Hide" : IconFonts.FontAwesome5.Eye + "  Show";
+        var visib = (_compOnOptions.IsVisible) ? Icon.EyeSlash + "  Hide" : Icon.Eye + "  Show";
         if (ImGui.MenuItem(visib))
         {
           _compOnOptions.IsVisible = !_compOnOptions.IsVisible;
         }
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete"))
+        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {
           _compOnOptions.DetachFromSpriteScene();
           if (OnDelPart != null) OnDelPart(_compOnOptions);
         }
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate"))
+        if (ImGui.MenuItem(Icon.Copy + "  Copy"))
         {
-          ImGui.CloseCurrentPopup();
+          _copiedSprite = _compOnOptions;
+        }
+        var isCut = false;
+        if (ImGui.MenuItem(Icon.Cut + "  Cut"))
+        {
+          _compOnOptions.DetachFromSpriteScene();
+          if (OnDelPart != null) OnDelPart(_compOnOptions);
+          _copiedSprite = null;
+          isCut = true;
+        }
+        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        {
+          var sprite = _compOnOptions.SpriteScene.AddSprite(_compOnOptions.Duplicate());
+          sprite.Transform.Position.X += 100;
+        }
+
+        if (!isCut) _compOnOptions = null;
+        ImGui.EndPopup();
+      }
+
+      if (ImGui.BeginPopup("scene-canvas-component-options"))
+      {
+        if ((_compOnOptions != null || _copiedSprite != null) && _posOnOpenCanvas != Vector2.Zero && ImGui.MenuItem(Icon.Paste + "  Paste"))
+        {
+          SourcedSprite gotSprite;
+          if (_compOnOptions != null)
+          {
+            gotSprite = _compOnOptions;
+            _compOnOptions = null;
+          }
+          else 
+            gotSprite = _copiedSprite.Duplicate();
+
+          var sprite = gotSprite.SpriteScene.AddSprite(gotSprite);
+          sprite.Transform.Position = _posOnOpenCanvas;
         }
         ImGui.EndPopup();
       }
+
     }
     void DrawComponentOptions(SourcedSprite sprite, ref SourcedSprite removeSprite)
     {
@@ -110,19 +155,19 @@ namespace Raven
       ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(sprite.Name).X - 140, 0f));
       ImGui.SameLine();
       ImGui.PushID($"spriteScene-component-{sprite.Name}-options");
-      var visibState = (!sprite.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
+      var visibState = (!sprite.IsVisible) ? Icon.EyeSlash : Icon.Eye;
       if (ImGui.SmallButton(visibState))
       {
         sprite.IsVisible = !sprite.IsVisible;
       }
       ImGui.SameLine();
-      var lockState = (!sprite.IsLocked) ? IconFonts.FontAwesome5.LockOpen: IconFonts.FontAwesome5.Lock;
+      var lockState = (!sprite.IsLocked) ? Icon.LockOpen: Icon.Lock;
       if (ImGui.SmallButton(lockState))
       {
         sprite.IsLocked = !sprite.IsLocked;
       }
       ImGui.SameLine();
-      if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
+      if (ImGui.SmallButton(Icon.Times))
       {
         removeSprite = sprite;
       }
@@ -149,6 +194,7 @@ namespace Raven
     List<bool> _selectedSprites = new List<bool>();
     List<bool> _selectedAnims = new List<bool>();
     bool _isOpenAnimationOptionPopup = false;
+
     protected override void OnRenderAfterName()
     {
       _selectedSprites.EqualFalseRange(SpriteScene.Parts.Count());      
@@ -178,11 +224,12 @@ namespace Raven
 
         ImGui.EndChild();
       }
+      SourcedSprite removeSprite = null;
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
-        ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), 
+            false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
 
-        SourcedSprite removeSprite = null;
         for (int i = 0; i < _selectedSprites.Count; i++)
         {
           var part = SpriteScene.Parts[i];
@@ -221,14 +268,14 @@ namespace Raven
 
         }
         ImGui.EndChild();
-        DrawOptions();
-        DrawAnimationOptionPopup();
-        if (removeSprite != null) removeSprite.DetachFromSpriteScene();
       }
+      DrawOptions();
+      DrawAnimationOptionPopup();
+      if (removeSprite != null) removeSprite.DetachFromSpriteScene();
     }
     public override string GetIcon()
     {
-      return IconFonts.FontAwesome5.User;
+      return Icon.User;
     }
     protected override void OnChangeName(string old, string now)
     {

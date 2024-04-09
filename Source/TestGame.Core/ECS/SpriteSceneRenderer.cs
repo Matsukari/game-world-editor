@@ -35,8 +35,8 @@ namespace Raven
     {
       for (int i = SpriteScene.Parts.Count()-1; i >= 0; i--)
       {
-        var bounds = SpriteScene.Parts[i].Bounds;
-        bounds.Location += Transform.Position;
+        var bounds = SpriteScene.Parts[i].SceneBounds;
+        bounds.Location = Transform.Position + LocalOffset + SpriteScene.Transform.Position + SpriteScene.Parts[i].Transform.Position;
         bounds.Size *= Transform.Scale;
         if (bounds.Contains(position)) return SpriteScene.Parts[i];
       }
@@ -45,8 +45,8 @@ namespace Raven
     public RectangleF GetPartWorldBounds(SourcedSprite sprite)
     {
       var bounds = new RectangleF();
-      bounds.Location = Transform.Position + LocalOffset + sprite.Transform.Position;
-      bounds.Size = (Transform.Scale * sprite.Transform.Scale) * sprite.Bounds.Size;
+      bounds.Location = Transform.Position + LocalOffset + SpriteScene.Transform.Position + sprite.Transform.Position;
+      bounds.Size = Transform.Scale * sprite.SceneBounds.Size;
       return bounds;
     }
     public override void Render(Batcher batcher, Camera camera)

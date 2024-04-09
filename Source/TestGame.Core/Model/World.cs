@@ -40,7 +40,7 @@ namespace Raven
         if (!sprite.IsVisible) return;
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,
-            position: position + SpriteScene.Transform.Position + sprite.Bounds.Location,
+            position: position + sprite.SceneBounds.Location,
             sourceRectangle: sprite.SourceSprite.Region,
             color: sprite.Color.ToColor(),
             rotation: SpriteScene.Transform.Rotation + sprite.Transform.Rotation,
