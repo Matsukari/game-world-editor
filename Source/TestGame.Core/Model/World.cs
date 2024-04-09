@@ -26,7 +26,6 @@ namespace Raven
       var levelEntity = new LevelEntity(level);
       levelEntity.SetParent(this);
       Levels.Add(levelEntity); 
-      Levels = Levels.EnsureNoRepeatNameField();
       return levelEntity;
     }
   }
@@ -178,6 +177,7 @@ namespace Raven
       level.Name = name;
       level.Layers.Add(layer);
       Levels.Add(level);
+      Levels = Levels.EnsureNoRepeatNameField();
       return level;
     }
 
@@ -190,6 +190,8 @@ namespace Raven
     {
       level.DetachFromWorld();
       Levels.Add(level);
+      Levels = Levels.EnsureNoRepeatNameField();
+
     }
     /// <summary>
     /// Adds a Sheet resource

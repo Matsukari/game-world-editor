@@ -75,6 +75,12 @@ namespace Raven
       Level = level;
       Name = GetType().Name;
     }
+ 
+    /// <summary>
+    /// Remoes this layer from its parent World; the World can no longer refenrece this level but 
+    /// this level could in reverse
+    /// </summary>
+    public void DetachFromLevel() => Level.RemoveLayer(Name);
 
     /// <summary>
     /// Creates a full copy of this Layer

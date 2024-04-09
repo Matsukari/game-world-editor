@@ -34,14 +34,14 @@ namespace Raven
       }
       if (ImGui.BeginPopupContextItem("layer-header-options-popup"))
       {
-        if (ImGui.BeginMenu(Icon.Plus + "  Create Layer"))
+        if (ImGui.BeginMenu(Icon.LayerGroup + "  Create Layer"))
         {
-          if (ImGui.MenuItem("Tiled")) 
+          if (ImGui.MenuItem(Icon.ThLarge + "  Tiled")) 
           {
             var layer = new TileLayer(Level, 16, 16);
             Level.AddLayer(layer);
           }
-          if (ImGui.MenuItem("Freeform"))
+          if (ImGui.MenuItem(Icon.ArrowsAlt + "  Freeform"))
           {  
             var layer = new FreeformLayer(Level);
             Level.AddLayer(layer);
@@ -60,6 +60,43 @@ namespace Raven
       }
       if (ImGui.BeginPopupContextItem("layer-options-popup") && _layerOnOptions != null)
       {
+
+        if ((_cutLayer != null || _copiedLayer != null) && ImGui.MenuItem(Icon.Paste + "  Paste Layer"))
+        {
+          Layer gotLayer;
+          if (_cutLayer != null)
+          {
+            gotLayer = _cutLayer;
+            _cutLayer = null;
+          }
+          else 
+            gotLayer = _copiedLayer.Copy();
+
+          gotLayer.Level.AddLayer(gotLayer);
+          gotLayer.Level.OrderAt(gotLayer, gotLayer.Level.Layers.FindIndex(item => item.Name == _layerOnOptions.Name));
+        }
+
+        ImGui.Separator();
+
+        if (ImGui.MenuItem(Icon.LevelDownAlt + "  Send to back"))
+        {
+          _layerOnOptions.Level.OrderAt(_layerOnOptions, 0);  
+        }
+        if (ImGui.MenuItem(Icon.ChevronDown + "  Move down"))
+        {
+          _layerOnOptions.Level.BringDown(_layerOnOptions);  
+        }
+        if (ImGui.MenuItem(Icon.ChevronUp + "  Move up"))
+        {
+          _layerOnOptions.Level.BringUp(_layerOnOptions);  
+        }
+        if (ImGui.MenuItem(Icon.LevelUpAlt + "  Bring to front"))
+        {
+          _layerOnOptions.Level.OrderAt(_layerOnOptions, _layerOnOptions.Level.Layers.Count);  
+        }
+
+        ImGui.Separator();
+
         var lockState = (!_layerOnOptions.IsLocked) ? Icon.LockOpen + "  Unlock" : Icon.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
@@ -70,13 +107,36 @@ namespace Raven
         {
           _layerOnOptions.IsVisible = !_layerOnOptions.IsVisible;
         }
+
+        ImGui.Separator();
+
         if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {
           Level.Layers.Remove(_layerOnOptions);  
         }
+        if (ImGui.MenuItem(Icon.Copy + "  Copy"))
+        {
+          _copiedLayer = _layerOnOptions;
+          _cutLayer = null;
+        }
+        if (ImGui.MenuItem(Icon.Cut + "  Cut"))
+        {
+          _cutLayer = _layerOnOptions;
+          _cutLayer.DetachFromLevel();
+          _copiedLayer = null;
+        }
+        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        {
+          var layer = _layerOnOptions.Copy();
+          layer.Offset.X += 200;
+          _layerOnOptions.Level.AddLayer(layer);
+        }
+
         ImGui.EndPopup();
       }
     }
+    internal Layer _copiedLayer;
+    internal Layer _cutLayer;
     void DrawLayerOptions(Layer layer, ref Layer removeLayer)
     {
       // Options next to name

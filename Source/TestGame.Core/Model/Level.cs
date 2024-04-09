@@ -120,6 +120,27 @@ namespace Raven
     /// </summary>
     public void RemoveLayer(string name) => Layers.Remove(Layers.Find(item => item.Name == name));
 
+
+    /// <summary>
+    /// Pushes the given layer at the given index
+    /// </summary>
+    public void OrderAt(Layer layer, int index) 
+    {
+      try 
+      {
+        var current = (Layers.FindIndex(item => item.Name == layer.Name));
+
+        var temp = Layers[index];
+        Layers[index] = Layers[current];
+        Layers[current] = temp;
+      }
+      catch (Exception) {} 
+    }
+    public void BringDown(Layer layer) => OrderAt(layer, Layers.FindIndex(item => item.Name == layer.Name) - 1);
+
+    public void BringUp(Layer layer) => OrderAt(layer, Layers.FindIndex(item => item.Name == layer.Name) + 1); 
+
+
     /// <summary>
     /// Remoes this layer from its parent World; the World can no longer refenrece this level but 
     /// this level could in reverse

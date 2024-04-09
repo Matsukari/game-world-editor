@@ -22,7 +22,6 @@ Choose ease type
 
 ## Level
 Indicator for able and not able paint
-Order layers
 Transforms on Scenes
 
 
