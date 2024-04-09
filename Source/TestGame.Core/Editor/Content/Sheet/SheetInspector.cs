@@ -86,7 +86,7 @@ namespace Raven
           ImGui.Unindent();
         }
       }
-      if (ImGui.CollapsingHeader($"{Icon.Users} SpriteScenees ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
+      if (ImGui.CollapsingHeader($"{Icon.Users} SpriteScenes ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         ImGui.BeginChild("spriteScenees");
         ImGui.Indent();

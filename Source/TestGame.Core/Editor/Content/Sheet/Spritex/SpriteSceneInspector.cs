@@ -33,6 +33,8 @@ namespace Raven
     public override void Render(ImGuiWinManager imgui)
     {
       if (SpriteScene != null) base.Render(imgui);
+      DrawOptions();
+      DrawAnimationOptionPopup();
     }
     public static void RenderSprite(SourcedSprite sprite, bool drawName = true)
     {
@@ -75,6 +77,7 @@ namespace Raven
     internal bool _isOpenSceneOnSpritePopup = false;
     internal SourcedSprite _compOnOptions = null;
     internal SourcedSprite _copiedSprite; 
+    internal SourcedSprite _cutSprite; 
     internal Vector2 _posOnOpenCanvas = Vector2.Zero;
 
     void DrawOptions()
@@ -89,15 +92,11 @@ namespace Raven
         _isOpenSceneOnSpritePopup = false;
         ImGui.OpenPopup("scene-canvas-component-options");
       }
-      if (ImGui.BeginPopupContextItem("sprite-component-options") && _compOnOptions != null)
+      if (ImGui.BeginPopup("sprite-component-options") && _compOnOptions != null)
       {
-        if (ImGui.MenuItem(Icon.LevelDownAlt + "  Bring to back"))
+        if (ImGui.MenuItem(Icon.LevelDownAlt + "  Send to back"))
         {
           _compOnOptions.SpriteScene.OrderAt(_compOnOptions, 0);  
-        }
-        if (ImGui.MenuItem(Icon.LevelUpAlt + "  Bring to front"))
-        {
-          _compOnOptions.SpriteScene.OrderAt(_compOnOptions, SpriteScene.Parts.Count);  
         }
         if (ImGui.MenuItem(Icon.ChevronDown + "  Move down"))
         {
@@ -107,8 +106,13 @@ namespace Raven
         {
           _compOnOptions.SpriteScene.BringUp(_compOnOptions);  
         }
+        if (ImGui.MenuItem(Icon.LevelUpAlt + "  Bring to front"))
+        {
+          _compOnOptions.SpriteScene.OrderAt(_compOnOptions, SpriteScene.Parts.Count);  
+        }
 
         ImGui.Separator();
+
         var lockState = (_compOnOptions.IsLocked) ? Icon.LockOpen + "  Unlock" : Icon.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
@@ -119,6 +123,9 @@ namespace Raven
         {
           _compOnOptions.IsVisible = !_compOnOptions.IsVisible;
         }
+
+        ImGui.Separator();
+
         if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {
           _compOnOptions.DetachFromSpriteScene();
@@ -128,13 +135,12 @@ namespace Raven
         {
           _copiedSprite = _compOnOptions;
         }
-        var isCut = false;
         if (ImGui.MenuItem(Icon.Cut + "  Cut"))
         {
-          _compOnOptions.DetachFromSpriteScene();
-          if (OnDelPart != null) OnDelPart(_compOnOptions);
+          _cutSprite = _compOnOptions;
+          _cutSprite.DetachFromSpriteScene();
+          if (OnDelPart != null) OnDelPart(_cutSprite);
           _copiedSprite = null;
-          isCut = true;
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
@@ -142,19 +148,18 @@ namespace Raven
           sprite.Transform.Position.X += 100;
         }
 
-        if (!isCut) _compOnOptions = null;
         ImGui.EndPopup();
       }
 
-      if (ImGui.BeginPopupContextItem("scene-canvas-component-options"))
+      if (ImGui.BeginPopup("scene-canvas-component-options"))
       {
-        if ((_compOnOptions != null || _copiedSprite != null) && _posOnOpenCanvas != Vector2.Zero && ImGui.MenuItem(Icon.Paste + "  Paste"))
+        if ((_cutSprite != null || _copiedSprite != null) && _posOnOpenCanvas != Vector2.Zero && ImGui.MenuItem(Icon.Paste + "  Paste"))
         {
           SourcedSprite gotSprite;
-          if (_compOnOptions != null)
+          if (_cutSprite != null)
           {
-            gotSprite = _compOnOptions;
-            _compOnOptions = null;
+            gotSprite = _cutSprite;
+            _cutSprite = null;
           }
           else 
             gotSprite = _copiedSprite.Duplicate();
@@ -301,16 +306,16 @@ namespace Raven
             }
             _selectedSprites[i] = true;
           }
+          if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+          {
+            _isOpenComponentOptionPopup = true;
+            _compOnOptions = part;
+          }
 
           DrawComponentOptions(part, ref removeSprite);
 
           if (spriteNode)
           {
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
-            {
-              _isOpenComponentOptionPopup = true;
-              _compOnOptions = part;
-            }
             ImGui.PushID("spriteScene-component-content-" + part.Name);
             RenderSprite(part);
             ImGui.PopID();
@@ -321,8 +326,6 @@ namespace Raven
         }
         ImGui.EndChild();
       }
-      DrawOptions();
-      DrawAnimationOptionPopup();
       if (removeSprite != null) removeSprite.DetachFromSpriteScene();
     }
     public override string GetIcon()

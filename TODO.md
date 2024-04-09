@@ -18,10 +18,8 @@ Implement ellipses
 Multiple select parts
 Multiple transforms on selected parts
 Rotate parts on selection
-Order parts
 Duplicate frames 
 Delete frames
-Delete animations
 Choose ease type
 
 ## Level
@@ -44,7 +42,6 @@ Separate transform operations
 Display appropriate mouse cursors
 Copy & paste: 
 - shapes
-- animations
 Snapping mouse
 
 

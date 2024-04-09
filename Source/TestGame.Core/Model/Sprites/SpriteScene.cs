@@ -151,12 +151,16 @@ namespace Raven
     {
       try 
       {
-        sprite.DetachFromSpriteScene();
-        if (index == Parts.Count) AddSprite(sprite);
-        else Parts.Insert(index, sprite);
-      } catch (Exception) {}
+        var current = (Parts.FindIndex(item => item.Name == sprite.Name));
+
+        var temp = Parts[index];
+        Parts[index] = Parts[current];
+        Parts[current] = temp;
+      }
+      catch (Exception) {} 
     }
     public void BringDown(SourcedSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) - 1);
+
     public void BringUp(SourcedSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) + 1); 
 
     /// <summary>
