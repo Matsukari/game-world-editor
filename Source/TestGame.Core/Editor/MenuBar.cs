@@ -13,14 +13,26 @@ namespace Raven
 
     void ProjectOptions()
     {
-      if (ImGui.MenuItem("Save")) _editor.Serializer.SaveContent();
+      var type = (_editor.ContentManager.View is WorldView) ? "World" : "Sheet";
       if (ImGui.MenuItem("Project Settings")) _editor.WindowManager.GetRenderable<Settings>().IsOpen = true;
+      if (ImGui.MenuItem("Project Dashboard")) {}
+      ImGui.Separator();
+      if (ImGui.MenuItem($"Save ({type})")) _editor.Serializer.SaveContent();
+      if (ImGui.MenuItem("Save as")) _editor.Serializer.SaveContent();
+      if (ImGui.MenuItem("Close")) Core.Exit();
     }
     void WorldOptions()
     {
       if (ImGui.MenuItem("New World")) _editor.ContentManager.AddTab(new WorldView(), new World());
       if (ImGui.BeginMenu("Worlds"))
       {
+        foreach (var content in _editor.ContentManager._tabs)
+        {
+          if (content.Content is World world && ImGui.MenuItem(world.Name.BestWrap()))
+          {
+            _editor.ContentManager.Switch(_editor.ContentManager._tabs.FindIndex(item => item.Content.Name == world.Name));
+          }
+        }
         ImGui.EndMenu();
       }
     }
@@ -29,6 +41,13 @@ namespace Raven
       if (ImGui.MenuItem("New Sheet")) _editor.WindowManager.FilePicker.Open((filename)=> _editor.ContentManager.AddTab(new SheetView(), new Sheet(filename))); 
       if (ImGui.BeginMenu("Sheets"))
       {
+        foreach (var content in _editor.ContentManager._tabs)
+        {
+          if (content.Content is Sheet sheet && ImGui.MenuItem(sheet.Name.BestWrap()))
+          {
+            _editor.ContentManager.Switch(_editor.ContentManager._tabs.FindIndex(item => item.Content.Name == sheet.Name));
+          }
+        }
         ImGui.EndMenu();
       }
     }
@@ -47,36 +66,10 @@ namespace Raven
             ("Sheet", SheetOptions),
             ("View", ViewOptions),
         },
-          // 1, operationButton
-          new (string, Action)[]
-          {
-            (Icon.MousePointer, ()=>{}),
-            (Icon.ArrowsAlt, ()=>{}),
-            (Icon.HandSpock, ()=>{}),
-            (Icon.Expand, ()=>{}),
-            (Icon.SyncAlt, ()=>{}),
-          },
-          // 2, view options
-          new (string, Action)[]
-          {
-            (Icon.BorderAll, ToogleGrid),
-            (Icon.EllipsisV, ()=>_isDrawSnappingPopup = !_isDrawSnappingPopup),
-          },
-          // 3, select type options
-          new (string, Action)[]
-          {
-            (Icon.User, ()=>{}),
-            (Icon.Shapes, ()=>{})
-          },
       };
 
     }
     bool _isDrawSnappingPopup = false;
-    void ToogleGrid()
-    {
-      if (_editor.ContentManager.View is SheetView sheet) sheet.IsDrawGrid = !sheet.IsDrawGrid;
-      else if (_editor.ContentManager.View is WorldView world) world.IsDrawTileLayerGrid = !world.IsDrawTileLayerGrid;
-    }
     void DrawSnappingPopup()
     {
       if (_isDrawSnappingPopup)
@@ -107,18 +100,6 @@ namespace Raven
         ImGui.SetWindowSize(size.ToNumerics());
         stackSize.Y += size.Y;
       }
-      void ButtonSetFlat(int set, float span = 10)
-      {
-        ImGui.SameLine();
-        ImGui.Dummy(new System.Numerics.Vector2(span, 0f)); 
-        foreach (var button in _buttons[set]) 
-        {
-          ImGui.SameLine();
-          
-          if (ImGui.Button(button.Item1)) button.Item2.Invoke();
-        }
-      }
-
 
       // Main menubar; topmost horizontal bar
       if (ImGui.BeginMainMenuBar())
@@ -158,25 +139,46 @@ namespace Raven
       }
       ImGui.EndTabBar();
 
-
-
       // Start of tools bar
       BeginStackBar("tools-bar", 37);
 
-      // Operation buttosn
-      ButtonSetFlat(1, 270);
+      ImGuiUtils.SpanX(270);
+      Widget.ImGuiWidget.ToggleButtonGroup(
+          ids: new []{Icon.MousePointer, Icon.ArrowsAlt, Icon.HandSpock, Icon.Expand, Icon.SyncAlt},
+          toggles: ref _editorOpToggled,
+          actions: new []{
+          ()=>{}, 
+          ()=>{}, 
+          ()=>{}, 
+          ()=>{}, 
+          ()=>{},           
+          },
+          fallback: null,
+          color: EditorColors.Get(ImGuiCol.ButtonHovered));
 
-      // View options
-      ButtonSetFlat(2, 10);
-
-      // Select type options
-      ButtonSetFlat(3, 20);
-    
-      // Geometry opeionts
+      ImGuiUtils.SpanX(10);
+      var gridToggle = (_editor.ContentManager.View is WorldView world) ? _editor.Settings.Graphics.DrawLayerGrid : _editor.Settings.Graphics.DrawSheetGrid; 
+      if (Widget.ImGuiWidget.ToggleButton(Icon.BorderAll, ref gridToggle))
+      {
+        if (_editor.ContentManager.View is WorldView) _editor.Settings.Graphics.DrawLayerGrid = !_editor.Settings.Graphics.DrawLayerGrid;
+        else _editor.Settings.Graphics.DrawSheetGrid = !_editor.Settings.Graphics.DrawSheetGrid;
+      }
       ImGui.SameLine();
-      ImGui.Dummy(new System.Numerics.Vector2(20, 0)); 
+      if (ImGui.Button(Icon.EllipsisV)) _isDrawSnappingPopup = !_isDrawSnappingPopup;
 
-      // Draw shape annotators
+      ImGuiUtils.SpanX(20);
+      Widget.ImGuiWidget.ToggleButtonGroup(
+          ids: new []{Icon.User, Icon.Shapes},
+          toggles: ref _selTypeToggled,
+          actions: new []{
+          ()=>{}, 
+          ()=>{}, 
+          },
+          fallback: null,
+          color: EditorColors.Get(ImGuiCol.ButtonHovered));
+
+      // Geometry opeionts
+      ImGuiUtils.SpanX(20);
       foreach (var shapeModel in _shapeModels)
       {
         ImGui.SameLine();
@@ -226,7 +228,9 @@ namespace Raven
       ImGui.End();
     }
     ShapeModel[] _shapeModels = new ShapeModel[]{new RectangleModel(), new EllipseModel(), new PointModel(), new PolygonModel()};
-    bool[] _paintModeToggled = new []{false, false};
+    bool[] _editorOpToggled = new []{false, true, false, false, false};
+    bool[] _selTypeToggled = new []{false, false};
+    bool[] _paintModeToggled = new []{true, false};
     bool[] _paintTypeToggled = new []{false, false, false};
     bool _isRandomPaint = false;
   }

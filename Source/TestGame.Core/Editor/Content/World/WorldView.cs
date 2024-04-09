@@ -17,7 +17,6 @@ namespace Raven
     World _world;
 
     // Settings
-    public bool IsDrawTileLayerGrid = true;
     public bool IsRandomPaint = false;
     public PaintMode PaintMode = PaintMode.Pen;
     public PaintType PaintType = PaintType.Single;
@@ -74,7 +73,7 @@ namespace Raven
         foreach (var layer in level.Layers)
         {
           WorldRenderer.RenderLayer(batcher, camera, layer);
-          if (layer is TileLayer tileLayer && layer.IsVisible)
+          if (layer is TileLayer tileLayer && layer.IsVisible && Settings.Graphics.DrawLayerGrid)
           {
             Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
               tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());

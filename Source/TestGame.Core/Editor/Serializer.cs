@@ -52,10 +52,9 @@ namespace Raven
         throw new Exception($"Cannot load type {typeof(T).Name}");
       }
     }
-    public void SaveContent()
+    public void SaveContent(string filepath)
     {
       var content = _contentManager.GetContent().Content;
-      var filepath = _contentManager.GetContent().Data.Filename;
       if (filepath == null) filepath = "Sample.content";
       if (content is Sheet sheet) new SheetSerializer().Save(filepath, sheet);
       else 
@@ -63,5 +62,6 @@ namespace Raven
         throw new Exception($"Cannot load type {typeof(Sheet).Name}");
       }
     }
+    public void SaveContent() => SaveContent(_contentManager.GetContent().Data.Filename);
   }
 }

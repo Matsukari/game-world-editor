@@ -1,9 +1,19 @@
 
-
 namespace Raven 
 {
   public static class StringExt
   {
+    static public string BestWrap(this string name, int chars = 30)
+    {
+      var file = Path.GetFileName(name);
+      if (file.Length > chars) file.Substring(file.Length-chars, file.Length);
+      if (Path.GetDirectoryName(name) != string.Empty) 
+        name = $"../{file}";
+      else 
+        name = file;
+      return name; 
+    }
+
     static public string EnsureNoRepeat(this string name)
     {
       var last = name.Last();

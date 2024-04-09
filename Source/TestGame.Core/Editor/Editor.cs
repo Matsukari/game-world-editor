@@ -2,6 +2,8 @@ using Nez;
 
 namespace Raven
 {
+  public enum EditorOperator { Select, MoveOnly, HandPanner, Scaler, Rotator }
+
 	public class Editor : Nez.Entity
 	{
     public EditorSettings Settings = new EditorSettings();

@@ -20,7 +20,6 @@ namespace Raven
     
     string lastSheet = "";
 
-    public bool IsDrawGrid = true;
     public Rectangle TileInMouse;
 
     public SheetInspector Inspector { get => _imgui.Inspector; }
@@ -80,7 +79,7 @@ namespace Raven
         var worldTile = tile.ToRectangleF();
         worldTile.Location += _image.Bounds.Location;
         if (worldTile.Contains(camera.MouseToWorldPoint()) ) TileInMouse = tile;
-        if (IsDrawGrid)
+        if (Settings.Graphics.DrawSheetGrid)
         {
           batcher.DrawRectOutline(camera, worldTile, settings.Colors.PickHoverOutline.ToColor());
         }
