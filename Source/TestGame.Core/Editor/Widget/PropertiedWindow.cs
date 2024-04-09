@@ -37,8 +37,8 @@ namespace Raven.Widget
       }
       OnRenderAfterName();
 
-      if (PropertiesRenderer.Render(imgui, this)) OnChangeProperty(name);
-      if (PropertiesRenderer.HandleNewProperty(this, imgui)) OnChangeProperty(name);
+      if (PropertiesRenderer.Render(imgui, this)) this.OnChangeProperty(name);
+      PropertiesRenderer.HandleNewProperty(this, imgui, OnChangeProperty); 
 
       ImGui.End();
     }

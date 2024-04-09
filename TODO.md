@@ -1,9 +1,6 @@
 
 
 
-## Properties 
-Fix multiple tiles properties adding
-
 ## Sheet
 Multiple selection tile
 Implement SpriteFrames

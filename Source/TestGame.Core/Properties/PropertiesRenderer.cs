@@ -187,7 +187,7 @@ namespace Raven
 
 
     static Type _pickedPropertyType = null;
-    public static bool HandleNewProperty(IPropertied propertied, ImGuiWinManager manager)
+    public static bool HandleNewProperty(IPropertied propertied, ImGuiWinManager manager, Action<string> onCreate=null)
     {
       if (ImGui.BeginPopupContextItem("prop-popup"))
       {
@@ -218,6 +218,7 @@ namespace Raven
               ImGui.CloseCurrentPopup();
               ImGui.OpenPopup("property-name");
               _pickedPropertyType = type;
+              _once = true;
               return false;
             }
           }
@@ -254,13 +255,20 @@ namespace Raven
 
         ImGui.EndPopup();
       }
-      if (_pickedPropertyType != null)
+      if (_once && _propCreated)
       {
-        manager.NameModal.Open((name)=>NameProperty(propertied, name));
+        _once = false;
+        _propCreated = false;
         return true;
       }
-      return false;
+      if (_pickedPropertyType != null)
+      {
+        manager.NameModal.Open((name)=>{NameProperty(propertied, name); if (onCreate != null) onCreate.Invoke("");});
+      }
+      return _propCreated;
     }
+    static bool _once = true;
+    static bool _propCreated = false;
     static Tuple<string, object> _propOnOptions;
     static Tuple<string, object> _cutProperty;
     static Tuple<string, object> _copiedProperty;
@@ -273,6 +281,7 @@ namespace Raven
       {
         propertied.Properties.Data[name] = System.Convert.ChangeType(System.Activator.CreateInstance(_pickedPropertyType), _pickedPropertyType); 
       }
+      _propCreated = true;
       _pickedPropertyType = null;
     }
   }
