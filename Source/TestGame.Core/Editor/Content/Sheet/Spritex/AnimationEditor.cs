@@ -56,7 +56,7 @@ namespace Raven
       _inspector.Animator = _player;
       _inspector.Render(imgui);  
 
-      if (SelectedFrame != null)
+      if (SelectedFrame != null && _inspector.CanOpen)
       {
         _frameInspector.Animator = _player;
         _frameInspector.Render(imgui);

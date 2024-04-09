@@ -37,6 +37,16 @@ namespace Raven
     /// </summary>
     public int TotalFrames { get => Frames.Count(); }
 
+    /// <summary>
+    /// Inserts a frame AFTER the given index (exising) or appends in same size 
+    /// </summary>
+    public void Insert(AnimationFrame frame, int index)
+    {
+      if (index < 0 || index > TotalFrames) return;
+      else if (index == TotalFrames) Frames.Add(frame);
+      else Frames.Insert(++index, frame);
+    }
+
     public Animation Copy()
     {
       var anim = MemberwiseClone() as Animation;

@@ -125,7 +125,6 @@ namespace Raven
       if (index < 0 || index > animation.TotalFrames) return;
       else if (index == animation.TotalFrames) AddFrame(anim, frame);
       else animation.Frames.Insert(++index, frame);
-      animation.Frames = animation.Frames.EnsureNoRepeatNameField();
     }
 
     /// <summary>

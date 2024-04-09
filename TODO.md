@@ -18,8 +18,6 @@ Implement ellipses
 Multiple select parts
 Multiple transforms on selected parts
 Rotate parts on selection
-Duplicate frames 
-Delete frames
 Choose ease type
 
 ## Level

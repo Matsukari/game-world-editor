@@ -1,6 +1,7 @@
 
 using Microsoft.Xna.Framework;
 using ImGuiNET;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
@@ -8,6 +9,12 @@ namespace Raven
   {
     AnimationEditor _animEditor;
     public AnimationPlayer Animator;
+    public Animation Animation { get => Animator.Animation; }
+    public bool CanOpen { get => 
+             Animator == null 
+          || Animation == null 
+          || _animEditor.SpriteScene.Animations.Find(item => item.Name == _animEditor.Animation.Name) == null; 
+    }
 
     public AnimationInspector(AnimationEditor animEditor) 
     {
@@ -19,10 +26,12 @@ namespace Raven
     {
       // also check if the animation's reference is valid, which may be lost at some point when deleting the current and last animation 
       // while inspcetor is opened
-      if (Animator == null || _animEditor.SpriteScene.Animations.Find(item => item.Name == _animEditor.Animation.Name) == null) return;
+      if (CanOpen) return;
       base.Render(imgui);
       DrawFrameOptions();
     }
+    int _cutFrame = -1;
+    int _copiedFrame = -1;
     void DrawFrameOptions()
     {
       if (_isOpenFrameOptions)
@@ -30,10 +39,38 @@ namespace Raven
         _isOpenFrameOptions = false;
         ImGui.OpenPopup("frame-options-popup");
       }
-      if (ImGui.BeginPopup("frame-options-popup"))
+      if (_frameOnOpenOptions != -1 && ImGui.BeginPopup("frame-options-popup"))
       {
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete")) {}
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate")) {}
+
+        if (_copiedFrame != -1 || _cutFrame != -1)
+        {
+          int frame;
+          if (_cutFrame != -1) frame = _cutFrame;
+          else frame = _copiedFrame;
+            
+          if (ImGui.MenuItem(Icon.Paste + "  Paste"))
+          {
+            Animation.Insert(Animation.Frames[frame], Animator.CurrentIndex);
+          }
+
+          ImGui.Separator();
+        }
+
+        if (ImGui.MenuItem(Icon.Trash + "  Delete")) Animation.Frames.RemoveAt(_frameOnOpenOptions);
+
+        if (ImGui.MenuItem(Icon.Cut + "  Cut")) 
+        {
+          _cutFrame = _frameOnOpenOptions;
+          Animation.Frames.RemoveAt(_frameOnOpenOptions);
+        }
+        if (ImGui.MenuItem(Icon.Copy + "  Copy")) 
+        {
+          _copiedFrame = _frameOnOpenOptions;
+        }
+        if (ImGui.MenuItem(Icon.Clone + "  Duplicate")) 
+        {
+          Animation.Insert(Animation.Frames[_frameOnOpenOptions].Copy(), _frameOnOpenOptions); 
+        }
         ImGui.EndPopup();
       }
     }
@@ -54,16 +91,16 @@ namespace Raven
 
       ImGuiUtils.SpanX(10f);
       Widget.ImGuiWidget.ButtonSetFlat(0f,
-        (IconFonts.FontAwesome5.Backward,       ()=>Animator.IsReversed = true),
-        (IconFonts.FontAwesome5.StepBackward,   ()=>Animator.Backward()),
-        (GetPlayString(Animator),               ()=>Animator.TooglePlay()),
-        (IconFonts.FontAwesome5.StepForward,    ()=>Animator.Forward()),
-        (IconFonts.FontAwesome5.Forward,        ()=>Animator.IsReversed = false)
+        (Icon.Backward,             ()=>Animator.IsReversed = true),
+        (Icon.StepBackward,         ()=>Animator.Backward()),
+        (GetPlayString(Animator),   ()=>Animator.TooglePlay()),
+        (Icon.StepForward,          ()=>Animator.Forward()),
+        (Icon.Forward,              ()=>Animator.IsReversed = false)
       );      
       ImGuiUtils.SpanX(10f);
-      Widget.ImGuiWidget.DelegateToggleButton(IconFonts.FontAwesome5.SyncAlt, ()=>Animator.IsLooping=!Animator.IsLooping);
+      Widget.ImGuiWidget.DelegateToggleButton(Icon.SyncAlt, ()=>Animator.IsLooping=!Animator.IsLooping);
       ImGuiUtils.SpanX(10f);
-      Widget.ImGuiWidget.DelegateButton(IconFonts.FontAwesome5.Key, ()=>_animEditor.AddFrameFromCurrentState());
+      Widget.ImGuiWidget.DelegateButton(Icon.Key, ()=>_animEditor.AddFrameFromCurrentState());
 
       ImGui.BeginChild("animation-content");
       _trackContentMin = ImGui.GetItemRectMax();
@@ -79,7 +116,7 @@ namespace Raven
       ImGui.EndChild();
    }
     bool _isOpenFrameOptions = false;
-    SpriteSceneAnimationFrame _frameOnOpenOptions = null;
+    int _frameOnOpenOptions = -1;
     void DrawComponentsTrack()
     {
       ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(2, 2));
@@ -109,8 +146,8 @@ namespace Raven
             {
               var frame = frameSet.Parts[i];
               var color = (Animator.CurrentIndex == j) ? _animEditor.Settings.Colors.FrameActive : _animEditor.Settings.Colors.FrameInactive;
-              var frameIcon = IconFonts.FontAwesome5.Circle;
-              if (Animator.CurrentIndex == j) frameIcon = IconFonts.FontAwesome5.DotCircle; 
+              var frameIcon = Icon.Circle;
+              if (Animator.CurrentIndex == j) frameIcon = Icon.DotCircle; 
 
               ImGui.PushStyleColor(ImGuiCol.Text, color);
               ImGui.Text(frameIcon);
@@ -125,13 +162,13 @@ namespace Raven
               if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
               {
                 _isOpenFrameOptions = true;
-                _frameOnOpenOptions = frameSet;
+                _frameOnOpenOptions = j;
               } 
             }
             catch (Exception)
             {
               ImGui.PushStyleColor(ImGuiCol.Text, _animEditor.Settings.Colors.FrameInactive);
-              ImGui.Text(IconFonts.FontAwesome5.Minus);
+              ImGui.Text(Icon.Minus);
               ImGui.PopStyleColor();
             }
             ImGuiUtils.SpanX(10f);
@@ -156,8 +193,8 @@ namespace Raven
 
     string GetPlayString(AnimationPlayer anim)
     {
-      if (anim.IsPaused || anim.IsFinished) return IconFonts.FontAwesome5.Play;
-      return IconFonts.FontAwesome5.Pause;
+      if (anim.IsPaused || anim.IsFinished) return Icon.Play;
+      return Icon.Pause;
     }
   }
 }
