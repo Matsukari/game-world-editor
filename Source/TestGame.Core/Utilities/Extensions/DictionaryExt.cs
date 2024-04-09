@@ -14,5 +14,16 @@ namespace Raven
       dict[newKey] = value;  
       return true;
     }
+    public static void AddWithUniqueName<T>(this IDictionary<string, T> dict, string key, T value)
+    {
+      T res;
+      if (dict.TryGetValue(key, out res))
+      {
+        key = key.EnsureNoRepeat();
+        AddWithUniqueName(dict, key, value);
+      }
+      else 
+        dict.Add(key, value);
+    }
   }
 }

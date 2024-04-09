@@ -85,12 +85,11 @@ namespace Raven
         }
       }
       // Highlight the tile under mouse
-      if (!TileInMouse.IsEmpty && !_input.IsBlocked) 
+      if (!TileInMouse.IsEmpty && !_input.IsBlocked && ContentData.SelectionList.Selections.Count() <= 1) 
       {
         var worldTileInMouse = TileInMouse.ToRectangleF();
         worldTileInMouse.Location += _image.Bounds.Location;
         batcher.DrawRect(worldTileInMouse, settings.Colors.PickHover.ToColor());
-        batcher.DrawRectOutline(camera, worldTileInMouse, settings.Colors.PickSelectedOutline.ToColor());
       }
 
       // Draw last selected sprite
@@ -101,7 +100,10 @@ namespace Raven
         else if (selection is Tile tile) region = tile.Region.ToRectangleF();
 
         if (region != RectangleF.Empty) 
+        {
           batcher.DrawRect(GetRegionInSheet(region), settings.Colors.PickFill.ToColor());
+          batcher.DrawRectOutline(camera, GetRegionInSheet(region), settings.Colors.PickSelectedOutline.ToColor());
+        }
 
       }
     }

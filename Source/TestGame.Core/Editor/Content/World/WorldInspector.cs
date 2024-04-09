@@ -120,9 +120,7 @@ namespace Raven
           {
             flags |= ImGuiTreeNodeFlags.Selected;
           }
-          var name = sheet.Sheet.Name;
-          if (name.Count() > 20) name = name.Substring(0, 20) + "...";
-          var sheetNode = ImGui.TreeNodeEx(sheet.Sheet.Name, flags); 
+          var sheetNode = ImGui.TreeNodeEx(sheet.Sheet.Name.BestWrap(), flags); 
 
           if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen())
           {

@@ -3,7 +3,6 @@
 
 ## Properties 
 Fix multiple tiles properties adding
-Remove properties 
 
 ## Sheet
 Multiple selection tile

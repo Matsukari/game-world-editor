@@ -3,6 +3,13 @@ namespace Raven
 {
   public static class StringExt
   {
+    static public object AttemptCopy(this object obj)
+    {
+      if (obj.GetType().IsValueType) return obj;
+      else if (obj.GetType().IsClass && obj is ICloneable cloner)  return cloner.Clone();
+      throw new Exception();
+    }
+
     static public string BestWrap(this string name, int chars = 30)
     {
       var file = Path.GetFileName(name);

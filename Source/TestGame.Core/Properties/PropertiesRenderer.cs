@@ -2,6 +2,7 @@ using ImGuiNET;
 using System.Reflection;
 using Microsoft.Xna.Framework;
 using Nez;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
@@ -77,7 +78,14 @@ namespace Raven
 
         foreach (var (property, propertyData) in propertied.Properties)
         {
-          if (ImGui.TreeNode(property))
+          var node = ImGui.TreeNode(property);
+          if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
+          {
+            ImGui.OpenPopup("prop-options");
+            _propOnOptions = new Tuple<string, object>(property, propertyData);
+          }
+
+          if (node)
           {
             var nameHolder = property;
             changedNameOfProperty = property;
@@ -183,7 +191,23 @@ namespace Raven
     {
       if (ImGui.BeginPopupContextItem("prop-popup"))
       {
-        if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + " New Property"))
+        if ((_cutProperty != null || _copiedProperty != null) && ImGui.MenuItem(Icon.Paste + "  Paste Property"))
+        {
+          Tuple<string, object> gotProperty;
+          if (_cutProperty != null)
+          {
+            gotProperty = _cutProperty;
+            _cutProperty = null;
+          }
+          else 
+          {
+            gotProperty = new Tuple<string, object>(_copiedProperty.Item1, _copiedProperty.Item2.AttemptCopy());
+          }
+
+
+          propertied.Properties.Add(gotProperty.Item2);
+        }
+        if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + "  New Property"))
         {
           foreach (var (name, type) in _propertyTypes)
           {
@@ -199,6 +223,35 @@ namespace Raven
           }
           ImGui.EndMenu();
         }
+
+
+        ImGui.EndPopup();
+      }
+      if (_propOnOptions != null && ImGui.BeginPopupContextItem("prop-options"))
+      {
+        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
+        {
+          propertied.Properties.Remove(_propOnOptions.Item1);
+        }
+        if (ImGui.MenuItem(Icon.Copy + "  Copy"))
+        {
+          _copiedProperty = _propOnOptions;
+          _cutProperty = null;
+        }
+        if (ImGui.MenuItem(Icon.Cut + "  Cut"))
+        {
+          _cutProperty = _propOnOptions;
+          propertied.Properties.Remove(_cutProperty.Item1);
+          _copiedProperty = null;
+        }
+        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        {
+          if (_propOnOptions.Item2.GetType().IsValueType)
+            propertied.Properties.Add(_propOnOptions.Item2);
+          else if (_propOnOptions.Item2 is ICloneable cloner)
+            propertied.Properties.Add(cloner.Clone());
+        }
+
         ImGui.EndPopup();
       }
       if (_pickedPropertyType != null)
@@ -208,6 +261,10 @@ namespace Raven
       }
       return false;
     }
+    static Tuple<string, object> _propOnOptions;
+    static Tuple<string, object> _cutProperty;
+    static Tuple<string, object> _copiedProperty;
+
     static void NameProperty(IPropertied propertied, string name)
     {
       // String doesnt have a parameterless constructor

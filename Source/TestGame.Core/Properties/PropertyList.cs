@@ -9,18 +9,10 @@ namespace Raven
   {
     public Dictionary<string, object> Data = new Dictionary<string, object>();
 
-    int _counter = 0;
-    public void Add<T>(T obj)
+    public void Add<T>(T obj, string name="")
     {
-      string name = $"{obj.GetType().Name}.{_counter++}";
-      if (obj is IPropertied prop) 
-      {
-        if (prop.Name != "") 
-        {
-          name = prop.Name;
-        }
-      }
-      Data.TryAdd(name, obj);
+      if (name == string.Empty) name = obj.GetType().Name;
+      Data.AddWithUniqueName(name, obj);
     }
     public PropertyList Copy() 
     {
@@ -31,11 +23,10 @@ namespace Raven
         {
           throw new Exception("Err copy with a non clonable property");
         }
-        copy.TryAdd(prop.Key, prop.Value);
+        copy.AddWithUniqueName(prop.Key, prop.Value);
       }
       var list = new PropertyList();
       list.Data = copy;
-      list._counter = _counter;
       return list;
     }
     object ICloneable.Clone() => Copy();

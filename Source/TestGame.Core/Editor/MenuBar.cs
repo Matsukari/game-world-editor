@@ -127,7 +127,7 @@ namespace Raven
       for (int i = 0; i < tabs.Count(); i++)
       {
         var open = true;
-        if (ImGui.BeginTabItem(tabs[i].Content.Name, ref open))
+        if (ImGui.BeginTabItem(tabs[i].Content.Name.BestWrap(), ref open))
         {
           if (_editor.ContentManager.Content.Name != tabs[i].Content.Name) _editor.ContentManager.Switch(i);
           ImGui.EndTabItem();
