@@ -75,7 +75,7 @@ namespace Raven
           RenderProperties renderProp;
           if (tileLayer.TilesProp.TryGetValue(tilePosition, out renderProp)) 
           {
-            rot *= renderProp.Transform.RotationRadians;
+            rot *= renderProp.Transform.Rotation;
             eff = renderProp.SpriteEffects;
             color = renderProp.Color.ToColor();
           }

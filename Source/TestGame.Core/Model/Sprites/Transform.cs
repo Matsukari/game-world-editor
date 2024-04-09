@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using ImGuiNET;
+using Nez;
 
 namespace Raven 
 {
@@ -8,9 +9,15 @@ namespace Raven
     public Vector2 Position = new Vector2(0, 0);
     public Vector2 Scale = new Vector2(1, 1);
     public Vector2 Skew = new Vector2(1, 1);
+
+    /// <summary>
+    /// In radians
+    /// </summary>
     public float Rotation = 0f;
-    public float RotationRadians { get => Nez.Mathf.Radians(Rotation); }
-    public float RotationDegrees { get => Rotation * 360f; set => Rotation = value / 360f; }
+    
+    public float RotationNormal { get => (RotationDegrees/360f) % 1f; }
+
+    public float RotationDegrees { get => Mathf.Degrees(Rotation); set => Rotation = Mathf.Radians(value); }
 
     public Transform() {}
     public void Apply(Nez.Transform transform)

@@ -9,7 +9,7 @@ namespace Raven
   /// A render model with a Transform and other basic render options 
   /// and a reference to a sprite in a Sheet.
   /// </summary>
-  public class SourcedSprite : IPropertied
+  public class SourcedSprite : IPropertied, ICloneable
   {
     string IPropertied.Name { get => Name; set => Name = value; }
 
@@ -97,5 +97,9 @@ namespace Raven
       sprite.Color = Color;
       return sprite;
     }
+
+    public SourcedSprite Copy() => Duplicate();
+
+    object ICloneable.Clone() => Copy();
   }
 }

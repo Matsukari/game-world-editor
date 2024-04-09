@@ -17,7 +17,9 @@ namespace Raven
     }
     public override void Render(ImGuiWinManager imgui)
     {
-      if (Animator == null) return;
+      // also check if the animation's reference is valid, which may be lost at some point when deleting the current and last animation 
+      // while inspcetor is opened
+      if (Animator == null || _animEditor.SpriteScene.Animations.Find(item => item.Name == _animEditor.Animation.Name) == null) return;
       base.Render(imgui);
       DrawFrameOptions();
     }
@@ -31,7 +33,7 @@ namespace Raven
       if (ImGui.BeginPopup("frame-options-popup"))
       {
         if (ImGui.MenuItem(IconFonts.FontAwesome5.Trash + "  Delete")) {}
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.Copy + "  Duplicate")) {}
+        if (ImGui.MenuItem(IconFonts.FontAwesome5.Clone + "  Duplicate")) {}
         ImGui.EndPopup();
       }
     }
@@ -50,7 +52,7 @@ namespace Raven
       ImGui.SetNextItemWidth(48f);
       if (ImGui.DragInt("##4", ref currFrame) && currFrame >= 0 && currFrame < Animator.Animation.TotalFrames) Animator.JumpTo(currFrame);
 
-      Widget.ImGuiWidget.SpanX(10f);
+      ImGuiUtils.SpanX(10f);
       Widget.ImGuiWidget.ButtonSetFlat(0f,
         (IconFonts.FontAwesome5.Backward,       ()=>Animator.IsReversed = true),
         (IconFonts.FontAwesome5.StepBackward,   ()=>Animator.Backward()),
@@ -58,9 +60,9 @@ namespace Raven
         (IconFonts.FontAwesome5.StepForward,    ()=>Animator.Forward()),
         (IconFonts.FontAwesome5.Forward,        ()=>Animator.IsReversed = false)
       );      
-      Widget.ImGuiWidget.SpanX(10f);
+      ImGuiUtils.SpanX(10f);
       Widget.ImGuiWidget.DelegateToggleButton(IconFonts.FontAwesome5.SyncAlt, ()=>Animator.IsLooping=!Animator.IsLooping);
-      Widget.ImGuiWidget.SpanX(10f);
+      ImGuiUtils.SpanX(10f);
       Widget.ImGuiWidget.DelegateButton(IconFonts.FontAwesome5.Key, ()=>_animEditor.AddFrameFromCurrentState());
 
       ImGui.BeginChild("animation-content");
@@ -71,11 +73,7 @@ namespace Raven
         DrawComponentsTrack();
       else 
       {
-        var msg = "This animation contains no frames yet. ";
-        var msgSize = ImGui.CalcTextSize(msg);
-        ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowWidth()/2-msgSize.X/2, childSize.Y/2-msgSize.Y/2));
-        ImGui.SameLine();
-        ImGui.TextDisabled(msg);
+        ImGuiUtils.TextMiddle("This animation contains no frames yet. ");
       }
 
       ImGui.EndChild();
@@ -136,7 +134,7 @@ namespace Raven
               ImGui.Text(IconFonts.FontAwesome5.Minus);
               ImGui.PopStyleColor();
             }
-            Widget.ImGuiWidget.SpanX(10f);
+            ImGuiUtils.SpanX(10f);
           }
         }
         ImGui.EndTable();
@@ -151,7 +149,7 @@ namespace Raven
       {
         var frame = Animator.Animation.Frames[i];
         ImGui.Text(i.ToString());
-        Widget.ImGuiWidget.SpanX(12f);
+        ImGuiUtils.SpanX(12f);
 
       }
     }

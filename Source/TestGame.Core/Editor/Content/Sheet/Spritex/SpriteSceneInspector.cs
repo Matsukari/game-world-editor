@@ -89,8 +89,26 @@ namespace Raven
         _isOpenSceneOnSpritePopup = false;
         ImGui.OpenPopup("scene-canvas-component-options");
       }
-      if (ImGui.BeginPopup("sprite-component-options") && _compOnOptions != null)
+      if (ImGui.BeginPopupContextItem("sprite-component-options") && _compOnOptions != null)
       {
+        if (ImGui.MenuItem(Icon.LevelDownAlt + "  Bring to back"))
+        {
+          _compOnOptions.SpriteScene.OrderAt(_compOnOptions, 0);  
+        }
+        if (ImGui.MenuItem(Icon.LevelUpAlt + "  Bring to front"))
+        {
+          _compOnOptions.SpriteScene.OrderAt(_compOnOptions, SpriteScene.Parts.Count);  
+        }
+        if (ImGui.MenuItem(Icon.ChevronDown + "  Move down"))
+        {
+          _compOnOptions.SpriteScene.BringDown(_compOnOptions);  
+        }
+        if (ImGui.MenuItem(Icon.ChevronUp + "  Move up"))
+        {
+          _compOnOptions.SpriteScene.BringUp(_compOnOptions);  
+        }
+
+        ImGui.Separator();
         var lockState = (_compOnOptions.IsLocked) ? Icon.LockOpen + "  Unlock" : Icon.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
@@ -128,7 +146,7 @@ namespace Raven
         ImGui.EndPopup();
       }
 
-      if (ImGui.BeginPopup("scene-canvas-component-options"))
+      if (ImGui.BeginPopupContextItem("scene-canvas-component-options"))
       {
         if ((_compOnOptions != null || _copiedSprite != null) && _posOnOpenCanvas != Vector2.Zero && ImGui.MenuItem(Icon.Paste + "  Paste"))
         {
@@ -182,7 +200,14 @@ namespace Raven
         ImGui.CloseCurrentPopup();
         ImGui.OpenPopup("animation-options-popup");
       }
-      if (ImGui.BeginPopup("animation-options-popup"))
+      if (_isOpenAnimationOperations)
+      {
+        _isOpenAnimationOperations = false;
+        ImGui.CloseCurrentPopup();
+        ImGui.OpenPopup("animation-operations-popup");
+      }
+
+      if (ImGui.BeginPopupContextItem("animation-options-popup"))
       {
         if (ImGui.MenuItem("Create Animation"))
         {
@@ -190,10 +215,25 @@ namespace Raven
         }
         ImGui.EndPopup();
       }
+      if (ImGui.BeginPopupContextItem("animation-operations-popup") && _onOpenAnimtaionOperations != null)
+      {
+        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
+        {
+          SpriteScene.RemoveAnimation(_onOpenAnimtaionOperations.Name);
+          _onOpenAnimtaionOperations = null;
+        }
+        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        {
+          SpriteScene.Animations.Add(_onOpenAnimtaionOperations.Copy());
+        }
+        ImGui.EndPopup();
+      }
     }
     List<bool> _selectedSprites = new List<bool>();
     List<bool> _selectedAnims = new List<bool>();
     bool _isOpenAnimationOptionPopup = false;
+    bool _isOpenAnimationOperations = false;
+    Animation _onOpenAnimtaionOperations;
 
     protected override void OnRenderAfterName()
     {
@@ -210,6 +250,10 @@ namespace Raven
       {
 
         ImGui.BeginChild($"spriteScene-anim-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+
+        if (SpriteScene.Animations.Count == 0)
+          ImGuiUtils.TextMiddle("No animations yet.");
+
         for (int i = 0; i < SpriteScene.Animations.Count(); i++)
         {
           var animation = SpriteScene.Animations[i];
@@ -220,6 +264,11 @@ namespace Raven
             _selectedAnims[i] = true;
             if (OnOpenAnimation != null) OnOpenAnimation(SpriteScene, animation);
           }
+          if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+          {
+            _isOpenAnimationOperations = true;
+            _onOpenAnimtaionOperations = animation;
+          }
         }
 
         ImGui.EndChild();
@@ -229,6 +278,9 @@ namespace Raven
       {
         ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), 
             false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+
+        if (_selectedSprites.Count == 0)
+          ImGuiUtils.TextMiddle("No components found.");
 
         for (int i = 0; i < _selectedSprites.Count; i++)
         {

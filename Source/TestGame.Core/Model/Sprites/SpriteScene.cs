@@ -105,6 +105,17 @@ namespace Raven
     /// </summary>
     public Animation GetAnimation(string anim) => Animations.Find((animation)=>animation.Name == anim);
 
+
+    /// <summary>
+    /// Removes the animation with given name
+    /// </summary>
+    public void RemoveAnimation(string anim) 
+    {
+      var index = Animations.FindIndex(animation => animation.Name == anim);
+      if (index != -1)
+        Animations.RemoveAt(index);
+    }
+
     /// <summary>
     /// Inserts a frame after the given index
     /// </summary>
@@ -131,8 +142,22 @@ namespace Raven
       Parts.Add(sprite);
       return sprite;
     }
-
     public SourcedSprite AddSprite(SourcedSprite sprite) => AddSprite("Component", sprite);
+
+    /// <summary>
+    /// Pushes the given sprite at the given index
+    /// </summary>
+    public void OrderAt(SourcedSprite sprite, int index) 
+    {
+      try 
+      {
+        sprite.DetachFromSpriteScene();
+        if (index == Parts.Count) AddSprite(sprite);
+        else Parts.Insert(index, sprite);
+      } catch (Exception) {}
+    }
+    public void BringDown(SourcedSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) - 1);
+    public void BringUp(SourcedSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) + 1); 
 
     /// <summary>
     /// Removes a part with the same name as the given name
@@ -146,14 +171,27 @@ namespace Raven
 
 
     /// <summary>
-    /// Duplicates the SpriteScene with a new instance of parts but shares the same animation
+    /// Duplicates the SpriteScene with a new instance of parts but shares the same animation and properties
     /// </summary>
     public SpriteScene Duplicate()
     {
-      var spriteScene = new SpriteScene();
+      var spriteScene = MemberwiseClone() as SpriteScene;
       spriteScene.Name = Name.EnsureNoRepeat();
       spriteScene.Parts = DuplicateParts();
       spriteScene.Animations = Animations;
+      return spriteScene;
+    }
+
+    /// <summary>
+    /// Creates a full copy of SpriteScene with new instances of animations and parts
+    /// </summary>
+    public SpriteScene Copy()
+    {
+      var spriteScene = new SpriteScene();
+      spriteScene.Name = Name.EnsureNoRepeat();
+      spriteScene.Properties = Properties.Copy();
+      spriteScene.Parts = DuplicateParts();
+      spriteScene.Animations = Animations.CloneItems();
       spriteScene._sheet = _sheet;
       return spriteScene;
     }

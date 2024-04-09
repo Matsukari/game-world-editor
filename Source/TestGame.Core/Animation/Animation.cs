@@ -12,17 +12,39 @@ namespace Raven
     [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
+    /// <summary>
+    /// Identitier of this Animation
+    /// </summary>
     public string Name;
 
-    // The context of the play
+    /// <summary>
+    /// The context of the play
+    /// </summary>
     public object Target;
 
-    // This will make the previous frame of the first frame after it has run once 
+    /// <summary>
+    /// Turning this will make the previous frame of the first frame, last, after it has run once 
+    /// </summary>
     public bool IsContinous = false;
 
+    /// <summary>
+    /// Linear ordered array of frames
+    /// </summary>
     public List<AnimationFrame> Frames = new List<AnimationFrame>();
 
+    /// <summary>
+    /// Total ammount of frames
+    /// </summary>
     public int TotalFrames { get => Frames.Count(); }
+
+    public Animation Copy()
+    {
+      var anim = MemberwiseClone() as Animation;
+      anim.Name = Name.EnsureNoRepeat();
+      anim.Properties = Properties.Copy();
+      anim.Frames = Frames.CloneItems();  
+      return anim;
+    }
 
     private Animation()
     {

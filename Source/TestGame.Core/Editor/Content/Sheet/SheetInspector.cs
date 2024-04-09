@@ -1,5 +1,6 @@
 using ImGuiNET;
 using Nez;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 { 
@@ -45,7 +46,7 @@ namespace Raven
     protected override void OnRenderAfterName()
     {
       int w = Sheet.TileWidth, h = Sheet.TileHeight;
-      ImGui.LabelText(IconFonts.FontAwesome5.File + " File", Sheet.Source);
+      ImGui.LabelText(Icon.File + " File", Sheet.Source);
       if (ImGui.InputInt("TileWidth", ref w)) Sheet.SetTileSize(w, Sheet.TileHeight);
       if (ImGui.InputInt("TileHeight", ref h)) Sheet.SetTileSize(Sheet.TileWidth, h);
       ImGui.BeginDisabled();
@@ -74,7 +75,7 @@ namespace Raven
         SpritePicker.Draw(new RectangleF(ImGui.GetItemRectMin().X, ImGui.GetItemRectMin().Y, 450, 450));
       }
 
-      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Th} Tiles ({Sheet.Tiles.X * Sheet.Tiles.Y})"))
+      if (ImGui.CollapsingHeader($"{Icon.Th} Tiles ({Sheet.Tiles.X * Sheet.Tiles.Y})"))
       {
         foreach (var (name, tile) in Sheet.TileMap)
         {
@@ -85,13 +86,16 @@ namespace Raven
           ImGui.Unindent();
         }
       }
-      if (ImGui.CollapsingHeader($"{IconFonts.FontAwesome5.Users} SpriteScenees ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
+      if (ImGui.CollapsingHeader($"{Icon.Users} SpriteScenees ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         ImGui.BeginChild("spriteScenees");
         ImGui.Indent();
+
+        if (Sheet.SpriteScenees.Count == 0) ImGuiUtils.TextMiddle("No Scenes yet.");
+
         foreach (var spriteScene in Sheet.SpriteScenees)
         {
-          if (ImGui.MenuItem($"{IconFonts.FontAwesome5.User} {spriteScene.Name}") && OnClickScene != null) 
+          if (ImGui.MenuItem($"{Icon.User} {spriteScene.Name}") && OnClickScene != null) 
           {
             OnClickScene(spriteScene);
           }
@@ -104,17 +108,21 @@ namespace Raven
         ImGui.Unindent();
         ImGui.EndChild();
       }
-      if (ImGui.BeginPopupContextItem("spriteScene-options-popup"))
+      if (ImGui.BeginPopupContextItem("spriteScene-options-popup") && _spriteSceneOnOption != null)
       {
-        if (ImGui.MenuItem("Rename"))
+        if (ImGui.MenuItem(Icon.Pen + "  Rename"))
         {
           ImGuiManager.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
         }
-        if (ImGui.MenuItem("Delete"))
+        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {
           Sheet.SpriteScenees.RemoveAll((spriteScene)=>spriteScene.Name == _spriteSceneOnOption.Name);
           if (Sheet.SpriteScenees.Count() == 0 && OnDeleteScene != null) 
             OnDeleteScene(_spriteSceneOnOption);
+        }
+        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        {
+          Sheet.SpriteScenees.Add(_spriteSceneOnOption.Copy());
         }
         ImGui.EndPopup();
       }

@@ -7,7 +7,7 @@ namespace Raven
   /// Basic implementation of animation frame. You only need to animate the spriteScenees (with transforms). 
   /// Some custom operations, if any, just add some properties
   /// </summary>
-  public class AnimationFrame : IPropertied
+  public class AnimationFrame : IPropertied, ICloneable
   {
     string IPropertied.Name { get => Name; set => Name = value; }
 
@@ -34,5 +34,14 @@ namespace Raven
     public virtual void Interpolate(AnimationFrame prevFrame, object target, float ease) {}
 
     public virtual void OnEnter(object target) {}
+
+    public virtual AnimationFrame Copy() 
+    {
+      var frame = MemberwiseClone() as AnimationFrame;
+      frame.Properties = Properties.Copy();
+      return frame;
+    }
+
+    object ICloneable.Clone() => Copy();
   }
 }

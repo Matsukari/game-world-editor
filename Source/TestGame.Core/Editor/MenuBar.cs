@@ -188,7 +188,7 @@ namespace Raven
       }
 
 
-      Widget.ImGuiWidget.SpanX(20);
+      ImGuiUtils.SpanX(20);
       if (_editor.ContentManager.View is WorldView worldView)
       {
         Widget.ImGuiWidget.ToggleButtonGroup(

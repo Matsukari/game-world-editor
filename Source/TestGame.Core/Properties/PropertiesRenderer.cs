@@ -64,27 +64,16 @@ namespace Raven
       bool anyOtherChanges = false;
       if (propertied.Properties == null) return false;
 
-      if (ImGui.CollapsingHeader("Properties", ImGuiTreeNodeFlags.DefaultOpen))
+      var header = ImGui.CollapsingHeader("Properties", ImGuiTreeNodeFlags.DefaultOpen);
+
+      if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
+
+      if (header)
       {
-        if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
 
         ImGui.BeginChild("Properties");
  
-        if (propertied.Properties.Data.Count() == 0)
-        {
-          // Calculate the size of the child window
-          var childSize = ImGui.GetWindowSize();
-          var hint = "No properties yet.";
-
-          var textPos = new System.Numerics.Vector2();
-          textPos.X = (childSize.X - ImGui.CalcTextSize(hint).X) * 0.5f;
-          textPos.Y = (childSize.Y - ImGui.GetTextLineHeightWithSpacing()) * 0.5f;
-
-          ImGui.SetCursorPos(textPos);
-          ImGui.TextDisabled(hint);
-        }
-
-
+        if (propertied.Properties.Data.Count() == 0) ImGuiUtils.TextMiddle("No properties yet.");
 
         foreach (var (property, propertyData) in propertied.Properties)
         {

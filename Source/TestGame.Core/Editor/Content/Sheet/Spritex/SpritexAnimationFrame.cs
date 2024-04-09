@@ -67,6 +67,14 @@ namespace Raven
         }
       }
     }
+    public override AnimationFrame Copy()
+    {
+      var frame = MemberwiseClone() as SpriteSceneAnimationFrame;
+      frame.Properties = Properties.Copy();
+      frame.Parts = Parts.CloneItems();
+      return frame;
+    }
+      
   }
 
 }

@@ -1,5 +1,6 @@
 using ImGuiNET;
 using Nez;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
@@ -25,7 +26,7 @@ namespace Raven
       if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Sprite sprite && ImGui.BeginPopup("sprite-popup"))
       {
         // convert to new spriteScene
-        if (ImGui.MenuItem(IconFonts.FontAwesome5.PlusSquare + " Convert to SpriteScene"))
+        if (ImGui.MenuItem(Icon.PlusSquare + " Convert to SpriteScene"))
         {
           imgui.NameModal.Open((name)=>
           {
@@ -35,11 +36,11 @@ namespace Raven
           });
         }
         // add to exisiting spriteScene; select by list
-        if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(IconFonts.FontAwesome5.UserPlus + " Add to SpriteScene"))
+        if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(Icon.UserPlus + " Add to SpriteScene"))
         {
           foreach (var spriteScene in _sheet.SpriteScenees)
           {
-            if (ImGui.MenuItem(IconFonts.FontAwesome5.Users + " " + spriteScene.Name)) 
+            if (ImGui.MenuItem(Icon.Users + " " + spriteScene.Name)) 
             {
               _spriteSceneOnName = spriteScene;
               imgui.NameModal.Open((name)=>
