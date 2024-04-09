@@ -44,7 +44,7 @@ namespace Raven
       }
 
       // Foundation for multiple tile selection
-      if (input.IsDragFirst && _initialMouse == Vector2.Zero && Nez.Input.LeftMouseButtonDown) 
+      if (input.IsDragFirst && Nez.Input.LeftMouseButtonDown) 
       {
         _initialMouse = Camera.MouseToWorldPoint();
         
@@ -59,7 +59,7 @@ namespace Raven
         }
  
       }
-      else if (input.IsDrag && _initialMouse != Vector2.Zero && Nez.Input.LeftMouseButtonDown)
+      else if (input.IsDrag && Nez.Input.LeftMouseButtonDown)
       {
         var mouseDragArea = new RectangleF();
         mouseDragArea.Location = _view.GetOffRegionInSheet(_initialMouse);

@@ -27,7 +27,7 @@ namespace Raven
     public bool IsDrag = false;
     public bool IsDragFirst = false;
     public bool IsDragLast = false; 
-    public bool IsImGuiBlocking { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow); }
+    public bool IsImGuiBlocking { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) || ImGui.GetIO().WantTextInput || ImGui.GetIO().WantCaptureMouse; }
 
     public int MouseDragButton = -1; 
     public RectangleF MouseDragArea = new RectangleF();
