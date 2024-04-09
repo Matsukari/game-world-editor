@@ -202,17 +202,15 @@ namespace Raven
       if (_isOpenAnimationOptionPopup)
       {
         _isOpenAnimationOptionPopup = false;
-        ImGui.CloseCurrentPopup();
         ImGui.OpenPopup("animation-options-popup");
       }
       if (_isOpenAnimationOperations)
       {
         _isOpenAnimationOperations = false;
-        ImGui.CloseCurrentPopup();
         ImGui.OpenPopup("animation-operations-popup");
       }
 
-      if (ImGui.BeginPopupContextItem("animation-options-popup"))
+      if (ImGui.BeginPopup("animation-options-popup"))
       {
         if (ImGui.MenuItem("Create Animation"))
         {
@@ -220,7 +218,7 @@ namespace Raven
         }
         ImGui.EndPopup();
       }
-      if (ImGui.BeginPopupContextItem("animation-operations-popup") && _onOpenAnimtaionOperations != null)
+      if (ImGui.BeginPopup("animation-operations-popup") && _onOpenAnimtaionOperations != null)
       {
         if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {

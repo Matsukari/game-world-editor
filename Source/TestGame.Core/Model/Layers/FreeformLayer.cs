@@ -19,17 +19,7 @@ namespace Raven
       return res;
     }
   }
-  /// <summary>
-  /// Sorts the Renderables based on their Y corrdinates; bottom are in the front, upper is sent to back
-  /// </summary>
-  class SceneYComparer : IComparer<SpriteScene>
-  {
-    public int Compare(SpriteScene self, SpriteScene other)
-    {
-      var res = other.Bounds.Bottom > self.Bounds.Bottom ? -1 : other.Bounds.Bottom < self.Bounds.Bottom ? 1 : 0;
-      return res;
-    }
-  }
+
   public class FreeformLayerRenderer : LayerRenderer<FreeformLayer>
   {
     public List<SpriteSceneRenderer> SpriteScenes = new List<SpriteSceneRenderer>();
@@ -53,13 +43,6 @@ namespace Raven
       Layer.PaintSpriteScene(spriteScene);
       SpriteScenes.Add(new SpriteSceneRenderer(spriteScene));
     }
-    public void RemoveSpriteScene(SpriteScene spriteScene)
-    {
-      var index = SpriteScenes.FindIndex(item => item.SpriteScene.Name == spriteScene.Name);
-      if (index == -1) return;
-      Layer.RemoveSpriteScene(spriteScene);
-      SpriteScenes.RemoveAt(index);
-    }
     /// <summary>
     /// Get the topmost SpriteScene that contains the given position
     /// </summary> 
@@ -75,38 +58,69 @@ namespace Raven
     {
       if (Layer.IsYSorted) 
       {
-        SpriteScenes.Sort(new RenderableYComparer());
+        Layer.SortScenes();
       }
-      foreach (var spriteScene in SpriteScenes)
+      for (int i = 0; i < Layer.SpriteScenees.Count; i++)
       {
-        spriteScene.Render(batcher, camera);
+        RenderScene(Layer.SpriteScenees[i].Item1, Transform.Position + LocalOffset + Layer.Bounds.Location, Layer.SpriteScenees[i].Item2, batcher, camera);
       }
     }
+    public static void RenderScene(SpriteScene SpriteScene, Vector2 position, RenderProperties props, Batcher batcher, Camera camera)
+    {
+      foreach (var sprite in SpriteScene.Parts)
+      {
+        if (!sprite.IsVisible) return;
+        batcher.Draw(
+            texture: sprite.SourceSprite.Texture,
+            position: position + sprite.SceneBounds.Location + props.Transform.Position,
+            sourceRectangle: sprite.SourceSprite.Region,
+            color: sprite.Color.ToColor(),
+            rotation: props.Transform.Rotation + SpriteScene.Transform.Rotation + sprite.Transform.Rotation,
+            origin: sprite.Origin,
+            scale: props.Transform.Scale * SpriteScene.Transform.Scale * sprite.Transform.Scale,
+            effects: sprite.SpriteEffects,
+            layerDepth: 0);
+      }
+    }    
   }
   /// <summary>
   /// A Layer that can only contain SpriteScenes;
   /// </summary> 
   public class FreeformLayer : Layer
   {
+    /// <summary>
+    /// Sorts the Renderables based on their Y corrdinates; bottom are in the front, upper is sent to back
+    /// </summary>
+    class SceneYComparer : IComparer<(SpriteScene, RenderProperties)>
+    {
+      public int Compare((SpriteScene, RenderProperties) self, (SpriteScene, RenderProperties) other)
+      {
+        var selfBot = self.Item1.Bounds.Bottom + self.Item2.Transform.Position.Y;
+        var otherBot = other.Item1.Bounds.Bottom + other.Item2.Transform.Position.Y;
+
+        var res = otherBot > selfBot ? -1 : otherBot < selfBot ? 1 : 0;
+        return res;
+      }
+    }
     public bool IsYSorted = true;
-    public List<SpriteScene> SpriteScenees = new List<SpriteScene>();
+    public List<(SpriteScene, RenderProperties)> SpriteScenees { get; private set; }= new List<(SpriteScene, RenderProperties)>();
 
     public FreeformLayer(Level level) : base(level) {}
 
-    public SpriteScene PaintSpriteScene(SpriteScene spriteScene)
+    public RenderProperties PaintSpriteScene(SpriteScene spriteScene)
     {
-      var newSpriteScene = spriteScene.Duplicate(); 
-      SpriteScenees.Add(newSpriteScene);
-      return newSpriteScene;
-    }
-    public void RemoveSpriteScene(SpriteScene spriteScene)
-    {
-      SpriteScenees.Remove(spriteScene);
+      var props = new RenderProperties();
+      SpriteScenees.Add((spriteScene, props));
+      return props;
     }
     public void RemoveSpriteSceneAt(Vector2 position)
     {
-      var index = SpriteScenees.FindLastIndex(scene => scene.Bounds.Contains(position));
+      var index = SpriteScenees.FindLastIndex(scene => scene.Item1.Bounds.Contains(position));
       if (index != -1) SpriteScenees.RemoveAt(index);
+    }
+    public void SortScenes()
+    {
+      SpriteScenees.Sort(new SceneYComparer());
     }
   }
 }

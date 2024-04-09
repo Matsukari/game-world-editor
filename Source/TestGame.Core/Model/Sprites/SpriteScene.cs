@@ -78,26 +78,18 @@ namespace Raven
       AddSprite("Main component", main);
     }
 
-    public void PutToFront()
-    {
-
-    }
-    /// <summary>
-    /// Creates another set of parts with different instanec
-    /// </summary>
-    public List<SourcedSprite> DuplicateParts()
-    {
-      var list = new List<SourcedSprite>();
-      foreach (var part in Parts) list.Add(part.Duplicate());
-      return list;
-    }
-
     /// <summary>
     /// Adds frame to the given animation
     /// </summary>
     public void AddFrame(string anim, SpriteSceneAnimationFrame frame)
     {
-      GetAnimation(anim)?.Frames.Add(frame);
+      var animation = GetAnimation(anim);
+      if (animation != null) 
+      {
+        animation.Frames.Add(frame);
+        animation.Frames = animation.Frames.EnsureNoRepeatNameField();
+      }
+      
     }
 
     /// <summary>
@@ -117,6 +109,15 @@ namespace Raven
     }
 
     /// <summary>
+    /// Adds the given animation 
+    /// </summary>
+    public void AddAnimation(Animation animation) 
+    {
+      Animations.Add(animation);
+      Animations = Animations.EnsureNoRepeatNameField();
+    }
+
+    /// <summary>
     /// Inserts a frame after the given index
     /// </summary>
     public void InsertFrame(string anim, int index, SpriteSceneAnimationFrame frame)
@@ -125,6 +126,7 @@ namespace Raven
       if (index < 0 || index > animation.TotalFrames) return;
       else if (index == animation.TotalFrames) AddFrame(anim, frame);
       else animation.Frames.Insert(++index, frame);
+      animation.Frames = animation.Frames.EnsureNoRepeatNameField();
     }
 
     /// <summary>
@@ -133,13 +135,11 @@ namespace Raven
     public SourcedSprite AddSprite(string name, SourcedSprite sprite=null) 
     {
       if (sprite == null) sprite = new SourcedSprite();
-
-      if (Parts.Find(item => item.Name == name) != null) 
-        name = name.EnsureNoRepeat();
-
       sprite.SpriteScene = this;
       sprite.Name = name;
       Parts.Add(sprite);
+      Parts = Parts.EnsureNoRepeatNameField();
+
       return sprite;
     }
     public SourcedSprite AddSprite(SourcedSprite sprite) => AddSprite("Component", sprite);
@@ -175,28 +175,15 @@ namespace Raven
 
 
     /// <summary>
-    /// Duplicates the SpriteScene with a new instance of parts but shares the same animation and properties
-    /// </summary>
-    public SpriteScene Duplicate()
-    {
-      var spriteScene = MemberwiseClone() as SpriteScene;
-      spriteScene.Name = Name.EnsureNoRepeat();
-      spriteScene.Parts = DuplicateParts();
-      spriteScene.Animations = Animations;
-      return spriteScene;
-    }
-
-    /// <summary>
     /// Creates a full copy of SpriteScene with new instances of animations and parts
     /// </summary>
     public SpriteScene Copy()
     {
-      var spriteScene = new SpriteScene();
-      spriteScene.Name = Name.EnsureNoRepeat();
+      var spriteScene = MemberwiseClone() as SpriteScene;
       spriteScene.Properties = Properties.Copy();
-      spriteScene.Parts = DuplicateParts();
+      spriteScene.Transform = Transform.Duplicate();
+      spriteScene.Parts = Parts.CloneItems();
       spriteScene.Animations = Animations.CloneItems();
-      spriteScene._sheet = _sheet;
       return spriteScene;
     }
   }

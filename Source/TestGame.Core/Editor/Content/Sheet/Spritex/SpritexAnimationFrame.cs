@@ -15,7 +15,7 @@ namespace Raven
     {}
     public SpriteSceneAnimationFrame(SpriteScene spriteScene)
     {
-      Parts = spriteScene.DuplicateParts();
+      Parts = spriteScene.Parts.CloneItems();
     }
     
     /// <summary>
@@ -32,7 +32,7 @@ namespace Raven
         // Fallback
         try 
         {
-          spriteScene.Parts[i] = Parts[i].Duplicate();
+          spriteScene.Parts[i] = Parts[i].Copy();
         }
         catch (Exception)
         {
@@ -45,7 +45,7 @@ namespace Raven
     }
     public void EndReference(SpriteScene spriteScene)
     {
-      Parts = spriteScene.DuplicateParts();
+      Parts = spriteScene.Parts.CloneItems();
     }
     public override void Interpolate(AnimationFrame prev, object target, float ease)
     {

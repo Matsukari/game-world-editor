@@ -42,6 +42,34 @@ namespace Raven
       if (list.Count() != count) list = FalseRange(list, count);
       return list;
     }
+    public static List<T> EnsureNoRepeatNameField<T>(this List<T> list) where T: class
+    {
+      for (int i = list.Count-1; i >= 0; i--)
+      {
+        var item = list[i];
+        var field = item.GetType().GetField("Name");
+        if (field != null && field.GetValue(item) is string nameString)
+        {
+          for (int j = 0; j < list.Count; j++)
+          {
+            if (i != j && nameString == GetNameField(list[j])) 
+            {
+              field.SetValue(item, nameString.EnsureNoRepeat());
+              return EnsureNoRepeatNameField(list);
+            }
+          }
+          field.SetValue(item, nameString);
+        }
+      }
+
+      return list;
+    }
+    public static string GetNameField<T>(this T item) where T: class
+    {
+      var prop = item.GetType().GetField("Name");
+      if (prop.GetValue(item) is string nameString) return nameString;
+      return string.Empty;
+    }
     public static List<string> ConvertToNameList<T>(this List<T> list)
     {
       List<string> result = new List<string>();

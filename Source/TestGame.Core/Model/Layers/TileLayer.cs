@@ -12,7 +12,7 @@ namespace Raven
     public RenderProperties Copy() => MemberwiseClone() as RenderProperties;
   }
   public class TileLayerRenderer : LayerRenderer<TileLayer>
-  {
+  {  
     public override void Render(Batcher batcher, Camera camera)
     {
       foreach (var (tilePosition, tile) in Layer.Tiles)

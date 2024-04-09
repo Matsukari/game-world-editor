@@ -32,24 +32,6 @@ namespace Raven
 
   public class WorldRenderer
   {
-    
-    public static void RenderScene(SpriteScene SpriteScene, Vector2 position, Batcher batcher, Camera camera)
-    {
-      foreach (var sprite in SpriteScene.Parts)
-      {
-        if (!sprite.IsVisible) return;
-        batcher.Draw(
-            texture: sprite.SourceSprite.Texture,
-            position: position + sprite.SceneBounds.Location,
-            sourceRectangle: sprite.SourceSprite.Region,
-            color: sprite.Color.ToColor(),
-            rotation: SpriteScene.Transform.Rotation + sprite.Transform.Rotation,
-            origin: sprite.Origin,
-            scale: SpriteScene.Transform.Scale * sprite.Transform.Scale,
-            effects: sprite.SpriteEffects,
-            layerDepth: 0);
-      }
-    }    
  
     public static void RenderLayer(Batcher batcher, Camera camera, Layer layer)
     {
@@ -96,11 +78,11 @@ namespace Raven
       {
         if (freeform.IsYSorted) 
         {
-          freeform.SpriteScenees.Sort(new SceneYComparer());
+          freeform.SortScenes();
         }
         foreach (var spriteScene in freeform.SpriteScenees)
         {
-          RenderScene(spriteScene, freeform.Bounds.Location, batcher, camera);
+          FreeformLayerRenderer.RenderScene(spriteScene.Item1, layer.Bounds.Location, spriteScene.Item2, batcher, camera);
         }
  
       }
