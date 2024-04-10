@@ -77,7 +77,7 @@ namespace Raven
         _spritePicker.Sheets.Clear();
         foreach (var sheet in _world.Sheets) 
         {
-          var data = new SheetPickerData(sheet, Settings.Colors);
+          var data = new SheetPickerData(sheet);
           _spritePicker.Sheets.Add(data);
         }
       }

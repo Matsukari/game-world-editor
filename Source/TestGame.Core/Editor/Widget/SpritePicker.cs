@@ -7,20 +7,10 @@ namespace Raven
   public class SheetPickerData
   {
     public Sheet Sheet;
-    public Vector2 Position = new Vector2();
     public float Zoom = 1;
-    public uint GridColor = 0;
-    public uint HoverTileBorderColor = 0;
-    public uint HoverTileFillColor = 0;
     public bool Selected = false;
+    public Vector2 Position = new Vector2();
     public SheetPickerData(Sheet sheet) => Sheet = sheet;
-    public SheetPickerData(Sheet sheet, EditorColors colors) 
-    {
-      Sheet = sheet;
-      GridColor = colors.LevelGrid.ToImColor();
-      HoverTileBorderColor = colors.PickHoverOutline.ToImColor();
-      HoverTileFillColor = colors.PickFill.ToImColor();
-    }
 
   }
   public class SpritePicker
@@ -44,7 +34,7 @@ namespace Raven
     public virtual void OnHandleSelectedSprite()
     {
     }
-    public void Draw(RectangleF preBounds)
+    public void Draw(RectangleF preBounds, EditorColors colors)
     {
       var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
@@ -77,19 +67,6 @@ namespace Raven
 
       // Sync tiles
       if (_tiles.Count() == 0) RebuildTiles();
-
-      // Preserve image ratio 
-      var texSize = OpenSheet.Sheet.Size;
-      float imageRatio = 1f;
-      if (texSize.X > texSize.Y) 
-        imageRatio = Bounds.Size.X / texSize.X;
-      else 
-        imageRatio = Bounds.Size.Y / texSize.Y;
-
-      var imageSize = texSize * imageRatio;
-
-      // Bounds.Size = texSize;
-      // Bounds.Size = ImGui.GetWindowSize();
 
       // The ratio between the drawn size and it's actual size (in raw texture)
       var sheetScale = Bounds.Size / OpenSheet.Sheet.Size;
@@ -126,7 +103,7 @@ namespace Raven
 
           ImGui.GetWindowDrawList().AddImage(texture, 
               (Bounds.Location.ToNumerics() + OpenSheet.Position.ToNumerics()) * OpenSheet.Zoom, 
-              (Bounds.Location.ToNumerics() + OpenSheet.Position.ToNumerics() + texSize.ToNumerics()) * OpenSheet.Zoom, 
+              (Bounds.Location.ToNumerics() + OpenSheet.Position.ToNumerics() + OpenSheet.Sheet.Size.ToNumerics()) * OpenSheet.Zoom, 
               new System.Numerics.Vector2(0, 0), new System.Numerics.Vector2(1, 1));
 
 
@@ -140,7 +117,7 @@ namespace Raven
             ImGui.GetWindowDrawList().AddRect(
                 (worldTile.Location).ToNumerics(), 
                 (worldTile.Location + worldTile.Size).ToNumerics(), 
-                OpenSheet.GridColor);
+                colors.PickHoverOutline.ToImColor());
 
             // Draws highlight under mouse
             if (rectTile.Contains(mouse) && !input.IsDrag)
@@ -148,7 +125,7 @@ namespace Raven
               ImGui.GetWindowDrawList().AddRect(
                   (worldTile.Location).ToNumerics(), 
                   (worldTile.Location + worldTile.Size).ToNumerics(), 
-                  OpenSheet.HoverTileBorderColor);
+                  colors.PickSelectedOutline.ToImColor());
             }
           }
           // Highlights selected sprite
@@ -161,7 +138,11 @@ namespace Raven
               ImGui.GetWindowDrawList().AddRectFilled(
                   (regionWorld.Location).ToNumerics(), 
                   (regionWorld.Location + regionWorld.Size).ToNumerics(), 
-                  OpenSheet.HoverTileFillColor);               
+                  colors.PickFill.ToImColor());               
+              ImGui.GetWindowDrawList().AddRect(
+                  (regionWorld.Location).ToNumerics(), 
+                  (regionWorld.Location + regionWorld.Size).ToNumerics(), 
+                  colors.PickSelectedOutline.ToImColor());               
             }
           }
           var mouseDragArea = new RectangleF();
@@ -186,16 +167,13 @@ namespace Raven
             rectTile.Location = mouse;
             rectTile.Size = OpenSheet.Sheet.TileSize.ToVector2();
 
-            if (mouseDragArea.Intersects(bounds))
-            {
-              var tiled = OpenSheet.Sheet.GetTileCoordFromWorld(rectTile.X, rectTile.Y);
-              // Prevent going out of bounds
-              tiled.X = Math.Min(tiled.X, OpenSheet.Sheet.Tiles.X-1);
-              tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1); 
+            var tiled = OpenSheet.Sheet.GetTileCoordFromWorld(rectTile.X, rectTile.Y);
+            // Prevent going out of bounds
+            tiled.X = Math.Min(tiled.X, OpenSheet.Sheet.Tiles.X-1);
+            tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1); 
 
-              if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
-              else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile.RoundLocationFloor(OpenSheet.Sheet.TileSize), OpenSheet.Sheet);
-            }
+            if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
+            else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile.RoundLocationFloor(OpenSheet.Sheet.TileSize), OpenSheet.Sheet);
           }
           else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;
 
@@ -273,8 +251,6 @@ namespace Raven
       {
         OpenSheet.Position = _initialPosition - (input.MouseDragStart - ImGui.GetIO().MousePos);        
       } 
-      // OpenSheet.Position.X = Mathf.Clamp(OpenSheet.Position.X, 0f, Bounds.Width * (OpenSheet.Zoom-1f));
-      // OpenSheet.Position.Y = Mathf.Clamp(OpenSheet.Position.Y, 0f, Bounds.Height * (OpenSheet.Zoom-1f));
     }
     public System.Numerics.Vector2 GetUvMin(SheetPickerData state) => (state.Position / Bounds.Size / state.Zoom).ToNumerics(); 
     public System.Numerics.Vector2 GetUvMax(SheetPickerData state) => ((state.Position + Bounds.Size) / Bounds.Size / state.Zoom).ToNumerics();
@@ -283,9 +259,11 @@ namespace Raven
     public Vector2 MouseToPickerPoint(SheetPickerData state)
     {
       var mouse = ImGui.GetMousePos();
-      var pos = mouse - Bounds.Location;
-      pos *= new Vector2(state.Zoom, state.Zoom);
-      pos += state.Position;
+      var pos = mouse.ToVector2(); 
+      pos /= state.Zoom;
+      pos -= Bounds.Location;
+      pos -= state.Position;
+
       return pos;
     }
   }

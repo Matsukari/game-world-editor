@@ -14,9 +14,10 @@ namespace Raven
       get => _sheet; 
       set 
       { 
-        if ((value != null && _sheet != null && _sheet.Name != value.Name) || _sheet == null)
+        if (value == null) return;
+        if ((_sheet != null && _sheet.Name != value.Name) || _sheet == null)
         {
-          _sheetData = new SheetPickerData(_sheet, _settings.Colors); 
+          _sheetData = new SheetPickerData(value); 
         }
         _sheet = value; 
       } 
@@ -65,26 +66,16 @@ namespace Raven
         float previewHeight = 100;
         float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
 
-        // Preserve image ratio 
-        var texSize = SpritePicker.SelectedSheet.Sheet.Size;
-        float imageRatio = 1f;
-        if (texSize.X > texSize.Y) 
-          imageRatio = previewWidth / texSize.X;
-        else 
-          imageRatio = previewHeight / texSize.Y;
-
-        var imageSize = texSize * imageRatio;
+        var imageSize = ImGuiUtils.ContainSize(SpritePicker.SelectedSheet.Sheet.Size.ToNumerics(), new System.Numerics.Vector2(previewWidth, previewHeight));
 
         // Draws the selected spritesheet
         var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(SpritePicker.SelectedSheet.Sheet.Texture);
-        ImGui.Image(texture, new System.Numerics.Vector2(imageSize.X, imageSize.Y), 
-            SpritePicker.GetUvMin(SpritePicker.SelectedSheet), 
-            SpritePicker.GetUvMax(SpritePicker.SelectedSheet));
+        ImGui.Image(texture, new System.Numerics.Vector2(imageSize.X, imageSize.Y));
         if (SpritePicker.OpenSheet == null && ImGui.IsItemHovered())
         {
           SpritePicker.OpenSheet = SpritePicker.SelectedSheet;
         }
-        SpritePicker.Draw(new RectangleF(ImGui.GetItemRectMin().X, ImGui.GetItemRectMin().Y, 450, 450));
+        SpritePicker.Draw(new RectangleF(ImGui.GetItemRectMin().X, ImGui.GetItemRectMin().Y, 450, 450), _settings.Colors);
       }
 
       if (ImGui.CollapsingHeader($"{Icon.Th} Tiles ({Sheet.Tiles.X * Sheet.Tiles.Y})"))

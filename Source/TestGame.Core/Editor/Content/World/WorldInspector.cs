@@ -146,13 +146,12 @@ namespace Raven
             // Draw preview spritesheet
             float previewHeight = 100;
             float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
-            float ratio = (previewWidth) / previewHeight;
+
+            var imageSize = ImGuiUtils.ContainSize(_spritePicker.SelectedSheet.Sheet.Size.ToNumerics(), new System.Numerics.Vector2(previewWidth, previewHeight));
 
             // Draws the selected spritesheet
             var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_spritePicker.SelectedSheet.Sheet.Texture);
-            ImGui.Image(texture, new System.Numerics.Vector2(previewWidth, previewHeight*ratio), 
-                _spritePicker.GetUvMin(_spritePicker.SelectedSheet), 
-                _spritePicker.GetUvMax(_spritePicker.SelectedSheet));
+            ImGui.Image(texture, new System.Numerics.Vector2(imageSize.X, imageSize.Y));
             if (_spritePicker.OpenSheet == null && ImGui.IsItemHovered())
             {
               _spritePicker.OpenSheet = _spritePicker.SelectedSheet;
@@ -167,7 +166,7 @@ namespace Raven
         World.Sheets.Remove(removeSheet.Sheet);
       }
 
-      _spritePicker.Draw(new Nez.RectangleF(0f, Screen.Height-450-28, 450, 450));
+      _spritePicker.Draw(new Nez.RectangleF(0f, Screen.Height-450-28, 450, 450), _viewImGui.Settings.Colors);
     }      
   }
 

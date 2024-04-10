@@ -14,6 +14,17 @@ namespace Raven
 
     public static Vector2 Rotate(Vector2 v, float cos_a, float sin_a) => new Vector2(v.X * cos_a - v.Y * sin_a, v.X * sin_a + v.Y * cos_a);
 
+    public static Vector2 ContainSize(Vector2 size, Vector2 intendedSize)
+    {
+        float imageRatio = 1f;
+        if (size.X > size.Y) 
+          imageRatio = intendedSize.X / size.X;
+        else 
+          imageRatio = intendedSize.Y / size.Y;
+
+        return size * imageRatio;
+    }
+
     public static void TextMiddle(string hint)
     {
       // Calculate the size of the child window
@@ -27,7 +38,7 @@ namespace Raven
       ImGui.TextDisabled(hint);
     }
 
-    void DrawImage(ImDrawListPtr drawList, nint texture, Vector2 center, Vector2 size, float angle, uint color)
+    public static void DrawImage(ImDrawListPtr drawList, nint texture, Vector2 center, Vector2 size, float angle, uint color)
     {
       float cos_a = MathF.Cos(angle);
       float sin_a = MathF.Sin(angle);
