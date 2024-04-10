@@ -239,7 +239,7 @@ namespace Raven
           else zoomFactor = 0.01f;
         }
         var zoom = Math.Clamp(OpenSheet.Zoom * zoomFactor, 0.01f, 10f);
-        var delta = (MouseToPickerPoint(OpenSheet) - OpenSheet.Position) * (zoomFactor - 1);
+        var delta = (OpenSheet.Position - MouseToPickerPoint(OpenSheet)) * (zoomFactor - 1);
         if (zoomFactor != 1f) OpenSheet.Position += delta;
         OpenSheet.Zoom = zoom;
       }
@@ -249,7 +249,7 @@ namespace Raven
       }
       if (input.IsDrag && input.MouseDragButton == 2) 
       {
-        OpenSheet.Position = _initialPosition - (input.MouseDragStart - ImGui.GetIO().MousePos);        
+        OpenSheet.Position = _initialPosition - (input.MouseDragStart - ImGui.GetIO().MousePos) / OpenSheet.Zoom;        
       } 
     }
     public System.Numerics.Vector2 GetUvMin(SheetPickerData state) => (state.Position / Bounds.Size / state.Zoom).ToNumerics(); 
@@ -260,9 +260,9 @@ namespace Raven
     {
       var mouse = ImGui.GetMousePos();
       var pos = mouse.ToVector2(); 
-      pos /= state.Zoom;
       pos -= Bounds.Location;
-      pos -= state.Position;
+      pos /= OpenSheet.Zoom;
+      pos += state.Position;
 
       return pos;
     }
