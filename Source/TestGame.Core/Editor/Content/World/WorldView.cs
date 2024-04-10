@@ -48,6 +48,7 @@ namespace Raven
       _imgui.Popups.OnDeleteLevel += level => _imgui.SelectedLevel = -1;
       _imgui.Popups.OnDeleteLevel += level => Selection.End();
       _imgui.Popups.OnCutLevel += level => Selection.End();
+      _imgui.SpritePicker.OnLeave += () => { if (CanPaint) Selection.End(); };
 
     }
 
@@ -63,7 +64,7 @@ namespace Raven
     }
     void OnLeftClickLevel(Level level, int i)
     {
-      Selection.Begin(level.Bounds, level);
+      if (!CanPaint) Selection.Begin(level.Bounds, level);
       _imgui.SelectedLevel = i;
     }
     void OpenLevelOptions(Level level, int i)
@@ -76,6 +77,8 @@ namespace Raven
       Guidelines.OriginLinesRenderable.Render(batcher, camera, settings.Colors.OriginLineX.ToColor(), settings.Colors.OriginLineY.ToColor());
 
       RenderAnnotations(ContentData.PropertiedContext, batcher, camera, settings);
+
+      var enterLayer = false;
       for (var i = 0; i < _world.Levels.Count(); i++)
       {
         var level = _world.Levels[i];
@@ -85,12 +88,21 @@ namespace Raven
         foreach (var layer in level.Layers)
         {
           WorldRenderer.RenderLayer(batcher, camera, layer);
+          if (layer.Bounds.Contains(Camera.MouseToWorldPoint()) && !Selection.HasBegun())
+          {
+            enterLayer = true;
+            _imgui.SelectedLevel = i;
+          }
+
           if (layer is TileLayer tileLayer && layer.IsVisible && Settings.Graphics.DrawLayerGrid)
           {
             Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
               tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
           }
         }
+      }
+      if (!enterLayer)
+      {
       }
 
       // if (_imgui.SelectedLevelInspector != null && _imgui.SelectedLevelInspector.CurrentLayer is TileLayer tileLayer)

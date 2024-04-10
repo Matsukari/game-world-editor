@@ -22,7 +22,8 @@ namespace Raven
     public RectangleF Bounds = new RectangleF(0, 0, 1, 1);
     Vector2 _initialPosition = Vector2.Zero;
     List<RectangleF> _tiles = new List<RectangleF>();
-    public Action OnSelectRightMouseClick = null;
+    public event Action OnSelectRightMouseClick;
+    public event Action OnLeave;
 
     public bool isPickOnlyTile = false;
     public bool IsHoverSelected = false;
@@ -213,6 +214,8 @@ namespace Raven
       // Mouse is outside the enlargened picker
       if (!totalBounds.Contains(ImGui.GetMousePos()) && !input.IsDrag) 
       {
+        if (OnLeave != null)
+          OnLeave();
         OpenSheet = null;
         _tiles.Clear();
       }
