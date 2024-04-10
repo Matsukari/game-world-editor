@@ -172,8 +172,11 @@ namespace Raven
             tiled.X = Math.Min(tiled.X, OpenSheet.Sheet.Tiles.X-1);
             tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1); 
 
-            if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
-            else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile.RoundLocationFloor(OpenSheet.Sheet.TileSize), OpenSheet.Sheet);
+            try 
+            {
+              if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
+              else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile.RoundLocationFloor(OpenSheet.Sheet.TileSize), OpenSheet.Sheet);
+            } catch (Exception) {}
           }
           else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;
 

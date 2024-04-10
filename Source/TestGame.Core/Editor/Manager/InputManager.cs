@@ -22,6 +22,7 @@ namespace Raven
     public void OnInputBlocked(InputManager input) {}
 
   }
+  
   public class InputManager : GlobalManager
   {
     public bool IsDrag = false;

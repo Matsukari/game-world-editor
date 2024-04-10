@@ -1,5 +1,6 @@
 
 using Nez;
+using Microsoft.Xna.Framework;
 
 namespace Raven
 {
@@ -20,6 +21,7 @@ namespace Raven
     public bool IsRandomPaint = false;
     public PaintMode PaintMode = PaintMode.Pen;
     public PaintType PaintType = PaintType.Single;
+    Vector2 _initialScale = new Vector2();
 
     public bool CanPaint { get => _imgui.SpritePicker.SelectedSprite != null; }
 
@@ -30,8 +32,9 @@ namespace Raven
       base.Initialize(editor, content);
 
       _input = new WorldViewInputHandler(this);
-      _input.OnLeftClickLevel += SelectLevel;
+      _input.OnLeftClickLevel += OnLeftClickLevel;
       _input.OnRightClickLevel += OpenLevelOptions;
+      _input.OnRightClickScene += OnLeftClickScene;
       _input.OnRightClickWorld += (position) =>_imgui.Popups.OpenWorldOptions(World);
       _input.Initialize(editor, content);
 
@@ -47,15 +50,20 @@ namespace Raven
     public override void OnContentOpen(IPropertied content)
     {
       _world = content as World; 
-    }   
-    void SelectLevel(Level level, int i)
+    }  
+    void OnLeftClickScene(Layer layer, SpriteScene scene, RenderProperties props)
+    {
+      Selection.Begin(scene.Bounds.AddTransform(props.Transform), props);
+      _initialScale = props.Transform.Scale;
+      _imgui.SceneInstanceInspector.Scene = scene;
+    }
+    void OnLeftClickLevel(Level level, int i)
     {
       Selection.Begin(level.Bounds, level);
       _imgui.SelectedLevel = i;
     }
     void OpenLevelOptions(Level level, int i)
     {
-      Console.WriteLine("Right lick");
       _imgui.Popups.OpenLevelOptions(level);
     }
 
@@ -87,6 +95,11 @@ namespace Raven
       {
         lev.LocalOffset = Selection.ContentBounds.Location;
         lev.ContentSize = Selection.ContentBounds.Size.ToPoint();
+      }
+      else if (Selection.Capture is RenderProperties props)
+      {
+        props.Transform.Position = Selection.ContentBounds.Location;
+        props.Transform.Scale = _initialScale + (Selection.ContentBounds.Size / Selection.InitialBounds.Size) - Vector2.One;
       }
       if (_imgui.SelectedLevel != -1)
       {

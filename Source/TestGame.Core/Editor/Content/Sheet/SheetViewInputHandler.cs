@@ -66,6 +66,7 @@ namespace Raven
         mouseDragArea.Size = Camera.MouseToWorldPoint() - _initialMouse;
         mouseDragArea = mouseDragArea.AlwaysPositive();
         _selectedTiles = _view.Sheet.GetTiles(mouseDragArea);
+        IsBlocked = true;
         var sprite = _sheet.CreateSprite(_selectedTiles.ToArray());
         Select(sprite);
       }

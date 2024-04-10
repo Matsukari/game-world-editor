@@ -70,6 +70,12 @@ namespace Raven
       rect.Location += delta;
       return rect;
     }
+    public static RectangleF AddTransform(this RectangleF rect, Transform transform)
+    {
+      rect.Location += transform.Position;
+      rect.Size *= transform.Scale;
+      return rect;
+    }
     public static Vector2 GetHalfSize(this RectangleF rect)
     {
       return rect.Size/2f;

@@ -9,6 +9,7 @@ namespace Raven
     public event Action<Level, int> OnLeftClickLevel;
     public event Action<Level, int> OnRightClickLevel;
     public event Action<Vector2> OnRightClickWorld;
+    public event Action<Layer, SpriteScene, RenderProperties> OnRightClickScene;
     public readonly TilePainter Painter;
 
     public WorldViewInputHandler(WorldView view)
@@ -16,7 +17,6 @@ namespace Raven
       _view = view;
       Painter = new TilePainter(_view);
     }
-
 
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
@@ -30,9 +30,22 @@ namespace Raven
         var level = _view.World.Levels[i];
         if (!level.IsVisible) continue;
 
+        foreach (var layer in level.Layers)
+        {
+          SpriteScene scene;
+          RenderProperties props;
+          if (layer is FreeformLayer freeform 
+              && freeform.GetSceneAt(Camera.MouseToWorldPoint(), out scene, out props)
+              && Nez.Input.LeftMouseButtonPressed 
+              && OnRightClickScene != null)
+          {
+            OnRightClickScene(layer, scene, props);
+            return true;
+          }
+        }
+
         if (Nez.Input.LeftMouseButtonPressed 
             && level.Bounds.Contains(Camera.MouseToWorldPoint()) 
-            && _view.SpritePicker.SelectedSprite == null 
             && OnLeftClickLevel != null)
         {
           OnLeftClickLevel(level, i);

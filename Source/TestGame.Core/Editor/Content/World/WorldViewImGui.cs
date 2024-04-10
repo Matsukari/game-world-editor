@@ -9,6 +9,7 @@ namespace Raven
     public SpritePicker SpritePicker { get => _spritePicker; }
     public List<LevelInspector> LevelInspectors { get => _levelInspectors; }
     public WorldViewPopup Popups { get => _popups;  }
+    public readonly SceneInstanceInspector SceneInstanceInspector = new SceneInstanceInspector();
 
     readonly List<LevelInspector> _levelInspectors = new List<LevelInspector>();
     readonly TilePainter _spritePicker;
@@ -90,6 +91,7 @@ namespace Raven
       SyncLevelInspectors();
 
       _inspector.Render(imgui);
+      SceneInstanceInspector.Render(imgui);
 
       // Render window of current level
       if (SelectedLevel != -1) _levelInspectors[SelectedLevel].Render(imgui);

@@ -113,10 +113,25 @@ namespace Raven
       SpriteScenees.Add((spriteScene, props));
       return props;
     }
+    public int GetSceneAt(Vector2 position) => SpriteScenees.FindLastIndex(scene => scene.Item1.Bounds.AddTransform(scene.Item2.Transform).Contains(position));
     public void RemoveSpriteSceneAt(Vector2 position)
     {
-      var index = SpriteScenees.FindLastIndex(scene => scene.Item1.Bounds.Contains(position));
+      var index = GetSceneAt(position);
       if (index != -1) SpriteScenees.RemoveAt(index);
+    }
+    public bool GetSceneAt(Vector2 position, out SpriteScene scene, out RenderProperties props) 
+    {
+      var index = GetSceneAt(position);
+      
+      if (index != -1) 
+      {
+        props = SpriteScenees[index].Item2;
+        scene = SpriteScenees[index].Item1;
+        return true;
+      }
+      props = null;
+      scene = null;
+      return false;
     }
     public void SortScenes()
     {

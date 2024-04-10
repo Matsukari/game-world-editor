@@ -14,6 +14,8 @@ namespace Raven
       _colors = colors;
     }
 
+    int IInputHandler.Priority() => -1;
+
     bool IInputHandler.OnHandleInput(InputManager input)
     {
       if (Nez.Input.LeftMouseButtonPressed && _selection.HasBegun()) 
