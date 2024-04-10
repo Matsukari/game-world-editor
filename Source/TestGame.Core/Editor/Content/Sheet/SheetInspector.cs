@@ -14,8 +14,11 @@ namespace Raven
       get => _sheet; 
       set 
       { 
+        if ((value != null && _sheet != null && _sheet.Name != value.Name) || _sheet == null)
+        {
+          _sheetData = new SheetPickerData(_sheet, _settings.Colors); 
+        }
         _sheet = value; 
-        _sheetData = new SheetPickerData(_sheet, _settings.Colors); 
       } 
     }
     Sheet _sheet;
@@ -61,11 +64,20 @@ namespace Raven
         // Draw preview spritesheet
         float previewHeight = 100;
         float previewWidth = ImGui.GetWindowWidth()-ImGui.GetStyle().WindowPadding.X*2-3; 
-        float ratio = (previewWidth) / previewHeight;
+
+        // Preserve image ratio 
+        var texSize = SpritePicker.SelectedSheet.Sheet.Size;
+        float imageRatio = 1f;
+        if (texSize.X > texSize.Y) 
+          imageRatio = previewWidth / texSize.X;
+        else 
+          imageRatio = previewHeight / texSize.Y;
+
+        var imageSize = texSize * imageRatio;
 
         // Draws the selected spritesheet
         var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(SpritePicker.SelectedSheet.Sheet.Texture);
-        ImGui.Image(texture, new System.Numerics.Vector2(previewWidth, previewHeight*ratio), 
+        ImGui.Image(texture, new System.Numerics.Vector2(imageSize.X, imageSize.Y), 
             SpritePicker.GetUvMin(SpritePicker.SelectedSheet), 
             SpritePicker.GetUvMax(SpritePicker.SelectedSheet));
         if (SpritePicker.OpenSheet == null && ImGui.IsItemHovered())
