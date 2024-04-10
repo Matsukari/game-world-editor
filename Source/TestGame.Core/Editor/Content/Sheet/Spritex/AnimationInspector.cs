@@ -11,9 +11,9 @@ namespace Raven
     public AnimationPlayer Animator;
     public Animation Animation { get => Animator.Animation; }
     public bool CanOpen { get => 
-             Animator == null 
+        !(   Animator == null 
           || Animation == null 
-          || _animEditor.SpriteScene.Animations.Find(item => item.Name == _animEditor.Animation.Name) == null; 
+          || _animEditor.SpriteScene.Animations.Find(item => item.Name == _animEditor.Animation.Name) == null); 
     }
 
     public AnimationInspector(AnimationEditor animEditor) 
@@ -26,7 +26,7 @@ namespace Raven
     {
       // also check if the animation's reference is valid, which may be lost at some point when deleting the current and last animation 
       // while inspcetor is opened
-      if (CanOpen) return;
+      if (!CanOpen) return;
       base.Render(imgui);
       DrawFrameOptions();
     }

@@ -32,11 +32,15 @@ namespace Raven
       base.Initialize(editor, content);
 
       _input = new WorldViewInputHandler(this);
+      _input.OnLeftClickScene += OnLeftClickScene;
       _input.OnLeftClickLevel += OnLeftClickLevel;
       _input.OnRightClickLevel += OpenLevelOptions;
-      _input.OnRightClickScene += OnLeftClickScene;
       _input.OnRightClickWorld += (position) =>_imgui.Popups.OpenWorldOptions(World);
       _input.Initialize(editor, content);
+
+      _input.OnLeftClickLevel += (level, i) => _imgui.SceneInstanceInspector.Scene = null;
+      _input.OnRightClickLevel += (level, i) => _imgui.SceneInstanceInspector.Scene = null;
+      _input.OnRightClickWorld += (position) => _imgui.SceneInstanceInspector.Scene = null;
 
       _imgui = new WorldViewImGui(_input.Painter); 
       _imgui.Initialize(editor, content);
@@ -51,11 +55,11 @@ namespace Raven
     {
       _world = content as World; 
     }  
-    void OnLeftClickScene(Layer layer, SpriteScene scene, RenderProperties props)
+    void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
-      Selection.Begin(scene.Bounds.AddTransform(props.Transform), props);
-      _initialScale = props.Transform.Scale;
-      _imgui.SceneInstanceInspector.Scene = scene;
+      Selection.Begin(instance.ContentBounds, instance);
+      _initialScale = instance.Props.Transform.Scale;
+      _imgui.SceneInstanceInspector.Scene = instance;
     }
     void OnLeftClickLevel(Level level, int i)
     {
@@ -96,10 +100,10 @@ namespace Raven
         lev.LocalOffset = Selection.ContentBounds.Location;
         lev.ContentSize = Selection.ContentBounds.Size.ToPoint();
       }
-      else if (Selection.Capture is RenderProperties props)
+      else if (Selection.Capture is SpriteSceneInstance instance)
       {
-        props.Transform.Position = Selection.ContentBounds.Location;
-        props.Transform.Scale = _initialScale + (Selection.ContentBounds.Size / Selection.InitialBounds.Size) - Vector2.One;
+        instance.Props.Transform.Position = Selection.ContentBounds.Location;
+        instance.Props.Transform.Scale = _initialScale + (Selection.ContentBounds.Size / Selection.InitialBounds.Size) - Vector2.One;
       }
       if (_imgui.SelectedLevel != -1)
       {

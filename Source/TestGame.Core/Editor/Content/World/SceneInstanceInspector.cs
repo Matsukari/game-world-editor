@@ -1,5 +1,3 @@
-using ImGuiNET;
-using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
@@ -7,7 +5,7 @@ namespace Raven
   {
     public override string Name { get => Scene.Name; set => Scene.Name = value;}
     public override PropertyList Properties { get => Scene.Properties; set => Scene.Properties = value; }
-    public SpriteScene Scene;
+    public SpriteSceneInstance Scene;
 
     public override void Render(ImGuiWinManager imgui)
     {
@@ -16,7 +14,8 @@ namespace Raven
     }
     protected override void OnRenderAfterName()
     {
-      Scene.Transform.RenderImGui();
+      Scene.Props.Transform.RenderImGui();
+
     } 
   }
 }

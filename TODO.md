@@ -1,6 +1,10 @@
 
 
 
+
+
+
+
 ## Sheet
 Multiple selection tile
 Implement SpriteFrames
@@ -18,7 +22,6 @@ Choose ease type
 
 ## Level
 Indicator for able and not able paint
-Transforms on Scenes
 
 
 ## World

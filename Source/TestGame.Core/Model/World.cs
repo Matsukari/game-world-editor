@@ -82,7 +82,7 @@ namespace Raven
         }
         foreach (var spriteScene in freeform.SpriteScenees)
         {
-          FreeformLayerRenderer.RenderScene(spriteScene.Item1, layer.Bounds.Location, spriteScene.Item2, batcher, camera);
+          FreeformLayerRenderer.RenderScene(spriteScene, layer.Bounds.Location, batcher, camera);
         }
  
       }

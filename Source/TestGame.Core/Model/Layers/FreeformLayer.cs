@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven
 {
@@ -62,26 +63,47 @@ namespace Raven
       }
       for (int i = 0; i < Layer.SpriteScenees.Count; i++)
       {
-        RenderScene(Layer.SpriteScenees[i].Item1, Transform.Position + LocalOffset + Layer.Bounds.Location, Layer.SpriteScenees[i].Item2, batcher, camera);
+        RenderScene(Layer.SpriteScenees[i], Transform.Position + LocalOffset + Layer.Bounds.Location, batcher, camera);
       }
     }
-    public static void RenderScene(SpriteScene SpriteScene, Vector2 position, RenderProperties props, Batcher batcher, Camera camera)
+    public static void RenderScene(SpriteSceneInstance instance, Vector2 position, Batcher batcher, Camera camera)
     {
-      foreach (var sprite in SpriteScene.Parts)
+      foreach (var sprite in instance.Scene.Parts)
       {
         if (!sprite.IsVisible) return;
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,
-            position: position + sprite.SceneBounds.Location + props.Transform.Position,
+            position: position + sprite.SceneBounds.Location + instance.Props.Transform.Position,
             sourceRectangle: sprite.SourceSprite.Region,
             color: sprite.Color.ToColor(),
-            rotation: props.Transform.Rotation + SpriteScene.Transform.Rotation + sprite.Transform.Rotation,
+            rotation: instance.Props.Transform.Rotation + instance.Scene.Transform.Rotation + sprite.Transform.Rotation,
             origin: sprite.Origin,
-            scale: props.Transform.Scale * SpriteScene.Transform.Scale * sprite.Transform.Scale,
+            scale: instance.Props.Transform.Scale * instance.Scene.Transform.Scale * sprite.Transform.Scale,
             effects: sprite.SpriteEffects,
             layerDepth: 0);
       }
     }    
+  }
+
+  public class SpriteSceneInstance : IPropertied
+  {
+    [JsonInclude]
+    public string Name { get; set; } = "";
+
+    [JsonInclude]
+    public PropertyList Properties { get; set; } = new PropertyList();
+
+    public readonly SpriteScene Scene;
+
+    public RenderProperties Props;
+
+    public RectangleF ContentBounds { get => Scene.Bounds.AddTransform(Props.Transform); }
+
+    public SpriteSceneInstance(SpriteScene scene, RenderProperties props = null)
+    {
+      Scene = scene;
+      if (props != null) Props = props;
+    }
   }
   /// <summary>
   /// A Layer that can only contain SpriteScenes;
@@ -91,46 +113,44 @@ namespace Raven
     /// <summary>
     /// Sorts the Renderables based on their Y corrdinates; bottom are in the front, upper is sent to back
     /// </summary>
-    class SceneYComparer : IComparer<(SpriteScene, RenderProperties)>
+    class SceneYComparer : IComparer<SpriteSceneInstance>
     {
-      public int Compare((SpriteScene, RenderProperties) self, (SpriteScene, RenderProperties) other)
+      public int Compare(SpriteSceneInstance self, SpriteSceneInstance other)
       {
-        var selfBot = self.Item1.Bounds.Bottom + self.Item2.Transform.Position.Y;
-        var otherBot = other.Item1.Bounds.Bottom + other.Item2.Transform.Position.Y;
+        var selfBot = self.Props.Transform.Position.Y;
+        var otherBot = other.Props.Transform.Position.Y;
 
         var res = otherBot > selfBot ? -1 : otherBot < selfBot ? 1 : 0;
         return res;
       }
     }
     public bool IsYSorted = true;
-    public List<(SpriteScene, RenderProperties)> SpriteScenees { get; private set; }= new List<(SpriteScene, RenderProperties)>();
+    public List<SpriteSceneInstance> SpriteScenees { get; private set; }= new List<SpriteSceneInstance>();
 
     public FreeformLayer(Level level) : base(level) {}
 
     public RenderProperties PaintSpriteScene(SpriteScene spriteScene)
     {
-      var props = new RenderProperties();
-      SpriteScenees.Add((spriteScene, props));
-      return props;
+      var instance = new SpriteSceneInstance(spriteScene, new RenderProperties());
+      SpriteScenees.Add(instance);
+      return instance.Props;
     }
-    public int GetSceneAt(Vector2 position) => SpriteScenees.FindLastIndex(scene => scene.Item1.Bounds.AddTransform(scene.Item2.Transform).Contains(position));
+    public int GetSceneAt(Vector2 position) => SpriteScenees.FindLastIndex(scene => scene.Scene.Bounds.AddTransform(scene.Props.Transform).Contains(position));
     public void RemoveSpriteSceneAt(Vector2 position)
     {
       var index = GetSceneAt(position);
       if (index != -1) SpriteScenees.RemoveAt(index);
     }
-    public bool GetSceneAt(Vector2 position, out SpriteScene scene, out RenderProperties props) 
+    public bool GetSceneAt(Vector2 position, out SpriteSceneInstance instance) 
     {
       var index = GetSceneAt(position);
       
       if (index != -1) 
       {
-        props = SpriteScenees[index].Item2;
-        scene = SpriteScenees[index].Item1;
+        instance = SpriteScenees[index];
         return true;
       }
-      props = null;
-      scene = null;
+      instance = null;
       return false;
     }
     public void SortScenes()
