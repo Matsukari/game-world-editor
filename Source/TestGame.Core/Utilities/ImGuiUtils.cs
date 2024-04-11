@@ -37,6 +37,18 @@ namespace Raven
       ImGui.SetCursorPos(textPos);
       ImGui.TextDisabled(hint);
     }
+    public static void TextMiddleX(string hint)
+    {
+      // Calculate the size of the child window
+      var childSize = ImGui.GetWindowSize();
+
+      var textPos = new System.Numerics.Vector2();
+      textPos.X = (childSize.X - ImGui.CalcTextSize(hint).X) * 0.5f;
+
+      ImGui.SetCursorPos(textPos);
+      ImGui.Text(hint);
+    }
+
 
     public static void DrawImage(ImDrawListPtr drawList, nint texture, Vector2 center, Vector2 size, float angle, uint color)
     {

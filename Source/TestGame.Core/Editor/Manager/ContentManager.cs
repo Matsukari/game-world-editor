@@ -60,7 +60,7 @@ namespace Raven
     {
 
     }
-    public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=false)
+    public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=false, bool forceAdd=true)
     {
       Console.WriteLine("Adding content on tabs");
 
@@ -68,8 +68,16 @@ namespace Raven
       // This file already exist within the tab files
       if (Settings.LastFiles.Find((file)=>file.Filename == content.Name) != null)
       {
-        Console.WriteLine("Cannot add Content. Already exist.");
-        return;
+        if (forceAdd)
+        {
+          content.Name = content.Name.EnsureNoRepeat(); 
+          AddTab(contentView, content, isSwitch, forceAdd);
+        }
+        else 
+        {
+          Console.WriteLine("Cannot add Content. Already exist.");
+          return;
+        }
       }
       if (!contentView.CanDealWithType(content))
         throw new Exception();

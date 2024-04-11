@@ -155,6 +155,12 @@ namespace Raven
       SpriteScenees.Add(scene);
       SpriteScenees = SpriteScenees.EnsureNoRepeatNameField();
     }
+
+    public void ReplaceScene(string name, SpriteScene scene)
+    {
+      var index = SpriteScenees.FindIndex(item => item.Name == name);
+      if (index != -1) SpriteScenees[index] = scene;
+    }
     
     public Tile CustomTileExists(int x, int y) 
     {

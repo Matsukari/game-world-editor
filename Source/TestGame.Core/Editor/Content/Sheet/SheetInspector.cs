@@ -78,7 +78,7 @@ namespace Raven
         SpritePicker.Draw(new RectangleF(ImGui.GetItemRectMin().X, ImGui.GetItemRectMin().Y, 450, 450), _settings.Colors);
       }
 
-      if (ImGui.CollapsingHeader($"{Icon.Th} Tiles ({Sheet.Tiles.X * Sheet.Tiles.Y})"))
+      if (ImGui.CollapsingHeader($"{Icon.Th}   Tiles ({Sheet.Tiles.X * Sheet.Tiles.Y})"))
       {
         foreach (var (name, tile) in Sheet.TileMap)
         {
@@ -89,16 +89,18 @@ namespace Raven
           ImGui.Unindent();
         }
       }
-      if (ImGui.CollapsingHeader($"{Icon.Users} SpriteScenes ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
+      if (ImGui.CollapsingHeader($"{Icon.Users}   SpriteScenes ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
-        ImGui.BeginChild("spriteScenees");
+        var size = ImGui.GetContentRegionAvail();
+        ImGui.BeginChild("spriteScenees", new System.Numerics.Vector2(size.X, Math.Min(200, size.Y)));
         ImGui.Indent();
 
         if (Sheet.SpriteScenees.Count == 0) ImGuiUtils.TextMiddle("No Scenes yet.");
 
+        var i = 0;
         foreach (var spriteScene in Sheet.SpriteScenees)
         {
-          if (ImGui.MenuItem($"{Icon.User} {spriteScene.Name}") && OnClickScene != null) 
+          if (ImGui.MenuItem($"{++i}.   {spriteScene.Name}") && OnClickScene != null) 
           {
             OnClickScene(spriteScene);
           }
@@ -113,23 +115,22 @@ namespace Raven
       }
       if (ImGui.BeginPopupContextItem("spriteScene-options-popup") && _spriteSceneOnOption != null)
       {
-        if (ImGui.MenuItem(Icon.Pen + "  Rename"))
+        if (ImGui.MenuItem(Icon.Pen + "   Rename"))
         {
           ImGuiManager.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
         }
-        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
+        if (ImGui.MenuItem(Icon.Trash + "   Delete"))
         {
           Sheet.SpriteScenees.RemoveAll((spriteScene)=>spriteScene.Name == _spriteSceneOnOption.Name);
           if (Sheet.SpriteScenees.Count() == 0 && OnDeleteScene != null) 
             OnDeleteScene(_spriteSceneOnOption);
         }
-        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
         {
           Sheet.AddScene(_spriteSceneOnOption.Copy());
         }
         ImGui.EndPopup();
       }
-      ImGui.End();
     }
 	}
 }

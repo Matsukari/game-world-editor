@@ -89,6 +89,15 @@ namespace Raven.Widget
         if (ImGui.Button(button.Item1)) button.Item2.Invoke();
       }
     }
-
+    // public static void ButtonSetFlatDistrib(params (string, Action)[] actions)
+    // {
+    //   ImGui.SameLine();
+    //   for (int i = )
+    //   {
+    //     ImGui.SameLine();
+    //     var ratio = 1 / actions.Count();
+    //     if (ImGui.Button(button.Item1, new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X * ratio, 20))) button.Item2.Invoke();
+    //   }
+    // }
   }
 }

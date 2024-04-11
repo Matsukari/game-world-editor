@@ -13,6 +13,8 @@ namespace Raven
     public List<IImGuiRenderable> Renderables = new List<IImGuiRenderable>();
     public Widget.FilePicker FilePicker = new Widget.FilePicker();
     public Widget.NameModal NameModal = new Widget.NameModal();
+    public Widget.ConfirmModal ConfirmModal = new Widget.ConfirmModal();
+
     List<IImGuiRenderable> _renderablesToAdd = new List<IImGuiRenderable>();
     List<IImGuiRenderable> _renderablesToRemove = new List<IImGuiRenderable>();
 
@@ -61,8 +63,9 @@ namespace Raven
       }
 
       if (ContentRenderable != null) ContentRenderable.Render(this);
+      FilePicker.Draw(this);
       NameModal.Draw();
-      FilePicker.Draw();
+      ConfirmModal.Draw();
     }
   }
 }

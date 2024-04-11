@@ -16,7 +16,7 @@ public class TestGameProcess : Core
         IsFixedTimeStep = true;
         var imGuiOptions = new ImGuiOptions();
         imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.RobotoCondensedRegular, 16);
-        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.FontAwesome6FreeSolid900, 16);
+        imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.FontAwesome6FreeSolid900, 18);
         imGuiOptions.IncludeDefaultFont(false);
         
         var imGuiManager = new ImGuiManager(imGuiOptions);

@@ -13,7 +13,7 @@ namespace Raven.Widget
       _isOpenFile = true;
       AcceptedExtensions = ext;
     }
-    public void Draw()
+    public void Draw(ImGuiWinManager imgui)
     {
       if (_isOpenFile)
       {
@@ -23,13 +23,13 @@ namespace Raven.Widget
       var isOpen = true;
       if (ImGui.BeginPopupModal("file-picker-modal", ref isOpen, ImGuiWindowFlags.NoTitleBar))
       {
-        var picker = Nez.ImGuiTools.FilePicker.GetFilePicker(this, Path.Combine(Environment.CurrentDirectory, "Content"), AcceptedExtensions);
+        var picker = FileManWindow.GetFileManWindow(this, Environment.CurrentDirectory, AcceptedExtensions);
         picker.DontAllowTraverselBeyondRootFolder = true;
-        if (picker.Draw())
+        if (picker.Draw(imgui))
         {
           _pickerCallback.Invoke(picker.SelectedFile);
           _pickerCallback = null;
-          Nez.ImGuiTools.FilePicker.RemoveFilePicker(this);
+          FileManWindow.RemoveFileManWindow(this);
         }
         ImGui.EndPopup();
       }

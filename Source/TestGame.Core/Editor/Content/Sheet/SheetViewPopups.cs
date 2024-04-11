@@ -26,21 +26,42 @@ namespace Raven
       if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Sprite sprite && ImGui.BeginPopup("sprite-popup"))
       {
         // convert to new spriteScene
-        if (ImGui.MenuItem(Icon.PlusSquare + " Convert to SpriteScene"))
+        if (ImGui.MenuItem(Icon.SyncAlt + "   Convert To SpriteScene"))
         {
-          imgui.NameModal.Open((name)=>
+          void Convert()
           {
+            imgui.NameModal.Open((name)=>
+            {
               var spriteScene = _sheet.CreateSpriteScene(name, ContentData.SelectionList.Last() as Sprite);
-              _sheet.AddScene(spriteScene);
-              if (OnConvertToScene != null) OnConvertToScene(spriteScene);
-          });
+
+                // name conflict 
+              if (_sheet.SpriteScenees.Find(item => item.Name == name) != null)
+              {
+                imgui.ConfirmModal.Open((state)=>
+                {
+                  if (state == ConfirmState.Refused) Convert();
+                  else if (state == ConfirmState.Confirmed) 
+                  {
+                    _sheet.ReplaceScene(name, spriteScene);
+                    if (OnConvertToScene != null) OnConvertToScene(spriteScene);
+                  }
+                }, "Warning", $"File '{name}' already exists. \noverwrite it?");
+              }
+              else 
+              {
+                _sheet.AddScene(spriteScene);
+                if (OnConvertToScene != null) OnConvertToScene(spriteScene);
+              }
+            });
+          }
+          Convert();
         }
         // add to exisiting spriteScene; select by list
-        if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(Icon.UserPlus + " Add to SpriteScene"))
+        if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(Icon.Plus + "   Add To SpriteScene"))
         {
           foreach (var spriteScene in _sheet.SpriteScenees)
           {
-            if (ImGui.MenuItem(Icon.Users + " " + spriteScene.Name)) 
+            if (ImGui.MenuItem(Icon.Users + "   " + spriteScene.Name)) 
             {
               _spriteSceneOnName = spriteScene;
               imgui.NameModal.Open((name)=>
