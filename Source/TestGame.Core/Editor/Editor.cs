@@ -17,27 +17,27 @@ namespace Raven
 
     public static PrimitiveBatch PrimitiveBatch = new PrimitiveBatch();
 
-    void OnCloseContent()
+    void OnCloseContent(EditorContent content, ContentView view)
     {
       // Store last state
-      ContentManager.GetContent().Data.Zoom = Scene.Camera.RawZoom;
-      ContentManager.GetContent().Data.Position = Scene.Camera.Position;
+      content.Data.Zoom = Scene.Camera.RawZoom;
+      content.Data.Position = Scene.Camera.Position;
 
-      WindowManager.RemoveRenderable(ContentManager.View.ImGuiHandler);
+      WindowManager.RemoveRenderable(view.ImGuiHandler);
 
-      if (ContentManager.View.InputHandler != null)
-        Core.GetGlobalManager<InputManager>().InputHandlers.Remove(ContentManager.View.InputHandler);
+      if (view.InputHandler != null)
+        Core.GetGlobalManager<InputManager>().InputHandlers.Remove(view.InputHandler);
     }
-    void OnOpenContent()
+    void OnOpenContent(EditorContent content, ContentView view)
     {
       // Restore last state
-      Scene.Camera.RawZoom = ContentManager.GetContent().Data.Zoom;
-      Scene.Camera.Position = ContentManager.GetContent().Data.Position;
+      Scene.Camera.RawZoom = content.Data.Zoom;
+      Scene.Camera.Position = content.Data.Position;
 
-      WindowManager.AddRenderable(ContentManager.View.ImGuiHandler);
+      WindowManager.AddRenderable(view.ImGuiHandler);
 
-      if (ContentManager.View.InputHandler != null)
-        Core.GetGlobalManager<InputManager>().InputHandlers.AddIfNotPresent(ContentManager.View.InputHandler);
+      if (view.InputHandler != null)
+        Core.GetGlobalManager<InputManager>().InputHandlers.AddIfNotPresent(view.InputHandler);
 
     }
     void OnAddContent(EditorContent content, ContentView view)
@@ -49,8 +49,8 @@ namespace Raven
       Scene.Camera.Position = -Screen.Center / 2;
 
       ContentManager = new ContentManager(Settings);
-      ContentManager.OnBeforeSwitch += OnCloseContent;
-      ContentManager.OnAfterSwitch += OnOpenContent;
+      ContentManager.OnCloseContent += OnCloseContent;
+      ContentManager.OnOpenContent += OnOpenContent;
       ContentManager.OnAddContent += OnAddContent;
 
       Selection = AddComponent(new Selection());
@@ -82,6 +82,8 @@ namespace Raven
       var world = new World();
       world.AddSheet(sheet);
       ContentManager.AddTab(new WorldView(), world);
+
+      ContentManager.Switch(0, true);
 
       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().RegisterDrawCommand(WindowManager.Render);
     }

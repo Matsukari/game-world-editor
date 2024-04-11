@@ -9,7 +9,8 @@ namespace Raven
     public override bool IsVisibleFromCamera(Camera camera) => true;
     public override void Render(Batcher batcher, Camera camera)
     {
-      _contentManager.Render(batcher, camera);
+      if (_contentManager.View != null)
+        _contentManager.View.Render(batcher, camera, _contentManager.Settings);
     }
   }
   public class ContentManager 
@@ -21,8 +22,8 @@ namespace Raven
     public int CurrentIndex { get => _currentTab; }
 
     public EditorSettings Settings;
-    public event Action OnBeforeSwitch;
-    public event Action OnAfterSwitch;
+    public event Action<EditorContent, ContentView> OnCloseContent;
+    public event Action<EditorContent, ContentView> OnOpenContent;
     public event Action<EditorContent, ContentView> OnAddContent;
 
     // Either world or sheet; these are the objects that can be switch in and out
@@ -32,7 +33,6 @@ namespace Raven
 
     public ContentManager(EditorSettings settings) => Settings = settings;
 
-    public void Render(Batcher batcher, Camera camera) => View.Render(batcher, camera, Settings);
     public void Update()
     {
       if (HasContent)
@@ -41,30 +41,59 @@ namespace Raven
         ContentData.Filename = Content.Name;
       }
     }
-    public void Switch(int index) 
+    public void Switch(int index, bool force=true) 
     {
-      Console.WriteLine($"Switched to {index}");
+      // Console.WriteLine($"Switched to {index}");
 
-      OnBeforeSwitch();
-      if (HasContent) 
-        View.OnContentClose();
+      OnCloseContent(_tabs[_currentTab], _views[_currentTab]);
+      View.OnContentClose();
       _currentTab = Math.Clamp(index, 0, _tabs.Count()-1);
       View.OnContentOpen(Content);
-      OnAfterSwitch();
+      OnOpenContent(_tabs[_currentTab], _views[_currentTab]);
 
+    }
+    public void OpenTab(int index)
+    {
+      if (index < 0 || index >= _tabs.Count()) return;
+      // Console.WriteLine("Opened " + index);
+      _views[index].OnContentOpen(_views[index].Content);
+      OnOpenContent(_tabs[index], _views[index]);
       Settings.LastFile = index;
+      _currentTab = index;
+    }
+    public void CloseTab(int index)
+    {
+      if (index < 0 || index >= _tabs.Count()) return;
+      // Console.WriteLine("Closed " + index);
+      OnCloseContent(_tabs[index], _views[index]);
+      _views[index].OnContentClose();
     }
     public EditorContent GetContent() => _tabs[_currentTab];
 
-    public void RemoveTab()
+    public void RemoveTab(int index)
     {
+
+      CloseTab(index);
+
+      // Console.WriteLine("Removing " + index);
+      _tabs.RemoveAt(index);
+      _views.RemoveAt(index);
+      Settings.LastFiles.RemoveAt(index);
+
+      var newTab = _currentTab;
+      if (_currentTab >= index) newTab--;
+      if (newTab < 0) newTab = 0;
+
+      OpenTab(newTab);
 
     }
     public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=false, bool forceAdd=true)
     {
-      Console.WriteLine("Adding content on tabs");
+      if (!contentView.CanDealWithType(content))
+        throw new Exception();
 
       var contentData = new EditorContentData(content.Name, content.GetType().Name);
+
       // This file already exist within the tab files
       if (Settings.LastFiles.Find((file)=>file.Filename == content.Name) != null)
       {
@@ -72,6 +101,7 @@ namespace Raven
         {
           content.Name = content.Name.EnsureNoRepeat(); 
           AddTab(contentView, content, isSwitch, forceAdd);
+          return;
         }
         else 
         {
@@ -79,8 +109,8 @@ namespace Raven
           return;
         }
       }
-      if (!contentView.CanDealWithType(content))
-        throw new Exception();
+
+      Console.WriteLine("Adding content on tabs");
 
       Settings.LastFiles.Add(contentData);
 

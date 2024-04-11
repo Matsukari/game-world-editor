@@ -1,3 +1,4 @@
+using Nez.Persistence;
 
 namespace Raven
 {
@@ -10,6 +11,9 @@ namespace Raven
   {
     public EditorContentData Data { get; private set; }
     public IPropertied Content { get; private set; }
+
+    [JsonExclude]
+    public bool Open = true;
     public EditorContent(IPropertied content, EditorContentData data)   
     {
       Content = content;

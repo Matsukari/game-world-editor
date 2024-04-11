@@ -124,6 +124,7 @@ namespace Raven
       ImGui.SameLine();
       ImGui.BeginTabBar("files-tabs");
       var tabs = _editor.ContentManager._tabs;
+      var remove = -1;
       for (int i = 0; i < tabs.Count(); i++)
       {
         var open = true;
@@ -134,9 +135,11 @@ namespace Raven
         }
         if (!open)
         {
-
+          remove = i;
         }
       }
+      if (remove != -1)
+        _editor.ContentManager.RemoveTab(remove);
       ImGui.EndTabBar();
 
       // Start of tools bar

@@ -50,6 +50,7 @@ namespace Raven
 
       foreach (var renderableToAdd in _renderablesToAdd)
       {
+        if (Renderables.Contains(renderableToAdd)) continue;
         Renderables.Add(renderableToAdd);
       }
       _renderablesToAdd.Clear();
