@@ -6,9 +6,14 @@ namespace Raven.Widget
   {
     bool _isOpenFile = false;
     Action<string> _pickerCallback;
-    public string AcceptedExtensions = "";
-    public void Open(Action<string> callback, string ext=".png|.rvworld|.rvsheet")
+    public string[] AcceptedExtensions;
+    public string Title;
+    public void Open(Action<string> callback, string title, string[] ext = null)
     {
+      if (ext == null)
+        ext = Serializer.SheetStdExtensions.Concat(Serializer.WorldStdExtensions).Concat(new []{".png", ".jpg"}).ToArray();
+
+      Title = title;
       _pickerCallback = callback;
       _isOpenFile = true;
       AcceptedExtensions = ext;
@@ -23,7 +28,7 @@ namespace Raven.Widget
       var isOpen = true;
       if (ImGui.BeginPopupModal("file-picker-modal", ref isOpen, ImGuiWindowFlags.NoTitleBar))
       {
-        var picker = FileManWindow.GetFileManWindow(this, Environment.CurrentDirectory, AcceptedExtensions);
+        var picker = FileManWindow.GetFileManWindow(Title, this, Environment.CurrentDirectory, AcceptedExtensions);
         picker.DontAllowTraverselBeyondRootFolder = true;
         if (picker.Draw(imgui))
         {

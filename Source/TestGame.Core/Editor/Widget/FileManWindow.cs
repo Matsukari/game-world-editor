@@ -1,5 +1,4 @@
 using ImGuiNET;
-using Microsoft.Xna.Framework;
 using Icon = IconFonts.FontAwesome5;
 
 namespace Raven.Widget
@@ -11,15 +10,18 @@ namespace Raven.Widget
 		public string RootFolder;
 		public string CurrentFolder;
 		public string SelectedFile;
-		public List<string> AllowedExtensions;
+		public List<string> AllowedExtensions = new List<string>();
 		public bool HideHiddenFolders = true;
 		public bool OnlyAllowFolders;
 		public bool DontAllowTraverselBeyondRootFolder;
+    public int CurrentFormat = 0;
+    public string Title;
+    public static string AllFormats = "All formats";
 
-		public static FileManWindow GetFolderPicker(object o, string startingPath)
-			=> GetFileManWindow(o, startingPath, null, true);
+		public static FileManWindow GetFolderPicker(string title, object o, string startingPath)
+			=> GetFileManWindow(title, o, startingPath, null, true);
 
-		public static FileManWindow GetFileManWindow(object o, string startingPath, string searchFilter = null, bool onlyAllowFolders = false)
+		public static FileManWindow GetFileManWindow(string title, object o, string startingPath, string[] exts, bool onlyAllowFolders = false)
 		{
 			if (File.Exists(startingPath))
 			{
@@ -35,19 +37,17 @@ namespace Raven.Widget
 			if (!_filePickers.TryGetValue(o, out FileManWindow fp))
 			{
 				fp = new FileManWindow();
+        fp.Title = title;
 				fp.RootFolder = startingPath;
 				fp.CurrentFolder = startingPath;
 				fp.OnlyAllowFolders = onlyAllowFolders;
 
-				if (searchFilter != null)
-				{
-					if (fp.AllowedExtensions != null)
-						fp.AllowedExtensions.Clear();
-					else
-						fp.AllowedExtensions = new List<string>();
-					
-					fp.AllowedExtensions.AddRange(searchFilter.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries));
-				}
+        if (exts != null)
+        {
+          fp.AllowedExtensions = exts.ToList();
+        }
+        fp.AllowedExtensions.Add(AllFormats);
+        fp.CurrentFormat = fp.AllowedExtensions.Count() -1;
 
 				_filePickers.Add(o, fp);
 			}
@@ -76,7 +76,7 @@ namespace Raven.Widget
     public string PickedFile = "";
 		public bool Draw(ImGuiWinManager imgui)
 		{
-			ImGui.Text("Current Folder: " + Path.GetFileName(RootFolder) + CurrentFolder.Replace(RootFolder, ""));
+			ImGui.Text($"{Title} at " + Path.GetFileName(RootFolder) + CurrentFolder.Replace(RootFolder, ""));
 			bool result = false;
 
       var di = new DirectoryInfo(CurrentFolder);
@@ -94,7 +94,7 @@ namespace Raven.Widget
         {
           imgui.NameModal.Open(name => Directory.CreateDirectory(Path.Join(CurrentFolder, name)));
         }
-        if (ImGui.BeginChild(1, new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y-30)))
+        if (ImGui.BeginChild(1, new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y-60)))
         {
           var fileSystemEntries = GetFileSystemEntries(di.FullName);
           foreach (var fse in fileSystemEntries)
@@ -131,18 +131,24 @@ namespace Raven.Widget
       ImGui.EndChild();
 
       var newName = (SelectedFile == null) ? "" : SelectedFile;
+      ImGui.Text("File name: ");
+      ImGui.SameLine();
+      ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
       if (ImGui.InputText("##2", ref newName, 1000, ImGuiInputTextFlags.EnterReturnsTrue))
       {
         result = true;
       }
       SelectedFile = newName;
 
+      ImGui.Text("File type: ");
+      ImGui.SameLine();
+      ImGui.Combo("##3", ref CurrentFormat, AllowedExtensions.ToArray(), AllowedExtensions.Count());
 
       ImGui.SameLine();
-      ImGui.PushItemWidth(ImGui.GetContentRegionAvail().X * 0.5f);
+      var size = new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X * 0.5f, 20);
       if (OnlyAllowFolders)
       {
-        if (ImGui.Button("Ok"))
+        if (ImGui.Button("Ok", size))
         {
           result = true;
           SelectedFile = CurrentFolder;
@@ -152,20 +158,19 @@ namespace Raven.Widget
       }
       else if (SelectedFile != null)
       {
-        if (ImGui.Button("Ok"))
+        if (ImGui.Button("Ok", size))
         {
           result = true;
           ImGui.CloseCurrentPopup();
         }
         ImGui.SameLine();
       }
-			if (ImGui.Button("Cancel"))
+			if (ImGui.Button("Cancel", size))
 			{
 				result = false;
 				RemoveFileManWindow(this);
 				ImGui.CloseCurrentPopup();
 			}
-      ImGui.PopItemWidth();
 
 			return result;
 		}
@@ -200,7 +205,7 @@ namespace Raven.Widget
 					if (AllowedExtensions != null)
 					{
 						var ext = Path.GetExtension(fse);
-						if (AllowedExtensions.Contains(ext))
+						if (AllowedExtensions[CurrentFormat].Contains(ext) || AllowedExtensions[CurrentFormat] == AllFormats)
 							files.Add(fse);
 					}
 					else

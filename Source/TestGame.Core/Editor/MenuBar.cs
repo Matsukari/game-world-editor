@@ -38,7 +38,7 @@ namespace Raven
     }
     void SheetOptions()
     {
-      if (ImGui.MenuItem("New Sheet")) _editor.WindowManager.FilePicker.Open((filename)=> _editor.ContentManager.AddTab(new SheetView(), new Sheet(filename))); 
+      if (ImGui.MenuItem("New Sheet")) _editor.WindowManager.FilePicker.Open((filename)=> _editor.ContentManager.AddTab(new SheetView(), new Sheet(filename)), "Open Sheet"); 
       if (ImGui.BeginMenu("Sheets"))
       {
         foreach (var content in _editor.ContentManager._tabs)

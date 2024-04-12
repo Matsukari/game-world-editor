@@ -83,7 +83,7 @@ namespace Raven
       world.AddSheet(sheet);
       ContentManager.AddTab(new WorldView(), world);
 
-      ContentManager.Switch(0, true);
+      ContentManager.Switch(1, true);
 
       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().RegisterDrawCommand(WindowManager.Render);
     }

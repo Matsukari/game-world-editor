@@ -40,7 +40,7 @@ namespace Raven
               OnAddSheet(file);
             }
           }
-          imgui.FilePicker.Open(AddSheet);
+          imgui.FilePicker.Open(AddSheet, "Open Sheet");
         }
         ImGui.EndPopup();
       }
