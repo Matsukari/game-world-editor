@@ -7,11 +7,14 @@ namespace Raven
   {
     public Camera Camera { get; private set; }
     public Selection Selection { get; private set; }
+    public Guidelines.MovableOriginLines Mover { get; private set; }
     public IPropertied Content { get; private set; }
     public Serializer Serializer { get; private set; }
     public EditorContentData ContentData { get; private set; }
     public EditorSettings Settings { get; private set; }
+    public EditorOperator Operator { get => _editor.Operator; }
     public Entity Entity { get; private set; }
+    Editor _editor { get => Entity as Editor; }
 
     public virtual void Initialize(Editor editor, EditorContent content)
     {
@@ -22,6 +25,7 @@ namespace Raven
       Content = content.Content;
       Serializer = editor.Serializer;
       Settings = editor.Settings;
+      Mover = editor.Mover;
     }
 
     public override bool Equals(object obj)

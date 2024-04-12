@@ -8,6 +8,8 @@ namespace Raven
 	{
     public EditorSettings Settings = new EditorSettings();
 
+    public EditorOperator Operator;
+    public Guidelines.MovableOriginLines Mover;
     public Selection Selection;
     public Serializer Serializer;
     public ShapeAnnotator ShapeAnnotator;
@@ -48,6 +50,8 @@ namespace Raven
     {
       Scene.Camera.Position = -Screen.Center / 2;
 
+      Operator = EditorOperator.Select;
+
       ContentManager = new ContentManager(Settings);
       ContentManager.OnCloseContent += OnCloseContent;
       ContentManager.OnOpenContent += OnOpenContent;
@@ -56,6 +60,8 @@ namespace Raven
       Selection = AddComponent(new Selection());
       Serializer = new Serializer(ContentManager);
       ShapeAnnotator = new ShapeAnnotator(Settings);
+      Mover = AddComponent(new Guidelines.MovableOriginLines());
+      Mover.RenderLayer = -1;
 
       WindowManager = new ImGuiWinManager();
       WindowManager.Renderables.Add(new Settings(Settings));
@@ -73,6 +79,7 @@ namespace Raven
       var input = Core.GetGlobalManager<InputManager>();
       input.RegisterInputHandler(ShapeAnnotator);
       input.RegisterInputHandler(Selection);
+      input.RegisterInputHandler(Mover);
       input.RegisterInputHandler(GetComponent<SelectionRenderer>());
 
       Serializer.LoadStartup();

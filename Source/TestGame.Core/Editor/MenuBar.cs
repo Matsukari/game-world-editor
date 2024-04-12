@@ -156,12 +156,12 @@ namespace Raven
       Widget.ImGuiWidget.ToggleButtonGroup(
           ids: new []{Icon.MousePointer, Icon.ArrowsAlt, Icon.HandSpock, Icon.Expand, Icon.SyncAlt},
           toggles: ref _editorOpToggled,
-          actions: new []{
-          ()=>{}, 
-          ()=>{}, 
-          ()=>{}, 
-          ()=>{}, 
-          ()=>{},           
+          actions: new Action[]{
+          ()=>_editor.Operator = EditorOperator.Select,
+          ()=>_editor.Operator = EditorOperator.MoveOnly, 
+          ()=>_editor.Operator = EditorOperator.HandPanner, 
+          ()=>_editor.Operator = EditorOperator.Scaler, 
+          ()=>_editor.Operator = EditorOperator.Rotator,           
           },
           fallback: null,
           color: EditorColors.Get(ImGuiCol.ButtonHovered));
@@ -238,7 +238,7 @@ namespace Raven
       ImGui.End();
     }
     ShapeModel[] _shapeModels = new ShapeModel[]{new RectangleModel(), new EllipseModel(), new PointModel(), new PolygonModel()};
-    bool[] _editorOpToggled = new []{false, true, false, false, false};
+    bool[] _editorOpToggled = new []{true, false, false, false, false};
     bool[] _selTypeToggled = new []{false, false};
     bool[] _paintModeToggled = new []{true, false};
     bool[] _paintTypeToggled = new []{false, false, false};

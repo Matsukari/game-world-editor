@@ -100,6 +100,11 @@ namespace Raven
           (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
         selPart.Transform.Position = _initialPos + ((Selection.ContentBounds.Location - selPart.Origin) - (Selection.InitialBounds.Location - selPart.Origin));
       }
+      if (Mover.Capture is SourcedSprite p)
+      {
+        Console.WriteLine("Moving at " + Mover.Position);
+        p.Transform.Position = _initialPos + ((Mover.Position - p.Origin) - (Mover.InitialPosition - p.Origin));        
+      }
     }  
     Vector2 _initialScale = new Vector2();
     Vector2 _initialPos = new Vector2();
@@ -112,6 +117,8 @@ namespace Raven
 
       if (part != null)
       {
+        if (Operator == EditorOperator.MoveOnly) Mover.Show(part.Bounds.Center);
+
         if (Nez.Input.RightMouseButtonPressed)
         {
           _sceneInspector._isOpenComponentOptionPopup = true;
@@ -122,11 +129,14 @@ namespace Raven
         {
           _initialScale = part.Transform.Scale;
           _initialPos = part.Transform.Position;
-          Selection.Begin(part.Bounds, part);
-          return true;
+
+          if (Operator == EditorOperator.Select) Selection.Begin(part.Bounds, part); 
+          else if (Operator == EditorOperator.MoveOnly) Mover.TryBegin(part.Bounds.Center, input.Camera, part); 
         }
       }
-      else if (Nez.Input.RightMouseButtonPressed)
+      else if (Operator == EditorOperator.MoveOnly) Mover.Hide();
+
+      if (Nez.Input.RightMouseButtonPressed)
       {
         _sceneInspector._isOpenSceneOnSpritePopup = true; 
         _sceneInspector._posOnOpenCanvas = Camera.MouseToWorldPoint();

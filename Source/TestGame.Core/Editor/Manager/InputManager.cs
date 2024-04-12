@@ -33,6 +33,7 @@ namespace Raven
     public int MouseDragButton = -1; 
     public RectangleF MouseDragArea = new RectangleF();
     public Num.Vector2 MouseDragStart = new Num.Vector2();
+    public Camera Camera { get => Core.Scene.Camera; }
 
     public List<IInputHandler> InputHandlers { get => _inputHandlers; }
 
@@ -49,7 +50,7 @@ namespace Raven
     {
       HandleGuiDrags();
 
-      if (IsImGuiBlocking) return;
+      if (IsImGuiBlocking || Core.Scene == null) return;
 
       for (int i = 0; i < _inputHandlers.Count; i++)
       {

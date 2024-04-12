@@ -81,6 +81,7 @@ namespace Raven
         {
           shape.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
           Finish();
+          return;
         }
       }
       // Dragging
