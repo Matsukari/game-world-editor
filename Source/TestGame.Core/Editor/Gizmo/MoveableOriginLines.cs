@@ -9,7 +9,7 @@ namespace Raven.Guidelines
     public Vector2 Length = new Vector2(50, 50);
     public Vector2 Thickness = new Vector2(5, 5);
     public float MinThickness = 5f;
-    public float MaxThickness = 10f;
+    public float MaxThickness = 7f;
     public Color HorizontalColor { get => Color; set => Color = value; }
     public Color VerticalColor;
     public (Vector2, Vector2) LineX { get => (LocalOffset, new Vector2(LocalOffset.X + Length.X, LocalOffset.Y)); }
@@ -17,6 +17,7 @@ namespace Raven.Guidelines
     public AxisType Axis = AxisType.None;
     public Vector2 Position { get => LocalOffset; }
     public Vector2 InitialPosition = Vector2.Zero;
+    public bool IsMoving { get => Axis != AxisType.None; }
     public object Capture;
 
     public MovableOriginLines() 
@@ -44,13 +45,13 @@ namespace Raven.Guidelines
       var pos = LocalOffset;
       if (Axis == AxisType.X)
       {
-        pos.X = InitialPosition.X + (input.Camera.MouseToWorldPoint().X - InitialPosition.X);
+        pos.X = InitialPosition.X + (Nez.Input.RawMousePosition.X - input.MouseDragStart.X) / input.Camera.RawZoom;
         Thickness.X = MaxThickness;
         Thickness.Y = MinThickness;
       }
       else if (Axis == AxisType.Y)
       {
-        pos.Y = InitialPosition.Y + (input.Camera.MouseToWorldPoint().Y - InitialPosition.Y);
+        pos.Y = InitialPosition.Y + (Nez.Input.RawMousePosition.Y - input.MouseDragStart.Y) / input.Camera.RawZoom;
         Thickness.X = MinThickness;
         Thickness.Y = MaxThickness;
       }

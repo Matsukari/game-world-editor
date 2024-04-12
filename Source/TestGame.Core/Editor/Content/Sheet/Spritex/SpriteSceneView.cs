@@ -134,7 +134,7 @@ namespace Raven
           else if (Operator == EditorOperator.MoveOnly) Mover.TryBegin(part.Bounds.Center, input.Camera, part); 
         }
       }
-      else if (Operator == EditorOperator.MoveOnly) Mover.Hide();
+      else if (Operator == EditorOperator.MoveOnly && Mover.Collides(Camera) == Guidelines.MovableOriginLines.AxisType.None) Mover.Hide();
 
       if (Nez.Input.RightMouseButtonPressed)
       {
