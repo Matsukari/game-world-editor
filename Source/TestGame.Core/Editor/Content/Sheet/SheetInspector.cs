@@ -117,6 +117,24 @@ namespace Raven
         ImGui.Unindent();
         ImGui.EndChild();
       }
+      if (ImGui.BeginPopupContextItem("sprite-anim-options-popup") && _animOnOption != null)
+      {
+        if (ImGui.MenuItem(Icon.Pen + "   Rename"))
+        {
+          ImGuiManager.NameModal.Open((name)=>{Sheet.Animations.Find(item => item.Name == _animOnOption.Name).Name = name;});
+        }
+        if (ImGui.MenuItem(Icon.Trash + "   Delete"))
+        {
+          Sheet.Animations.RemoveAll((item)=>item.Name == _animOnOption.Name);
+          if (Sheet.SpriteScenees.Count() == 0 && OnDeleteAnimation != null) 
+            OnDeleteAnimation(_animOnOption);
+        }
+        if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
+        {
+          Sheet.Animations.Add(_animOnOption.Copy() as AnimatedSprite);
+        }
+        ImGui.EndPopup();
+      }
       if (ImGui.CollapsingHeader($"{Icon.Users}   SpriteScenes ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         var size = ImGui.GetContentRegionAvail();
@@ -159,24 +177,7 @@ namespace Raven
         }
         ImGui.EndPopup();
       }
-      if (ImGui.BeginPopupContextItem("sprite-anim-options-popup") && _animOnOption != null)
-      {
-        if (ImGui.MenuItem(Icon.Pen + "   Rename"))
-        {
-          ImGuiManager.NameModal.Open((name)=>{Sheet.Animations.Find(item => item.Name == _animOnOption.Name).Name = name;});
-        }
-        if (ImGui.MenuItem(Icon.Trash + "   Delete"))
-        {
-          Sheet.Animations.RemoveAll((item)=>item.Name == _animOnOption.Name);
-          if (Sheet.SpriteScenees.Count() == 0 && OnDeleteAnimation != null) 
-            OnDeleteAnimation(_animOnOption);
-        }
-        if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
-        {
-          Sheet.Animations.Add(_animOnOption.Copy() as AnimatedSprite);
-        }
-        ImGui.EndPopup();
-      }
+
     }
 	}
 }
