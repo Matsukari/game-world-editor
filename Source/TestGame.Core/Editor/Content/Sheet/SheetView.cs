@@ -96,6 +96,12 @@ namespace Raven
         batcher.DrawRect(worldTileInMouse, settings.Colors.PickHover.ToColor());
       }
 
+      if (_imgui.Popups.SpriteSlicer.IsOpen)
+      { 
+        Raven.Guidelines.GridLines.RenderGridLines(batcher, camera, GetRegionInSheet(_imgui.Popups.SpriteSlicer.Sprite.Region.ToRectangleF()).Location, 
+            settings.Colors.PickSelectedOutline.ToColor(), _imgui.Popups.SpriteSlicer.SplitCount, _imgui.Popups.SpriteSlicer.SplitSize.ToVector2());
+      }
+
       if (_imgui.SpriteAnimEditor.IsOpen) 
       {
         for (int i = 0; i < _imgui.SpriteAnimEditor.Player.Animation.Frames.Count(); i++)

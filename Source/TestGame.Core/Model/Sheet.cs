@@ -160,6 +160,12 @@ namespace Raven
       SpriteScenees.Add(scene);
       SpriteScenees = SpriteScenees.EnsureNoRepeatNameField();
     }
+    public void AddAnimation(AnimatedSprite animation)
+    {
+      Animations.Add(animation);
+      Animations = Animations.EnsureNoRepeatNameField();
+    }
+
 
     public void ReplaceScene(string name, SpriteScene scene)
     {

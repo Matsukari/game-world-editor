@@ -9,7 +9,7 @@ namespace Raven
     public readonly Sheet Sheet;
     public Animation Animation;
     public AnimationPlayer Player { get => _player; }
-    public bool IsOpen { get => _player != null; }
+    public bool IsOpen { get => _player != null && _inspector.IsOpen; }
     public SpriteAnimationFrame SelectedFrame;
 
     public event Action OnClose;

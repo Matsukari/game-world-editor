@@ -1,5 +1,4 @@
 using ImGuiNET;
-using Nez;
 using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
@@ -9,6 +8,7 @@ namespace Raven
     Sheet _sheet { get => Content as Sheet; }
     SpriteScene _spriteSceneOnName;
     bool _isOpenSpriteOptions = false;
+    public Widget.SpriteSlicer SpriteSlicer = new Widget.SpriteSlicer();
 
     public event Action<SpriteScene> OnConvertToScene;
 
@@ -21,6 +21,7 @@ namespace Raven
         _isOpenSpriteOptions = false;
         ImGui.OpenPopup("sprite-popup");
       }
+      SpriteSlicer.Draw();
 
       // something is selected; render options
       if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Sprite sprite && ImGui.BeginPopup("sprite-popup"))
@@ -58,8 +59,9 @@ namespace Raven
         }
         if (ImGui.MenuItem(Icon.Film + "   Create Animation"))
         {
-          _sheet.Animations.Add(new AnimatedSprite(sprite.SubDivide(new Microsoft.Xna.Framework.Point(16, 16)))); 
-
+          SpriteSlicer.Sprite = sprite;
+          SpriteSlicer.Open(()=>_sheet.AddAnimation(new AnimatedSprite(sprite.SubDivide(SpriteSlicer.SplitSize))));
+           
         }
         // add to exisiting spriteScene; select by list
         if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(Icon.Plus + "   Add To SpriteScene"))
