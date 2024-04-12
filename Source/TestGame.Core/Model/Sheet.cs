@@ -27,6 +27,11 @@ namespace Raven
 		public List<SpriteScene> SpriteScenees = new List<SpriteScene>();
 
     /// <summary>
+    /// List of all Sprite animation created in this Sheet
+    /// </summary>
+		public List<AnimatedSprite> Animations = new List<AnimatedSprite>();
+
+    /// <summary>
     /// Width of tile in pixels
     /// </summary>
     public int TileWidth;

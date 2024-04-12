@@ -10,6 +10,7 @@ namespace Raven
     public readonly SheetInspector Inspector;
     public readonly SheetViewPopup Popups;
     public SpriteSceneView SceneView;
+    public SpriteAnimationEditor SpriteAnimEditor;
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
 
@@ -23,7 +24,15 @@ namespace Raven
       Inspector.SpritePicker.OnDropSource += source => SceneView.LastSprite.SpriteScene.AddSprite(source);
       Popups = new SheetViewPopup();
 
+      Inspector.OnClickAnimation += anim => SpriteAnimEditor.Open(anim);
+      Inspector.OnDeleteAnimation += anim => SpriteAnimEditor.Close();
     }
+    public override void Initialize(Editor editor, EditorContent content)
+    {
+      base.Initialize(editor, content);
+      SpriteAnimEditor = new SpriteAnimationEditor(content.Content as Sheet);
+    }
+        
     public void Update(Sheet sheet, SelectionList list) 
     {
       _list = list;
@@ -50,6 +59,9 @@ namespace Raven
         _spriteInspector.Sprite = _list.Selections.Last() as Sprite;
         _spriteInspector.Render(imgui);
       }
+
+      var animEditor = SpriteAnimEditor as IImGuiRenderable;
+      animEditor.Render(imgui);
 
       var popup = Popups as IImGuiRenderable;
       popup.Render(imgui);

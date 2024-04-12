@@ -38,10 +38,12 @@ namespace Raven
 
       _imgui = new SheetViewImGui(Settings, Camera);
       _imgui.Initialize(editor, content);
+      _imgui.Update(_sheet, ContentData.SelectionList);
       _imgui.SceneView = _scene;
 
       _imgui.Popups.Initialize(editor, content);
       _imgui.Popups.OnConvertToScene += scene => _scene.Edit(scene);
+      _imgui.SpriteAnimEditor.Initialize(editor, content);
 
       _input = new SheetViewInputHandler(this);
       _input.Initialize(editor, content);
@@ -49,6 +51,8 @@ namespace Raven
 
       Inspector.OnClickScene += scene => _scene.Edit(scene);
       Inspector.OnDeleteScene += scene => _scene.UnEdit();
+
+
     }
     public override void OnContentOpen(IPropertied content)
     {
@@ -90,6 +94,22 @@ namespace Raven
         var worldTileInMouse = TileInMouse.ToRectangleF();
         worldTileInMouse.Location += _image.Bounds.Location;
         batcher.DrawRect(worldTileInMouse, settings.Colors.PickHover.ToColor());
+      }
+
+      if (_imgui.SpriteAnimEditor.IsOpen) 
+      {
+        for (int i = 0; i < _imgui.SpriteAnimEditor.Player.Animation.Frames.Count(); i++)
+        {
+          if (_imgui.SpriteAnimEditor.Player.Animation.Frames[i] is not SpriteAnimationFrame spriteFrame) return;
+
+          batcher.DrawRect(GetRegionInSheet(spriteFrame.Sprite.Region.ToRectangleF()), settings.Colors.Background.ToColor());
+          if (_imgui.SpriteAnimEditor.Player.CurrentIndex == i)
+            batcher.Draw(
+                texture: Sheet.Texture, 
+                sourceRectangle: spriteFrame.Sprite.Region, 
+                destinationRectangle: GetRegionInSheet((_imgui.SpriteAnimEditor.Animation.Frames[0] as SpriteAnimationFrame).Sprite.Region.ToRectangleF()),
+                color: Color.White);
+        }
       }
 
       // Draw last selected sprite

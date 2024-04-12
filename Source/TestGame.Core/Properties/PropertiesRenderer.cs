@@ -72,7 +72,7 @@ namespace Raven
       if (header)
       {
 
-        ImGui.BeginChild("Properties");
+        ImGui.BeginChild("Properties", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, 200));
  
         if (propertied.Properties.Data.Count() == 0) ImGuiUtils.TextMiddle("No properties yet.");
 

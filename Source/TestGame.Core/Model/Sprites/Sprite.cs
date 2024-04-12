@@ -27,11 +27,40 @@ namespace Raven
 
     internal Sheet _sheet;
     private Sprite() {}
+
+
     public Sprite(Rectangle region, Sheet sheet)
     {
       Region = region;
       _sheet = sheet;
       _tiles = sheet.GetTiles(region.ToRectangleF());
+    }
+    public Sprite(Sheet sheet)
+    {
+      Region = new Rectangle();
+      _sheet = sheet;
+    }
+    
+    public void Refer(Sprite sprite)
+    {
+      Properties = sprite.Properties;
+      Name = sprite.Name;
+      Region = sprite.Region;
+      _sheet = sprite._sheet;
+      _tiles = _sheet.GetTiles(Region.ToRectangleF());
+    }
+
+    public List<Sprite> SubDivide(Point size)
+    {
+      List<Sprite> list = new List<Sprite>();
+      for (int y = Region.Top; y < Region.Bottom; y += size.Y)
+      {
+        for (int x = Region.Left; x < Region.Right; x += size.X)
+        {
+          list.Add(new Sprite(new Rectangle(x, y, size.X, size.Y), _sheet));
+        }
+      }
+      return list;
     }
     public List<Tile> GetRectTiles()
     {

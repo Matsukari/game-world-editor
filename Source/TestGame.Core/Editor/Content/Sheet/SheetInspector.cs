@@ -24,11 +24,15 @@ namespace Raven
     }
     Sheet _sheet;
     SpriteScene _spriteSceneOnOption;
+    AnimatedSprite _animOnOption;
     SheetPickerData _sheetData;
 
     public bool ShowPicker = false;
     public SpriteSceneSpritePicker SpritePicker;
     readonly internal EditorSettings _settings;
+
+    public event Action<AnimatedSprite> OnClickAnimation;
+    public event Action<AnimatedSprite> OnDeleteAnimation;
 
     public event Action<SpriteScene> OnClickScene;
     public event Action<SpriteScene> OnDeleteScene;
@@ -89,6 +93,30 @@ namespace Raven
           ImGui.Unindent();
         }
       }
+      if (ImGui.CollapsingHeader($"{Icon.Film}   Animations ({Sheet.Animations.Count})", ImGuiTreeNodeFlags.DefaultOpen))
+      {
+        var size = ImGui.GetContentRegionAvail();
+        ImGui.BeginChild("spri-animations", new System.Numerics.Vector2(size.X, Math.Min(200, size.Y)));
+        ImGui.Indent();
+
+        if (Sheet.Animations.Count == 0) ImGuiUtils.TextMiddle("No Animations yet.");
+
+        var i = 0;
+        foreach (var animation in Sheet.Animations)
+        {
+          if (ImGui.MenuItem($"{++i}.   {animation.Name}") && OnClickAnimation != null) 
+          {
+            OnClickAnimation(animation);
+          }
+          if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
+          {
+            ImGui.OpenPopup("sprite-anim-options-popup");
+            _animOnOption = animation;
+          }
+        }
+        ImGui.Unindent();
+        ImGui.EndChild();
+      }
       if (ImGui.CollapsingHeader($"{Icon.Users}   SpriteScenes ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         var size = ImGui.GetContentRegionAvail();
@@ -128,6 +156,24 @@ namespace Raven
         if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
         {
           Sheet.AddScene(_spriteSceneOnOption.Copy());
+        }
+        ImGui.EndPopup();
+      }
+      if (ImGui.BeginPopupContextItem("sprite-anim-options-popup") && _animOnOption != null)
+      {
+        if (ImGui.MenuItem(Icon.Pen + "   Rename"))
+        {
+          ImGuiManager.NameModal.Open((name)=>{Sheet.Animations.Find(item => item.Name == _animOnOption.Name).Name = name;});
+        }
+        if (ImGui.MenuItem(Icon.Trash + "   Delete"))
+        {
+          Sheet.Animations.RemoveAll((item)=>item.Name == _animOnOption.Name);
+          if (Sheet.SpriteScenees.Count() == 0 && OnDeleteAnimation != null) 
+            OnDeleteAnimation(_animOnOption);
+        }
+        if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
+        {
+          Sheet.Animations.Add(_animOnOption.Copy() as AnimatedSprite);
         }
         ImGui.EndPopup();
       }

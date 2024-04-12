@@ -56,6 +56,11 @@ namespace Raven
           }
           Convert();
         }
+        if (ImGui.MenuItem(Icon.Film + "   Create Animation"))
+        {
+          _sheet.Animations.Add(new AnimatedSprite(sprite.SubDivide(new Microsoft.Xna.Framework.Point(16, 16)))); 
+
+        }
         // add to exisiting spriteScene; select by list
         if (_sheet.SpriteScenees.Count() > 0 && ImGui.BeginMenu(Icon.Plus + "   Add To SpriteScene"))
         {

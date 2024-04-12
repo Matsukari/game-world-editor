@@ -37,6 +37,16 @@ namespace Raven
     /// </summary>
     public int TotalFrames { get => Frames.Count(); }
 
+
+    private Animation()
+    {
+    }
+    public Animation(object target, string name = "Animation") 
+    {
+      Name = name;
+      Target = target;
+    }
+
     /// <summary>
     /// Inserts a frame AFTER the given index (exising) or appends in same size 
     /// </summary>
@@ -54,15 +64,6 @@ namespace Raven
       anim.Properties = Properties.Copy();
       anim.Frames = Frames.CloneItems();  
       return anim;
-    }
-
-    private Animation()
-    {
-    }
-    public Animation(object target, string name = "Animation") 
-    {
-      Name = name;
-      Target = target;
     }
   }
 }
