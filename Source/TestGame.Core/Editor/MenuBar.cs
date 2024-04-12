@@ -11,14 +11,21 @@ namespace Raven
     (string, Action)[][] _buttons; 
     readonly Editor _editor;
 
+    void SaveFile()
+    {
+      _editor.WindowManager.FilePicker.Open(file => 
+      {
+        _editor.Serializer.SaveContent(file);
+      }, "Save file");
+    }
     void ProjectOptions()
     {
       var type = (_editor.ContentManager.View is WorldView) ? "World" : "Sheet";
       if (ImGui.MenuItem("Project Settings")) _editor.WindowManager.GetRenderable<Settings>().IsOpen = true;
       if (ImGui.MenuItem("Project Dashboard")) {}
       ImGui.Separator();
-      if (ImGui.MenuItem($"Save ({type})")) _editor.Serializer.SaveContent();
-      if (ImGui.MenuItem("Save as")) _editor.Serializer.SaveContent();
+      if (ImGui.MenuItem($"Save ({type})")) SaveFile();
+      if (ImGui.MenuItem("Save as")) SaveFile();
       if (ImGui.MenuItem("Close")) Core.Exit();
     }
     void WorldOptions()

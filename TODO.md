@@ -31,7 +31,6 @@ LOD system
 
 
 ## Misc
-File picker for saving 
 Save world
 Undo & redo
 Shape & tile separate selection

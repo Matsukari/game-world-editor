@@ -130,7 +130,7 @@ namespace Raven.Widget
       }
       ImGui.EndChild();
 
-      var newName = (SelectedFile == null) ? "" : SelectedFile;
+      var newName = (SelectedFile == null) ? "Untitled".GetUniqueFileName() : Path.GetFileName(SelectedFile);
       ImGui.Text("File name: ");
       ImGui.SameLine();
       ImGui.SetNextItemWidth(ImGui.GetContentRegionAvail().X);
@@ -171,6 +171,9 @@ namespace Raven.Widget
 				RemoveFileManWindow(this);
 				ImGui.CloseCurrentPopup();
 			}
+
+      if (result)
+        SelectedFile = Path.Join(CurrentFolder, newName);
 
 			return result;
 		}

@@ -7,7 +7,7 @@ namespace Raven.Widget
   {
     bool _isNameModal;
     Action<string> _nameCallback;
-    public void Open(Action<string> callback)
+    public void Open(Action<string> callback, bool modal=true)
     {
       _nameCallback = callback;
       _isNameModal = true;

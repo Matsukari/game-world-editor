@@ -1,11 +1,19 @@
-/home/ark/Documents/game/projects/WorldEditor/Vendor/Nez/Nez.Portable/Nez.MG38.csproj : warning NU1904: Package 'System.Drawing.Common' 5.0.2 has a known critical severity vulnerability, https://github.com/advisories/GHSA-rxg9-xrhp-64gj [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Desktop/TestGame.Desktop.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Vendor/Nez/Nez.Portable/Nez.MG38.csproj : warning NU1904: Package 'System.Drawing.Common' 5.0.2 has a known critical severity vulnerability, https://github.com/advisories/GHSA-rxg9-xrhp-64gj [TargetFramework=netstandard2.0]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Content/Sheet/SheetSelector.cs(26,12): warning CS8321: The local function 'OpenPopup' is declared but never used [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Content/Sheet/SheetView.cs(88,11): warning CS8073: The result of the expression is always 'true' since a value of type 'RectangleF' is never equal to 'null' of type 'RectangleF?' [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Content/Sheet/SheetSelector.cs(131,13): warning CS8073: The result of the expression is always 'true' since a value of type 'Rectangle' is never equal to 'null' of type 'Rectangle?' [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/World/Sprites/Spritex.cs(64,26): warning CS0168: The variable '_' is declared but never used [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Settings.cs(25,33): warning CS0169: The field 'Settings._fieldOnOpenColor' is never used [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Settings.cs(10,12): warning CS0169: The field 'Settings._editor' is never used [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Content/Sheet/Spritex/SpritexInspector.cs(15,20): warning CS0169: The field 'SpritexInspector._spritexPart' is never used [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Settings.cs(24,10): warning CS0414: The field 'Settings._isOpenColor' is assigned but its value is never used [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
-/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/Editor/Content/Sheet/Spritex/AnimationInspector.cs(147,9): warning CS0414: The field 'AnimationInspector._modifiedFrame' is assigned but its value is never used [/home/ark/Documents/game/projects/WorldEditor/Source/TestGame.Core/TestGame.Core.csproj]
+{
+	"@id": "1",
+	"Name": "/home/ark/Documents/game/projects/WorldEditor/Untitled.rvsheet",
+	"Properties": {
+		"@id": "2",
+		"Data": {
+
+		}
+	},
+	"Source": "/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png",
+	"_tiles": {
+
+	},
+	"SpriteScenees": [
+
+	],
+	"TileWidth": 16,
+	"TileHeight": 16
+}

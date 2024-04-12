@@ -14,6 +14,7 @@ namespace Raven
 
     [JsonExclude]
     public bool Open = true;
+
     public EditorContent(IPropertied content, EditorContentData data)   
     {
       Content = content;
