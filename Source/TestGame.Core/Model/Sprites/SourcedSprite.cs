@@ -51,8 +51,8 @@ namespace Raven
     public RectangleF Bounds 
     { 
       get => new RectangleF(
-          Transform.Position.X - Origin.X, 
-          Transform.Position.Y - Origin.Y, 
+          Transform.Position.X - Origin.X * Transform.Scale.X, 
+          Transform.Position.Y - Origin.Y * Transform.Scale.Y, 
           SourceSprite.Region.Width * Transform.Scale.X, 
           SourceSprite.Region.Height * Transform.Scale.Y);
       set 
@@ -98,7 +98,8 @@ namespace Raven
     }
     public int DeterminePreset()
     {
-      if (Origin == Bounds.Size/2f) return 0;
+      Console.WriteLine($"{Origin} == {SourceSprite.Region.Size.ToVector2()/2f}");
+      if (Origin == SourceSprite.Region.Size.ToVector2()/2f) return 0;
       else if (Origin == Vector2.Zero) return 1;
       else return 2;
     }

@@ -46,6 +46,7 @@ namespace Raven
       _sceneInspector = new SpriteSceneInspector(spriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => _animationEditor.Open(scene, anim);
       _sceneInspector.OnDelPart += part => Selection.End();
+      _sceneInspector.OnModifiedPart += ReSelect; 
       _renderer = new SpriteSceneRenderer(spriteScene);
       _renderer.Entity = Entity;
       ContentData.PropertiedContext = spriteScene;
@@ -70,6 +71,13 @@ namespace Raven
     {
       IsEditing = false;
     }
+    void ReSelect(SourcedSprite part)
+    {
+      if (Selection.HasBegun()) Selection.Begin(part.SceneBounds, part);  
+      _initialScale = part.Transform.Scale;
+      _initialPos = part.Transform.Position;
+      _initialRot = part.Transform.Rotation;
+    }
     public void Render(Batcher batcher, Camera camera)
     {
       if (!IsEditing) return;
@@ -86,8 +94,8 @@ namespace Raven
         batcher.DrawCircle(part.PlainBounds.AddTransform(part.SpriteScene.Transform).Location, 4f/camera.RawZoom, Settings.Colors.OriginPoint.ToColor());
 
         if (part.SceneBounds.Contains(camera.MouseToWorldPoint()))
-          batcher.DrawHollowRect(part.PlainBounds.AddTransform(part.SpriteScene.Transform), Settings.Colors.SpriteBoundsOutline.ToColor(), 
-              part.Transform.Rotation + part.SpriteScene.Transform.Rotation, part.Origin, 1f/camera.RawZoom);
+          batcher.DrawHollowRect(part.SceneBounds, Settings.Colors.SpriteBoundsOutline.ToColor(), 
+              part.Transform.Rotation + part.SpriteScene.Transform.Rotation, Vector2.Zero, 1f/camera.RawZoom);
 
         batcher.DrawString(
             Graphics.Instance.BitmapFont, 
@@ -104,7 +112,9 @@ namespace Raven
       {
         selPart.Transform.Scale = _initialScale + 
           (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
-        selPart.Transform.Position = _initialPos + ((Selection.ContentBounds.Location - selPart.Origin) - (Selection.InitialBounds.Location - selPart.Origin));
+        selPart.Transform.Position = _initialPos + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) +
+          ( selPart.Origin *
+          ((Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2())) );
       }
       if (Mover.Capture is SourcedSprite p)
       {
@@ -142,7 +152,7 @@ namespace Raven
           _initialPos = part.Transform.Position;
           _initialRot = part.Transform.Rotation;
 
-          if (Operator == EditorOperator.Select) Selection.Begin(part.Bounds, part); 
+          if (Operator == EditorOperator.Select) Selection.Begin(part.SceneBounds, part); 
           else if (Operator == EditorOperator.MoveOnly) Mover.TryBegin(part.Bounds.Center, input.Camera, part); 
           else if (Operator == EditorOperator.Rotator) Rotator.Begin(part.Bounds.Location, input.Camera, part); 
         }

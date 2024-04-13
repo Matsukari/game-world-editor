@@ -23,6 +23,7 @@ namespace Raven
     public event Action<SpriteScene, Animation> OnOpenAnimation;
     public event Action<SourcedSprite> OnAddPart;
     public event Action<SourcedSprite> OnDelPart;
+    public event Action<SourcedSprite> OnModifiedPart;
 
     static string[] _originTypes = new string[] { "Center", "Topleft", "Custom" };
 
@@ -36,32 +37,40 @@ namespace Raven
       DrawOptions();
       DrawAnimationOptionPopup();
     }
-    public static void RenderSprite(SourcedSprite sprite, bool drawName = true)
+        
+    public static bool RenderSprite(SourcedSprite sprite, bool drawName = true)
     {
       string name = sprite.Name;
+      bool mod = false;
       if (drawName && ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
       {
         sprite.Name = name;
+        mod = true;
       }
       ImGui.BeginDisabled();
         if (sprite.SourceSprite.Name != "") ImGui.LabelText("Source", sprite.SourceSprite.Name);
         ImGui.LabelText("Region", sprite.SourceSprite.Region.RenderStringFormat());
       ImGui.EndDisabled();
 
-      sprite.Transform.RenderImGui();
+      mod = mod || sprite.Transform.RenderImGui();
       var origin = sprite.Origin.ToNumerics();
 
       var originType = sprite.DeterminePreset();
       // Preset origin
       if (ImGui.Combo("Origin", ref originType, _originTypes, _originTypes.Count()))
       {
-        if (originType == 0) sprite.Origin = sprite.Bounds.Size/2f;
+        if (originType == 0) sprite.Origin = sprite.SourceSprite.Region.Size.ToVector2()/2f;
         else if (originType == 1) sprite.Origin = new Vector2();
+        mod = true;
       }
       // Custom origin is selected
       if (originType == 2)
       {
-        if (ImGui.InputFloat2("Origin", ref origin)) sprite.Origin = origin;
+        if (ImGui.InputFloat2("Origin", ref origin)) 
+        {
+          mod = true;
+          sprite.Origin = origin;
+        }
       }
       var color = sprite.Color.ToNumerics();
       if (ImGui.ColorEdit4("Tint", ref color)) sprite.Color = color;
@@ -72,6 +81,8 @@ namespace Raven
       if (ImGui.Checkbox("Flip X", ref flipH)) sprite.SpriteEffects ^= SpriteEffects.FlipHorizontally;
       ImGui.SameLine();
       if (ImGui.Checkbox("Flip Y", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
+
+      return mod;
     }
     internal bool _isOpenComponentOptionPopup = false;
     internal bool _isOpenSceneOnSpritePopup = false;
@@ -315,7 +326,7 @@ namespace Raven
           if (spriteNode)
           {
             ImGui.PushID("spriteScene-component-content-" + part.Name);
-            RenderSprite(part);
+            if (RenderSprite(part)) OnModifiedPart(part);
             ImGui.PopID();
 
             ImGui.TreePop();

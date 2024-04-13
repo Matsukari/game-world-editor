@@ -26,16 +26,34 @@ namespace Raven
       transform.LocalScale = Scale;
       transform.LocalRotationDegrees = Rotation;
     }
-    public void RenderImGui()
+    public bool RenderImGui()
     {
+      var mod = false;
       var pos = Position.ToNumerics();
       var scale = Scale.ToNumerics();
       var skew = Skew.ToNumerics();
       var rot = RotationDegrees;
-      if (ImGui.InputFloat2("Position", ref pos)) Position = pos.ToVector2();
-      if (ImGui.InputFloat2("Scale", ref scale)) Scale = scale.ToVector2();
-      if (ImGui.InputFloat2("Skew", ref skew)) Skew = skew.ToVector2();
-      if (ImGui.SliderFloat("Rotation", ref rot, 0, 360)) RotationDegrees = rot;
+      if (ImGui.InputFloat2("Position", ref pos)) 
+      {
+        Position = pos.ToVector2();
+        mod = true;
+      }
+      if (ImGui.InputFloat2("Scale", ref scale)) 
+      {
+        Scale = scale.ToVector2();
+        mod = true;
+      }
+      if (ImGui.InputFloat2("Skew", ref skew)) 
+      {
+        Skew = skew.ToVector2();
+        mod = true;
+      }
+      if (ImGui.SliderFloat("Rotation", ref rot, 0, 360)) 
+      {
+        RotationDegrees = rot;
+        mod = true;
+      }
+      return mod;
     }
     public static void RenderImGui(Nez.Transform transform)
     {
