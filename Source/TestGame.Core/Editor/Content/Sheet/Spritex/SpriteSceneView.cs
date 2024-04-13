@@ -83,6 +83,12 @@ namespace Raven
 
       foreach (var part in _sceneInspector.SpriteScene.Parts)
       {
+        batcher.DrawCircle(part.PlainBounds.AddTransform(part.SpriteScene.Transform).Location, 4f/camera.RawZoom, Settings.Colors.OriginPoint.ToColor());
+
+        if (part.SceneBounds.Contains(camera.MouseToWorldPoint()))
+          batcher.DrawHollowRect(part.PlainBounds.AddTransform(part.SpriteScene.Transform), Settings.Colors.SpriteBoundsOutline.ToColor(), 
+              part.Transform.Rotation + part.SpriteScene.Transform.Rotation, part.Origin, 1f/camera.RawZoom);
+
         batcher.DrawString(
             Graphics.Instance.BitmapFont, 
             part.Name,
@@ -106,7 +112,6 @@ namespace Raven
       }
       if (Rotator.Capture is SourcedSprite p2)
       {
-        Console.WriteLine($"Intiial: {Rotator.InitialAngle}, Now: {Rotator.Angle}");
         p2.Transform.Rotation = _initialRot + (Rotator.Angle  - Rotator.InitialAngle);
       }
     }  

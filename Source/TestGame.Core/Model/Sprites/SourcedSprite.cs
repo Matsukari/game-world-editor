@@ -39,7 +39,7 @@ namespace Raven
       get 
       {
         var bounds = Bounds;
-        bounds.Location += SpriteScene.Bounds.Location;
+        bounds.Location += SpriteScene.Transform.Position;
         bounds.Size *= SpriteScene.Transform.Scale;
         return bounds;
       }
@@ -58,6 +58,24 @@ namespace Raven
       set 
       {
         Transform.Position = value.Location + Origin;
+        Transform.Scale = value.Size / SourceSprite.Region.Size.ToVector2();
+      }
+    }
+
+
+    /// <summary>
+    /// Local bounds; relative to scene. Takes accounts the origin and local scale
+    /// </summary>
+    public RectangleF PlainBounds
+    { 
+      get => new RectangleF(
+          Transform.Position.X , 
+          Transform.Position.Y , 
+          SourceSprite.Region.Width * Transform.Scale.X, 
+          SourceSprite.Region.Height * Transform.Scale.Y);
+      set 
+      {
+        Transform.Position = value.Location;
         Transform.Scale = value.Size / SourceSprite.Region.Size.ToVector2();
       }
     }

@@ -14,6 +14,8 @@ namespace Raven
     public uint FrameInactive { get => Get(ImGuiCol.TextDisabled); }
     public uint FrameActive { get => Get(ImGuiCol.Text); }
 
+    public Vector4 OriginPoint = new Vector4(0.5f, 0.5f, 0.5f, 1f);
+    public Vector4 SpriteBoundsOutline = new Vector4(0.5f, 0.5f, 0.5f, 1f);
 
     // Guidelines
     public Vector4 OriginLineX = new Vector4(0.5f, 0.5f, 0.5f, 1f);
