@@ -10,6 +10,7 @@ namespace Raven
     WorldView _view;
     List<Point> _canFillTiles = new List<Point>();
     Camera Camera { get => _view.Camera; }
+    public event Action<FreeformLayer, SpriteSceneInstance> OnPaintScene;
 
     public TilePainter(WorldView view)
     {
@@ -108,11 +109,11 @@ namespace Raven
     }
     void PaintSpriteScene(FreeformLayer freeformLayer, SpriteScene scene)
     {
-      var tileApprox = Camera.MouseToWorldPoint() - scene.EnclosingBounds.Size/2f; 
+      var pos = Camera.MouseToWorldPoint(); 
       if (_view.PaintMode == PaintMode.Pen)
       {
         var paint = freeformLayer.PaintSpriteScene(scene);
-        paint.Transform.Position = Camera.MouseToWorldPoint() - freeformLayer.Bounds.Location;
+        paint.Transform.Position = pos - freeformLayer.Bounds.Location;
       }
       else if (_view.PaintMode == PaintMode.Eraser)
       {
@@ -166,7 +167,7 @@ namespace Raven
         {
           var min = part.SourceSprite.Region.Location.ToVector2() / part.SourceSprite.Texture.GetSize();
           var max = (part.SourceSprite.Region.Location + part.SourceSprite.Region.Size).ToVector2() / part.SourceSprite.Texture.GetSize();
-          var pos = rawMouse + part.Bounds.Location.ToNumerics();
+          var pos = rawMouse + part.Bounds.Location.ToNumerics() * Camera.RawZoom;
 
           ImGui.GetForegroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(part.SourceSprite.Texture),

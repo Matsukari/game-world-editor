@@ -16,7 +16,6 @@ Implement ellipses
 ## SpriteScene
 Multiple select parts
 Multiple transforms on selected parts
-Rotate parts on selection
 Choose ease type
 
 ## Level

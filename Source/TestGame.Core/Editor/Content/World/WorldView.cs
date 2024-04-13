@@ -22,6 +22,7 @@ namespace Raven
     public PaintMode PaintMode = PaintMode.Pen;
     public PaintType PaintType = PaintType.Single;
     Vector2 _initialScale = new Vector2();
+    Vector2 _initialPos = new Vector2();
 
     public bool CanPaint { get => _imgui.SpritePicker.SelectedSprite != null; }
 
@@ -49,7 +50,13 @@ namespace Raven
       _imgui.Popups.OnDeleteLevel += level => Selection.End();
       _imgui.Popups.OnCutLevel += level => Selection.End();
       _imgui.SpritePicker.OnLeave += () => { if (CanPaint) Selection.End(); };
+      _imgui.SceneInstanceInspector.OnSceneModified += ReSelect;
 
+    }
+    public void ReSelect(SpriteSceneInstance instance, FreeformLayer layer)
+    {
+      if (Selection.Capture is SpriteSceneInstance scene && scene.Name == instance.Name)
+        OnLeftClickScene(layer, instance);
     }
 
     public override void OnContentOpen(IPropertied content)
@@ -58,9 +65,11 @@ namespace Raven
     }  
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
-      Selection.Begin(instance.ContentBounds, instance);
+      Selection.Begin(instance.ContentBounds.AddPosition(layer.Bounds.Location), instance);
       _initialScale = instance.Props.Transform.Scale;
+      _initialPos = instance.Props.Transform.Position;
       _imgui.SceneInstanceInspector.Scene = instance;
+      _imgui.SceneInstanceInspector.Layer = layer as FreeformLayer;
     }
     void OnLeftClickLevel(Level level, int i)
     {
@@ -114,8 +123,10 @@ namespace Raven
       }
       else if (Selection.Capture is SpriteSceneInstance instance)
       {
-        instance.Props.Transform.Position = Selection.ContentBounds.Location;
-        instance.Props.Transform.Scale = _initialScale + (Selection.ContentBounds.Size / Selection.InitialBounds.Size) - Vector2.One;
+        var scaleDelta = (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (instance.Scene.Bounds.Size);
+        instance.Props.Transform.Position = _initialPos + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) 
+          + instance.Scene.MaxOrigin * scaleDelta;
+        instance.Props.Transform.Scale = _initialScale + scaleDelta;
       }
       if (_imgui.SelectedLevel != -1)
       {

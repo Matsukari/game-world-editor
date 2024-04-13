@@ -62,7 +62,21 @@ namespace Raven
           max.X = Math.Max(max.X, part.Bounds.Right);
           max.Y = Math.Max(max.Y, part.Bounds.Bottom);
         }
-        return RectangleF.FromMinMax(min, max);
+        return (Parts.Count() == 0) ? new RectangleF() : RectangleF.FromMinMax(min, max);
+      }
+    }
+
+    public Vector2 MaxOrigin
+    {
+      get 
+      {
+        var max = new Vector2(Int32.MinValue, Int32.MinValue);
+        foreach (var part in Parts)  
+        {
+          max.X = Math.Max(max.X, part.Origin.X);
+          max.Y = Math.Max(max.Y, part.Origin.Y);
+        }
+        return (Parts.Count() == 0) ? Vector2.Zero : max;
       }
     }
 

@@ -110,11 +110,9 @@ namespace Raven
       }
       if (Selection.Capture is SourcedSprite selPart)
       {
-        selPart.Transform.Scale = _initialScale + 
-          (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
-        selPart.Transform.Position = _initialPos + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) +
-          ( selPart.Origin *
-          ((Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2())) );
+        var contentScale = (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
+        selPart.Transform.Scale = _initialScale + contentScale;
+        selPart.Transform.Position = _initialPos + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) + (selPart.Origin * contentScale);
       }
       if (Mover.Capture is SourcedSprite p)
       {

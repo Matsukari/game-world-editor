@@ -73,7 +73,7 @@ namespace Raven
         if (!sprite.IsVisible) return;
         batcher.Draw(
             texture: sprite.SourceSprite.Texture,
-            position: position + sprite.SceneBounds.Location + instance.Props.Transform.Position,
+            position: position + sprite.PlainBounds.AddPosition(sprite.SpriteScene.Transform.Position).Location + instance.Props.Transform.Position,
             sourceRectangle: sprite.SourceSprite.Region,
             color: sprite.Color.ToColor(),
             rotation: instance.Props.Transform.Rotation + instance.Scene.Transform.Rotation + sprite.Transform.Rotation,
@@ -93,11 +93,20 @@ namespace Raven
     [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
+    /// <summary>
+    /// The reference to the content, modifying this will modify all instances that depends on this scene
+    /// </summary> 
     public readonly SpriteScene Scene;
 
+    /// <summary>
+    /// Options, transform for rendering
+    /// </summary> 
     public RenderProperties Props;
 
-    public RectangleF ContentBounds { get => Scene.Bounds.AddTransform(Props.Transform); }
+    /// <summary>
+    /// This is the bounds of the actual content (sprite parts) 
+    /// </summary> 
+    public RectangleF ContentBounds { get => Scene.Bounds.AddTransform(Props.Transform).AddPosition(-Scene.MaxOrigin * (Props.Transform.Scale - Vector2.One)); }
 
     public SpriteSceneInstance(SpriteScene scene, RenderProperties props = null)
     {
@@ -135,7 +144,7 @@ namespace Raven
       SpriteScenees.Add(instance);
       return instance.Props;
     }
-    public int GetSceneAt(Vector2 position) => SpriteScenees.FindLastIndex(scene => scene.Scene.Bounds.AddTransform(scene.Props.Transform).Contains(position));
+    public int GetSceneAt(Vector2 position) => SpriteScenees.FindLastIndex(scene => scene.ContentBounds.AddPosition(Bounds.Location).Contains(position));
     public void RemoveSpriteSceneAt(Vector2 position)
     {
       var index = GetSceneAt(position);
