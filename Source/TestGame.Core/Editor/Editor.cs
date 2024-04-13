@@ -10,6 +10,7 @@ namespace Raven
 
     public EditorOperator Operator;
     public Guidelines.MovableOriginLines Mover;
+    public Rotator Rotator;
     public Selection Selection;
     public Serializer Serializer;
     public ShapeAnnotator ShapeAnnotator;
@@ -62,6 +63,8 @@ namespace Raven
       ShapeAnnotator = new ShapeAnnotator(Settings);
       Mover = AddComponent(new Guidelines.MovableOriginLines());
       Mover.RenderLayer = -1;
+      Rotator = AddComponent(new Rotator());
+      Rotator.RenderLayer = -1;
 
       WindowManager = new ImGuiWinManager();
       WindowManager.Renderables.Add(new Settings(Settings));
@@ -80,6 +83,7 @@ namespace Raven
       input.RegisterInputHandler(ShapeAnnotator);
       input.RegisterInputHandler(Selection);
       input.RegisterInputHandler(Mover);
+      input.RegisterInputHandler(Rotator);
       input.RegisterInputHandler(GetComponent<SelectionRenderer>());
 
       Serializer.LoadStartup();

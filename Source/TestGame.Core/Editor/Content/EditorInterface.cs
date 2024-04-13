@@ -8,6 +8,7 @@ namespace Raven
     public Camera Camera { get; private set; }
     public Selection Selection { get; private set; }
     public Guidelines.MovableOriginLines Mover { get; private set; }
+    public Rotator Rotator { get; private set; }
     public IPropertied Content { get; private set; }
     public Serializer Serializer { get; private set; }
     public EditorContentData ContentData { get; private set; }
@@ -26,6 +27,7 @@ namespace Raven
       Serializer = editor.Serializer;
       Settings = editor.Settings;
       Mover = editor.Mover;
+      Rotator = editor.Rotator;
     }
 
     public override bool Equals(object obj)

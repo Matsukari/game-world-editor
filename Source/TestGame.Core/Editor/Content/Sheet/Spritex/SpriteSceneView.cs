@@ -102,12 +102,18 @@ namespace Raven
       }
       if (Mover.Capture is SourcedSprite p)
       {
-        Console.WriteLine("Moving at " + Mover.Position);
         p.Transform.Position = _initialPos + ((Mover.Position - p.Origin) - (Mover.InitialPosition - p.Origin));        
+      }
+      if (Rotator.Capture is SourcedSprite p2)
+      {
+        Console.WriteLine($"Intiial: {Rotator.InitialAngle}, Now: {Rotator.Angle}");
+        p2.Transform.Rotation = _initialRot + (Rotator.Angle  - Rotator.InitialAngle);
       }
     }  
     Vector2 _initialScale = new Vector2();
     Vector2 _initialPos = new Vector2();
+    float _initialRot = 0;
+
     public bool HandleInput(InputManager input)
     {
       if (!IsEditing) return false;
@@ -129,9 +135,11 @@ namespace Raven
         {
           _initialScale = part.Transform.Scale;
           _initialPos = part.Transform.Position;
+          _initialRot = part.Transform.Rotation;
 
           if (Operator == EditorOperator.Select) Selection.Begin(part.Bounds, part); 
           else if (Operator == EditorOperator.MoveOnly) Mover.TryBegin(part.Bounds.Center, input.Camera, part); 
+          else if (Operator == EditorOperator.Rotator) Rotator.Begin(part.Bounds.Location, input.Camera, part); 
         }
       }
       else if (Operator == EditorOperator.MoveOnly && Mover.Collides(Camera) == Guidelines.MovableOriginLines.AxisType.None) Mover.Hide();

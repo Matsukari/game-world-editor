@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Raven 
 {
+
   public enum SelectionAxis { TopLeft, BottomLeft, Left, TopRight, BottomRight, Right, Top, Bottom, None }
 
   // <summary>
