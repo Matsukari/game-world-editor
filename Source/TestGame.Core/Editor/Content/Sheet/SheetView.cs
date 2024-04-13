@@ -18,8 +18,6 @@ namespace Raven
     List<Rectangle> _tiles;
     SpriteSceneView _scene;
     
-    string lastSheet = "";
-
     public Rectangle TileInMouse;
 
     public SheetInspector Inspector { get => _imgui.Inspector; }
@@ -63,7 +61,6 @@ namespace Raven
     }
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
-      SyncModifiedTiles();
       _imgui.Update(_sheet, ContentData.SelectionList);
 
       RenderAnnotations(ContentData.PropertiedContext, batcher, camera, settings);
@@ -77,17 +74,24 @@ namespace Raven
 
       TileInMouse = Rectangle.Empty;
 
+
+      
       // Draw tiles grid
-      foreach (var tile in _tiles) 
+      for (int x = 0; x < _sheet.Tiles.X; x++)
       {
-        var worldTile = tile.ToRectangleF();
-        worldTile.Location += _image.Bounds.Location;
-        if (worldTile.Contains(camera.MouseToWorldPoint()) ) TileInMouse = tile;
-        if (Settings.Graphics.DrawSheetGrid)
+        for (int y = 0; y < _sheet.Tiles.Y; y++)
         {
-          batcher.DrawRectOutline(camera, worldTile, settings.Colors.PickHoverOutline.ToColor());
+          var worldTile = Sheet.GetTile(x, y).ToRectangleF();
+          worldTile.Location += _image.Bounds.Location;
+          if (worldTile.Contains(camera.MouseToWorldPoint()) ) TileInMouse = Sheet.GetTile(x, y);
+          if (Settings.Graphics.DrawSheetGrid)
+          {
+            batcher.DrawRectOutline(camera, worldTile, settings.Colors.PickHoverOutline.ToColor());
+          }
+
         }
       }
+
       // Highlight the tile under mouse
       if (!TileInMouse.IsEmpty && !_input.IsBlocked && ContentData.SelectionList.Selections.Count() <= 1) 
       {
@@ -133,14 +137,7 @@ namespace Raven
 
       }
     }
-    void SyncModifiedTiles()
-    {
-      if (lastSheet != _sheet.Name || _tiles == null)
-      {
-        lastSheet = _sheet.Name;
-        _tiles = _sheet.GetTiles();
-      }
-    }
+
     public RectangleF GetRegionInSheet(RectangleF rectangle)
     {
       rectangle.Location += _image.Bounds.Location;

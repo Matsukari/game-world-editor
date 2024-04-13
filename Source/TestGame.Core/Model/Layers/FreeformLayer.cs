@@ -117,7 +117,6 @@ namespace Raven
     object ICloneable.Clone()
     {
       var instance = MemberwiseClone() as SpriteSceneInstance;
-      Console.WriteLine("New props");
       instance.Properties = Properties.Copy();
       instance.Props = Props.Copy();
       return instance;

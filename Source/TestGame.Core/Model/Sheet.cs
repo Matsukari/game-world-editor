@@ -68,7 +68,7 @@ namespace Raven
     public Point TileSize { get => new Point(TileWidth, TileHeight); }
 
     /// <summary>
-    /// Number or rows or columns sliced when set with a TileSize in pixels
+    /// Number or rows or columns sliced when set with a TileSize
     /// </summary>
     public Point Tiles { get => new Point(_texture.Width/TileWidth, _texture.Height/TileHeight); }
 

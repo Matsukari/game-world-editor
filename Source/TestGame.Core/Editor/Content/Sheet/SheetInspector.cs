@@ -55,13 +55,12 @@ namespace Raven
     {
       int w = Sheet.TileWidth, h = Sheet.TileHeight;
       ImGui.LabelText(Icon.File + " File", Sheet.Source);
-      if (ImGui.InputInt("TileWidth", ref w)) Sheet.SetTileSize(w, Sheet.TileHeight);
-      if (ImGui.InputInt("TileHeight", ref h)) Sheet.SetTileSize(Sheet.TileWidth, h);
-      ImGui.BeginDisabled();
-      ImGui.LabelText("Width", $"{Sheet.Tiles.X} tiles");
-      ImGui.LabelText("Height", $"{Sheet.Tiles.Y} tiles");
-      ImGui.EndDisabled();
+      if (ImGui.InputInt("Tile Width", ref w)) Sheet.SetTileSize(w, Sheet.TileHeight);
+      if (ImGui.InputInt("Tile Height", ref h)) Sheet.SetTileSize(Sheet.TileWidth, h);
 
+      var count = Sheet.Tiles;
+      if (ImGui.InputInt("Columns", ref count.X) && count.X != 0) Sheet.TileWidth = (int)Sheet.Size.X / count.X;
+      if (ImGui.InputInt("Rows", ref count.Y) && count.Y != 0) Sheet.TileHeight = (int)Sheet.Size.Y / count.Y;
 
       if (ShowPicker && ImGui.CollapsingHeader("Preview", ImGuiTreeNodeFlags.DefaultOpen))
       {
