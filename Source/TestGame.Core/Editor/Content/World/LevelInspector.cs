@@ -92,12 +92,12 @@ namespace Raven
         }
         if (ImGui.MenuItem(Icon.LevelUpAlt + "  Bring to front"))
         {
-          _layerOnOptions.Level.OrderAt(_layerOnOptions, _layerOnOptions.Level.Layers.Count);  
+          _layerOnOptions.Level.OrderAt(_layerOnOptions, _layerOnOptions.Level.Layers.Count-1);  
         }
 
         ImGui.Separator();
 
-        var lockState = (!_layerOnOptions.IsLocked) ? Icon.LockOpen + "  Unlock" : Icon.Lock + "  Lock";
+        var lockState = (_layerOnOptions.IsLocked) ? Icon.LockOpen + "  Unlock" : Icon.Lock + "  Lock";
         if (ImGui.MenuItem(lockState))
         {
           _layerOnOptions.IsLocked = !_layerOnOptions.IsLocked;
@@ -150,7 +150,7 @@ namespace Raven
         layer.IsVisible = !layer.IsVisible;
       }
       ImGui.SameLine();
-      var lockState = (layer.IsLocked) ? Icon.LockOpen: Icon.Lock;
+      var lockState = (!layer.IsLocked) ? Icon.LockOpen: Icon.Lock;
       if (ImGui.SmallButton(lockState))
       {
         layer.IsLocked = !layer.IsLocked;
@@ -220,7 +220,7 @@ namespace Raven
         ImGui.BeginChild($"level-layers-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
         // Draw layers
         Layer removeLayer = null;
-        for (int i = 0; i < Level.Layers.Count(); i++)
+        for (int i = Level.Layers.Count()-1; i >= 0; i--)
         {
           var layer = Level.Layers[i];
           var flags = ImGuiTreeNodeFlags.AllowItemOverlap 

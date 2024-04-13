@@ -1,63 +1,8 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Nez;
 
 namespace Raven
 {
-  public class RenderProperties
-  {
-    public Transform Transform = new Transform();
-    public Vector4 Color = Vector4.One;
-    public SpriteEffects SpriteEffects = SpriteEffects.None;
-    public RenderProperties Copy() 
-    {
-      var ren = MemberwiseClone() as RenderProperties;
-      ren.Transform = Transform.Duplicate();
-      return ren;
-    }
-  }
-  public class TileLayerRenderer : LayerRenderer<TileLayer>
-  {  
-    public override void Render(Batcher batcher, Camera camera)
-    {
-      foreach (var (tilePosition, tile) in Layer.Tiles)
-      {
-        var dest = new RectangleF(
-            tilePosition.X*Layer.TileWidth, 
-            tilePosition.Y*Layer.TileHeight, 
-            Layer.TileWidth, Layer.TileHeight);
 
-        dest.Location += Bounds.Location;
-        
-        var scale = Transform.Scale;
-        scale.X *= dest.Width / tile.Region.Width;
-        scale.Y *= dest.Height / tile.Region.Height;
-
-        var rot = Transform.Rotation;
-        var eff = SpriteEffects.None;
-        var color = Color.White;
-
-        RenderProperties renderProp;
-        if (Layer.TilesProp.TryGetValue(tilePosition, out renderProp)) 
-        {
-          rot *= renderProp.Transform.Rotation;
-          eff = renderProp.SpriteEffects;
-          color = renderProp.Color.ToColor();
-        }
-
-        batcher.Draw(
-            texture: tile.Texture,
-            position: dest.Location + Transform.Position,
-            sourceRectangle: tile.Region,
-            color: color,
-            rotation: rot,
-            origin: Vector2.Zero,
-            scale: scale,
-            effects: eff,
-            layerDepth: 0);
-      }
-    }
-  }
   /// <summary>
   /// A Layer that can only contains Tiles.
   /// </summary> 

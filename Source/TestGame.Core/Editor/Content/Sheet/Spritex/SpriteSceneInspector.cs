@@ -119,7 +119,7 @@ namespace Raven
         }
         if (ImGui.MenuItem(Icon.LevelUpAlt + "  Bring to front"))
         {
-          _compOnOptions.SpriteScene.OrderAt(_compOnOptions, SpriteScene.Parts.Count);  
+          _compOnOptions.SpriteScene.OrderAt(_compOnOptions, SpriteScene.Parts.Count-1);  
         }
 
         ImGui.Separator();
@@ -290,13 +290,13 @@ namespace Raven
       SourcedSprite removeSprite = null;
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
-        ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), 
+        ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 300), 
             false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
 
         if (_selectedSprites.Count == 0)
           ImGuiUtils.TextMiddle("No components found.");
 
-        for (int i = 0; i < _selectedSprites.Count; i++)
+        for (int i = _selectedSprites.Count()-1; i >= 0; i--)
         {
           var part = SpriteScene.Parts[i];
           var isSelected = _selectedSprites[i];

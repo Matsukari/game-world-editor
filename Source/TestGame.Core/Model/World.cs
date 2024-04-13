@@ -1,103 +1,10 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Nez;
 using Nez.Persistence;
 
 namespace Raven
 {
-  public class WorldEntity : Entity
-  {
-    public readonly World World;
-    public List<LevelEntity> Levels = new List<LevelEntity>();
-    public WorldEntity(World world) => World = world;
-    public void RemoveLevel(Level level)
-    {
-      World.RemoveLevel(level);
-      var index = Levels.FindIndex(item => item.Level.Name == level.Name);
-      if (index != -1)
-      {
-        Levels[index].DetachFromScene();
-        Levels.RemoveAt(index);
-      } 
-    }
-    public LevelEntity CreateLevel(string name) 
-    {
-      Level level = World.CreateLevel(name);
-      var levelEntity = new LevelEntity(level);
-      levelEntity.SetParent(this);
-      Levels.Add(levelEntity); 
-      return levelEntity;
-    }
-  }
 
-  public class WorldRenderer
-  {
- 
-    public static void RenderLayer(Batcher batcher, Camera camera, Layer layer)
-    {
-      if (layer is TileLayer tileLayer && layer.IsVisible)
-      {
-        foreach (var (tilePosition, tile) in tileLayer.Tiles)
-        {
-          var dest = new RectangleF(
-              tilePosition.X*tileLayer.TileWidth, 
-              tilePosition.Y*tileLayer.TileHeight, 
-              tileLayer.TileWidth, tileLayer.TileHeight);
-
-          dest.Location += tileLayer.Bounds.Location;
-
-          var scale = Vector2.One;
-          scale.X *= dest.Width / tile.Region.Width;
-          scale.Y *= dest.Height / tile.Region.Height;
-
-          var rot = 0f;
-          var eff = SpriteEffects.None;
-          var color = Color.White;
-
-          RenderProperties renderProp;
-          if (tileLayer.TilesProp.TryGetValue(tilePosition, out renderProp)) 
-          {
-            rot *= renderProp.Transform.Rotation;
-            eff = renderProp.SpriteEffects;
-            color = renderProp.Color.ToColor();
-          }
-
-          batcher.Draw(
-              texture: tile.Texture,
-              position: dest.Location,
-              sourceRectangle: tile.Region,
-              color: color,
-              rotation: rot,
-              origin: Vector2.Zero,
-              scale: scale,
-              effects: eff,
-              layerDepth: 0);
-        }
-      }
-      else if (layer is FreeformLayer freeform)
-      {
-        if (freeform.IsYSorted) 
-        {
-          freeform.SortScenes();
-        }
-        foreach (var spriteScene in freeform.SpriteScenees)
-        {
-          FreeformLayerRenderer.RenderScene(spriteScene, layer.Bounds.Location, batcher, camera);
-        }
- 
-      }
-    }
-    public static void Render(Batcher batcher, Camera camera, World world) 
-    {
-      foreach (var level in world.Levels) 
-      {
-        foreach (var layer in level.Layers)
-        {
-          RenderLayer(batcher, camera, layer);
-        }
-      }
-    }
-  }
   /// <summary>
   /// Composed of interconnected Levels. This is where all you should dump topdwon oriented rendering.
   /// </summary>

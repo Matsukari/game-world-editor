@@ -6,6 +6,8 @@ namespace Raven
 {
   public class Transform 
   {
+    public static Transform Default = new Transform();
+
     public Vector2 Position = new Vector2(0, 0);
     public Vector2 Scale = new Vector2(1, 1);
     public Vector2 Skew = new Vector2(1, 1);
