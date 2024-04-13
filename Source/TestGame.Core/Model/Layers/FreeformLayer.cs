@@ -85,7 +85,7 @@ namespace Raven
     }    
   }
 
-  public class SpriteSceneInstance : IPropertied
+  public class SpriteSceneInstance : IPropertied, ICloneable
   {
     [JsonInclude]
     public string Name { get; set; } = "";
@@ -112,6 +112,15 @@ namespace Raven
     {
       Scene = scene;
       if (props != null) Props = props;
+    }
+
+    object ICloneable.Clone()
+    {
+      var instance = MemberwiseClone() as SpriteSceneInstance;
+      Console.WriteLine("New props");
+      instance.Properties = Properties.Copy();
+      instance.Props = Props.Copy();
+      return instance;
     }
   }
   /// <summary>
@@ -166,5 +175,13 @@ namespace Raven
     {
       SpriteScenees.Sort(new SceneYComparer());
     }
+    public override Layer Copy()
+    {
+      var layer = MemberwiseClone() as FreeformLayer;
+      layer.SpriteScenees = SpriteScenees.CloneItems();
+      return layer;
+
+    }
+      
   }
 }

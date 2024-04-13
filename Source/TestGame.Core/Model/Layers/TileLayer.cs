@@ -9,7 +9,12 @@ namespace Raven
     public Transform Transform = new Transform();
     public Vector4 Color = Vector4.One;
     public SpriteEffects SpriteEffects = SpriteEffects.None;
-    public RenderProperties Copy() => MemberwiseClone() as RenderProperties;
+    public RenderProperties Copy() 
+    {
+      var ren = MemberwiseClone() as RenderProperties;
+      ren.Transform = Transform.Duplicate();
+      return ren;
+    }
   }
   public class TileLayerRenderer : LayerRenderer<TileLayer>
   {  

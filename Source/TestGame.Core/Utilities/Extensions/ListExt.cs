@@ -3,6 +3,9 @@ namespace Raven
 {
   public static class ListExt
   {
+    /// <summary>
+    /// Gets an item or null if not present
+    /// </summary> 
     public static T GetAtOrNull<T>(this List<T> list, int index) where T : class
     {
       try 
@@ -14,6 +17,9 @@ namespace Raven
         return null;
       }
     }
+    /// <summary>
+    /// Clones all items in the list if they type implement IClonable 
+    /// </summary> 
     public static List<T> CloneItems<T>(this List<T> list) where T: class
     {
       List<T> newList = new List<T>();
@@ -42,6 +48,11 @@ namespace Raven
       if (list.Count() != count) list = FalseRange(list, count);
       return list;
     }
+    /// <summary>
+    /// Loop over the items in the list. If the type given contains a string field named "Name", then recusrively loop all over again
+    /// and check if the field's value for each item overlaps with each other, if they did, then simply add '-1', until no 'Name' field's 
+    /// value ovelaps with another
+    /// </summary> 
     public static List<T> EnsureNoRepeatNameField<T>(this List<T> list) where T: class
     {
       for (int i = list.Count-1; i >= 0; i--)
