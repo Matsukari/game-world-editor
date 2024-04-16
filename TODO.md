@@ -6,7 +6,6 @@
 
 
 ## Sheet
-Multiple selection tile
 Integrate SpriteFrames to SpriteScene
 
 ## Geometry

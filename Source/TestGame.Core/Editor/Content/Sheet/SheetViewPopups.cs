@@ -8,11 +8,13 @@ namespace Raven
     Sheet _sheet { get => Content as Sheet; }
     SpriteScene _spriteSceneOnName;
     bool _isOpenSpriteOptions = false;
+    bool _isOpenTileOptions = false;
     public Widget.SpriteSlicer SpriteSlicer = new Widget.SpriteSlicer();
 
     public event Action<SpriteScene> OnConvertToScene;
 
     public void OpenSpriteOptions() => _isOpenSpriteOptions = true;
+    public void OpenTileOptions() => _isOpenTileOptions = true;
 
     void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {
@@ -21,9 +23,22 @@ namespace Raven
         _isOpenSpriteOptions = false;
         ImGui.OpenPopup("sprite-popup");
       }
+      if (_isOpenTileOptions)
+      {
+        _isOpenTileOptions = false;
+        ImGui.OpenPopup("Tile-popup");
+      }
       SpriteSlicer.Draw();
 
       // something is selected; render options
+      if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Tile tile && ImGui.BeginPopup("Tile-popup"))
+      {
+        if (ImGui.MenuItem("Embed Shape Property"))
+        {
+          ContentData.PropertiedContext = tile;
+        }
+        ImGui.EndPopup();
+      }
       if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Sprite sprite && ImGui.BeginPopup("sprite-popup"))
       {
         // convert to new spriteScene

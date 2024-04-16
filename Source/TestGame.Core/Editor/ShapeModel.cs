@@ -2,6 +2,7 @@
 using Nez;
 using Microsoft.Xna.Framework;
 using Icons = IconFonts.FontAwesome5;
+using ImGuiNET;
 
 namespace Raven
 { 
@@ -12,6 +13,8 @@ namespace Raven
     public abstract RectangleF Bounds { get; set; }
 
     public abstract void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color);
+
+    public virtual void Render(ImDrawListPtr drawlist, Color color) {}
 
     public abstract bool CollidesWith(Vector2 point);
 
@@ -28,6 +31,11 @@ namespace Raven
     {
       primitiveBatch.DrawRectangle(Bounds.X, Bounds.Y, Bounds.Width, Bounds.Height, color);
       batcher.DrawRectOutline(camera, Bounds, color);
+    }
+
+    public override void Render(ImDrawListPtr drawlist, Color color)
+    {
+      drawlist.AddRectFilled(Bounds.Location.ToNumerics(), Bounds.Max.ToNumerics(), color.ToImColor());
     }
 
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
@@ -50,6 +58,12 @@ namespace Raven
     {
       primitiveBatch.DrawCircle(Center, Width, color, circleSegments: (int)(32*camera.RawZoom));
       batcher.DrawCircle(Center, Width, color, thickness: 1/camera.RawZoom, resolution: (int)(32*camera.RawZoom));
+    }
+
+    public override void Render(ImDrawListPtr drawlist, Color color)
+    {
+      ImGuiUtils.DrawEllipseFilled(drawlist, Bounds, color.ToImColor());
+      ImGuiUtils.DrawEllipse(drawlist, Bounds, color.ToImColor());
     }
 
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
@@ -85,7 +99,10 @@ namespace Raven
       primitiveBatch.DrawPolygon(Position.AddAsPositionToVertices(vertices), vertices.Count(), color);
       batcher.DrawPolygon(Position, vertices, color,  true, 1/camera.RawZoom);
     } 
-
+    public override void Render(ImDrawListPtr drawlist, Color color)
+    {
+      
+    }
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
 
     public override object Duplicate() => MemberwiseClone();

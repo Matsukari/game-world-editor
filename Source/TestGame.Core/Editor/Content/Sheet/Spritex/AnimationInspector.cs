@@ -186,7 +186,7 @@ namespace Raven
       {
         var frame = Animator.Animation.Frames[i];
         ImGui.Text(i.ToString());
-        ImGuiUtils.SpanX(12f);
+        ImGuiUtils.SpanX(14f);
 
       }
     }

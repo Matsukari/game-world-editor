@@ -12,6 +12,7 @@ namespace Raven
   {
     public override string Name { get => SpriteScene.Name; set => SpriteScene.Name = value; }
     public override PropertyList Properties { get => SpriteScene.Properties; set => SpriteScene.Properties = value; }
+    public Widget.AnnotatorPane AnnotatorPane = new Widget.AnnotatorPane();
     
     public SourcedSprite ChangePart = null;
     SourcedSprite  _spriteScenePart;
@@ -36,8 +37,8 @@ namespace Raven
       if (SpriteScene != null) base.Render(imgui);
       DrawOptions();
       DrawAnimationOptionPopup();
+      AnnotatorPane.Render(imgui);
     }
-        
     public static bool RenderSprite(SourcedSprite sprite, bool drawName = true)
     {
       string name = sprite.Name;
@@ -52,6 +53,7 @@ namespace Raven
         ImGui.LabelText("Region", sprite.SourceSprite.Region.RenderStringFormat());
       ImGui.EndDisabled();
 
+
       mod = mod || sprite.Transform.RenderImGui();
       var origin = sprite.Origin.ToNumerics();
 
@@ -63,14 +65,10 @@ namespace Raven
         else if (originType == 1) sprite.Origin = new Vector2();
         mod = true;
       }
-      // Custom origin is selected
-      if (originType == 2)
+      if (ImGui.InputFloat2("Origin", ref origin)) 
       {
-        if (ImGui.InputFloat2("Origin", ref origin)) 
-        {
-          mod = true;
-          sprite.Origin = origin;
-        }
+        mod = true;
+        sprite.Origin = origin;
       }
       var color = sprite.Color.ToNumerics();
       if (ImGui.ColorEdit4("Tint", ref color)) sprite.Color = color;
@@ -133,6 +131,10 @@ namespace Raven
         if (ImGui.MenuItem(visib))
         {
           _compOnOptions.IsVisible = !_compOnOptions.IsVisible;
+        }
+        if (ImGui.MenuItem("Embed Shape"))
+        {
+          AnnotatorPane.Edit(_compOnOptions, _compOnOptions);
         }
 
         ImGui.Separator();
