@@ -14,7 +14,7 @@ namespace Raven
 
     public abstract void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color);
 
-    public virtual void Render(ImDrawListPtr drawlist, Color color) {}
+    public virtual void Render(ImDrawListPtr drawlist, Color color, Color color2) {}
 
     public abstract bool CollidesWith(Vector2 point);
 
@@ -33,9 +33,10 @@ namespace Raven
       batcher.DrawRectOutline(camera, Bounds, color);
     }
 
-    public override void Render(ImDrawListPtr drawlist, Color color)
+    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
     {
       drawlist.AddRectFilled(Bounds.Location.ToNumerics(), Bounds.Max.ToNumerics(), color.ToImColor());
+      drawlist.AddRect(Bounds.Location.ToNumerics(), Bounds.Max.ToNumerics(), color2.ToImColor());
     }
 
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
@@ -60,10 +61,10 @@ namespace Raven
       batcher.DrawCircle(Center, Width, color, thickness: 1/camera.RawZoom, resolution: (int)(32*camera.RawZoom));
     }
 
-    public override void Render(ImDrawListPtr drawlist, Color color)
+    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
     {
       ImGuiUtils.DrawEllipseFilled(drawlist, Bounds, color.ToImColor());
-      ImGuiUtils.DrawEllipse(drawlist, Bounds, color.ToImColor());
+      ImGuiUtils.DrawEllipse(drawlist, Bounds, color2.ToImColor());
     }
 
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
@@ -99,9 +100,11 @@ namespace Raven
       primitiveBatch.DrawPolygon(Position.AddAsPositionToVertices(vertices), vertices.Count(), color);
       batcher.DrawPolygon(Position, vertices, color,  true, 1/camera.RawZoom);
     } 
-    public override void Render(ImDrawListPtr drawlist, Color color)
-    {
-      
+    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
+    { 
+      var vertices = Vertices;
+      drawlist.AddTriangleFilled(vertices[0].ToNumerics(), vertices[1].ToNumerics(), vertices[2].ToNumerics(), color.ToImColor());
+      drawlist.AddTriangle(vertices[0].ToNumerics(), vertices[1].ToNumerics(), vertices[2].ToNumerics(), color2.ToImColor());
     }
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
 

@@ -48,6 +48,7 @@ namespace Raven
       {
         SceneView.SceneInspector.Render(imgui);
         (SceneView.AnimationEditor as IImGuiRenderable).Render(imgui);
+        SceneView.AnnotatorPane.Render(imgui);
         return;
       }
       else if (_list != null && _list.Selections.Count() > 0)

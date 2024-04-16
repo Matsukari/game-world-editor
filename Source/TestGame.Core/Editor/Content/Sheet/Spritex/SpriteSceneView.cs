@@ -15,6 +15,7 @@ namespace Raven
     public SpriteSceneRenderer Renderer { get => _renderer; }
     public SpriteScene SpriteScene { get => _sceneInspector.SpriteScene; }
     public AnimationEditor AnimationEditor { get => _animationEditor; }
+    public Widget.AnnotatorPane AnnotatorPane;
 
     public AnimationEditor _animationEditor = new AnimationEditor();
     readonly SheetView _sheetView;
@@ -33,6 +34,7 @@ namespace Raven
     public override void Initialize(Editor editor, EditorContent content)
     {
       base.Initialize(editor, content);
+      AnnotatorPane = new Widget.AnnotatorPane(editor.Settings.Colors);
       _animationEditor.Initialize(editor, content);
       _animationEditor.OnClose += () => Selection.End();
     }
@@ -46,6 +48,7 @@ namespace Raven
       _sceneInspector = new SpriteSceneInspector(spriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => _animationEditor.Open(scene, anim);
       _sceneInspector.OnDelPart += part => Selection.End();
+      _sceneInspector.OnEmbedShape += part => AnnotatorPane.Edit(part, part);
       _sceneInspector.OnModifiedPart += ReSelect; 
       _renderer = new SpriteSceneRenderer(spriteScene);
       _renderer.Entity = Entity;

@@ -12,7 +12,6 @@ namespace Raven
   {
     public override string Name { get => SpriteScene.Name; set => SpriteScene.Name = value; }
     public override PropertyList Properties { get => SpriteScene.Properties; set => SpriteScene.Properties = value; }
-    public Widget.AnnotatorPane AnnotatorPane = new Widget.AnnotatorPane();
     
     public SourcedSprite ChangePart = null;
     SourcedSprite  _spriteScenePart;
@@ -25,6 +24,7 @@ namespace Raven
     public event Action<SourcedSprite> OnAddPart;
     public event Action<SourcedSprite> OnDelPart;
     public event Action<SourcedSprite> OnModifiedPart;
+    public event Action<SourcedSprite> OnEmbedShape;
 
     static string[] _originTypes = new string[] { "Center", "Topleft", "Custom" };
 
@@ -37,7 +37,6 @@ namespace Raven
       if (SpriteScene != null) base.Render(imgui);
       DrawOptions();
       DrawAnimationOptionPopup();
-      AnnotatorPane.Render(imgui);
     }
     public static bool RenderSprite(SourcedSprite sprite, bool drawName = true)
     {
@@ -132,9 +131,9 @@ namespace Raven
         {
           _compOnOptions.IsVisible = !_compOnOptions.IsVisible;
         }
-        if (ImGui.MenuItem("Embed Shape"))
+        if (OnEmbedShape != null && ImGui.MenuItem("Embed Shape"))
         {
-          AnnotatorPane.Edit(_compOnOptions, _compOnOptions);
+          OnEmbedShape(_compOnOptions);
         }
 
         ImGui.Separator();

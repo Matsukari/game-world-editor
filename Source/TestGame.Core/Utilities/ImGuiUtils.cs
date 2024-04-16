@@ -95,7 +95,7 @@ namespace Raven
         Vector2 point = new Vector2(center.X + radiusX * MathF.Cos(angle), center.Y + radiusY * MathF.Sin(angle));
         draw_list.AddTriangleFilled(center, prev_point, point, col);
         prev_point = point;
-    }
+      }
     }
 
     public static void DrawImage(ImDrawListPtr drawList, Texture2D tx2, Mono.Rectangle region, Vector2 position, 

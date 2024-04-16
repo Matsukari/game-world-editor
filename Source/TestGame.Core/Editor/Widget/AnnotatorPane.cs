@@ -15,14 +15,22 @@ namespace Raven.Widget
     Vector2 _initialPosition = Vector2.Zero;
     IPropertied _propertied;
     ShapeModel _shape;
+    readonly EditorColors _colors;
+    bool _isStartEdit = false;
 
-    public AnnotatorPane() => _isOpen = false;
+    public AnnotatorPane(EditorColors colors) 
+    {
+      _isOpen = false;
+      _colors = colors;
+
+    } 
 
     public void Edit(SourcedSprite sprite, IPropertied propertied)
     {
       _propertied = propertied;
       SourcedSprite = sprite;
       _isOpen = true;
+      _isStartEdit = true;
     }
     public void UnEdit()
     {
@@ -31,10 +39,19 @@ namespace Raven.Widget
 
     public override void OnRender(ImGuiWinManager imgui)
     {
+      if (_isStartEdit)
+      {
+        var max1 = Math.Max(SourcedSprite.SourceSprite.Region.Size.X, SourcedSprite.SourceSprite.Region.Size.Y);
+        var max2 = Math.Max(ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
+        Zoom = max2 / max1;
+        Position = -SourcedSprite.Transform.Position;
+        Position += ImGui.GetWindowSize() / 2 - (SourcedSprite.SourceSprite.Region.Size.ToVector2() / 2 * Zoom);
+        _isStartEdit = false;
+      }
       ImGuiUtils.DrawImage(ImGui.GetWindowDrawList(), SourcedSprite.SourceSprite.Texture, 
           SourcedSprite.SourceSprite.Region, 
           (SourcedSprite.Transform.Position + Position + ImGui.GetCursorScreenPos()).ToNumerics(),
-          (SourcedSprite.Transform.Scale * SourcedSprite.SourceSprite.Region.Size.ToVector2()).ToNumerics(), 
+          (SourcedSprite.Transform.Scale * Zoom * SourcedSprite.SourceSprite.Region.Size.ToVector2()).ToNumerics(), 
           SourcedSprite.Origin.ToNumerics(), 
           SourcedSprite.Transform.Rotation, 
           SourcedSprite.Color.ToImColor()); 
@@ -43,8 +60,21 @@ namespace Raven.Widget
       {
         if (_shape != null) 
         {
-          HandleInput();
-          _shape.Render(ImGui.GetWindowDrawList(), Color.Blue);
+          if (HandleInput()) 
+          {
+            Finish();
+            return;
+          }
+          _shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeActive.ToColor(), _colors.ShapeOutlineActive.ToColor());
+        }
+        foreach (var prop in _propertied.Properties)
+        {
+          if (prop.Value is ShapeModel shape) 
+          {
+            // if (shape.CollidesWith(ImGui.GetMousePos())) 
+              
+            shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
+          }
         }
         HandleMoveZoom();
       }
@@ -66,7 +96,7 @@ namespace Raven.Widget
     }
     Vector2 _initialMouse = Vector2.Zero;
 
-    void HandleInput()
+    bool HandleInput()
     {
       if (Nez.Input.LeftMouseButtonPressed)
       {
@@ -74,8 +104,7 @@ namespace Raven.Widget
         if (_shape is PointModel shape)
         {
           shape.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
-          Finish();
-          return;
+          return true;
         }
       }
       if (Nez.Input.LeftMouseButtonDown)
@@ -84,9 +113,13 @@ namespace Raven.Widget
         var rect = new RectangleF();
         rect.Location = _initialMouse;
         rect.Size = ImGui.GetMousePos() - _initialMouse; 
-        _shape.Bounds = rect;
- 
+        _shape.Bounds = rect; 
       }
+      if (Nez.Input.LeftMouseButtonReleased)
+      {
+        return true;
+      }
+      return false;
     }
     // Adds to current context
     void Finish()
@@ -101,6 +134,7 @@ namespace Raven.Widget
       var input = Core.GetGlobalManager<InputManager>();
       var mouse = ImGui.GetMousePos();
       mouse = ToWindow(mouse.ToVector2()).ToNumerics();
+      mouse /= Zoom;
 
       // zooms
       if (ImGui.GetIO().MouseWheel != 0)
