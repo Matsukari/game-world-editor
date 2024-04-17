@@ -38,7 +38,7 @@ namespace Raven
       DrawOptions();
       DrawAnimationOptionPopup();
     }
-    public static bool RenderSprite(SourcedSprite sprite, bool drawName = true)
+    public static bool RenderSprite(ImGuiWinManager imgui, SourcedSprite sprite, bool drawName = true)
     {
       string name = sprite.Name;
       bool mod = false;
@@ -78,6 +78,7 @@ namespace Raven
       if (ImGui.Checkbox("Flip X", ref flipH)) sprite.SpriteEffects ^= SpriteEffects.FlipHorizontally;
       ImGui.SameLine();
       if (ImGui.Checkbox("Flip Y", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
+
 
       return mod;
     }
@@ -327,7 +328,7 @@ namespace Raven
           if (spriteNode)
           {
             ImGui.PushID("spriteScene-component-content-" + part.Name);
-            if (RenderSprite(part)) OnModifiedPart(part);
+            if (RenderSprite(ImGuiManager, part)) OnModifiedPart(part);
             ImGui.PopID();
 
             ImGui.TreePop();

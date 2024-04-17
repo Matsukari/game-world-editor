@@ -45,9 +45,10 @@ namespace Raven.Widget
         var max2 = Math.Max(ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
         Zoom = max2 / max1;
         Position = -SourcedSprite.Transform.Position;
-        Position += ImGui.GetWindowSize() / 2 - (SourcedSprite.SourceSprite.Region.Size.ToVector2() / 2 * Zoom);
+        Position += ImGui.GetWindowSize() / 2 - (SourcedSprite.SourceSprite.Region.Size.ToVector2() * Zoom);
+        Position.Y += SourcedSprite.SourceSprite.Region.Size.Y * Zoom;
         _isStartEdit = false;
-      }
+      } 
       ImGuiUtils.DrawImage(ImGui.GetWindowDrawList(), SourcedSprite.SourceSprite.Texture, 
           SourcedSprite.SourceSprite.Region, 
           (SourcedSprite.Transform.Position + Position + ImGui.GetCursorScreenPos()).ToNumerics(),
@@ -72,8 +73,14 @@ namespace Raven.Widget
           if (prop.Value is ShapeModel shape) 
           {
             // if (shape.CollidesWith(ImGui.GetMousePos())) 
-              
+            var temp = shape.Bounds;
+            var temp2 = shape.Bounds;
+            temp.Location += Position * Zoom;
+            temp.Location -= SourcedSprite.Transform.Position;
+            temp.Size *= Zoom;
+            shape.Bounds = temp;  
             shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
+            shape.Bounds = temp2;
           }
         }
         HandleMoveZoom();
@@ -125,6 +132,11 @@ namespace Raven.Widget
     void Finish()
     {
       Mouse.SetCursor(MouseCursor.Arrow);
+      var bounds = _shape.Bounds;
+      bounds.Location -= Position;
+      bounds.Location += SourcedSprite.Transform.Position;
+      bounds.Size /= Zoom;
+      _shape.Bounds = bounds;
       _propertied.Properties.Add(_shape);
       _initialMouse = Vector2.Zero;
       _shape = null;
@@ -134,7 +146,6 @@ namespace Raven.Widget
       var input = Core.GetGlobalManager<InputManager>();
       var mouse = ImGui.GetMousePos();
       mouse = ToWindow(mouse.ToVector2()).ToNumerics();
-      mouse /= Zoom;
 
       // zooms
       if (ImGui.GetIO().MouseWheel != 0)
