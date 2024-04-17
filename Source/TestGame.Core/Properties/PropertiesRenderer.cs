@@ -57,7 +57,7 @@ namespace Raven
         }
       }
     }
-    public static bool Render(ImGuiWinManager manager, IPropertied propertied)
+    public static bool Render(ImGuiWinManager manager, IPropertied propertied, bool tree=false)
     {
       string changedName = null;
       object changedProperty = null;
@@ -65,7 +65,10 @@ namespace Raven
       bool anyOtherChanges = false;
       if (propertied.Properties == null) return false;
 
-      var header = ImGui.CollapsingHeader("Properties", ImGuiTreeNodeFlags.DefaultOpen);
+      bool header = false;
+      if (tree) header = ImGui.TreeNode("Properties");
+      else
+        header = ImGui.CollapsingHeader("Properties", ImGuiTreeNodeFlags.DefaultOpen);
 
       if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
 
@@ -141,6 +144,7 @@ namespace Raven
           }
         }
         ImGui.EndChild();
+        if (tree) ImGui.TreePop();
       }
       if (changedName != null)
       {

@@ -48,7 +48,8 @@ namespace Raven.Widget
         Position += ImGui.GetWindowSize() / 2 - (SourcedSprite.SourceSprite.Region.Size.ToVector2() * Zoom);
         Position.Y += SourcedSprite.SourceSprite.Region.Size.Y * Zoom;
         _isStartEdit = false;
-      } 
+      }
+      // ImGui.GetWindowDrawList().AddRectFilled(SourcedSprite)
       ImGuiUtils.DrawImage(ImGui.GetWindowDrawList(), SourcedSprite.SourceSprite.Texture, 
           SourcedSprite.SourceSprite.Region, 
           (SourcedSprite.Transform.Position + Position + ImGui.GetCursorScreenPos()).ToNumerics(),
@@ -57,6 +58,26 @@ namespace Raven.Widget
           SourcedSprite.Transform.Rotation, 
           SourcedSprite.Color.ToImColor()); 
 
+      if (_propertied != null)
+      {
+        foreach (var prop in _propertied.Properties)
+        {
+          if (prop.Value is ShapeModel shape) 
+          {
+            // if (shape.CollidesWith(ImGui.GetMousePos())) 
+            var temp = shape.Bounds;
+            var temp2 = shape.Bounds;
+            temp.Location *= Zoom;
+            temp.Location += SourcedSprite.Transform.Position;
+            temp.Location += ImGui.GetCursorScreenPos();
+            temp.Location += Position;
+            temp.Size *= Zoom;
+            shape.Bounds = temp;  
+            shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
+            shape.Bounds = temp2;
+          }
+        }
+      }
       if (ImGui.IsWindowHovered())
       {
         if (_shape != null) 
@@ -67,21 +88,6 @@ namespace Raven.Widget
             return;
           }
           _shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeActive.ToColor(), _colors.ShapeOutlineActive.ToColor());
-        }
-        foreach (var prop in _propertied.Properties)
-        {
-          if (prop.Value is ShapeModel shape) 
-          {
-            // if (shape.CollidesWith(ImGui.GetMousePos())) 
-            var temp = shape.Bounds;
-            var temp2 = shape.Bounds;
-            temp.Location += Position * Zoom;
-            temp.Location -= SourcedSprite.Transform.Position;
-            temp.Size *= Zoom;
-            shape.Bounds = temp;  
-            shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
-            shape.Bounds = temp2;
-          }
         }
         HandleMoveZoom();
       }
@@ -133,11 +139,15 @@ namespace Raven.Widget
     {
       Mouse.SetCursor(MouseCursor.Arrow);
       var bounds = _shape.Bounds;
-      bounds.Location -= Position;
-      bounds.Location += SourcedSprite.Transform.Position;
+      bounds.Location = _initialMouse - ImGui.GetCursorScreenPos();
+      bounds.Location += Position;
+      bounds.Location -= SourcedSprite.Transform.Position;
       bounds.Size /= Zoom;
+      Console.WriteLine("_initialMouse " + _initialMouse.ToString());
+      Console.WriteLine("Position " + Position.ToString());
+      Console.WriteLine("added " + bounds.ToString());
       _shape.Bounds = bounds;
-      _propertied.Properties.Add(_shape);
+      _propertied.Properties.Add(_shape.Duplicate());
       _initialMouse = Vector2.Zero;
       _shape = null;
     }
@@ -167,7 +177,7 @@ namespace Raven.Widget
       }
       if (input.IsDrag && input.MouseDragButton == 2) 
       {
-        Position = _initialPosition - (input.MouseDragStart - ImGui.GetMousePos()) / Zoom;        
+        Position = _initialPosition - (input.MouseDragStart - ImGui.GetMousePos()) ;        
       } 
     }
     Vector2 ToWindow(Vector2 screen) => new Vector2(screen.X-Bounds.X, screen.Y-Bounds.Y);
