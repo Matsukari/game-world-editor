@@ -105,15 +105,20 @@ namespace Raven
       float cos_a = MathF.Cos(angle);
       float sin_a = MathF.Sin(angle);
 
-      position.X += cos_a * size.X;
-      position.Y += sin_a * size.Y;
+      // position += size / 2;
+      // origin -= 
+      //
+      // position.X += cos_a * origin.X;
+      // position.Y += sin_a * origin.Y;
+      //
+      position += origin;
 
       Vector2[] pos = new []
       {
-        position + Rotate(new Vector2(-size.X * 0.5f, -size.Y * 0.5f), cos_a, sin_a),
-        position + Rotate(new Vector2(+size.X * 0.5f, -size.Y * 0.5f), cos_a, sin_a),
-        position + Rotate(new Vector2(+size.X * 0.5f, +size.Y * 0.5f), cos_a, sin_a),
-        position + Rotate(new Vector2(-size.X * 0.5f, +size.Y * 0.5f), cos_a, sin_a)
+        position + Rotate(new Vector2(0f, 0f), cos_a, sin_a),
+        position + Rotate(new Vector2(size.X, 0f), cos_a, sin_a),
+        position + Rotate(new Vector2(size.X, size.Y), cos_a, sin_a),
+        position + Rotate(new Vector2(0f, size.Y), cos_a, sin_a)
       };
       var texSize = tx2.GetSize();
       Vector2[] uvs = new []

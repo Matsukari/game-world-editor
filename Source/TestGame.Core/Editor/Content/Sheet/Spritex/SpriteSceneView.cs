@@ -155,7 +155,7 @@ namespace Raven
 
           if (Operator == EditorOperator.Select) Selection.Begin(part.SceneBounds, part); 
           else if (Operator == EditorOperator.MoveOnly) Mover.TryBegin(part.Bounds.Center, input.Camera, part); 
-          else if (Operator == EditorOperator.Rotator) Rotator.Begin(part.Bounds.Location, input.Camera, part); 
+          else if (Operator == EditorOperator.Rotator) Rotator.Begin(part.Bounds.Location + part.Origin, input.Camera, part); 
         }
       }
       else if (Operator == EditorOperator.MoveOnly && Mover.Collides(Camera) == Guidelines.MovableOriginLines.AxisType.None) Mover.Hide();

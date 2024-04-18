@@ -45,15 +45,19 @@ namespace Raven.Widget
         var max2 = Math.Max(ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
         Zoom = max2 / max1;
         Position = -SourcedSprite.Transform.Position;
-        Position += ImGui.GetWindowSize() / 2 - (SourcedSprite.SourceSprite.Region.Size.ToVector2() * Zoom);
-        Position.Y += SourcedSprite.SourceSprite.Region.Size.Y * Zoom;
+        // Position += ImGui.GetWindowSize() / 2 - (SourcedSprite.SourceSprite.Region.Size.ToVector2() * Zoom);
+        // Position.Y += SourcedSprite.SourceSprite.Region.Size.Y * Zoom;
+        _startZoom = Zoom;
         _isStartEdit = false;
       }
+      var sourcePosition = (SourcedSprite.Transform.Position + Position + ImGui.GetCursorScreenPos()).ToNumerics();
+      var SourceSize = (SourcedSprite.Transform.Scale * Zoom * SourcedSprite.SourceSprite.Region.Size.ToVector2()).ToNumerics();
+      ImGui.GetWindowDrawList().AddRectFilled(sourcePosition, sourcePosition + SourceSize, _colors.SheetSheet.ToImColor());
       // ImGui.GetWindowDrawList().AddRectFilled(SourcedSprite)
       ImGuiUtils.DrawImage(ImGui.GetWindowDrawList(), SourcedSprite.SourceSprite.Texture, 
           SourcedSprite.SourceSprite.Region, 
-          (SourcedSprite.Transform.Position + Position + ImGui.GetCursorScreenPos()).ToNumerics(),
-          (SourcedSprite.Transform.Scale * Zoom * SourcedSprite.SourceSprite.Region.Size.ToVector2()).ToNumerics(), 
+          sourcePosition,
+          SourceSize, 
           SourcedSprite.Origin.ToNumerics(), 
           SourcedSprite.Transform.Rotation, 
           SourcedSprite.Color.ToImColor()); 
@@ -108,6 +112,7 @@ namespace Raven.Widget
 
     }
     Vector2 _initialMouse = Vector2.Zero;
+    float _startZoom = 1;
 
     bool HandleInput()
     {
@@ -139,12 +144,14 @@ namespace Raven.Widget
     {
       Mouse.SetCursor(MouseCursor.Arrow);
       var bounds = _shape.Bounds;
-      bounds.Location = _initialMouse - ImGui.GetCursorScreenPos();
-      bounds.Location += Position;
+      var screenMouse = _initialMouse - ImGui.GetCursorScreenPos();
+      bounds.Location = screenMouse - Position;
       bounds.Location -= SourcedSprite.Transform.Position;
+      bounds.Location /= Zoom;
       bounds.Size /= Zoom;
-      Console.WriteLine("_initialMouse " + _initialMouse.ToString());
+      Console.WriteLine("Mouse " + (_initialMouse - ImGui.GetCursorScreenPos()).ToString());
       Console.WriteLine("Position " + Position.ToString());
+      Console.WriteLine("ZOom " + Zoom.ToString());
       Console.WriteLine("added " + bounds.ToString());
       _shape.Bounds = bounds;
       _propertied.Properties.Add(_shape.Duplicate());
