@@ -149,10 +149,10 @@ namespace Raven.Widget
       bounds.Location -= SourcedSprite.Transform.Position;
       bounds.Location /= Zoom;
       bounds.Size /= Zoom;
-      Console.WriteLine("Mouse " + (_initialMouse - ImGui.GetCursorScreenPos()).ToString());
-      Console.WriteLine("Position " + Position.ToString());
-      Console.WriteLine("ZOom " + Zoom.ToString());
-      Console.WriteLine("added " + bounds.ToString());
+      // Console.WriteLine("Mouse " + (_initialMouse - ImGui.GetCursorScreenPos()).ToString());
+      // Console.WriteLine("Position " + Position.ToString());
+      // Console.WriteLine("ZOom " + Zoom.ToString());
+      // Console.WriteLine("added " + bounds.ToString());
       _shape.Bounds = bounds;
       _propertied.Properties.Add(_shape.Duplicate());
       _initialMouse = Vector2.Zero;
