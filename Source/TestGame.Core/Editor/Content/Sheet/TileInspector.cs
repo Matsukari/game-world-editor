@@ -25,7 +25,7 @@ namespace Raven
     {
       if (Tile._sheet.CreateTile(Tile)) Console.WriteLine("Created tile");
     }
-    protected override void OnRenderBeforeName()
+    protected override void OnRenderAfterName()
     {
       ImGui.BeginDisabled();
       ImGui.LabelText("Id", Tile.Id.ToString());

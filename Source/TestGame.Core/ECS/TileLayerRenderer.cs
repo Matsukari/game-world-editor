@@ -6,7 +6,7 @@ namespace Raven
 {
   public class TileLayerRenderer : LayerRenderer<TileLayer>
   { 
-    public static void Render(Batcher batcher, Camera camera, TileLayer layer, Transform parent)
+    public static void Render(Batcher batcher, Camera camera, TileLayer layer, Transform parent, Color color=default)
     {
       foreach (var (tilePosition, tile) in layer.Tiles)
       {
@@ -23,7 +23,7 @@ namespace Raven
 
         var rot = parent.Rotation;
         var eff = SpriteEffects.None;
-        var color = Color.White;
+        if (color == default) color = Color.White;
 
         RenderProperties renderProp;
         if (layer.TilesProp.TryGetValue(tilePosition, out renderProp)) 

@@ -19,6 +19,7 @@ namespace Raven
 
     // Settings
     public bool IsRandomPaint = false;
+    public bool HighlightCurrentLayer = true;
     public PaintMode PaintMode = PaintMode.Pen;
     public PaintType PaintType = PaintType.Single;
     Vector2 _initialScale = new Vector2();
@@ -94,8 +95,20 @@ namespace Raven
         batcher.DrawRect(level.Bounds, settings.Colors.LevelSheet.ToColor());
         foreach (var layer in level.Layers)
         {
-          WorldRenderer.RenderLayer(batcher, camera, layer);
-          if (layer.Bounds.Contains(Camera.MouseToWorldPoint()) && !Selection.HasBegun())
+          bool mouseInLayer = layer.Bounds.Contains(Camera.MouseToWorldPoint());
+          Color color = default;
+          if (HighlightCurrentLayer 
+              && mouseInLayer
+              && CanPaint
+              && _imgui.SelectedLevelInspector != null 
+              && _imgui.SelectedLevelInspector.CurrentLayer != null 
+              && _imgui.SelectedLevelInspector.CurrentLayer.Name != layer.Name)
+          {
+            color = Color.Gray;
+          }
+          WorldRenderer.RenderLayer(batcher, camera, layer, color);
+
+          if (mouseInLayer && !Selection.HasBegun())
           {
             enterLayer = true;
             _imgui.SelectedLevel = i;

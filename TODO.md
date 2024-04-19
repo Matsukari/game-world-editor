@@ -10,6 +10,10 @@ Integrate SpriteFrames to SpriteScene
 
 ## Geometry
 Input selection 
+Polygon points inspector
+Polygon in pane's respective to zoom
+Mouse snappning
+Tile intergration
 
 ## SpriteScene
 Multiple select parts
@@ -19,9 +23,11 @@ Choose ease type
 ## Level
 Indicator for able and not able paint
 
+## Animation
+Sprite preview
+
 
 ## World
-Connect levels 
 Magnet levels
 LOD system
 
@@ -30,11 +36,8 @@ LOD system
 Save world
 Undo & redo
 Shape & tile separate selection
-Separate transform operations
-Display appropriate mouse cursors
 Copy & paste: 
 - shapes
-Snapping mouse
 
 
 ## Rendering 

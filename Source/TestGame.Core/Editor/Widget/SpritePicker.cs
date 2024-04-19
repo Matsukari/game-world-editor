@@ -234,7 +234,7 @@ namespace Raven
     void HandleMoveZoom()
     {
       var input = Core.GetGlobalManager<InputManager>();
-      var mouse = ImGui.GetMousePos();
+      var mouse = MouseToPickerPoint(OpenSheet);
       // zooms
       if (ImGui.GetIO().MouseWheel != 0)
       {
@@ -245,7 +245,7 @@ namespace Raven
           else zoomFactor = 0.01f;
         }
         var zoom = Math.Clamp(OpenSheet.Zoom * zoomFactor, 0.01f, 10f);
-        var delta = (OpenSheet.Position - MouseToPickerPoint(OpenSheet)) * (zoomFactor - 1);
+        var delta = (OpenSheet.Position - mouse) * (zoomFactor - 1);
         if (zoomFactor != 1f) OpenSheet.Position += delta;
         OpenSheet.Zoom = zoom;
       }
@@ -266,9 +266,9 @@ namespace Raven
     {
       var mouse = ImGui.GetMousePos();
       var pos = mouse.ToVector2(); 
-      pos -= Bounds.Location;
-      pos /= OpenSheet.Zoom;
+      pos -= ImGui.GetCursorScreenPos();
       pos += state.Position;
+      pos /= OpenSheet.Zoom;
 
       return pos;
     }

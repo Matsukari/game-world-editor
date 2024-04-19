@@ -1,14 +1,15 @@
 using Nez;
+using Microsoft.Xna.Framework;
 
 namespace Raven 
 {
   public class WorldRenderer
   { 
-    public static void RenderLayer(Batcher batcher, Camera camera, Layer layer)
+    public static void RenderLayer(Batcher batcher, Camera camera, Layer layer, Color color=default)
     {
       if (layer is TileLayer tileLayer)
       {
-        TileLayerRenderer.Render(batcher, camera, tileLayer, Transform.Default);
+        TileLayerRenderer.Render(batcher, camera, tileLayer, Transform.Default, color);
       }
       else if (layer is FreeformLayer freeform)
       {
@@ -18,7 +19,7 @@ namespace Raven
         }
         foreach (var spriteScene in freeform.SpriteScenees)
         {
-          FreeformLayerRenderer.RenderScene(spriteScene, layer.Bounds.Location, batcher, camera);
+          FreeformLayerRenderer.RenderScene(spriteScene, layer.Bounds.Location, batcher, camera, color);
         } 
       }
     }
