@@ -16,46 +16,55 @@ namespace Raven
       ("Boolean", typeof(bool)),
       ("Color", typeof(Color)),
     };
-    public static void RenderBestMatch(string name, ref object propertyData)
+    static object RenderPrimitiveType(object propertyData, string label = "Value")
+    {
+      switch (propertyData)
+      {
+        case int intValue: 
+          if (ImGui.InputInt(label, ref intValue)) 
+          {
+            return intValue;
+          }
+          break;
+        case bool boolValue: 
+          if (ImGui.Button(label)) 
+          {
+            boolValue = !boolValue;
+            return boolValue;
+          }
+          break;
+        case float floatValue: 
+          if (ImGui.InputFloat(label, ref floatValue)) 
+          {
+            return floatValue;
+          }
+          break;
+      }
+      return null;
+    }
+    public static object RenderBestMatch(object propertyData, ref bool anyOtherChanges)
     {
       // Property value itself is the data
       if (propertyData.GetType().IsPrimitive)
       {
-        switch (propertyData)
-        {
-          case int intValue: 
-            if (ImGui.InputInt(name, ref intValue)) 
-            {
-              propertyData = intValue;
-            }
-            break;
-          case bool boolValue: 
-            if (ImGui.Button(name)) 
-            {
-              boolValue = !boolValue;
-              propertyData = boolValue;
-            }
-            break;
-          case float floatValue: 
-            if (ImGui.InputFloat(name, ref floatValue)) 
-            {
-              propertyData = floatValue;
-            }
-            break;
-        }
-      }
-      else if (propertyData is Vector2 vector)
-      {
-        var vecNum = vector.ToNumerics();
-        if (ImGui.InputFloat2(name, ref vecNum)) propertyData = vecNum;
+        return RenderPrimitiveType(propertyData);
       }
       else if (propertyData is string stringValue)
       {
-        if (ImGui.InputText(name, ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
-        {
-          propertyData = stringValue;
-        }
+        if (ImGui.InputText("Value", ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
+          return stringValue;
       }
+      else 
+      {
+        // Console.WriteLine($"Type of : {property} {propertyData.GetType().Name}");
+        var subProperties = 
+          propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy); 
+        Console.WriteLine("Properties " + subProperties.Count().ToString());
+        var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
+        Console.WriteLine("Got " + subPropertiesCount.ToString());
+        anyOtherChanges = RenderHardTypes(subProperties, propertyData);
+      }
+      return null;
     }
     public static bool Render(ImGuiWinManager manager, IPropertied propertied, bool tree=false)
     {
@@ -63,6 +72,7 @@ namespace Raven
       object changedProperty = null;
       string changedNameOfProperty = null;
       bool anyOtherChanges = false;
+
       if (propertied.Properties == null) return false;
 
       bool header = false;
@@ -74,7 +84,6 @@ namespace Raven
 
       if (header)
       {
-
         ImGui.BeginChild("Properties", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, 200));
  
         if (propertied.Properties.Data.Count() == 0) ImGuiUtils.TextMiddle("No properties yet.");
@@ -87,56 +96,15 @@ namespace Raven
             ImGui.OpenPopup("prop-options");
             _propOnOptions = new Tuple<string, object>(property, propertyData);
           }
-
           if (node)
           {
             var nameHolder = property;
             changedNameOfProperty = property;
-            if (ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue))
-            {
-              changedName = nameHolder;
-            }
-            ImGui.LabelText("Type", propertyData.GetType().Name);
+            if (
+                ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue)) changedName = nameHolder;
+                ImGui.LabelText("Type", propertyData.GetType().Name);
 
-            // Property value itself is the data
-            if (propertyData.GetType().IsPrimitive)
-            {
-              switch (propertyData)
-              {
-                case int intValue: 
-                  if (ImGui.InputInt("Value", ref intValue)) 
-                  {
-                    changedProperty = intValue;
-                  }
-                  break;
-                case bool boolValue: 
-                  if (ImGui.Button("Value")) 
-                  {
-                    boolValue = !boolValue;
-                    changedProperty = boolValue;
-                  }
-                  break;
-                case float floatValue: 
-                  if (ImGui.InputFloat("Value", ref floatValue)) 
-                  {
-                    changedProperty = floatValue;
-                  }
-                  break;
-              }
-            }
-            else if (propertyData is string stringValue && ImGui.InputText("Value", ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue))
-            {
-              changedProperty = stringValue;
-            }
-            // Property's value contains a set of data
-            else 
-            {
-              // Console.WriteLine($"Type of : {property} {propertyData.GetType().Name}");
-              var subProperties = 
-                propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy); 
-              var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
-              anyOtherChanges = RenderHardTypes(subProperties, propertyData);
-            }
+            changedProperty = RenderBestMatch(propertyData, ref anyOtherChanges);
             ImGui.TreePop();
           }
         }
@@ -170,6 +138,7 @@ namespace Raven
     {
       var subProperty = subPropertyInfo.GetValue(propertyData);
       var subPropertyName = subPropertyInfo.Name;
+      Console.WriteLine(": " + subPropertyName);
       switch (subProperty)
       {
         case RectangleF rectProperty: 

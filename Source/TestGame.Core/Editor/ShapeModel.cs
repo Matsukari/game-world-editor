@@ -10,7 +10,6 @@ namespace Raven
   {
     public abstract string Icon { get; }
    
-    [PropertiedInput("Bounds")]
     public abstract RectangleF Bounds { get; set; }
 
     public abstract void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color);
@@ -22,7 +21,6 @@ namespace Raven
       var temp = Bounds;
       var temp2 = Bounds;
       temp.Location = camera.WorldToScreenPoint(temp.Location);
-      Console.WriteLine(temp.Location.ToString());
       temp.Size *= camera.RawZoom;
       Bounds = temp;   
       Render(drawlist, color, color2);
@@ -37,6 +35,7 @@ namespace Raven
   }
   public class RectangleModel : ShapeModel
   {  
+    [PropertiedInput("Bounds")]
     public override RectangleF Bounds { get; set; } = new RectangleF();
     public override string Icon { get => Icons.SquareFull; }
 
@@ -62,8 +61,13 @@ namespace Raven
     public override RectangleF Bounds { get; set; } = new RectangleF();
     public override string Icon { get => Icons.Circle; }
 
+    [PropertiedInput("Center")]
     public Vector2 Center { get => Bounds.Center; }
+
+    [PropertiedInput("Width")]
     public float Width { get => Bounds.Width; }
+
+    [PropertiedInput("Width")]
     public float Height { get => Bounds.Height; }
 
     public EllipseModel() {}
@@ -92,7 +96,10 @@ namespace Raven
     public override string Icon { get => Icons.MapMarkerAlt; }
 
     public static Vector2 Size = new Vector2(20, 30);
+
+    [PropertiedInput("Position")]
     public Vector2 Position { get => Bounds.Location; }
+
     public Vector2[] Vertices { get {
       var left = Position;
       left.X -= Size.X/2;
@@ -129,8 +136,11 @@ namespace Raven
     public override RectangleF Bounds { get; set; } = new RectangleF();
     public override string Icon { get => Icons.DrawPolygon; }
 
-    public List<Vector2> Points = new List<Vector2>();
-    public Vector2 Position = new Vector2();
+    [PropertiedInput("Points")]
+    public List<Vector2> Points { get; set; } = new List<Vector2>();
+
+    [PropertiedInput("Position")]
+    public Vector2 Position { get; set; } = new Vector2();
 
     public PolygonModel() {}
 
