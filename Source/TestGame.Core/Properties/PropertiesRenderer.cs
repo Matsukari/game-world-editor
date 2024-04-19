@@ -66,6 +66,7 @@ namespace Raven
       }
       return null;
     }
+    public static int MinimumPropChildHeight = 250;
     public static bool Render(ImGuiWinManager manager, IPropertied propertied, bool tree=false)
     {
       string changedName = null;
@@ -84,7 +85,9 @@ namespace Raven
 
       if (header)
       {
-        ImGui.BeginChild("Properties", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, 200));
+        var width = ImGui.GetContentRegionAvail().X;
+        var height = Math.Max(ImGui.GetContentRegionAvail().Y, MinimumPropChildHeight);
+        ImGui.BeginChild("Properties", new System.Numerics.Vector2(width, height));
  
         if (propertied.Properties.Data.Count() == 0) ImGuiUtils.TextMiddle("No properties yet.");
 
@@ -151,6 +154,15 @@ namespace Raven
           if (ImGui.InputFloat2(subPropertyName, ref vecNum))
             subPropertyInfo.SetValue(propertyData, vecNum.ToVector2()); 
           return true;
+      }
+      if (subProperty.GetType().IsPrimitive)
+      {
+        var data = RenderPrimitiveType(subProperty, subPropertyName);
+        if (data != null)
+        {
+          subPropertyInfo.SetValue(propertyData, data);
+          return true;
+        }
       }
       return false;
     }

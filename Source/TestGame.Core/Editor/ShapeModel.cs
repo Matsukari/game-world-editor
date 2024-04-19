@@ -62,13 +62,13 @@ namespace Raven
     public override string Icon { get => Icons.Circle; }
 
     [PropertiedInput("Center")]
-    public Vector2 Center { get => Bounds.Center; }
+    public Vector2 Center { get => Bounds.Center; set => Bounds = new RectangleF(value-Bounds.Size/2, Bounds.Size); }
 
     [PropertiedInput("Width")]
-    public float Width { get => Bounds.Width; }
+    public float Width { get => Bounds.Width; set => Bounds = new RectangleF(Bounds.X, Bounds.Y, value, Bounds.Height); }
 
-    [PropertiedInput("Width")]
-    public float Height { get => Bounds.Height; }
+    [PropertiedInput("Height")]
+    public float Height { get => Bounds.Height; set => Bounds = new RectangleF(Bounds.X, Bounds.Y, Bounds.Width, value); }
 
     public EllipseModel() {}
 
@@ -98,16 +98,16 @@ namespace Raven
     public static Vector2 Size = new Vector2(20, 30);
 
     [PropertiedInput("Position")]
-    public Vector2 Position { get => Bounds.Location; }
+    public Vector2 Position { get => Bounds.Location; set => Bounds = new RectangleF(value-Bounds.Size/2, Bounds.Size); }
 
     public Vector2[] Vertices { get {
       var left = Position;
       left.X -= Size.X/2;
-      left.Y -= Size.Y/2;
+      left.Y -= Size.Y;
 
       var right = Position;
       right.X += Size.X/2;
-      right.Y -= Size.Y/2;
+      right.Y -= Size.Y;
 
       return new []{ left, right, Position };
     }}
