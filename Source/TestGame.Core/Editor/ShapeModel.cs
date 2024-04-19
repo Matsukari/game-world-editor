@@ -133,14 +133,14 @@ namespace Raven
   }
   public class PolygonModel : ShapeModel
   { 
-    public override RectangleF Bounds { get; set; } = new RectangleF();
+    public override RectangleF Bounds { get; set; } = new RectangleF(); 
     public override string Icon { get => Icons.DrawPolygon; }
 
     [PropertiedInput("Points")]
     public List<Vector2> Points { get; set; } = new List<Vector2>();
 
     [PropertiedInput("Position")]
-    public Vector2 Position { get; set; } = new Vector2();
+    public Vector2 Position { get => Bounds.Location; set => Bounds = new RectangleF(value, Bounds.Size); }
 
     public PolygonModel() {}
 
@@ -149,8 +149,24 @@ namespace Raven
       primitiveBatch.DrawPolygon(Position.AddAsPositionToVertices(Points), Points.Count(), color);
       batcher.DrawPolygon(Position, Points.ToArray(), color, thickness: 1/camera.RawZoom);
     }       
+    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
+    {
+      if (Points.Count() < 2) return;
+      for (int i = 0; i < Points.Count()-1; i++)
+      {
+        var a = Points[i] + Position;
+        var b = Points[i+1] + Position;
+        drawlist.AddLine(a.ToNumerics(), b.ToNumerics(), color2.ToImColor());
+        drawlist.AddCircleFilled(a.ToNumerics(), 4, color2.ToImColor());
+      }
+    }
+      
 
-    public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
+    public override bool CollidesWith(Vector2 point) 
+    {
+      Nez.CollisionResult res;
+      return Nez.PhysicsShapes.ShapeCollisions.PointToPoly(point, new Nez.PhysicsShapes.Polygon(Points.ToArray()), out res);
+    }
 
     public override object Duplicate() => MemberwiseClone();
   }

@@ -68,17 +68,20 @@ namespace Raven.Widget
         {
           if (prop.Value is ShapeModel shape) 
           {
+            RectangleF Transform(RectangleF rect)
+            {
+              rect.Location *= Zoom;
+              rect.Location += SourcedSprite.Transform.Position;
+              rect.Location += ImGui.GetCursorScreenPos();
+              rect.Location += Position;
+              rect.Size *= Zoom;
+              return rect; 
+            }
             // if (shape.CollidesWith(ImGui.GetMousePos())) 
             var temp = shape.Bounds;
-            var temp2 = shape.Bounds;
-            temp.Location *= Zoom;
-            temp.Location += SourcedSprite.Transform.Position;
-            temp.Location += ImGui.GetCursorScreenPos();
-            temp.Location += Position;
-            temp.Size *= Zoom;
-            shape.Bounds = temp;  
+            shape.Bounds = Transform(shape.Bounds);  
             shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
-            shape.Bounds = temp2;
+            shape.Bounds = temp;
           }
         }
       }
@@ -124,6 +127,16 @@ namespace Raven.Widget
           shape.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
           return true;
         }
+        else if (_shape is PolygonModel poly)
+        {
+          if (poly.Points.Count() == 0)
+            poly.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
+
+          var point = _initialMouse-poly.Bounds.Location;
+          poly.Points.Add(point);
+          if (poly.Points.Count() >= 3 && Collisions.CircleToPoint(poly.Points[0], 10, point))
+            return true;
+        }
       }
       if (Nez.Input.LeftMouseButtonDown)
       {
@@ -133,7 +146,7 @@ namespace Raven.Widget
         rect.Size = ImGui.GetMousePos() - _initialMouse; 
         _shape.Bounds = rect; 
       }
-      if (Nez.Input.LeftMouseButtonReleased)
+      if (Nez.Input.LeftMouseButtonReleased && _shape is not PolygonModel)
       {
         return true;
       }
@@ -149,6 +162,11 @@ namespace Raven.Widget
       bounds.Location -= SourcedSprite.Transform.Position;
       bounds.Location /= Zoom;
       bounds.Size /= Zoom;
+      if (_shape is PolygonModel poly) 
+      {
+        for (int i = 0; i < poly.Points.Count(); i++)
+          poly.Points[i] = ToSourcePoint(poly.Points[i]);
+      }
       // Console.WriteLine("Mouse " + (_initialMouse - ImGui.GetCursorScreenPos()).ToString());
       // Console.WriteLine("Position " + Position.ToString());
       // Console.WriteLine("ZOom " + Zoom.ToString());
@@ -157,6 +175,14 @@ namespace Raven.Widget
       _propertied.Properties.Add(_shape.Duplicate());
       _initialMouse = Vector2.Zero;
       _shape = null;
+    }
+    Vector2 ToSourcePoint(Vector2 point)
+    {
+      var screenMouse = _initialMouse - ImGui.GetCursorScreenPos();
+      point = screenMouse - Position;
+      point -= SourcedSprite.Transform.Position;
+      point /= Zoom;
+      return point;
     }
     void HandleMoveZoom()
     {
