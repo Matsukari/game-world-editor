@@ -14,7 +14,9 @@ namespace Raven
 
     public abstract void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color);
 
-    public virtual void Render(ImDrawListPtr drawlist, Color color, Color color2) {}
+    public virtual void Render(ImDrawListPtr drawlist, Color color, Color color2) => Render(drawlist, Vector2.Zero, 1f, color, color2);
+
+    public virtual void Render(ImDrawListPtr drawlist, Vector2 offset, float zoom, Color color, Color color2) {}
 
     public void Render(ImDrawListPtr drawlist, Camera camera, Color color, Color color2)
     {
@@ -45,10 +47,14 @@ namespace Raven
       batcher.DrawRectOutline(camera, Bounds, color);
     }
 
-    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
+    public override void Render(ImDrawListPtr drawlist, Vector2 offset, float zoom, Color color, Color color2)      
     {
-      drawlist.AddRectFilled(Bounds.Location.ToNumerics(), Bounds.Max.ToNumerics(), color.ToImColor());
-      drawlist.AddRect(Bounds.Location.ToNumerics(), Bounds.Max.ToNumerics(), color2.ToImColor());
+      var bounds = Bounds;
+      bounds.Location *= zoom;
+      bounds.Location += offset;
+      bounds.Size *= zoom;
+      drawlist.AddRectFilled(bounds.Location.ToNumerics(), bounds.Max.ToNumerics(), color.ToImColor());
+      drawlist.AddRect(bounds.Location.ToNumerics(), bounds.Max.ToNumerics(), color2.ToImColor());
     }
 
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
@@ -78,10 +84,14 @@ namespace Raven
       batcher.DrawCircle(Center, Width, color, thickness: 1/camera.RawZoom, resolution: (int)(32*camera.RawZoom));
     }
 
-    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
+    public override void Render(ImDrawListPtr drawlist, Vector2 offset, float zoom, Color color, Color color2)      
     {
-      ImGuiUtils.DrawEllipseFilled(drawlist, Bounds, color.ToImColor());
-      ImGuiUtils.DrawEllipse(drawlist, Bounds, color2.ToImColor());
+      var bounds = Bounds;
+      bounds.Location *= zoom;
+      bounds.Location += offset;
+      bounds.Size *= zoom;
+      ImGuiUtils.DrawEllipseFilled(drawlist, bounds, color.ToImColor());
+      ImGuiUtils.DrawEllipse(drawlist, bounds, color2.ToImColor());
     }
 
     public override bool CollidesWith(Vector2 point) => Bounds.Contains(point);
@@ -100,29 +110,34 @@ namespace Raven
     [PropertiedInput("Position")]
     public Vector2 Position { get => Bounds.Location; set => Bounds = new RectangleF(value-Bounds.Size/2, Bounds.Size); }
 
-    public Vector2[] Vertices { get {
-      var left = Position;
+    public PointModel() {}
+
+    public Vector2[] GetVertices(Vector2 pos)
+    {
+      var left = pos;
       left.X -= Size.X/2;
       left.Y -= Size.Y;
 
-      var right = Position;
+      var right = pos;
       right.X += Size.X/2;
       right.Y -= Size.Y;
 
-      return new []{ left, right, Position };
-    }}
-
-    public PointModel() {}
+      return new []{ left, right, pos };
+    }
 
     public override void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color)
     {
-      var vertices = Vertices;
+      var vertices = GetVertices(Position);
       primitiveBatch.DrawPolygon(Position.AddAsPositionToVertices(vertices), vertices.Count(), color);
       batcher.DrawPolygon(Position, vertices, color,  true, 1/camera.RawZoom);
     } 
-    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
-    { 
-      var vertices = Vertices;
+    public override void Render(ImDrawListPtr drawlist, Vector2 offset, float zoom, Color color, Color color2)      
+    {
+      var bounds = Bounds;
+      bounds.Location *= zoom;
+      bounds.Location += offset;
+      bounds.Size *= zoom;
+      var vertices = GetVertices(bounds.Location);
       drawlist.AddTriangleFilled(vertices[0].ToNumerics(), vertices[1].ToNumerics(), vertices[2].ToNumerics(), color.ToImColor());
       drawlist.AddTriangle(vertices[0].ToNumerics(), vertices[1].ToNumerics(), vertices[2].ToNumerics(), color2.ToImColor());
     }
@@ -149,18 +164,25 @@ namespace Raven
       primitiveBatch.DrawPolygon(Position.AddAsPositionToVertices(Points), Points.Count(), color);
       batcher.DrawPolygon(Position, Points.ToArray(), color, thickness: 1/camera.RawZoom);
     }       
-    public override void Render(ImDrawListPtr drawlist, Color color, Color color2)
+    public override void Render(ImDrawListPtr drawlist, Vector2 offset, float zoom, Color color, Color color2)      
     {
-      if (Points.Count() < 2) return;
+      Vector2 Transform(Vector2 pos)
+      {
+        pos += Position;
+        pos *= zoom;
+        pos += offset;
+        return pos; 
+      }
       for (int i = 0; i < Points.Count()-1; i++)
       {
-        var a = Points[i] + Position;
-        var b = Points[i+1] + Position;
+        var a = Transform(Points[i]);
+        var b = Transform(Points[i+1] );
+        // Console.WriteLine($"Redering point {i} at {a}");
         drawlist.AddLine(a.ToNumerics(), b.ToNumerics(), color2.ToImColor());
-        drawlist.AddCircleFilled(a.ToNumerics(), 4, color2.ToImColor());
       }
+      for (int i = 0; i < Points.Count(); i++)
+        drawlist.AddCircleFilled(Transform(Points[i] ).ToNumerics(), 4, color2.ToImColor()); 
     }
-      
 
     public override bool CollidesWith(Vector2 point) 
     {
@@ -168,6 +190,12 @@ namespace Raven
       return Nez.PhysicsShapes.ShapeCollisions.PointToPoly(point, new Nez.PhysicsShapes.Polygon(Points.ToArray()), out res);
     }
 
-    public override object Duplicate() => MemberwiseClone();
+    public override object Duplicate()
+    {
+      var poly = MemberwiseClone() as PolygonModel;
+      poly.Points = Points.Copy();
+      return poly;
+    }
+      
   }
 }

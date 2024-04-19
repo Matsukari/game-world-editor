@@ -9,8 +9,8 @@
 Integrate SpriteFrames to SpriteScene
 
 ## Geometry
-Implement polygon shape
-Implement ellipses
+Input selection 
+World intergration
 
 ## SpriteScene
 Multiple select parts

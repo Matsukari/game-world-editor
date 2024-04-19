@@ -68,20 +68,21 @@ namespace Raven.Widget
         {
           if (prop.Value is ShapeModel shape) 
           {
-            RectangleF Transform(RectangleF rect)
-            {
-              rect.Location *= Zoom;
-              rect.Location += SourcedSprite.Transform.Position;
-              rect.Location += ImGui.GetCursorScreenPos();
-              rect.Location += Position;
-              rect.Size *= Zoom;
-              return rect; 
-            }
+            // RectangleF Transform(RectangleF rect)
+            // {
+            //   rect.Location *= Zoom;
+            //   rect.Location += SourcedSprite.Transform.Position;
+            //   rect.Location += ImGui.GetCursorScreenPos();
+            //   rect.Location += Position;
+            //   rect.Size *= Zoom;
+            //   return rect; 
+            // }
+            var offset = SourcedSprite.Transform.Position + ImGui.GetCursorScreenPos() + Position;
             // if (shape.CollidesWith(ImGui.GetMousePos())) 
-            var temp = shape.Bounds;
-            shape.Bounds = Transform(shape.Bounds);  
-            shape.Render(ImGui.GetWindowDrawList(), _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
-            shape.Bounds = temp;
+            // var temp = shape.Bounds;
+            // shape.Bounds = Transform(shape.Bounds);  
+            shape.Render(ImGui.GetWindowDrawList(), offset, Zoom, _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
+            // shape.Bounds = temp;
           }
         }
       }
@@ -102,7 +103,7 @@ namespace Raven.Widget
       foreach (var shapeModel in _shapeModels)
       {
         ImGui.SameLine();
-        var shapeInstance = shapeModel;
+        var shapeInstance = shapeModel.Duplicate() as ShapeModel;
         var icon = shapeModel.Icon;
 
         // pressed; begin annotation
@@ -129,16 +130,16 @@ namespace Raven.Widget
         }
         else if (_shape is PolygonModel poly)
         {
-          if (poly.Points.Count() == 0)
-            poly.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
+          // if (poly.Points.Count() == 0)
+          //   poly.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
 
-          var point = _initialMouse-poly.Bounds.Location;
-          poly.Points.Add(point);
-          if (poly.Points.Count() >= 3 && Collisions.CircleToPoint(poly.Points[0], 10, point))
+          // var point = _initialMouse-poly.Bounds.Location;
+          poly.Points.Add(_initialMouse);
+          if (poly.Points.Count() >= 3 && Collisions.CircleToPoint(poly.Points[0], 10, _initialMouse))
             return true;
         }
       }
-      if (Nez.Input.LeftMouseButtonDown)
+      if (Nez.Input.LeftMouseButtonDown && _shape is not PolygonModel)
       {
         // calculate position of area between mous drag
         var rect = new RectangleF();
@@ -156,23 +157,30 @@ namespace Raven.Widget
     void Finish()
     {
       Mouse.SetCursor(MouseCursor.Arrow);
-      var bounds = _shape.Bounds;
-      var screenMouse = _initialMouse - ImGui.GetCursorScreenPos();
-      bounds.Location = screenMouse - Position;
-      bounds.Location -= SourcedSprite.Transform.Position;
-      bounds.Location /= Zoom;
-      bounds.Size /= Zoom;
       if (_shape is PolygonModel poly) 
       {
         for (int i = 0; i < poly.Points.Count(); i++)
-          poly.Points[i] = ToSourcePoint(poly.Points[i]);
+        {
+          poly.Points[i] = poly.Points[i] - ImGui.GetCursorScreenPos() - Position;
+          poly.Points[i] /= Zoom;
+        }
+
+      }
+      else 
+      {
+        var bounds = _shape.Bounds;
+        var screenMouse = _initialMouse - ImGui.GetCursorScreenPos();
+        bounds.Location = screenMouse - Position;
+        bounds.Location -= SourcedSprite.Transform.Position;
+        bounds.Location /= Zoom;
+        bounds.Size /= Zoom;
+        _shape.Bounds = bounds;
       }
       // Console.WriteLine("Mouse " + (_initialMouse - ImGui.GetCursorScreenPos()).ToString());
       // Console.WriteLine("Position " + Position.ToString());
       // Console.WriteLine("ZOom " + Zoom.ToString());
       // Console.WriteLine("added " + bounds.ToString());
-      _shape.Bounds = bounds;
-      _propertied.Properties.Add(_shape.Duplicate());
+      _propertied.Properties.Add(_shape);
       _initialMouse = Vector2.Zero;
       _shape = null;
     }

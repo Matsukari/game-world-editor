@@ -17,6 +17,12 @@ namespace Raven
         return null;
       }
     }
+    public static List<T> Copy<T>(this List<T> list) where T: struct 
+    {
+      List<T> newList = new List<T>();
+      foreach (var item in list) newList.Add(item);
+      return newList;
+    }
     /// <summary>
     /// Clones all items in the list if they type implement IClonable 
     /// </summary> 
