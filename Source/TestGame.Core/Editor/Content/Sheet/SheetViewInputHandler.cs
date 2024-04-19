@@ -48,15 +48,6 @@ namespace Raven
       {
         _initialMouse = Camera.MouseToWorldPoint();
         
-        foreach (var shape in _sheet.Properties)
-        {
-          if (Nez.Input.LeftMouseButtonPressed && shape.Value is ShapeModel model && model.CollidesWith(Camera.MouseToWorldPoint()))
-          {
-            RemoveSelection();
-            Selection.Begin(model.Bounds, model.Icon);
-            return true;
-          }
-        }
  
       }
       else if (input.IsDrag && Nez.Input.LeftMouseButtonDown)

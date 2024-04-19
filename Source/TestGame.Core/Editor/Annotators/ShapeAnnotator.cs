@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Raven
 {
-  public class ShapeAnnotator : RenderableComponent, IInputHandler
+  public class ShapeAnnotator : IInputHandler, IImGuiRenderable
   {
     EditorSettings _settings;
     IPropertied _propertied;
@@ -17,14 +17,14 @@ namespace Raven
     public event Action OnAnnotateStart;
     public event Action OnAnnotateEnd;
 
+    public event Action<ShapeModel, IPropertied> PostProcess;
+
     public ShapeAnnotator(EditorSettings settings)
     {
       _settings = settings;
       _annotating = false;
     }
 
-    public override bool IsVisibleFromCamera(Camera camera) => true;
-        
     public void Annotate(IPropertied property, ShapeModel shape)
     {
       Mouse.SetCursor(MouseCursor.Crosshair);
@@ -57,6 +57,7 @@ namespace Raven
     void Finish()
     {
       Mouse.SetCursor(MouseCursor.Arrow);
+      if (PostProcess != null) PostProcess(_shape, _propertied);
       _propertied.Properties.Add(_shape);
       _initialMouse = Vector2.Zero;
       _annotating = false;
@@ -64,7 +65,7 @@ namespace Raven
       _isDrag = false;
       Console.WriteLine("Finished");
     }
-    public override void Render(Batcher batcher, Camera camera)
+    void IImGuiRenderable.Render(ImGuiWinManager imgui)
     {
 
       if (!_annotating) return;
@@ -75,7 +76,7 @@ namespace Raven
       // start point
       if (_initialMouse == Vector2.Zero)
       {
-        _initialMouse = camera.MouseToWorldPoint();
+        _initialMouse = input.Camera.MouseToWorldPoint();
         if (OnAnnotateStart != null) OnAnnotateStart();
         if (_shape is PointModel shape)
         {
@@ -84,18 +85,17 @@ namespace Raven
           return;
         }
       }
+
       // Dragging
       if (_isDrag) 
       {
-        Editor.PrimitiveBatch.Begin(camera.ProjectionMatrix, camera.TransformMatrix);
-        _shape.Render(Editor.PrimitiveBatch, batcher, camera, (Entity as Editor).Settings.Colors.ShapeActive.ToColor());
-        Editor.PrimitiveBatch.End();
+        _shape.Render(ImGuiNET.ImGui.GetBackgroundDrawList(), input.Camera, _settings.Colors.ShapeActive.ToColor(), _settings.Colors.ShapeOutlineActive.ToColor());
       }
 
       // calculate position of area between mous drag
       var rect = input.MouseDragArea;
       rect.Location = _initialMouse;
-      rect.Size = camera.MouseToWorldPoint() - _initialMouse; 
+      rect.Size = input.Camera.MouseToWorldPoint() - _initialMouse; 
       _shape.Bounds = rect;
 
     }

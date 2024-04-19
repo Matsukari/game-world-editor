@@ -31,6 +31,15 @@ namespace Raven
         var level = _view.World.Levels[i];
         if (!level.IsVisible) continue;
 
+        foreach (var shape in level.Properties)
+        {
+          if (Nez.Input.LeftMouseButtonPressed && shape.Value is ShapeModel model && model.CollidesWith(Camera.MouseToWorldPoint()-level.Bounds.Location))
+          {
+            Selection.Begin(model.Bounds, model.Icon);
+            return true;
+          }
+        }
+
         foreach (var layer in level.Layers)
         {
           SpriteSceneInstance scene;

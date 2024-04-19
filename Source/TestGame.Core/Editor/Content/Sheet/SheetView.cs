@@ -63,7 +63,6 @@ namespace Raven
     {
       _imgui.Update(_sheet, ContentData.SelectionList);
 
-      RenderAnnotations(ContentData.PropertiedContext, batcher, camera, settings);
       if (_scene.IsEditing) 
       {
         _scene.Render(batcher, camera);

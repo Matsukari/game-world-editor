@@ -124,12 +124,9 @@ namespace Raven
                   break;
               }
             }
-            else if (propertyData is string stringValue)
+            else if (propertyData is string stringValue && ImGui.InputText("Value", ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue))
             {
-              if (ImGui.InputText("Value", ref stringValue, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
-              {
-                changedProperty = stringValue;
-              }
+              changedProperty = stringValue;
             }
             // Property's value contains a set of data
             else 
@@ -137,7 +134,7 @@ namespace Raven
               // Console.WriteLine($"Type of : {property} {propertyData.GetType().Name}");
               var subProperties = 
                 propertyData.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy); 
-              // var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
+              var subPropertiesCount = subProperties.Where(prop => prop.IsDefined(typeof(PropertiedInputAttribute), false)).Count();
               anyOtherChanges = RenderHardTypes(subProperties, propertyData);
             }
             ImGui.TreePop();

@@ -47,6 +47,10 @@ namespace Raven
     {
       view.Initialize(this, content);
     }
+    void ShapePostProcessor(ShapeModel shape, IPropertied context)
+    {
+      if (context is Level level) shape.Bounds = shape.Bounds.AddPosition(-level.Bounds.Location);
+    }
     public override void OnAddedToScene()
     {
       Scene.Camera.Position = -Screen.Center / 2;
@@ -61,6 +65,7 @@ namespace Raven
       Selection = AddComponent(new Selection());
       Serializer = new Serializer(ContentManager);
       ShapeAnnotator = new ShapeAnnotator(Settings);
+      ShapeAnnotator.PostProcess += ShapePostProcessor;
       Mover = AddComponent(new Guidelines.MovableOriginLines());
       Mover.RenderLayer = -1;
       Rotator = AddComponent(new Rotator());
@@ -70,6 +75,7 @@ namespace Raven
       WindowManager.Renderables.Add(new Settings(Settings));
       WindowManager.Renderables.Add(new StatusBar(this));
       WindowManager.Renderables.Add(new Menubar(this));
+      WindowManager.Renderables.Add(ShapeAnnotator);
 
       WindowManager.GetRenderable<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
 
@@ -77,7 +83,6 @@ namespace Raven
       AddComponent(new Utils.Components.CameraZoomComponent()); 
       AddComponent(new ContentRenderer(ContentManager));
       AddComponent(new SelectionRenderer(Selection, Settings.Colors));
-      AddComponent(ShapeAnnotator);
 
       var input = Core.GetGlobalManager<InputManager>();
       input.RegisterInputHandler(ShapeAnnotator);

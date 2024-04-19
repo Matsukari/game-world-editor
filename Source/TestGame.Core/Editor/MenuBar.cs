@@ -187,22 +187,23 @@ namespace Raven
           fallback: null,
           color: EditorColors.Get(ImGuiCol.ButtonHovered));
 
-      // Geometry opeionts
-      ImGuiUtils.SpanX(20);
-      foreach (var shapeModel in _shapeModels)
-      {
-        ImGui.SameLine();
-        var shapeInstance = shapeModel;
-        var icon = shapeModel.Icon;
-
-        // pressed; begin annotation
-        if (ImGui.Button(icon)) _editor.ShapeAnnotator.Annotate(_editor.ContentManager.ContentData.PropertiedContext, shapeInstance);
-      }
-
-
-      ImGuiUtils.SpanX(20);
       if (_editor.ContentManager.View is WorldView worldView)
       {
+        // Geometry opeionts
+        ImGuiUtils.SpanX(20);
+        foreach (var shapeModel in _shapeModels)
+        {
+          ImGui.SameLine();
+          var shapeInstance = shapeModel;
+          var icon = shapeModel.Icon;
+          IPropertied context = worldView.World;
+          if (_editor.Selection.Capture is IPropertied prop) context = prop;
+
+          // pressed; begin annotation
+          if (ImGui.Button(icon)) _editor.ShapeAnnotator.Annotate(context, shapeInstance);
+        }
+
+        ImGuiUtils.SpanX(20);
         Widget.ImGuiWidget.ToggleButtonGroup(
             ids: new []{Icon.PaintBrush, Icon.Eraser},
             toggles: ref _paintModeToggled,

@@ -29,7 +29,14 @@ namespace Raven
       Mover = editor.Mover;
       Rotator = editor.Rotator;
     }
-
+    protected void RenderAnnotations(IPropertied propertied, EditorSettings settings)
+    {
+      foreach (var shape in propertied.Properties)
+      {
+        if (shape.Value is ShapeModel model)
+          model.Render(ImGuiNET.ImGui.GetBackgroundDrawList(), Camera, settings.Colors.ShapeInactive.ToColor(), settings.Colors.ShapeOutlineActive.ToColor()); 
+      }
+    }
     public override bool Equals(object obj)
     {
       if (obj is EditorInterface inf) return Content.Name == inf.Content.Name;

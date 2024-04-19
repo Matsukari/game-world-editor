@@ -9,12 +9,25 @@ namespace Raven
   public abstract class ShapeModel : ICloneable
   {
     public abstract string Icon { get; }
-    
+   
+    [PropertiedInput("Bounds")]
     public abstract RectangleF Bounds { get; set; }
 
     public abstract void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color);
 
     public virtual void Render(ImDrawListPtr drawlist, Color color, Color color2) {}
+
+    public void Render(ImDrawListPtr drawlist, Camera camera, Color color, Color color2)
+    {
+      var temp = Bounds;
+      var temp2 = Bounds;
+      temp.Location = camera.WorldToScreenPoint(temp.Location);
+      Console.WriteLine(temp.Location.ToString());
+      temp.Size *= camera.RawZoom;
+      Bounds = temp;   
+      Render(drawlist, color, color2);
+      Bounds = temp2;
+    }
 
     public abstract bool CollidesWith(Vector2 point);
 
