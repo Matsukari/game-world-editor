@@ -49,7 +49,7 @@ namespace Raven
         _isDrag = true;
 
       }
-      if (input.IsDragLast) Finish();
+      if (input.IsDragLast && _shape is not PolygonModel) Finish();
 
       return true;
     }
@@ -84,6 +84,15 @@ namespace Raven
           Finish();
           return;
         }
+        else if (_shape is PolygonModel poly)
+        {
+          poly.Points.Add(_initialMouse);
+          if (poly.Points.Count() >= 3 && Collisions.CircleToPoint(poly.Points[0], 10, _initialMouse))
+          {
+            Finish();
+            return;
+          }
+        }
       }
 
       // Dragging
@@ -91,6 +100,8 @@ namespace Raven
       {
         _shape.Render(ImGuiNET.ImGui.GetBackgroundDrawList(), input.Camera, _settings.Colors.ShapeActive.ToColor(), _settings.Colors.ShapeOutlineActive.ToColor());
       }
+
+      if (_shape is PolygonModel) return;
 
       // calculate position of area between mous drag
       var rect = input.MouseDragArea;

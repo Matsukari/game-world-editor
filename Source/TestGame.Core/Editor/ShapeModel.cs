@@ -18,7 +18,7 @@ namespace Raven
 
     public virtual void Render(ImDrawListPtr drawlist, Vector2 offset, float zoom, Color color, Color color2) {}
 
-    public void Render(ImDrawListPtr drawlist, Camera camera, Color color, Color color2)
+    public virtual void Render(ImDrawListPtr drawlist, Camera camera, Color color, Color color2)
     {
       var temp = Bounds;
       var temp2 = Bounds;
@@ -172,6 +172,22 @@ namespace Raven
         pos *= zoom;
         pos += offset;
         return pos; 
+      }
+      for (int i = 0; i < Points.Count()-1; i++)
+      {
+        var a = Transform(Points[i]);
+        var b = Transform(Points[i+1] );
+        // Console.WriteLine($"Redering point {i} at {a}");
+        drawlist.AddLine(a.ToNumerics(), b.ToNumerics(), color2.ToImColor());
+      }
+      for (int i = 0; i < Points.Count(); i++)
+        drawlist.AddCircleFilled(Transform(Points[i] ).ToNumerics(), 4, color2.ToImColor()); 
+    }
+    public override void Render(ImDrawListPtr drawlist, Camera camera, Color color, Color color2)
+    {
+      Vector2 Transform(Vector2 pos)
+      {
+        return camera.WorldToScreenPoint(pos); 
       }
       for (int i = 0; i < Points.Count()-1; i++)
       {

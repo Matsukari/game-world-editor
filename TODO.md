@@ -10,7 +10,6 @@ Integrate SpriteFrames to SpriteScene
 
 ## Geometry
 Input selection 
-World intergration
 
 ## SpriteScene
 Multiple select parts
