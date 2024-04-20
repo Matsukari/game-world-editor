@@ -37,25 +37,15 @@ namespace Raven
       SpriteSlicer.Draw();
       AnnotatorPane.Render(imgui);
 
-      // something is selected; render options
-      if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Tile tile && ImGui.BeginPopup("Tile-popup"))
+      void ConvertOption(Sprite sprite)
       {
-        if (ImGui.MenuItem("Embed Shape"))
-        {
-          AnnotatorPane.Edit(new SourcedSprite(sprite: new Sprite(tile.Region, _sheet)), tile, shape => _sheet.CreateTile(tile));
-        }
-        ImGui.EndPopup();
-      }
-      if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Sprite sprite && ImGui.BeginPopup("sprite-popup"))
-      {
-        // convert to new spriteScene
         if (ImGui.MenuItem(Icon.SyncAlt + "   Convert To SpriteScene"))
         {
           void Convert()
           {
             imgui.NameModal.Open((name)=>
             {
-              var spriteScene = _sheet.CreateSpriteScene(name, ContentData.SelectionList.Last() as Sprite);
+              var spriteScene = _sheet.CreateSpriteScene(name, sprite);
 
                 // name conflict 
               if (_sheet.SpriteScenees.Find(item => item.Name == name) != null)
@@ -79,6 +69,22 @@ namespace Raven
           }
           Convert();
         }
+      }
+
+      // something is selected; render options
+      if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Tile tile && ImGui.BeginPopup("Tile-popup"))
+      {
+        ConvertOption(new Sprite(tile.Region, tile._sheet));
+        if (ImGui.MenuItem(Icon.Shapes + "   Embed Shape"))
+        {
+          AnnotatorPane.Edit(new SourcedSprite(sprite: new Sprite(tile.Region, _sheet)), tile, shape => _sheet.CreateTile(tile));
+        }
+        ImGui.EndPopup();
+      }
+      if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Sprite sprite && ImGui.BeginPopup("sprite-popup"))
+      {
+        ConvertOption(sprite);
+        // convert to new spriteScene
         if (ImGui.MenuItem(Icon.Film + "   Create Animation"))
         {
           SpriteSlicer.Sprite = sprite;
