@@ -105,12 +105,6 @@ namespace Raven
       float cos_a = MathF.Cos(angle);
       float sin_a = MathF.Sin(angle);
 
-      // position += size / 2;
-      // origin -= 
-      //
-      // position.X += cos_a * origin.X;
-      // position.Y += sin_a * origin.Y;
-      //
       position += origin;
 
       Vector2[] pos = new []

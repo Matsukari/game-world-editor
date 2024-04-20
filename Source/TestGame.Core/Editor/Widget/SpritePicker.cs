@@ -98,7 +98,6 @@ namespace Raven
         {
 
 
-          HandleMoveZoom();
           // Draws the spritesheet with zoom and fofset
           var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(OpenSheet.Sheet.Texture);
 
@@ -146,6 +145,7 @@ namespace Raven
                   colors.PickSelectedOutline.ToImColor());               
             }
           }
+          HandleMoveZoom();
           var mouseDragArea = new RectangleF();
           mouseDragArea.Location = _initialMouseOnDrag;
 
@@ -231,22 +231,30 @@ namespace Raven
         }
       }
     }
+    public float MinZoom = 0.000001f;
+    public float MaxZoom = 100f;
+    public float ZoomFactor = 1.2f;
     void HandleMoveZoom()
     {
       var input = Core.GetGlobalManager<InputManager>();
-      var mouse = MouseToPickerPoint(OpenSheet);
       // zooms
       if (ImGui.GetIO().MouseWheel != 0)
       {
-        float zoomFactor = 1.2f;
+        float zoomFactor = ZoomFactor;
         if (ImGui.GetIO().MouseWheel < 0) 
         {
-          if (OpenSheet.Zoom > 0.01) zoomFactor = 1/zoomFactor;
-          else zoomFactor = 0.01f;
+          if (OpenSheet.Zoom > MinZoom) zoomFactor = 1/zoomFactor;
+          else zoomFactor = MinZoom;
         }
-        var zoom = Math.Clamp(OpenSheet.Zoom * zoomFactor, 0.01f, 10f);
+        var zoom = Math.Clamp(OpenSheet.Zoom * zoomFactor, MinZoom, MaxZoom);
+        var mouse = MouseToPickerPoint(OpenSheet.Zoom, OpenSheet.Position);
+        Console.WriteLine("Zoom: " + OpenSheet.Zoom.ToString());
+        Console.WriteLine("Position: " + OpenSheet.Position.ToString());
         var delta = (OpenSheet.Position - mouse) * (zoomFactor - 1);
         if (zoomFactor != 1f) OpenSheet.Position += delta;
+        Console.WriteLine("Mouse: " + mouse.ToString());
+        Console.WriteLine("Delta: " + delta.ToString());
+        Console.WriteLine();
         OpenSheet.Zoom = zoom;
       }
       if (input.IsDragFirst)
@@ -262,13 +270,13 @@ namespace Raven
     public System.Numerics.Vector2 GetUvMax(SheetPickerData state) => ((state.Position + Bounds.Size) / Bounds.Size / state.Zoom).ToNumerics();
 
     // Convert mouse position relative to picker's bounds
-    public Vector2 MouseToPickerPoint(SheetPickerData state)
+    public Vector2 MouseToPickerPoint(float zoom, Vector2 offset)
     {
       var mouse = ImGui.GetMousePos();
       var pos = mouse.ToVector2(); 
       pos -= ImGui.GetCursorScreenPos();
-      pos += state.Position;
-      pos /= OpenSheet.Zoom;
+      pos /= zoom;
+      pos += offset;
 
       return pos;
     }
