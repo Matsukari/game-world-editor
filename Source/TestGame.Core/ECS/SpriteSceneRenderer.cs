@@ -31,7 +31,7 @@ namespace Raven
         }
       }
     }
-    public SourcedSprite GetPartAtWorld(Vector2 position)
+    public ISceneSprite GetPartAtWorld(Vector2 position)
     {
       for (int i = SpriteScene.Parts.Count()-1; i >= 0; i--)
       {
@@ -42,7 +42,7 @@ namespace Raven
       }
       return null;
     }
-    public RectangleF GetPartWorldBounds(SourcedSprite sprite)
+    public RectangleF GetPartWorldBounds(ISceneSprite sprite)
     {
       var bounds = new RectangleF();
       bounds.Location = Transform.Position + LocalOffset + sprite.SceneBounds.Location;

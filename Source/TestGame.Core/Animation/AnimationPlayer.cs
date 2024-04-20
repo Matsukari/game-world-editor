@@ -58,6 +58,7 @@ namespace Raven
         IsFinished = true;
         if (OnFinished != null) OnFinished();
       }
+      Animation.CurrentFrame = _currentKeyframe;
       CurrentFrame.OnEnter(Animation.Target);
 
       _currentKeyframe = Math.Min(_currentKeyframe, Animation.TotalFrames-1);

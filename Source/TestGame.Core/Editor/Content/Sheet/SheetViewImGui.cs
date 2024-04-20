@@ -44,11 +44,14 @@ namespace Raven
       Inspector.Sheet = _sheet;
       Inspector.Render(imgui);
 
+      var animEditor = SpriteAnimEditor as IImGuiRenderable;
+      animEditor.Render(imgui);
+
       if (SceneView != null && SceneView.IsEditing)
       {
         SceneView.SceneInspector.Render(imgui);
-        (SceneView.AnimationEditor as IImGuiRenderable).Render(imgui);
         SceneView.AnnotatorPane.Render(imgui);
+        (SceneView.AnimationEditor as IImGuiRenderable).Render(imgui);
         return;
       }
       else if (_list != null && _list.Selections.Count() > 0)
@@ -61,8 +64,6 @@ namespace Raven
         _spriteInspector.Render(imgui);
       }
 
-      var animEditor = SpriteAnimEditor as IImGuiRenderable;
-      animEditor.Render(imgui);
 
       var popup = Popups as IImGuiRenderable;
       popup.Render(imgui);

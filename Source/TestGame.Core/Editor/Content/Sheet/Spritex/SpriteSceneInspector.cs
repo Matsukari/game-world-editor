@@ -13,18 +13,18 @@ namespace Raven
     public override string Name { get => SpriteScene.Name; set => SpriteScene.Name = value; }
     public override PropertyList Properties { get => SpriteScene.Properties; set => SpriteScene.Properties = value; }
     
-    public SourcedSprite ChangePart = null;
-    SourcedSprite  _spriteScenePart;
+    public ISceneSprite ChangePart = null;
+    ISceneSprite  _spriteScenePart;
     // Gui state data
     public SpriteScene SpriteScene;
     public Vector2 GuiPosition = new Vector2();
     public float GuiZoom = 0.5f;
 
     public event Action<SpriteScene, Animation> OnOpenAnimation;
-    public event Action<SourcedSprite> OnAddPart;
-    public event Action<SourcedSprite> OnDelPart;
-    public event Action<SourcedSprite> OnModifiedPart;
-    public event Action<SourcedSprite> OnEmbedShape;
+    public event Action<ISceneSprite> OnAddPart;
+    public event Action<ISceneSprite> OnDelPart;
+    public event Action<ISceneSprite> OnModifiedPart;
+    public event Action<ISceneSprite> OnEmbedShape;
 
     static string[] _originTypes = new string[] { "Center", "Topleft", "Custom" };
 
@@ -38,7 +38,7 @@ namespace Raven
       DrawOptions();
       DrawAnimationOptionPopup();
     }
-    public static bool RenderSprite(ImGuiWinManager imgui, SourcedSprite sprite, bool drawName = true)
+    public static bool RenderSprite(ImGuiWinManager imgui, ISceneSprite sprite, bool drawName = true)
     {
       string name = sprite.Name;
       bool mod = false;
@@ -87,9 +87,9 @@ namespace Raven
     }
     internal bool _isOpenComponentOptionPopup = false;
     internal bool _isOpenSceneOnSpritePopup = false;
-    internal SourcedSprite _compOnOptions = null;
-    internal SourcedSprite _copiedSprite; 
-    internal SourcedSprite _cutSprite; 
+    internal ISceneSprite _compOnOptions = null;
+    internal ISceneSprite _copiedSprite; 
+    internal ISceneSprite _cutSprite; 
     internal Vector2 _posOnOpenCanvas = Vector2.Zero;
 
     void DrawOptions()
@@ -106,6 +106,18 @@ namespace Raven
       }
       if (ImGui.BeginPopup("sprite-component-options") && _compOnOptions != null)
       {
+
+        if (OnEmbedShape != null && ImGui.MenuItem(Icon.Shapes + "  Embed Shape"))
+        {
+          OnEmbedShape(_compOnOptions);
+        }
+        if (_compOnOptions is AnimatedSprite animatedSprite)
+        {
+          if (ImGui.MenuItem(Icon.Film + "  Open Animation") && OnOpenAnimation != null) OnOpenAnimation(SpriteScene, animatedSprite);
+        }
+
+        ImGui.Separator();
+
         if (ImGui.MenuItem(Icon.LevelDownAlt + "  Send to back"))
         {
           _compOnOptions.SpriteScene.OrderAt(_compOnOptions, 0);  
@@ -134,10 +146,6 @@ namespace Raven
         if (ImGui.MenuItem(visib))
         {
           _compOnOptions.IsVisible = !_compOnOptions.IsVisible;
-        }
-        if (OnEmbedShape != null && ImGui.MenuItem("Embed Shape"))
-        {
-          OnEmbedShape(_compOnOptions);
         }
 
         ImGui.Separator();
@@ -171,14 +179,14 @@ namespace Raven
       {
         if ((_cutSprite != null || _copiedSprite != null) && _posOnOpenCanvas != Vector2.Zero && ImGui.MenuItem(Icon.Paste + "  Paste"))
         {
-          SourcedSprite gotSprite;
+          ISceneSprite gotSprite;
           if (_cutSprite != null)
           {
             gotSprite = _cutSprite;
             _cutSprite = null;
           }
           else 
-            gotSprite = _copiedSprite.Duplicate();
+            gotSprite = _copiedSprite.Copy();
 
           var sprite = gotSprite.SpriteScene.AddSprite(gotSprite);
           sprite.Transform.Position = _posOnOpenCanvas;
@@ -187,7 +195,7 @@ namespace Raven
       }
 
     }
-    void DrawComponentOptions(SourcedSprite sprite, ref SourcedSprite removeSprite)
+    void DrawComponentOptions(ISceneSprite sprite, ref ISceneSprite removeSprite)
     {
       // Options next to name
       ImGui.SameLine();
@@ -292,7 +300,7 @@ namespace Raven
 
         ImGui.EndChild();
       }
-      SourcedSprite removeSprite = null;
+      ISceneSprite removeSprite = null;
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
         ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 300), 

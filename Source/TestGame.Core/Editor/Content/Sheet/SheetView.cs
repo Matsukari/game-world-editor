@@ -21,6 +21,7 @@ namespace Raven
     public Rectangle TileInMouse;
 
     public SheetInspector Inspector { get => _imgui.Inspector; }
+    public SpriteAnimationEditor SpriteAnimationEditor { get => _imgui.SpriteAnimEditor; }
 
     public override bool CanDealWithType(object content) => content is Sheet;
 
@@ -31,7 +32,9 @@ namespace Raven
       _scene = new SpriteSceneView(this);
       _scene.Initialize(editor, content);
       _scene.OnEdit += () => Inspector.ShowPicker = true;
+      _scene.OnEdit += () => _imgui.SpriteAnimEditor.Close();
       _scene.OnUnEdit += () => Inspector.ShowPicker = false;
+      _scene.OnUnEdit += () => _imgui.SpriteAnimEditor.Close();
       _scene.OnUnEdit += () => ContentData.PropertiedContext = _sheet;
 
       _imgui = new SheetViewImGui(Settings, Camera);

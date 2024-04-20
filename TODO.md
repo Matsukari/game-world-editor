@@ -1,13 +1,4 @@
 
-
-
-
-
-
-
-## Sheet
-Integrate SpriteFrames to SpriteScene
-
 ## Geometry
 Input selection 
 Polygon points inspector

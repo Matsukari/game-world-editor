@@ -22,7 +22,7 @@ namespace Raven
     public RectangleF Bounds = new RectangleF(0, 0, 1, 1);
     Vector2 _initialPosition = Vector2.Zero;
     List<RectangleF> _tiles = new List<RectangleF>();
-    public event Action OnSelectRightMouseClick;
+    public event Action<object> OnSelectRightMouseClick;
     public event Action OnLeave;
 
     public bool isPickOnlyTile = false;
@@ -192,13 +192,22 @@ namespace Raven
             if (anim.TotalFrames <= 0) continue;
             var frame = anim.Frames.First() as SpriteAnimationFrame;
             ImGuiUtils.DrawImage(frame.Sprite, size.ToNumerics());
+            ImGui.SameLine();
 
             ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickHoverOutline.ToImColor());
 
+            if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) 
+            {
+              SelectedSprite = anim;
+              Console.WriteLine("Selected " + SelectedSprite.GetType().Name);
+            }
+            else if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && OnSelectRightMouseClick != null) OnSelectRightMouseClick(anim);
+
+
             if (RectangleF.FromMinMax(ImGui.GetItemRectMin(), ImGui.GetItemRectMax()).Contains(ImGui.GetMousePos()))
             {
+              IsHoverSelected = true;
               ImGui.GetWindowDrawList().AddRectFilled(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickFill.ToImColor());              
-              if (ImGui.IsItemClicked()) SelectedSprite = anim;
             }
             if (SelectedSprite is Animation animation && animation.Name == anim.Name) 
               ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickSelectedOutline.ToImColor());

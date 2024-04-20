@@ -11,7 +11,7 @@ namespace Raven.Widget
     static ShapeModel[] _shapeModels = new ShapeModel[]{new RectangleModel(), new EllipseModel(), new PointModel(), new PolygonModel()};
     public float Zoom = 1;
     public Vector2 Position = Vector2.Zero;
-    public SourcedSprite SourcedSprite;
+    public ISceneSprite SourcedSprite;
     Vector2 _initialPosition = Vector2.Zero;
     IPropertied _propertied;
     ShapeModel _shape;
@@ -27,7 +27,7 @@ namespace Raven.Widget
 
     } 
 
-    public void Edit(SourcedSprite sprite, IPropertied propertied, Action<ShapeModel> onFinish=null)
+    public void Edit(ISceneSprite sprite, IPropertied propertied, Action<ShapeModel> onFinish=null)
     {
       _propertied = propertied;
       SourcedSprite = sprite;

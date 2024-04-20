@@ -22,7 +22,7 @@ namespace Raven
     /// <summary>
     /// All the SpriteScene operates on. Like a components that is attached to an Entity
     /// </summary>
-    public List<SourcedSprite> Parts = new List<SourcedSprite>();
+    public List<ISceneSprite> Parts = new List<ISceneSprite>();
 
     /// <summary>
     /// Animations this SpriteScene can do
@@ -85,7 +85,7 @@ namespace Raven
     {
     }
 
-    public SpriteScene(string name, SourcedSprite main, Sheet sheet) 
+    public SpriteScene(string name, ISceneSprite main, Sheet sheet) 
     {
       Name = name;
       _sheet = sheet;
@@ -144,7 +144,7 @@ namespace Raven
     /// <summary>
     /// Adds a new part with the name given to this SpriteScene
     /// </summary>
-    public SourcedSprite AddSprite(string name, SourcedSprite sprite=null) 
+    public ISceneSprite AddSprite(string name, ISceneSprite sprite=null) 
     {
       if (sprite == null) sprite = new SourcedSprite();
       sprite.SpriteScene = this;
@@ -154,12 +154,12 @@ namespace Raven
 
       return sprite;
     }
-    public SourcedSprite AddSprite(SourcedSprite sprite) => AddSprite("Component", sprite);
+    public ISceneSprite AddSprite(ISceneSprite sprite) => AddSprite("Component", sprite);
 
     /// <summary>
     /// Pushes the given sprite at the given index
     /// </summary>
-    public void OrderAt(SourcedSprite sprite, int index) 
+    public void OrderAt(ISceneSprite sprite, int index) 
     {
       try 
       {
@@ -171,9 +171,9 @@ namespace Raven
       }
       catch (Exception) {} 
     }
-    public void BringDown(SourcedSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) - 1);
+    public void BringDown(ISceneSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) - 1);
 
-    public void BringUp(SourcedSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) + 1); 
+    public void BringUp(ISceneSprite sprite) => OrderAt(sprite, Parts.FindIndex(item => item.Name == sprite.Name) + 1); 
 
     /// <summary>
     /// Removes a part with the same name as the given name

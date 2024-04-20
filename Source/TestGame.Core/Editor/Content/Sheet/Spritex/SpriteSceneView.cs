@@ -46,7 +46,16 @@ namespace Raven
 
       // Prepare
       _sceneInspector = new SpriteSceneInspector(spriteScene);
-      _sceneInspector.OnOpenAnimation += (scene, anim) => _animationEditor.Open(scene, anim);
+      _sceneInspector.OnOpenAnimation += (scene, anim) => 
+      {
+        if (anim is AnimatedSprite)
+        {
+          Console.WriteLine("Openning AnimatedSprite");
+          _sheetView.SpriteAnimationEditor.Open(anim);
+        }
+        else 
+          _animationEditor.Open(scene, anim);
+      };
       _sceneInspector.OnDelPart += part => Selection.End();
       _sceneInspector.OnEmbedShape += part => AnnotatorPane.Edit(part, part);
       _sceneInspector.OnModifiedPart += ReSelect; 
@@ -74,7 +83,7 @@ namespace Raven
     {
       IsEditing = false;
     }
-    void ReSelect(SourcedSprite part)
+    void ReSelect(ISceneSprite part)
     {
       if (Selection.HasBegun()) Selection.Begin(part.SceneBounds, part);  
       _initialScale = part.Transform.Scale;
@@ -111,17 +120,17 @@ namespace Raven
             effects: Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 
             layerDepth: 0f);
       }
-      if (Selection.Capture is SourcedSprite selPart)
+      if (Selection.Capture is ISceneSprite selPart)
       {
         var contentScale = (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (selPart.SourceSprite.Region.Size.ToVector2());
         selPart.Transform.Scale = _initialScale + contentScale;
         selPart.Transform.Position = _initialPos + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) + (selPart.Origin * contentScale);
       }
-      if (Mover.Capture is SourcedSprite p)
+      if (Mover.Capture is ISceneSprite p)
       {
         p.Transform.Position = _initialPos + ((Mover.Position - p.Origin) - (Mover.InitialPosition - p.Origin));        
       }
-      if (Rotator.Capture is SourcedSprite p2)
+      if (Rotator.Capture is ISceneSprite p2)
       {
         p2.Transform.Rotation = _initialRot + (Rotator.Angle  - Rotator.InitialAngle);
       }

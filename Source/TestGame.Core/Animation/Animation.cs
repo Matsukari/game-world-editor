@@ -23,6 +23,11 @@ namespace Raven
     public object Target;
 
     /// <summary>
+    /// The current index of the play
+    /// </summary>
+    public int CurrentFrame = 0;
+
+    /// <summary>
     /// Turning this will make the previous frame of the first frame, last, after it has run once 
     /// </summary>
     public bool IsContinous = false;
@@ -46,6 +51,8 @@ namespace Raven
       Name = name;
       Target = target;
     }
+
+    public T GetFrame<T>(int index) where T: AnimationFrame => Frames[index] as T;
 
     /// <summary>
     /// Inserts a frame AFTER the given index (exising) or appends in same size 

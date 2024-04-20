@@ -10,7 +10,7 @@ namespace Raven
     AnimationEditor _animEditor;
     public AnimationPlayer Animator;
     public SpriteSceneAnimationFrame Frame { get => _animEditor.SelectedFrame; }
-    public SourcedSprite  FramePart { get => _animEditor.SelectedFramePart; }
+    public ISceneSprite FramePart { get => _animEditor.SelectedFramePart; }
 
     public AnimationFrameInspector(AnimationEditor animEditor) 
     {

@@ -9,7 +9,7 @@ namespace Raven
   /// </summary>
   public class SpriteSceneAnimationFrame : AnimationFrame
   {
-    public List<SourcedSprite> Parts = new List<SourcedSprite>();
+    public List<ISceneSprite> Parts = new List<ISceneSprite>();
 
     private SpriteSceneAnimationFrame()
     {}

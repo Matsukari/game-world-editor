@@ -10,7 +10,7 @@ namespace Raven
     public SpriteScene SpriteScene;
     public bool IsOpen { get => _player != null; }
     public SpriteSceneAnimationFrame SelectedFrame;
-    public SourcedSprite SelectedFramePart;
+    public ISceneSprite SelectedFramePart;
 
     public event Action OnClose;
     public event Action<int, int> OnSelectFrame;
