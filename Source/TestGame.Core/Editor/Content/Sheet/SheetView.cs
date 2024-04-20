@@ -45,7 +45,11 @@ namespace Raven
 
       _input = new SheetViewInputHandler(this);
       _input.Initialize(editor, content);
-      _input.OnSelectionRightClick += () => _imgui.Popups.OpenSpriteOptions();
+      _input.OnSelectionRightClick += () => 
+      { 
+        if (ContentData.SelectionList.Last() is Sprite) _imgui.Popups.OpenSpriteOptions(); 
+        else _imgui.Popups.OpenTileOptions(); 
+      };
 
       Inspector.OnClickScene += scene => _scene.Edit(scene);
       Inspector.OnDeleteScene += scene => _scene.UnEdit();

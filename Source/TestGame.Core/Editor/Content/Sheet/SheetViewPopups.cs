@@ -10,12 +10,18 @@ namespace Raven
     bool _isOpenSpriteOptions = false;
     bool _isOpenTileOptions = false;
     public Widget.SpriteSlicer SpriteSlicer = new Widget.SpriteSlicer();
+    public Widget.AnnotatorPane AnnotatorPane;
 
     public event Action<SpriteScene> OnConvertToScene;
 
     public void OpenSpriteOptions() => _isOpenSpriteOptions = true;
     public void OpenTileOptions() => _isOpenTileOptions = true;
 
+    public override void Initialize(Editor editor, EditorContent content)
+    {
+      base.Initialize(editor, content);
+      AnnotatorPane = new Widget.AnnotatorPane(Settings.Colors);
+    }
     void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {
       if (_isOpenSpriteOptions)
@@ -29,13 +35,14 @@ namespace Raven
         ImGui.OpenPopup("Tile-popup");
       }
       SpriteSlicer.Draw();
+      AnnotatorPane.Render(imgui);
 
       // something is selected; render options
       if (ContentData.SelectionList.NotEmpty() && ContentData.SelectionList.Last() is Tile tile && ImGui.BeginPopup("Tile-popup"))
       {
-        if (ImGui.MenuItem("Embed Shape Property"))
+        if (ImGui.MenuItem("Embed Shape"))
         {
-          ContentData.PropertiedContext = tile;
+          AnnotatorPane.Edit(new SourcedSprite(sprite: new Sprite(tile.Region, _sheet)), tile, shape => _sheet.CreateTile(tile));
         }
         ImGui.EndPopup();
       }

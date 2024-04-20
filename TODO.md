@@ -13,7 +13,6 @@ Input selection
 Polygon points inspector
 Polygon in pane's respective to zoom
 Mouse snappning
-Tile intergration
 
 ## SpriteScene
 Multiple select parts

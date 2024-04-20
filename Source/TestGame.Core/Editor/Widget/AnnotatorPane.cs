@@ -17,20 +17,23 @@ namespace Raven.Widget
     ShapeModel _shape;
     readonly EditorColors _colors;
     bool _isStartEdit = false;
+    Action<ShapeModel> _onFinish;
 
     public AnnotatorPane(EditorColors colors) 
     {
       _isOpen = false;
       _colors = colors;
+      NoClose = false;
 
     } 
 
-    public void Edit(SourcedSprite sprite, IPropertied propertied)
+    public void Edit(SourcedSprite sprite, IPropertied propertied, Action<ShapeModel> onFinish=null)
     {
       _propertied = propertied;
       SourcedSprite = sprite;
       _isOpen = true;
       _isStartEdit = true;
+      _onFinish = onFinish;
     }
     public void UnEdit()
     {
@@ -176,6 +179,7 @@ namespace Raven.Widget
         bounds.Size /= Zoom;
         _shape.Bounds = bounds;
       }
+      if (_onFinish != null) _onFinish(_shape);
       // Console.WriteLine("Mouse " + (_initialMouse - ImGui.GetCursorScreenPos()).ToString());
       // Console.WriteLine("Position " + Position.ToString());
       // Console.WriteLine("ZOom " + Zoom.ToString());
