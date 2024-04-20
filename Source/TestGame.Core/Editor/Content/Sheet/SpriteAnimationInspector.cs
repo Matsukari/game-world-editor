@@ -78,6 +78,7 @@ namespace Raven
       }
     }
     Vector2 _trackContentMin = Vector2.Zero;
+    public bool IsGridView = true;
     public override void OnRender(ImGuiWinManager imgui)
     {
       ImGui.Text("Animation: ");
@@ -103,6 +104,9 @@ namespace Raven
       ImGuiUtils.SpanX(10f);
       Widget.ImGuiWidget.DelegateToggleButton(Icon.SyncAlt, ()=>Animator.IsLooping=!Animator.IsLooping);
 
+      ImGuiUtils.SpanX(10f);
+      Widget.ImGuiWidget.DelegateToggleButton(Icon.ThLarge, ()=>IsGridView = !IsGridView);
+
       ImGui.BeginChild("animation-content");
       _trackContentMin = ImGui.GetItemRectMax();
       var childSize = ImGui.GetWindowSize() - _trackContentMin;
@@ -121,9 +125,11 @@ namespace Raven
     void DrawComponentsTrack()
     {
       ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(2, 2));
-      DrawFrameHeader();
 
       ImGui.NewLine();
+
+      Vector2 thumbnailSize = new Vector2(30, 30);
+      int cols = (int)(ImGui.GetContentRegionAvail().X / thumbnailSize.X);
 
       // Draw components names in left side
       for (int i = 0; i < Animation.Frames.Count(); i++)
@@ -135,9 +141,28 @@ namespace Raven
           var frameIcon = Icon.Circle;
           if (Animator.CurrentIndex == i) frameIcon = Icon.DotCircle; 
 
-          ImGui.PushStyleColor(ImGuiCol.Text, color);
-          ImGui.Text(frameIcon);
-          ImGui.PopStyleColor();
+          if (IsGridView)
+          {
+            ImGuiUtils.DrawImage(frame.Sprite, thumbnailSize.ToNumerics());
+            Console.WriteLine("Position " + ImGui.GetItemRectMin());
+            if (Animator.CurrentIndex == i)
+              ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), color);
+          }
+          else 
+          {
+            ImGui.PushStyleColor(ImGuiCol.Text, color);
+            ImGui.Text(frameIcon);
+            ImGui.PopStyleColor();
+          }
+          var up = ImGui.GetItemRectMin();
+          up.Y -= ImGui.CalcTextSize(i.ToString()).Y;
+          ImGui.GetWindowDrawList().AddText(up, color, i.ToString());
+
+          var down = up;
+          down.Y += ImGui.GetWindowSize().Y;
+
+          if (Animator.CurrentIndex == i)
+            ImGui.GetWindowDrawList().AddLine(up, down, color);
 
           var name = (frame.Name != string.Empty) ? frame.Name : "No name";
           Widget.ImGuiWidget.TextTooltip($"{name} ({i})");
@@ -169,7 +194,7 @@ namespace Raven
       {
         var frame = Animator.Animation.Frames[i];
         ImGui.Text(i.ToString());
-        ImGuiUtils.SpanX(12f);
+        ImGuiUtils.SpanX(15.5f);
 
       }
     }

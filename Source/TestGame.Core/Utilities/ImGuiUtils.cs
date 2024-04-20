@@ -97,6 +97,11 @@ namespace Raven
         prev_point = point;
       }
     }
+    public static void DrawImage(Sprite sprite, Vector2 size)
+    {
+      nint texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture);
+      ImGui.Image(texture, size, sprite.MinUv.ToNumerics(), sprite.MaxUv.ToNumerics());
+    }
 
     public static void DrawImage(ImDrawListPtr drawList, Texture2D tx2, Mono.Rectangle region, Vector2 position, 
         Vector2 size, Vector2 origin, float angle, uint color)

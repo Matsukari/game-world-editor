@@ -23,10 +23,6 @@ Choose ease type
 ## Level
 Indicator for able and not able paint
 
-## Animation
-Sprite preview
-
-
 ## World
 Magnet levels
 LOD system

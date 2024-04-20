@@ -248,12 +248,12 @@ namespace Raven
         }
         var zoom = Math.Clamp(OpenSheet.Zoom * zoomFactor, MinZoom, MaxZoom);
         var mouse = MouseToPickerPoint(OpenSheet.Zoom, OpenSheet.Position);
-        Console.WriteLine("Zoom: " + OpenSheet.Zoom.ToString());
-        Console.WriteLine("Position: " + OpenSheet.Position.ToString());
+        // Console.WriteLine("Zoom: " + OpenSheet.Zoom.ToString());
+        // Console.WriteLine("Position: " + OpenSheet.Position.ToString());
         var delta = (OpenSheet.Position - mouse) * (zoomFactor - 1);
         if (zoomFactor != 1f) OpenSheet.Position += delta;
-        Console.WriteLine("Mouse: " + mouse.ToString());
-        Console.WriteLine("Delta: " + delta.ToString());
+        // Console.WriteLine("Mouse: " + mouse.ToString());
+        // Console.WriteLine("Delta: " + delta.ToString());
         Console.WriteLine();
         OpenSheet.Zoom = zoom;
       }

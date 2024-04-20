@@ -22,6 +22,10 @@ namespace Raven
     public List<Tile> GetTiles { get => _createdTiles; }
     public Texture2D Texture { get => _sheet.Texture; }
     public Point TileSize { get => _sheet.TileSize; }
+
+    public Vector2 MinUv { get => Region.Location.ToVector2() / _sheet.Size; }
+    public Vector2 MaxUv { get => (Region.Location + Region.Size).ToVector2() / _sheet.Size; }
+
     internal List<int> _tiles = new List<int>();
     internal List<Tile> _createdTiles = new List<Tile>();
 
