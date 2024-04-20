@@ -41,7 +41,7 @@ namespace Raven
       var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
-      if (SelectedSprite != null && Nez.Input.RightMouseButtonReleased) SelectedSprite = null;
+      if (SelectedSprite != null && Nez.Input.RightMouseButtonReleased && !input.IsImGuiBlocking) SelectedSprite = null;
 
       if (OpenSheet == null) 
       {
@@ -184,7 +184,29 @@ namespace Raven
 
           ImGui.EndTabItem();
         }
-        if (!isPickOnlyTile && ImGui.BeginTabItem("SpriteScenees"))
+        if (ImGui.BeginTabItem("Animations"))
+        {
+          var size = new Vector2(50, 50);
+          foreach (var anim in OpenSheet.Sheet.Animations)  
+          {
+            if (anim.TotalFrames <= 0) continue;
+            var frame = anim.Frames.First() as SpriteAnimationFrame;
+            ImGuiUtils.DrawImage(frame.Sprite, size.ToNumerics());
+
+            ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickHoverOutline.ToImColor());
+
+            if (RectangleF.FromMinMax(ImGui.GetItemRectMin(), ImGui.GetItemRectMax()).Contains(ImGui.GetMousePos()))
+            {
+              ImGui.GetWindowDrawList().AddRectFilled(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickFill.ToImColor());              
+              if (ImGui.IsItemClicked()) SelectedSprite = anim;
+            }
+            if (SelectedSprite is Animation animation && animation.Name == anim.Name) 
+              ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickSelectedOutline.ToImColor());
+
+          }
+          ImGui.EndTabItem();
+        }
+        if (!isPickOnlyTile && ImGui.BeginTabItem("Scenes"))
         {
           ImGui.SameLine();
           Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.ThLarge, ref PreviewScenes);
