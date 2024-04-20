@@ -28,6 +28,7 @@ namespace Raven
     public bool isPickOnlyTile = false;
     public bool IsHoverSelected = false;
     public bool EnableReselect = true;
+    public bool PreviewScenes = true;
 
     bool _firstEnter = true;
 
@@ -183,15 +184,44 @@ namespace Raven
 
           ImGui.EndTabItem();
         }
-        var grid = false;
         if (!isPickOnlyTile && ImGui.BeginTabItem("SpriteScenees"))
         {
-          Widget.ImGuiWidget.ButtonSetFlat(new List<(string, Action)>{
-              (IconFonts.FontAwesome5.ThLarge, ()=>{grid=true;}),
-              (IconFonts.FontAwesome5.GripLines, ()=>{grid=false;}),
-          });
-          if (grid)
+          ImGui.SameLine();
+          Widget.ImGuiWidget.ToggleButton(IconFonts.FontAwesome5.ThLarge, ref PreviewScenes);
+          if (PreviewScenes)
           {
+            var scenePos = ImGui.GetCursorScreenPos();
+            foreach (var spriteScene in OpenSheet.Sheet.SpriteScenees)
+            {
+              var size = new Vector2(50, 50);
+              var sceneScaleRatio = size / spriteScene.EnclosingBounds.Size;
+
+              ImGui.GetWindowDrawList().AddRect(scenePos, (scenePos + size).ToNumerics(), colors.PickHoverOutline.ToImColor());
+
+              foreach (var part in spriteScene.Parts)
+              {
+                var partPos = part.Transform.Position * sceneScaleRatio;
+                partPos -= spriteScene.EnclosingBounds.Location * sceneScaleRatio;
+                var partSize = part.Transform.Scale * sceneScaleRatio * part.SourceSprite.Region.Size.ToVector2();
+                ImGuiUtils.DrawImage(ImGui.GetWindowDrawList(), part.SourceSprite, (scenePos + partPos).ToNumerics(), partSize.ToNumerics());
+              }
+              var sceneBounds = new RectangleF(scenePos, size);
+
+              if (sceneBounds.Contains(ImGui.GetMousePos()))
+              {
+                ImGui.GetWindowDrawList().AddRectFilled(scenePos, (scenePos + size).ToNumerics(), colors.PickFill.ToImColor());
+
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                  SelectedSprite = spriteScene;
+              }
+
+              if (SelectedSprite is SpriteScene scene && scene.Name == spriteScene.Name)
+                ImGui.GetWindowDrawList().AddRect(scenePos, (scenePos + size).ToNumerics(), colors.PickSelectedOutline.ToImColor());
+
+              scenePos.X += size.X;
+              if (scenePos.X >= ImGui.GetCursorScreenPos().X + ImGui.GetWindowSize().X)
+                scenePos = new System.Numerics.Vector2(ImGui.GetCursorScreenPos().X, scenePos.Y + size.Y);
+            }
           }
           else 
           {

@@ -19,9 +19,6 @@ Multiple select parts
 Multiple transforms on selected parts
 Choose ease type
 
-## Level
-Indicator for able and not able paint
-
 ## World
 Magnet levels
 LOD system

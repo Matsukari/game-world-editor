@@ -102,6 +102,11 @@ namespace Raven
       nint texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture);
       ImGui.Image(texture, size, sprite.MinUv.ToNumerics(), sprite.MaxUv.ToNumerics());
     }
+    public static void DrawImage(ImDrawListPtr drawList, Sprite sprite, Vector2 pos, Vector2 size, Mono.Color color = default)
+    {
+      if (color == default) color = Mono.Color.White;
+      DrawImage(drawList, sprite.Texture, sprite.Region, pos, size, Vector2.Zero, 0f, color.ToImColor());
+    }
 
     public static void DrawImage(ImDrawListPtr drawList, Texture2D tx2, Mono.Rectangle region, Vector2 position, 
         Vector2 size, Vector2 origin, float angle, uint color)

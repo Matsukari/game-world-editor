@@ -158,8 +158,6 @@ namespace Raven
             } 
             break;
         }
-
-
       }
       else if (_view.SpritePicker.SelectedSprite is SpriteScene spriteScene)
       {
