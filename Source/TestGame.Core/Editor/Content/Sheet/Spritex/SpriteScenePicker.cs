@@ -61,7 +61,7 @@ namespace Raven
           {
             ISceneSprite part = null;
             if (SelectedSprite is Sprite sprite) part = new SourcedSprite(sprite);
-            else if (SelectedSprite is AnimatedSprite anim) part = anim;
+            else if (SelectedSprite is AnimatedSprite anim) part = (anim as ISceneSprite).Copy();
             if (part != null)
             {
               Console.WriteLine("Dropped " + part.GetType().Name);

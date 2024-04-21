@@ -1,3 +1,4 @@
+using System.Reflection;
 
 namespace Raven
 {
@@ -67,11 +68,14 @@ namespace Raven
         var field = item.GetType().GetField("Name");
         if (field != null && field.GetValue(item) is string nameString)
         {
+          Console.WriteLine("Trying out: " + nameString);
           for (int j = 0; j < list.Count; j++)
           {
+            Console.Write("..." + list[j]);
             if (i != j && nameString == GetNameField(list[j])) 
             {
               field.SetValue(item, nameString.EnsureNoRepeat());
+              Console.Write("...=> new " + nameString.EnsureNoRepeat());
               return EnsureNoRepeatNameField(list);
             }
           }
@@ -84,6 +88,12 @@ namespace Raven
     public static string GetNameField<T>(this T item) where T: class
     {
       var prop = item.GetType().GetField("Name");
+      if (prop.GetValue(item) is string nameString) return nameString;
+      return string.Empty;
+    }
+    public static string GetNameProp<T>(this T item) where T: class
+    {
+      var prop = item.GetType().GetProperty("Name");
       if (prop.GetValue(item) is string nameString) return nameString;
       return string.Empty;
     }

@@ -154,7 +154,7 @@ namespace Raven
 
       return sprite;
     }
-    public ISceneSprite AddSprite(ISceneSprite sprite) => AddSprite("Component", sprite);
+    public ISceneSprite AddSprite(ISceneSprite sprite) => AddSprite((sprite.Name != string.Empty) ? sprite.Name : "Component", sprite);
 
     /// <summary>
     /// Pushes the given sprite at the given index

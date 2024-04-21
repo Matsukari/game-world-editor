@@ -6,7 +6,7 @@ namespace Raven
   /// </summary>
   public interface IPropertied
   {
-    string Name { get; set; }
-    PropertyList Properties { get; }
+    public string Name { get; set; }
+    public PropertyList Properties { get; }
   }
 }

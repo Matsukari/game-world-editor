@@ -21,6 +21,15 @@ namespace Raven
     public bool IsVisible { get; set; } = true;
     public bool IsLocked { get; set; } = false;
 
+    ISceneSprite ISceneSprite.Copy()
+    {
+      var anim = MemberwiseClone() as AnimatedSprite;
+      anim.Properties = Properties.Copy();
+      anim.Frames = Frames.CloneItems();  
+      anim.Transform = Transform.Duplicate();
+      return anim;
+    }
+
     public AnimatedSprite(List<Sprite> frames, float dur=0.1f) : base(new Sprite(null))
     {
       foreach (var frame in frames) 

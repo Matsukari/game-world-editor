@@ -91,7 +91,7 @@ namespace Raven
         worldTile.Size *= sheetZoom;
         return worldTile;
       }
-
+      IsHoverSelected = false;
       if (ImGui.BeginTabBar("sheet-picker-tab"))
       {
         // Show tiles
@@ -133,7 +133,6 @@ namespace Raven
           {
             if (SelectedSprite is Sprite sprite)
             {
-              IsHoverSelected = false;
               if (sprite.Region.Contains(mouse)) IsHoverSelected = true;
               var regionWorld = TranslateToWorld(sprite.Region.ToRectangleF());
               ImGui.GetWindowDrawList().AddRectFilled(
@@ -151,7 +150,7 @@ namespace Raven
           mouseDragArea.Location = _initialMouseOnDrag;
 
           // Multiple selection (rectangle) 
-          if (input.IsDragFirst && (EnableReselect || !IsHoverSelected) && Nez.Input.LeftMouseButtonDown)
+          if (input.IsDragFirst && (EnableReselect || (!IsHoverSelected)) && Nez.Input.LeftMouseButtonDown)
           {
             _initialMouseOnDrag = mouse;
             SelectedSprite = null;
@@ -196,17 +195,21 @@ namespace Raven
 
             ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickHoverOutline.ToImColor());
 
-            if (ImGui.IsItemClicked(ImGuiMouseButton.Left)) 
+            if (ImGui.IsItemHovered()) 
             {
-              SelectedSprite = anim;
-              Console.WriteLine("Selected " + SelectedSprite.GetType().Name);
+              if (ImGui.IsMouseDown(ImGuiMouseButton.Left))
+              {
+                SelectedSprite = anim;
+                Console.WriteLine("Selected " + SelectedSprite.GetType().Name);
+              }
+              if (SelectedSprite is AnimatedSprite)
+                IsHoverSelected = true;
             }
             else if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && OnSelectRightMouseClick != null) OnSelectRightMouseClick(anim);
 
 
             if (RectangleF.FromMinMax(ImGui.GetItemRectMin(), ImGui.GetItemRectMax()).Contains(ImGui.GetMousePos()))
             {
-              IsHoverSelected = true;
               ImGui.GetWindowDrawList().AddRectFilled(ImGui.GetItemRectMin(), ImGui.GetItemRectMax(), colors.PickFill.ToImColor());              
             }
             if (SelectedSprite is Animation animation && animation.Name == anim.Name) 
