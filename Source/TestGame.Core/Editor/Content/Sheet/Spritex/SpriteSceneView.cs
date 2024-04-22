@@ -37,9 +37,6 @@ namespace Raven
       AnnotatorPane = new Widget.AnnotatorPane(editor.Settings.Colors);
       _animationEditor.Initialize(editor, content);
       _animationEditor.OnClose += () => Selection.End();
-      _initialScale.Add(Vector2.Zero);
-      _initialPos.Add(Vector2.Zero);
-      _initialRot.Add(0);
     }
     // Go to canvas and close spritesheet view
     public void Edit(SpriteScene spriteScene)
@@ -88,10 +85,10 @@ namespace Raven
     }
     void ReSelect(ISceneSprite part)
     {
-      if (Selection.HasBegun()) Selection.Begin(part.SceneBounds, part);  
-      _initialScale[0] = part.Transform.Scale;
-      _initialPos[0] = part.Transform.Position;
-      _initialRot[0] = part.Transform.Rotation;
+      if (Selection.Capture is List<ISceneSprite> sels && sels.Count() != 1) return;
+      Selection.Begin(part.SceneBounds, part);  
+      _initialTransform.Clear();
+      _initialTransform.Add(part.Transform.Duplicate());
     }
     public void Render(Batcher batcher, Camera camera)
     {
@@ -107,18 +104,15 @@ namespace Raven
 
       foreach (var part in _multiSels)
       {
-        batcher.DrawRectOutline(part.PlainBounds.AddTransform(part.SpriteScene.Transform), Settings.Colors.PickSelectedOutline.ToColor());
+        batcher.DrawRectOutline(camera, part.PlainBounds.AddTransform(part.SpriteScene.Transform), Settings.Colors.PickSelectedOutline.ToColor());
       }
       batcher.DrawRect(_multiSelection, Settings.Colors.SelectionFill.ToColor());
+      batcher.DrawRectOutline(camera, _multiSels.EnclosedBounds(), Settings.Colors.SelectionOutline.ToColor());
       batcher.DrawRectOutline(camera, _multiSelection, Settings.Colors.SelectionOutline.ToColor());
 
       foreach (var part in _sceneInspector.SpriteScene.Parts)
       {
         batcher.DrawCircle(part.PlainBounds.AddTransform(part.SpriteScene.Transform).Location, 4f/camera.RawZoom, Settings.Colors.OriginPoint.ToColor());
-
-        // if (part.SceneBounds.Contains(camera.MouseToWorldPoint()))
-        //   batcher.DrawHollowRect(part.SceneBounds, Settings.Colors.SpriteBoundsOutline.ToColor(), 
-        //       part.Transform.Rotation + part.SpriteScene.Transform.Rotation, Vector2.Zero, 1f/camera.RawZoom);
 
         batcher.DrawString(
             Graphics.Instance.BitmapFont, 
@@ -133,32 +127,34 @@ namespace Raven
       }
       if (Selection.Capture is List<ISceneSprite> sels)
       {
-        int i = 0;
-        // Console.WriteLine("Num of sels: " + sels.Count);
-        foreach (var sel in sels)
+        for (int i = 0; i < sels.Count(); i++)
         {
-          i++;
           var contentScale = (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / Selection.InitialBounds.Size;
-          sel.Transform.Scale = _initialScale[i] + contentScale * _initialScale[i];
-          sel.Transform.Position = _initialPos[i] + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) + (sel.Origin * contentScale);
-          sel.Transform.Position += (contentScale * (_initialPos[i] - Selection.InitialBounds.Location));
-
+          sels[i].Transform.Scale = _initialTransform[i].Scale + contentScale * _initialTransform[i].Scale;
+          sels[i].Transform.Position = _initialTransform[i].Position 
+            + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) 
+            + (sels[i].Origin * contentScale)
+            + (contentScale * (_initialTransform[i].Position - Selection.InitialBounds.Location));
         }
       }
-      if (Mover.Capture is ISceneSprite p)
+      if (Mover.Capture is List<ISceneSprite> moving)
       {
-        p.Transform.Position = _initialPos[0] + ((Mover.Position - p.Origin) - (Mover.InitialPosition - p.Origin));        
+        for (int i = 0; i < moving.Count(); i++)
+        {
+          moving[i].Transform.Position = _initialTransform[i].Position + ((Mover.Position - moving[i].Origin) - (Mover.InitialPosition - moving[i].Origin));        
+        }
       }
-      if (Rotator.Capture is ISceneSprite p2)
+      if (Rotator.Capture is List<ISceneSprite> rotating)
       {
-        p2.Transform.Rotation = _initialRot[0] + (Rotator.Angle  - Rotator.InitialAngle);
+        for (int i = 0; i < rotating.Count(); i++)
+        {
+          rotating[i].Transform.Rotation = _initialTransform[i].Rotation + (Rotator.Angle  - Rotator.InitialAngle);
+        }
       }
     }  
-    List<Vector2> _initialScale = new List<Vector2>();
-    List<Vector2> _initialPos = new List<Vector2>();
-    List<float> _initialRot = new List<float>();
-    RectangleF _multiSelection = new RectangleF();
+    List<Transform> _initialTransform = new List<Transform>();
     List<ISceneSprite> _multiSels = new List<ISceneSprite>();
+    RectangleF _multiSelection = new RectangleF();
 
     public bool HandleInput(InputManager input)
     {
@@ -168,7 +164,11 @@ namespace Raven
 
       if (_multiSels.Count > 0)
       {
-        if (Operator == EditorOperator.MoveOnly) Mover.Show(_multiSels.EnclosedBounds().Center);
+        if (_multiSels.EnclosedBounds().Contains(mouse))
+        {
+          if (Operator == EditorOperator.MoveOnly) Mover.Show(_multiSels.EnclosedBounds().Center);
+          if (Operator != EditorOperator.Select) Selection.End();
+        }
 
         if (Nez.Input.RightMouseButtonPressed)
         {
@@ -177,7 +177,7 @@ namespace Raven
           return true;
         }
       }
-      else if (Operator == EditorOperator.MoveOnly && Mover.Collides(Camera) == Guidelines.MovableOriginLines.AxisType.None) Mover.Hide();
+      if (Mover.Collides(Camera) == Guidelines.MovableOriginLines.AxisType.None) Mover.Hide();
 
       if (Nez.Input.RightMouseButtonPressed)
       {
@@ -187,13 +187,25 @@ namespace Raven
       }
 
 
-      if (Nez.Input.LeftMouseButtonPressed && !_multiSelection.Contains(mouse))
+      if (Nez.Input.LeftMouseButtonPressed)
       {
-        // Console.WriteLine("Started");
-        _multiSels.Clear();
-        _multiSelection = new RectangleF();
+        if (_multiSels.Count > 0 && Operator == EditorOperator.MoveOnly) 
+        {
+          Mover.TryBegin(_multiSels.EnclosedBounds().Center, Camera, _multiSels);
+        }
+        else if (_multiSels.Count > 0 && Operator == EditorOperator.Rotator) 
+        {
+          if (_multiSels.Count() == 1) Rotator.Begin(_multiSels.Last().Bounds.Location, Camera, _multiSels);
+          else Rotator.Begin(_multiSels.EnclosedBounds().Center, Camera, _multiSels);
+        }
+        else if (!_multiSelection.Contains(mouse))
+        {
+          // Console.WriteLine("Started");
+          _multiSels.Clear();
+          _multiSelection = new RectangleF();
+        }
       }
-      if (Nez.Input.LeftMouseButtonDown)
+      if (Nez.Input.LeftMouseButtonDown && !Rotator.IsVisible && !Mover.IsMoving && !Selection.HasBegun())
       {
         _multiSelection = RectangleF.FromMinMax(Camera.ScreenToWorldPoint(input.MouseDragStart), mouse).AlwaysPositive();
 
@@ -215,26 +227,16 @@ namespace Raven
         _multiSelection = new RectangleF();
         if (_multiSels.Count <= 0) 
         {
-          // Console.WriteLine("Ends");
-          // Selection.End();
           return false;
         }
-        // _multiSelection = new RectangleF();
-        if (_initialPos.Count() > 1)
-        {
-          _initialPos.RemoveRange(1, _initialPos.Count()-1);
-          _initialScale.RemoveRange(1, _initialScale.Count()-1);
-          _initialRot.RemoveRange(1, _initialRot.Count()-1);
-        }
-        foreach (var p in _multiSels)
-        {
-         
-          _initialPos.Add(p.Transform.Position);
-          _initialScale.Add(p.Transform.Scale);
-          _initialRot.Add(p.Transform.Rotation);
-        }
-        Selection.Begin(_multiSels.EnclosedBounds(), _multiSels);
+
+        _initialTransform.Clear();
+        foreach (var i in _multiSels)
+          _initialTransform.Add(i.Transform.Duplicate());
+
+        if (Operator == EditorOperator.Select) Selection.Begin(_multiSels.EnclosedBounds(), _multiSels);
       }
+
 
       return false;
     }

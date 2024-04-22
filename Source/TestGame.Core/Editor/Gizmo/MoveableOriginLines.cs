@@ -76,10 +76,15 @@ namespace Raven.Guidelines
       Thickness = new Vector2(MinThickness, MinThickness);
       return AxisType.None;
     }
-    public void TryBegin(Vector2 start, Camera camera, object capture)
+    public bool TryBegin(Vector2 start, Camera camera, object capture)
     {
       var axis = Collides(camera);
-      if (axis != AxisType.None) Begin(start, axis, capture);
+      if (axis != AxisType.None) 
+      {
+        Begin(start, axis, capture);
+        return true;
+      }
+      return false;
     }
     public void Begin(Vector2 start, AxisType axis, object capture)
     {
