@@ -16,11 +16,12 @@ namespace Raven.Serializers
       settings.TypeNameHandling = TypeNameHandling.Auto;
       settings.TypeConverters = new JsonTypeConverter[] 
       {
+        new AnimatedSpriteJsonConverter(),
         new AnimationJsonConverter(),
         new ColorJsonConverter(),
         new RectangleJsonConverter(),
         new SheetJsonConverter(),
-        new SceneSpriteJsonConverter(),
+        new SourcedSpriteJsonConverter(),
         new SpriteJsonConverter(),
         new SpriteSceneAnimationFrameJsonConverter(),
         new SpriteSceneJsonConverter(),

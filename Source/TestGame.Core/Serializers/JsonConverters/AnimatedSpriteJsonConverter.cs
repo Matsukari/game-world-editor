@@ -4,11 +4,11 @@ using Nez.Persistence;
 namespace Raven.Serializers
 {
 
-  class SourcedSpriteJsonConverter : JsonTypeConverter<SourcedSprite>
+  class AnimatedSpriteJsonConverter : JsonTypeConverter<AnimatedSprite>
   {
     public override bool WantsExclusiveWrite => true;
          
-    public override void WriteJson( IJsonEncoder encoder, SourcedSprite instance)
+    public override void WriteJson( IJsonEncoder encoder, AnimatedSprite instance)
     {
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
@@ -18,10 +18,13 @@ namespace Raven.Serializers
       encoder.EncodeKeyValuePair("Transform", instance.Transform);
       encoder.EncodeKeyValuePair("IsLocked", instance.IsLocked);
       encoder.EncodeKeyValuePair("SpriteEffects", instance.SpriteEffects);
-      encoder.EncodeKeyValuePair("SourceSprite", instance.SourceSprite);
 
+      encoder.EncodeKeyValuePair("IsContinous", instance.IsContinous);
+      encoder.EncodeKeyValuePair("CurrentFrame", instance.CurrentFrame);
+      encoder.EncodeKeyValuePair("Frames", instance.Frames); 
+      encoder.EncodeKeyValuePair("Target", instance.Target); 
     }
-    public override void OnFoundCustomData(SourcedSprite instance, string key, object value )
+    public override void OnFoundCustomData(AnimatedSprite instance, string key, object value )
     {
     }
   }

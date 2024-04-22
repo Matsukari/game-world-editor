@@ -13,10 +13,14 @@ namespace Raven
     public AnimationPlayer Animator;
     public AnimatedSprite Animation { get => Animator.Animation as AnimatedSprite; }
     public bool CanOpen { get => 
-        !(  
-            Animator == null 
-          || Animation == null 
-          || ((Animation.SpriteScene.Parts.Find(item => item.Name == Animation.Name) == null))); 
+      (  
+       Animator != null 
+       && Animation != null 
+       && (
+         (Animation.SpriteScene != null && Animation.SpriteScene.Parts.Find(item => item.Name == Animation.Name) != null)
+         || _animEditor.Sheet.Animations.Find(item => item.Name == Animation.Name) != null
+         )
+      ); 
     }
 
     public SpriteAnimationInspector(SpriteAnimationEditor animEditor) 

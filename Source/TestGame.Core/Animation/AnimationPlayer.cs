@@ -68,6 +68,8 @@ namespace Raven
     public void Update() => Update(Nez.Time.DeltaTime);
     public void Update(float dt)
     {
+      // if (Animation != null)
+      // Console.WriteLine("Target is : " + Animation.Target != null);
       if (!IsRunning()) return;
 
       _frameTimer += dt;
@@ -94,8 +96,7 @@ namespace Raven
         IsPaused
         || IsFinished
         || Animation == null 
-        || Animation.TotalFrames <= 0 
-        || Animation.Target == null); 
+        || Animation.TotalFrames <= 0 ); 
   }
 
 }
