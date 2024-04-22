@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using Nez.Persistence;
+using Nez;
 
 namespace Raven 
 {
@@ -76,16 +77,17 @@ namespace Raven
       return list;
     }
     // Forms a new region based on min and max, in this case max, the coord's region
-    public void Rectangular(int coord)
+    public void Rectangular(RectangleF rect)
     {
-      if (!_sheet.IsTileValid(coord)) throw new Exception();
-      var rect2 = _sheet.GetTile(coord);
-      var region = Region;
-      region.Width = rect2.Right - region.X;
-      region.Height = rect2.Bottom - region.Y;
-      Region = region.ToRectangleF().AlwaysPositive();
-      Console.WriteLine("Size: " + Region.Size);
-      _tiles = _sheet.GetTiles(Region.ToRectangleF());
+      Console.WriteLine("About " + rect.RenderStringFormat());
+      _tiles = _sheet.GetTiles(rect);
+      var list = new List<Tile>();
+      foreach (var tile in _tiles)
+      {
+        list.Add(new Tile(_sheet.GetTileCoord(tile), _sheet));
+      }
+      Region = list.EnclosedBounds();
+
     }
     public override bool Equals(object obj)
     {

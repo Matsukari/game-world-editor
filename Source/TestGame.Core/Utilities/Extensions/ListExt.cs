@@ -40,6 +40,20 @@ namespace Raven
       }
       return (list.Count == 0) ? new RectangleF() : RectangleF.FromMinMax(min, max);
     }
+    public static RectangleF EnclosedBounds(this List<Tile> list) 
+    {
+      var min = new Vector2(100000, 100000);
+      var max = new Vector2(-10000, -10000);
+
+      foreach (var p in list)
+      {
+        min.X = Math.Min(min.X, p.Region.X);
+        min.Y = Math.Min(min.Y, p.Region.Y);
+        max.X = Math.Max(max.X, p.Region.Right);
+        max.Y = Math.Max(max.Y, p.Region.Bottom);
+      }
+      return (list.Count == 0) ? new RectangleF() : RectangleF.FromMinMax(min, max);
+    }
     /// <summary>
     /// Clones all items in the list if they type implement IClonable 
     /// </summary> 

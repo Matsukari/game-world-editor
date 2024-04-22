@@ -152,23 +152,26 @@ namespace Raven
           // Multiple selection (rectangle) 
           if (input.IsDragFirst && (EnableReselect || (!IsHoverSelected)) && Nez.Input.LeftMouseButtonDown)
           {
-            _initialMouseOnDrag = mouse;
+            _initialMouseOnDrag = ImGui.GetMousePos();
             SelectedSprite = null;
           }
           else if (input.IsDrag && _initialMouseOnDrag != Vector2.Zero)
           {
+            var area = input.MouseDragArea;
+            area.Location = _initialMouseOnDrag;
+            area.Size = ImGui.GetMousePos() - _initialMouseOnDrag;
+            area = area.AlwaysPositive();
+            area.Location -= Bounds.Location;
+            area.Location -= OpenSheet.Position;
+            area.Location /= OpenSheet.Zoom;
+            area.Size /= OpenSheet.Zoom;
+
             var rectTile = new RectangleF();
             rectTile.Location = mouse;
             rectTile.Size = OpenSheet.Sheet.TileSize.ToVector2();
-
-            var tiled = OpenSheet.Sheet.GetTileCoordFromWorld(rectTile.X, rectTile.Y);
-            // Prevent going out of bounds
-            tiled.X = Math.Min(tiled.X, OpenSheet.Sheet.Tiles.X-1);
-            tiled.Y = Math.Min(tiled.Y, OpenSheet.Sheet.Tiles.Y-1); 
-
             try 
             {
-              if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
+              if (SelectedSprite is Sprite sprite) sprite.Rectangular(area);
               else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile.RoundLocationFloor(OpenSheet.Sheet.TileSize), OpenSheet.Sheet);
             } 
             catch (Exception) {}
