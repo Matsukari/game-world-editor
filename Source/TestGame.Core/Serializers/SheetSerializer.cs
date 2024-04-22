@@ -11,24 +11,24 @@ namespace Raven.Serializers
       model._texture =Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(model.Source));
       Insist.IsNotNull(model._texture);  
 
-      foreach (var spritex in model.SpriteScenees)
+      foreach (var scene in model.SpriteScenees)
       {
-        spritex._sheet = model;
-        foreach (var part in spritex.Parts)
+        scene._sheet = model;
+        foreach (var part in scene.Parts)
         {
-          part.SpriteScene = spritex;
+          part.SpriteScene = scene;
           part.SourceSprite._sheet = model;
         }
-        foreach (var anim in spritex.Animations)
+        foreach (var anim in scene.Animations)
         {
-          anim.Target = spritex;
+          anim.Target = scene;
           foreach (var frame in anim.Frames)
           {
-            if (frame is SpriteSceneAnimationFrame spritexFrame) 
+            if (frame is SpriteSceneAnimationFrame sceneFrame) 
             {
-              foreach (var part in spritexFrame.Parts) 
+              foreach (var part in sceneFrame.Parts) 
               {
-                part.SpriteScene = spritex;
+                part.SpriteScene = scene;
                 part.SourceSprite._sheet = model;
               }
             }

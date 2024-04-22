@@ -31,8 +31,9 @@ namespace Raven
     internal List<Tile> _createdTiles = new List<Tile>();
 
     internal Sheet _sheet;
-    private Sprite() {}
 
+
+    private Sprite() {}
 
     public Sprite(Rectangle region, Sheet sheet)
     {

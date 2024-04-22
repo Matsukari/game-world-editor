@@ -46,6 +46,7 @@ namespace Raven
     }
     public T LoadContent<T>(string file) where T: class
     {
+      Console.WriteLine($"Loading content {file}");
       if (typeof(T) == typeof(Sheet)) return new SheetSerializer().Load(file) as T;
       else 
       {

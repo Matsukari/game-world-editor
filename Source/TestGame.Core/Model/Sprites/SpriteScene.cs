@@ -32,6 +32,7 @@ namespace Raven
     /// <summary>
     /// Root transform that affects all parts
     /// </summary>
+    [JsonExclude]
     public Transform Transform = new Transform();
 
     internal Sheet _sheet;

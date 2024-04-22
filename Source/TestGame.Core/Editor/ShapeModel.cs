@@ -3,13 +3,15 @@ using Nez;
 using Microsoft.Xna.Framework;
 using Icons = IconFonts.FontAwesome5;
 using ImGuiNET;
+using Nez.Persistence;
 
 namespace Raven
 { 
   public abstract class ShapeModel : ICloneable
   {
     public abstract string Icon { get; }
-   
+
+    [JsonInclude]
     public abstract RectangleF Bounds { get; set; }
 
     public abstract void Render(PrimitiveBatch primitiveBatch, Batcher batcher, Camera camera, Color color);
@@ -152,6 +154,7 @@ namespace Raven
     public override string Icon { get => Icons.DrawPolygon; }
 
     [PropertiedInput("Points")]
+    [JsonInclude]
     public List<Vector2> Points { get; set; } = new List<Vector2>();
 
     [PropertiedInput("Position")]

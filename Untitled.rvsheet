@@ -1,0 +1,107 @@
+{
+	"@id": "1",
+	"Name": "/home/ark/Documents/game/projects/WorldEditor/Untitled.rvsheet",
+	"Properties": {
+		"@id": "2",
+		"Data": {
+
+		}
+	},
+	"Animations": [
+
+	],
+	"Source": "/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png",
+	"_tiles": {
+
+	},
+	"SpriteScenees": [
+		{
+			"@id": "3",
+			"Name": "asd",
+			"Properties": {
+				"@id": "4",
+				"Data": {
+
+				}
+			},
+			"Parts": [
+				{
+					"@id": "5",
+					"@type": "Raven.SourcedSprite",
+					"Name": "Main component",
+					"Properties": {
+						"@id": "6",
+						"Data": {
+
+						}
+					},
+					"IsVisible": true,
+					"Color": {
+						"@id": "7",
+						"X": 1,
+						"Y": 1,
+						"Z": 1,
+						"W": 1
+					},
+					"Origin": {
+						"@id": "8",
+						"X": 0,
+						"Y": 0
+					},
+					"Transform": {
+						"@id": "9",
+						"Position": {
+							"@ref": "8"
+						},
+						"Scale": {
+							"@id": "10",
+							"X": 1,
+							"Y": 1
+						},
+						"Skew": {
+							"@ref": "10"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"@id": "11",
+						"Name": "",
+						"Properties": {
+							"@id": "12",
+							"Data": {
+
+							}
+						},
+						"Region": {
+							"@id": "13",
+							"X": 0,
+							"Y": 0,
+							"Width": 128,
+							"Height": 160
+						}
+					}
+				}
+			],
+			"Animations": [
+
+			],
+			"Transform": {
+				"@id": "14",
+				"Position": {
+					"@ref": "8"
+				},
+				"Scale": {
+					"@ref": "10"
+				},
+				"Skew": {
+					"@ref": "10"
+				},
+				"Rotation": 0
+			}
+		}
+	],
+	"TileWidth": 16,
+	"TileHeight": 16
+}

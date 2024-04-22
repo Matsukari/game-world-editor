@@ -17,6 +17,9 @@ namespace Raven
     [JsonExclude]
     public SelectionList SelectionList = new SelectionList();
 
+    private EditorContentData()
+    {}
+
     public EditorContentData(string filename, string type)
     {
       Filename = filename;

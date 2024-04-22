@@ -43,7 +43,7 @@ namespace Raven
     public int TotalFrames { get => Frames.Count(); }
 
 
-    private Animation()
+    protected Animation()
     {
     }
     public Animation(object target, string name = "Animation") 

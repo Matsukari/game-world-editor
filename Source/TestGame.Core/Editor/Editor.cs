@@ -93,13 +93,16 @@ namespace Raven
 
       Serializer.LoadStartup();
 
-      var sheet = new Sheet("/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png");
-      ContentManager.AddTab(new SheetView(), sheet);
-      var world = new World();
-      world.AddSheet(sheet);
-      ContentManager.AddTab(new WorldView(), world);
+      if (Settings.LastFiles.Count() == 0)
+      {
+        var sheet = new Sheet("/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png");
+        ContentManager.AddTab(new SheetView(), sheet);
+        var world = new World();
+        world.AddSheet(sheet);
+        ContentManager.AddTab(new WorldView(), world);
+      }
 
-      ContentManager.Switch(1, true);
+      ContentManager.Switch(0, true);
 
       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().RegisterDrawCommand(WindowManager.Render);
     }

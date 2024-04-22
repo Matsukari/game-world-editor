@@ -20,11 +20,12 @@ namespace Raven.Serializers
         new ColorJsonConverter(),
         new RectangleJsonConverter(),
         new SheetJsonConverter(),
-        new SourcedSpriteJsonConverter(),
+        new SceneSpriteJsonConverter(),
         new SpriteJsonConverter(),
         new SpriteSceneAnimationFrameJsonConverter(),
         new SpriteSceneJsonConverter(),
         new TileJsonConverter(),
+        new EditorContentDataJsonConverter(),
       };
       settings.PrettyPrint = PrettyPrint;
       File.WriteAllText(file, Json.ToJson(obj, settings));
@@ -41,6 +42,7 @@ namespace Raven.Serializers
     /// </summary>
     public T Load(string file)
     {
+      // if (file.exi)
       return Realize(Json.FromJson<T>(File.ReadAllText(file)));
     }
   }

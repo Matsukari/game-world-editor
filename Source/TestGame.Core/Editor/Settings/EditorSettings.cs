@@ -8,7 +8,6 @@ namespace Raven
 
     public EditorGraphicsPref Graphics = new EditorGraphicsPref();
 
-    [JsonExclude]
     public List<EditorContentData> LastFiles = new List<EditorContentData>();
 
     public int LastFile = 0;
