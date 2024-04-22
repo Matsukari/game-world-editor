@@ -77,17 +77,17 @@ namespace Raven
       // The mouse relative to the picker's bounds, plus zoom and offset; 
       // this is relative to the actual size of the texture as opoposed to the rendered bounds
       var mouse = rawMouse.ToVector2();  
-      mouse /= sheetZoom;
       mouse -= Bounds.Location;
       mouse -= OpenSheet.Position;
+      mouse /= sheetZoom;
 
       // Convenicne for translating raw data to renderable position
       RectangleF TranslateToWorld(RectangleF rect)
       {
         var worldTile = rect;
+        worldTile.Location *= sheetZoom;
         worldTile.Location += OpenSheet.Position;
         worldTile.Location += Bounds.Location;
-        worldTile.Location *= sheetZoom;
         worldTile.Size *= sheetZoom;
         return worldTile;
       }
@@ -102,11 +102,13 @@ namespace Raven
           // Draws the spritesheet with zoom and fofset
           var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(OpenSheet.Sheet.Texture);
 
-          ImGui.GetWindowDrawList().AddImage(texture, 
-              (Bounds.Location.ToNumerics() + OpenSheet.Position.ToNumerics()) * OpenSheet.Zoom, 
-              (Bounds.Location.ToNumerics() + OpenSheet.Position.ToNumerics() + OpenSheet.Sheet.Size.ToNumerics()) * OpenSheet.Zoom, 
-              new System.Numerics.Vector2(0, 0), new System.Numerics.Vector2(1, 1));
-
+          ImGuiUtils.DrawImage(ImGui.GetWindowDrawList(), OpenSheet.Sheet.Texture, 
+              new RectangleF(Vector2.Zero, OpenSheet.Sheet.Size), 
+              (Bounds.Location + OpenSheet.Position).ToNumerics(),
+              (OpenSheet.Sheet.Size * OpenSheet.Zoom).ToNumerics(), 
+              Vector2.Zero.ToNumerics(), 
+              0f, 
+              Color.White.ToImColor()); 
 
           // Highlights tile on mouse hvoer
           foreach (var rectTile in _tiles)
@@ -146,8 +148,6 @@ namespace Raven
             }
           }
           HandleMoveZoom();
-          var mouseDragArea = new RectangleF();
-          mouseDragArea.Location = _initialMouseOnDrag;
 
           // Multiple selection (rectangle) 
           if (input.IsDragFirst && (EnableReselect || (!IsHoverSelected)) && Nez.Input.LeftMouseButtonDown)
@@ -157,13 +157,6 @@ namespace Raven
           }
           else if (input.IsDrag && _initialMouseOnDrag != Vector2.Zero)
           {
-            mouseDragArea.Size = (mouse - _initialMouseOnDrag);
-            mouseDragArea = mouseDragArea.AlwaysPositive();
-
-            var bounds = Bounds;
-            bounds.Location = new Vector2();
-            // bounds.Size /= sheetZoom;
-
             var rectTile = new RectangleF();
             rectTile.Location = mouse;
             rectTile.Size = OpenSheet.Sheet.TileSize.ToVector2();
@@ -177,7 +170,8 @@ namespace Raven
             {
               if (SelectedSprite is Sprite sprite) sprite.Rectangular(OpenSheet.Sheet.GetTileId(tiled.X, tiled.Y));
               else if (SelectedSprite == null) SelectedSprite = new Sprite(rectTile.RoundLocationFloor(OpenSheet.Sheet.TileSize), OpenSheet.Sheet);
-            } catch (Exception) {}
+            } 
+            catch (Exception) {}
           }
           else if (input.IsDragLast) _initialMouseOnDrag = Vector2.Zero;
 
@@ -312,13 +306,8 @@ namespace Raven
         }
         var zoom = Math.Clamp(OpenSheet.Zoom * zoomFactor, MinZoom, MaxZoom);
         var mouse = MouseToPickerPoint(OpenSheet.Zoom, OpenSheet.Position);
-        // Console.WriteLine("Zoom: " + OpenSheet.Zoom.ToString());
-        // Console.WriteLine("Position: " + OpenSheet.Position.ToString());
         var delta = (OpenSheet.Position - mouse) * (zoomFactor - 1);
         if (zoomFactor != 1f) OpenSheet.Position += delta;
-        // Console.WriteLine("Mouse: " + mouse.ToString());
-        // Console.WriteLine("Delta: " + delta.ToString());
-        Console.WriteLine();
         OpenSheet.Zoom = zoom;
       }
       if (input.IsDragFirst)
@@ -327,7 +316,7 @@ namespace Raven
       }
       if (input.IsDrag && input.MouseDragButton == 2) 
       {
-        OpenSheet.Position = _initialPosition - (input.MouseDragStart - ImGui.GetIO().MousePos) / OpenSheet.Zoom;        
+        OpenSheet.Position = _initialPosition - (input.MouseDragStart - ImGui.GetIO().MousePos);        
       } 
     }
     public System.Numerics.Vector2 GetUvMin(SheetPickerData state) => (state.Position / Bounds.Size / state.Zoom).ToNumerics(); 
@@ -339,8 +328,8 @@ namespace Raven
       var mouse = ImGui.GetMousePos();
       var pos = mouse.ToVector2(); 
       pos -= ImGui.GetCursorScreenPos();
-      pos /= zoom;
-      pos += offset;
+      // pos /= zoom;
+      // pos += offset;
 
       return pos;
     }
