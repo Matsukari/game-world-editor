@@ -17,8 +17,6 @@ LOD system
 Save world
 Undo & redo
 Shape & tile separate selection
-Copy & paste: 
-- shapes
 
 
 ## Rendering 

@@ -48,10 +48,10 @@ namespace Raven
       _sceneInspector = new SpriteSceneInspector(spriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => 
       {
-        if (anim is AnimatedSprite)
+        if (anim is AnimatedSprite animatedSprite)
         {
           Console.WriteLine("Openning AnimatedSprite");
-          _sheetView.SpriteAnimationEditor.Open(anim);
+          _sheetView.SpriteAnimationEditor.Open(animatedSprite);
         }
         else 
           _animationEditor.Open(scene, anim);

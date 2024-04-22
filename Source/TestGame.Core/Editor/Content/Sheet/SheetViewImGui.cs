@@ -21,7 +21,11 @@ namespace Raven
     {
       _settings = settings;
       Inspector = new SheetInspector(settings, camera);
-      Inspector.SpritePicker.OnDropSource += source => SceneView.LastSprite.SpriteScene.AddSprite(source);
+      Inspector.SpritePicker.OnDropSource += source => 
+      {
+        source.SpriteScene = SceneView.LastSprite.SpriteScene;
+        SceneView.LastSprite.SpriteScene.AddSprite(source);
+      };
       Popups = new SheetViewPopup();
 
       Inspector.OnClickAnimation += anim => SpriteAnimEditor.Open(anim);

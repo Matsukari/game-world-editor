@@ -168,7 +168,7 @@ namespace Raven
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
-          var sprite = _compOnOptions.SpriteScene.AddSprite(_compOnOptions.Duplicate());
+          var sprite = _compOnOptions.SpriteScene.AddSprite(_compOnOptions.Copy());
           sprite.Transform.Position.X += 100;
         }
 

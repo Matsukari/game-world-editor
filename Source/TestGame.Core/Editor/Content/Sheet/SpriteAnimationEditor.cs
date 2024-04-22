@@ -7,7 +7,7 @@ namespace Raven
     SpriteAnimationInspector _inspector;
     AnimationPlayer _player;
     public readonly Sheet Sheet;
-    public Animation Animation;
+    public AnimatedSprite Animation;
     public AnimationPlayer Player { get => _player; }
     public bool IsOpen { get => _player != null && _inspector.IsOpen; }
     public SpriteAnimationFrame SelectedFrame;
@@ -29,7 +29,7 @@ namespace Raven
       var newFrame = Animation.Frames[index] as SpriteAnimationFrame;
       SelectedFrame = newFrame;
     }
-    public void Open(Animation animation)
+    public void Open(AnimatedSprite animation)
     {
       Animation = animation;
       _inspector.IsOpen = true;

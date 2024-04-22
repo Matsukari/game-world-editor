@@ -39,12 +39,16 @@ namespace Raven
       foreach (var point in _selection.Points.Points)
       {
         var centerPoint = point;
+        centerPoint.Size *= _selection.SelectedSelectionPointSizeFactor;
         if (camera.RawZoom < 1) centerPoint.Size /= camera.RawZoom;
         centerPoint = centerPoint.GetCenterToStart();
         if (centerPoint.Contains(camera.MouseToWorldPoint())) 
         {
           axis = i;
         }
+        centerPoint = point;
+        if (camera.RawZoom < 1) centerPoint.Size /= camera.RawZoom;
+        centerPoint = centerPoint.GetCenterToStart();
         batcher.DrawRect(centerPoint, _colors.SelectionPoint.ToColor());
         i++;
       }
@@ -53,7 +57,7 @@ namespace Raven
       {
         var point = _selection.Points.Points[axis];
         var centerPoint = point;
-        centerPoint.Size *= 1.4f;
+        centerPoint.Size *= _selection.SelectedSelectionPointSizeFactor;
         if (camera.RawZoom < 1) centerPoint.Size /= camera.RawZoom;
         centerPoint = centerPoint.GetCenterToStart();
         batcher.DrawRect(centerPoint, _colors.SelectionPoint.ToColor());
