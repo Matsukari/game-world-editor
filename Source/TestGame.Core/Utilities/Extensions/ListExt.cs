@@ -1,4 +1,6 @@
 using System.Reflection;
+using Nez; 
+using Microsoft.Xna.Framework;
 
 namespace Raven
 {
@@ -23,6 +25,20 @@ namespace Raven
       List<T> newList = new List<T>();
       foreach (var item in list) newList.Add(item);
       return newList;
+    }
+    public static RectangleF EnclosedBounds(this List<ISceneSprite> list) 
+    {
+      var min = new Vector2(100000, 100000);
+      var max = new Vector2(-10000, -10000);
+
+      foreach (var p in list)
+      {
+        min.X = Math.Min(min.X, p.Bounds.X);
+        min.Y = Math.Min(min.Y, p.Bounds.Y);
+        max.X = Math.Max(max.X, p.Bounds.Right);
+        max.Y = Math.Max(max.Y, p.Bounds.Bottom);
+      }
+      return (list.Count == 0) ? new RectangleF() : RectangleF.FromMinMax(min, max);
     }
     /// <summary>
     /// Clones all items in the list if they type implement IClonable 

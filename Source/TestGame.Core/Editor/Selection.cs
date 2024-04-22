@@ -46,6 +46,7 @@ namespace Raven
       SelAxis = SelectionAxis.None;
       ContentBounds = new RectangleF();
       _started = false;
+      _isDragInsideArea = false;
     }
     public bool HasBegun() => _started;
 
@@ -136,6 +137,7 @@ namespace Raven
       {
         _bounds.Location = _selectionInitial.Location + delta;
         ContentBounds = _bounds;
+        Console.WriteLine("Inside draggin");
         return true;
       }
 

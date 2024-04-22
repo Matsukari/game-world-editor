@@ -6,8 +6,6 @@ Polygon in pane's respective to zoom
 Mouse snappning
 
 ## SpriteScene
-Multiple select parts
-Multiple transforms on selected parts
 Choose ease type
 
 ## World
