@@ -6,6 +6,12 @@ namespace Raven
 {
   public static class ListExt
   {
+
+    public static void Deconstruct<TKey,TValue>( this string[] pair, out string a, out string b) 
+    {
+      a = pair[0];
+      b = pair[1];
+    }
     /// <summary>
     /// Gets an item or null if not present
     /// </summary> 

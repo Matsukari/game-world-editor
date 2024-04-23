@@ -15,6 +15,8 @@ namespace Raven
     [JsonInclude]
     public Level Level { get; internal set; }
 
+    public World World { get => Level.World; }
+
     /// <summary>
     /// The ID of this Layer, cannot be the same with other Layers on the Level
     /// </summary>

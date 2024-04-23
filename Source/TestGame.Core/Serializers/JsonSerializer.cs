@@ -3,6 +3,11 @@ using Nez.Persistence;
 
 namespace Raven.Serializers
 {
+  public class DeepDictionary
+  {
+    public Dictionary<string, object> Data { get; private set; } = new Dictionary<string, object>();
+
+  }
   class JsonCache
   {
     static internal Dictionary<string, object> Data { get; private set; } = new Dictionary<string, object>();
@@ -30,6 +35,7 @@ namespace Raven.Serializers
           new WorldJsonConverter(),
           new TileInstanceJsonConverter(),
           new SpriteSceneInstanceJsonConverter(),
+          new TileLayerJsonConverter(),
     };
     /// <summary>
     /// Serializes object with expected TypeConverters

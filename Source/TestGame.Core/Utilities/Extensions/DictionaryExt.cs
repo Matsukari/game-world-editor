@@ -4,6 +4,12 @@ namespace Raven
 {
   public static class DictionaryExt
   {
+    public static Dictionary<string, object> Dig(this Dictionary<string, object> dict, string key) 
+    {
+      var dig = new Dictionary<string, object>();
+      dict.TryAdd(key, dig);
+      return dig;
+    }
     public static Dictionary<K, V> CloneItems<K, V>(this Dictionary<K, V> list) where V: class
     {
       Dictionary<K, V> newDictionary = new Dictionary<K, V>();
