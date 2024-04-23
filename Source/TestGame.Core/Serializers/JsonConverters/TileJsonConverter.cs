@@ -7,7 +7,8 @@ namespace Raven.Serializers
   class TileJsonConverter : JsonTypeConverter<Tile>
   {
     public override bool WantsExclusiveWrite => true;
-         
+    public override bool CanWrite => true;     
+
     public override void WriteJson( IJsonEncoder encoder, Tile instance)
     {
       encoder.EncodeKeyValuePair("Name", instance.Name);
@@ -19,7 +20,7 @@ namespace Raven.Serializers
     {
       Console.WriteLine("OnFoundCustomData TIle: " + key);
       Console.WriteLine("value TIle: " + value);      
-       
+      JsonCache.Data["Tile"] = value;       
     }
   }
 }

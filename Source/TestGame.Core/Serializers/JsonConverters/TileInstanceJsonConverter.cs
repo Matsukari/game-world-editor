@@ -10,9 +10,15 @@ namespace Raven.Serializers
          
     public override void WriteJson( IJsonEncoder encoder, TileInstance instance)
     {
-      encoder.EncodeKeyValuePair("Name", instance.Name);
-      encoder.EncodeKeyValuePair("Properties", instance.Properties);
-      encoder.EncodeKeyValuePair("Props", instance.Props);
+      if (instance.Name != string.Empty)
+        encoder.EncodeKeyValuePair("Name", instance.Name);
+
+      if (instance.Properties.Data.Count() > 0)
+        encoder.EncodeKeyValuePair("Properties", instance.Properties);
+
+      if (instance.Props != null) 
+        encoder.EncodeKeyValuePair("Props", instance.Props);
+
       encoder.EncodeKeyValuePair("Tile", instance.Tile);
     }
     public override void OnFoundCustomData(TileInstance instance, string key, object value )

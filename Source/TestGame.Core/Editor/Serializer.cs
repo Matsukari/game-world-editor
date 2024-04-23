@@ -66,7 +66,7 @@ namespace Raven
       Console.WriteLine($"Saving at {ApplicationSavePath}");
       new SettingsSerializer().Save(ApplicationSavePath, _contentManager.Settings);
     }
-    public T LoadContent<T>(string file) where T: class
+    public static T LoadContent<T>(string file) where T: class
     {
       Console.WriteLine($"Loading content {file}");
       if (!Path.Exists(file)) 
