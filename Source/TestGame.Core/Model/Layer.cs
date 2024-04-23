@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Nez;
+using Nez.Persistence;
 
 namespace Raven
 {
@@ -11,6 +12,7 @@ namespace Raven
     /// <summary>
     /// The Level this Layer is attached to
     /// </summary>
+    [JsonInclude]
     public Level Level { get; internal set; }
 
     /// <summary>
@@ -48,6 +50,10 @@ namespace Raven
     /// Same as Level's size
     /// </summary>
     public Point Size { get => Level.ContentSize; }
+
+    internal Layer()
+    {
+    }
 
     public Layer(Level level)
     {

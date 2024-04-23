@@ -26,12 +26,34 @@ namespace Raven
       }
       var loadedSettings = LoadSettings();
 
-      foreach (var file in loadedSettings.LastFiles)
+      List<int> invalidFiles = new List<int>();
+      for (int i = 0; i < loadedSettings.LastFiles.Count(); i++)
       {
-             if (file.Type == "Sheet") _contentManager.AddTab(new SheetView(), LoadContent<Sheet>(file.Filename));
-        else if (file.Type == "World") _contentManager.AddTab(new WorldView(), LoadContent<World>(file.Filename));
-        else throw new Exception($"Error in file metadata. Cannot load {file.Type} content");
+        var file = loadedSettings.LastFiles[i];
+        try 
+        {
+          if (file.Type == "Sheet") _contentManager.AddTab(new SheetView(), LoadContent<Sheet>(file.Filename));
+          else if (file.Type == "World") _contentManager.AddTab(new WorldView(), LoadContent<World>(file.Filename));
+          else throw new Exception($"Error in file metadata. Cannot load {file.Type} content");
+        } 
+        catch (FileNotFoundException) 
+        { 
+          invalidFiles.Add(i);
+          Console.WriteLine("Err; does not exist; ignoring");
+          continue; 
+        }
+        catch (NotSupportedException) 
+        { 
+          invalidFiles.Add(i);
+          Console.WriteLine("Err; does not support type");
+          continue; 
+        }
       }
+      foreach (var inv in invalidFiles)
+        loadedSettings.LastFiles.RemoveAt(inv); 
+
+      new SettingsSerializer().Save(ApplicationSavePath, loadedSettings);
+
       _contentManager.Settings.Colors = loadedSettings.Colors;
     }
     public EditorSettings LoadSettings()
@@ -47,10 +69,16 @@ namespace Raven
     public T LoadContent<T>(string file) where T: class
     {
       Console.WriteLine($"Loading content {file}");
+      if (!Path.Exists(file)) 
+      {
+        throw new FileNotFoundException();
+      }
+      
       if (typeof(T) == typeof(Sheet)) return new SheetSerializer().Load(file) as T;
+      else if (typeof(T) == typeof(World)) return new WorldSerializer().Load(file) as T;
       else 
       {
-        throw new Exception($"Cannot load type {typeof(T).Name}");
+        throw new NotSupportedException($"Cannot load type {typeof(T).Name}");
       }
     }
     public void SaveContent(string filepath)
@@ -58,9 +86,10 @@ namespace Raven
       var content = _contentManager.GetContent().Content;
       if (filepath == null) filepath = "Sample.content";
       if (content is Sheet sheet) new SheetSerializer().Save(filepath, sheet);
+      else if (content is World world) new WorldSerializer().Save(filepath, world);
       else 
       {
-        throw new Exception($"Cannot load type {typeof(Sheet).Name}");
+        throw new NotSupportedException($"Cannot load type {typeof(Sheet).Name}");
       }
     }
     public void SaveContent() => SaveContent(_contentManager.GetContent().Data.Filename);

@@ -4,6 +4,15 @@ namespace Raven
 {
   public static class DictionaryExt
   {
+    public static Dictionary<K, V> CloneItems<K, V>(this Dictionary<K, V> list) where V: class
+    {
+      Dictionary<K, V> newDictionary = new Dictionary<K, V>();
+      foreach (var item in list)
+      {
+        if (item.Value is ICloneable cloner) newDictionary.Add(item.Key, cloner.Clone() as V);
+      }
+      return newDictionary;
+    }
     public static bool ChangeKey<TKey, TValue>(this IDictionary<TKey, TValue> dict, 
         TKey oldKey, TKey newKey)
     {

@@ -13,9 +13,13 @@ namespace Raven.Serializers
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
       encoder.EncodeKeyValuePair("Coordinates", instance.Coordinates);
+      encoder.EncodeKeyValuePair("SheetSource", instance._sheet.Name);
     }
     public override void OnFoundCustomData(Tile instance, string key, object value )
     {
+      Console.WriteLine("OnFoundCustomData TIle: " + key);
+      Console.WriteLine("value TIle: " + value);      
+       
     }
   }
 }

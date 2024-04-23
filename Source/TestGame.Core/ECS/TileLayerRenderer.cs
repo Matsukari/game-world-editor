@@ -8,8 +8,10 @@ namespace Raven
   { 
     public static void Render(Batcher batcher, Camera camera, TileLayer layer, Transform parent, Color color=default)
     {
-      foreach (var (tilePosition, tile) in layer.Tiles)
+      foreach (var (tilePosition, tileInstance) in layer.Tiles)
       {
+        var tile = tileInstance.Tile;
+
         var dest = new RectangleF(
             tilePosition.X*layer.TileWidth, 
             tilePosition.Y*layer.TileHeight, 
@@ -26,8 +28,9 @@ namespace Raven
         if (color == default) color = Color.White;
 
         RenderProperties renderProp;
-        if (layer.TilesProp.TryGetValue(tilePosition, out renderProp)) 
+        if (tileInstance.Props != null) 
         {
+          renderProp = tileInstance.Props;
           rot *= renderProp.Transform.Rotation;
           eff = renderProp.SpriteEffects;
           color = renderProp.Color.ToColor();
@@ -48,8 +51,9 @@ namespace Raven
 
     public override void Render(Batcher batcher, Camera camera)
     {
-      foreach (var (tilePosition, tile) in Layer.Tiles)
+      foreach (var (tilePosition, tileInstance) in Layer.Tiles)
       {
+        var tile = tileInstance.Tile;
         var dest = new RectangleF(
             tilePosition.X*Layer.TileWidth, 
             tilePosition.Y*Layer.TileHeight, 
@@ -66,8 +70,9 @@ namespace Raven
         var color = Color.White;
 
         RenderProperties renderProp;
-        if (Layer.TilesProp.TryGetValue(tilePosition, out renderProp)) 
+        if (tileInstance.Props != null) 
         {
+          renderProp = tileInstance.Props;
           rot *= renderProp.Transform.Rotation;
           eff = renderProp.SpriteEffects;
           color = renderProp.Color.ToColor();

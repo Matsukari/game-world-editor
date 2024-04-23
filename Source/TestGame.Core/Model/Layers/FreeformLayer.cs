@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Nez.Persistence;
 
 namespace Raven
 {
@@ -9,7 +10,13 @@ namespace Raven
   public class FreeformLayer : Layer
   {
     public bool IsYSorted = true;
+
+    [JsonInclude]
     public List<SpriteSceneInstance> SpriteScenees { get; private set; }= new List<SpriteSceneInstance>();
+
+    internal FreeformLayer()
+    {
+    }
 
     public FreeformLayer(Level level) : base(level) {}
 

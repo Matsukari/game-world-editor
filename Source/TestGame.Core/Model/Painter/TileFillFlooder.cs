@@ -37,7 +37,7 @@ namespace Raven
       if (!_frontier.Contains(point) && _isCleared) 
       {
         _frontier.Enqueue(point);
-        if (layer.Tiles.ContainsKey(point)) _flood = layer.Tiles[point];
+        if (layer.Tiles.ContainsKey(point)) _flood = layer.Tiles[point].Tile;
         else _flood = null;
         _isCleared = false;
       } 
@@ -55,7 +55,7 @@ namespace Raven
           next.X += dir.Item1;
           next.Y += dir.Item2;
           if (_layer.IsTileValid(next.X, next.Y) 
-              && (!_layer.Tiles.ContainsKey(next) || (_flood != null && _layer.Tiles[next].Id == _flood.Id))
+              && (!_layer.Tiles.ContainsKey(next) || (_flood != null && _layer.Tiles[next].Tile.Id == _flood.Id))
               && !_visited.ContainsKey(next))
           {
             _frontier.Enqueue(next);

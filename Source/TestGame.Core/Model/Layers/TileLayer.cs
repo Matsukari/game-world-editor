@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Nez.Persistence;
 
 namespace Raven
 {
@@ -8,11 +9,6 @@ namespace Raven
   /// </summary> 
   public class TileLayer : Layer
   {
-    public TileLayer(Level level, int w, int h) : base(level) 
-    {
-      TileWidth = w;
-      TileHeight = h;
-    }
     /// <summary>
     // The width of an individual Tile
     /// </summary> 
@@ -33,20 +29,28 @@ namespace Raven
     /// <summary>
     // The list of all painted Tiles
     /// </summary> 
-    public Dictionary<Point, Tile> Tiles { get => _tiles; private set => _tiles = value; }
+    [JsonInclude]
+    public Dictionary<Point, TileInstance> Tiles { get; private set;} = new Dictionary<Point, TileInstance>();
 
-    /// <summary>
-    // The list of all custom render peoperties associated to a Tile
-    /// </summary> 
-    public Dictionary<Point, RenderProperties> TilesProp = new Dictionary<Point, RenderProperties>();
 
-    Dictionary<Point, Tile> _tiles = new Dictionary<Point, Tile>();
+    internal TileLayer()
+    {
+    }
+
+
+    public TileLayer(Level level, int w, int h) : base(level) 
+    {
+      TileWidth = w;
+      TileHeight = h;
+    }
 
     public Point GetTileCoordFromWorld(Vector2 point) => new Point(
         (int)(point.X - Bounds.Location.X) / TileWidth, 
         (int)(point.Y - Bounds.Location.Y) / TileHeight);
 
     public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
+
+    public TileInstance GetTile(Point point) => Tiles[point]; 
 
     /// <summary>
     // Checks if the layer contains the given corrdinate 
@@ -65,22 +69,14 @@ namespace Raven
     public void ReplaceTile(Point coord, Tile tile)
     {
       if (!IsTileValid(coord.X, coord.Y)) return;
-      _tiles[coord] = tile;
+      Tiles[coord] = new TileInstance(tile, null);
     }
 
-
-    /// <summary>
-    /// Replaces or create custom render properties (such as Transform, Color) for a specific Tile at the given position
-    /// </summary>
-    public RenderProperties ReplaceTileProperties(int x, int y)
+    public void ReplaceTile(Point coord, TileInstance instance)
     {
-      if (!IsTileValid(x, y)) throw new Exception("Tile coordinates invalid");
-      var loc = new Point(x, y);
-      var prop = new RenderProperties();
-      TilesProp[loc] = prop;
-      return prop;
+      if (!IsTileValid(coord.X, coord.Y)) return;
+      Tiles[coord] = instance;
     }
-
 
     /// <summary>
     /// Removed the tile that is contained in the coordinate provided
@@ -89,7 +85,7 @@ namespace Raven
     {
       if (!IsTileValid(x, y)) return;
       var loc = new Point(x, y);
-      _tiles.Remove(loc);
+      Tiles.Remove(loc);
     }
 
 
@@ -98,17 +94,7 @@ namespace Raven
     public override Layer Copy()
     {
       var layer = MemberwiseClone() as TileLayer;
-      layer._tiles = new Dictionary<Point, Tile>();
-      foreach (var item in _tiles)
-      {
-        layer._tiles.Add(item.Key, item.Value.Copy());
-      }
-      layer.TilesProp = new Dictionary<Point, RenderProperties>();
-      foreach (var item in TilesProp)
-      {
-        layer.TilesProp.Add(item.Key, item.Value.Copy());
-      }
-
+      layer.Tiles = Tiles.CloneItems(); 
       return layer;
     }
 
