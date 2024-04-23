@@ -158,7 +158,8 @@
 						"@ref": "23"
 					}
 				}
-			]
+			],
+			"Target": null
 		}
 	],
 	"Source": "/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png",
@@ -235,7 +236,9 @@
 					"Properties": {
 						"@id": "35",
 						"Data": {
-
+							"RectangleModel": {
+								"@id": "36"
+							}
 						}
 					},
 					"IsVisible": true,
@@ -246,14 +249,14 @@
 						"@ref": "6"
 					},
 					"Transform": {
-						"@id": "36",
+						"@id": "37",
 						"Position": {
-							"@id": "37",
+							"@id": "38",
 							"X": -156.12741,
 							"Y": -42.782547
 						},
 						"Scale": {
-							"@id": "38",
+							"@id": "39",
 							"X": 2.3261957,
 							"Y": 2.2659142
 						},
@@ -268,7 +271,7 @@
 					"CurrentFrame": 3,
 					"Frames": [
 						{
-							"@id": "39",
+							"@id": "40",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "10"
@@ -281,7 +284,7 @@
 							}
 						},
 						{
-							"@id": "40",
+							"@id": "41",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "14"
@@ -294,7 +297,7 @@
 							}
 						},
 						{
-							"@id": "41",
+							"@id": "42",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "18"
@@ -307,7 +310,7 @@
 							}
 						},
 						{
-							"@id": "42",
+							"@id": "43",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "22"
@@ -319,14 +322,15 @@
 								"@ref": "23"
 							}
 						}
-					]
+					],
+					"Target": null
 				},
 				{
-					"@id": "43",
+					"@id": "44",
 					"@type": "Raven.SourcedSprite",
 					"Name": "Component",
 					"Properties": {
-						"@id": "44",
+						"@id": "45",
 						"Data": {
 
 						}
@@ -339,14 +343,14 @@
 						"@ref": "6"
 					},
 					"Transform": {
-						"@id": "45",
+						"@id": "46",
 						"Position": {
-							"@id": "46",
+							"@id": "47",
 							"X": 3.8011808,
 							"Y": -63.372124
 						},
 						"Scale": {
-							"@id": "47",
+							"@id": "48",
 							"X": 0.8057592,
 							"Y": 0.74078906
 						},
@@ -358,16 +362,16 @@
 					"IsLocked": false,
 					"SpriteEffects": "None",
 					"SourceSprite": {
-						"@id": "48",
+						"@id": "49",
 						"Name": "",
 						"Properties": {
-							"@id": "49",
+							"@id": "50",
 							"Data": {
 
 							}
 						},
 						"Region": {
-							"@id": "50",
+							"@id": "51",
 							"X": 128,
 							"Y": 0,
 							"Width": 144,
@@ -376,11 +380,11 @@
 					}
 				},
 				{
-					"@id": "51",
+					"@id": "52",
 					"@type": "Raven.AnimatedSprite",
 					"Name": "Animation-1",
 					"Properties": {
-						"@id": "52",
+						"@id": "53",
 						"Data": {
 
 						}
@@ -393,9 +397,9 @@
 						"@ref": "6"
 					},
 					"Transform": {
-						"@id": "53",
+						"@id": "54",
 						"Position": {
-							"@id": "54",
+							"@id": "55",
 							"X": 166.5119,
 							"Y": 45.74063
 						},
@@ -413,7 +417,7 @@
 					"CurrentFrame": 0,
 					"Frames": [
 						{
-							"@id": "55",
+							"@id": "56",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "10"
@@ -426,7 +430,7 @@
 							}
 						},
 						{
-							"@id": "56",
+							"@id": "57",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "14"
@@ -439,7 +443,7 @@
 							}
 						},
 						{
-							"@id": "57",
+							"@id": "58",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "18"
@@ -452,7 +456,7 @@
 							}
 						},
 						{
-							"@id": "58",
+							"@id": "59",
 							"@type": "Raven.SpriteAnimationFrame",
 							"Sprite": {
 								"@ref": "22"
@@ -464,14 +468,15 @@
 								"@ref": "23"
 							}
 						}
-					]
+					],
+					"Target": null
 				}
 			],
 			"Animations": [
 
 			],
 			"Transform": {
-				"@id": "59",
+				"@id": "60",
 				"Position": {
 					"@ref": "6"
 				},
