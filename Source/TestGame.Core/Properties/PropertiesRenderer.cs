@@ -69,7 +69,6 @@ namespace Raven
     public static int MinimumPropChildHeight = 250;
     public static bool Render(ImGuiWinManager manager, IPropertied propertied, bool tree=false)
     {
-      string changedName = null;
       object changedProperty = null;
       string changedNameOfProperty = null;
       bool anyOtherChanges = false;
@@ -91,8 +90,10 @@ namespace Raven
  
         if (propertied.Properties.Data.Count() == 0) ImGuiUtils.TextMiddle("No properties yet.");
 
-        foreach (var (property, propertyData) in propertied.Properties)
+        foreach (var pObject in propertied.Properties)
         {
+          var property = pObject.Key;
+          var propertyData = pObject.Value;
           var node = ImGui.TreeNode(property);
           if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
           {
@@ -104,7 +105,7 @@ namespace Raven
             var nameHolder = property;
             changedNameOfProperty = property;
             if (
-                ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue)) changedName = nameHolder;
+                ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue)) pObject.Key = nameHolder;
                 ImGui.LabelText("Type", propertyData.GetType().Name);
 
             changedProperty = RenderBestMatch(propertyData, ref anyOtherChanges);
@@ -114,14 +115,9 @@ namespace Raven
         ImGui.EndChild();
         if (tree) ImGui.TreePop();
       }
-      if (changedName != null)
+      if (changedProperty != null)
       {
-        propertied.Properties.Data.ChangeKey(changedNameOfProperty, changedName);
-        return true;
-      }
-      else if (changedProperty != null)
-      {
-        propertied.Properties.Data[changedNameOfProperty] = changedProperty;
+        propertied.Properties.AddOrSet(changedProperty, changedNameOfProperty);
         return true;
       }
       return anyOtherChanges;
@@ -258,10 +254,10 @@ namespace Raven
     static void NameProperty(IPropertied propertied, string name)
     {
       // String doesnt have a parameterless constructor
-      if (_pickedPropertyType == typeof(string)) propertied.Properties.Data[name] = "";
+      if (_pickedPropertyType == typeof(string)) propertied.Properties.AddOrSet("", name);
       else 
       {
-        propertied.Properties.Data[name] = System.Convert.ChangeType(System.Activator.CreateInstance(_pickedPropertyType), _pickedPropertyType); 
+        propertied.Properties.AddOrSet(System.Convert.ChangeType(System.Activator.CreateInstance(_pickedPropertyType), _pickedPropertyType), name); 
       }
       _propCreated = true;
       _pickedPropertyType = null;

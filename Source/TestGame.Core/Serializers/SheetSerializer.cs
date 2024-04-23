@@ -29,6 +29,14 @@ namespace Raven.Serializers
           part.SourceSprite._sheet = model;
           if (part is AnimatedSprite animatedSprite)
           {
+            foreach (var prop in part.Properties.Data)
+            {
+              Console.WriteLine($"Got {prop.Key} : {prop.Value}, type: {prop.Value.GetType().AssemblyQualifiedName}");
+              if (prop.Value is Dictionary<string, object> dict)
+              {
+                foreach (var p in dict) Console.WriteLine($"From dict {p.Key} = {p.Value}");
+              }
+            }
             foreach (var frame in animatedSprite.Frames)
             {
               if (frame is SpriteAnimationFrame spriteAnimationFrame) spriteAnimationFrame.Sprite._sheet = model;

@@ -40,6 +40,7 @@ namespace Raven
   public class RectangleModel : ShapeModel
   {  
     [PropertiedInput("Bounds")]
+    [JsonInclude]
     public override RectangleF Bounds { get; set; } = new RectangleF();
     public override string Icon { get => Icons.SquareFull; }
 
@@ -66,7 +67,9 @@ namespace Raven
   }
   public class EllipseModel : ShapeModel
   {
+    [JsonInclude]
     public override RectangleF Bounds { get; set; } = new RectangleF();
+
     public override string Icon { get => Icons.Circle; }
 
     [PropertiedInput("Center")]
@@ -104,7 +107,9 @@ namespace Raven
 
   public class PointModel : ShapeModel 
   {
+    [JsonInclude]
     public override RectangleF Bounds { get; set; } = new RectangleF();
+
     public override string Icon { get => Icons.MapMarkerAlt; }
 
     public static Vector2 Size = new Vector2(20, 30);
@@ -150,7 +155,9 @@ namespace Raven
   }
   public class PolygonModel : ShapeModel
   { 
+    [JsonInclude]
     public override RectangleF Bounds { get; set; } = new RectangleF(); 
+
     public override string Icon { get => Icons.DrawPolygon; }
 
     [PropertiedInput("Points")]
