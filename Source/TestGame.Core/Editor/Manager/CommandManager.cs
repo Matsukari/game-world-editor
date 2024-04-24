@@ -70,8 +70,8 @@ namespace Raven
       {
         _node.Undo();
         if (_node.OnUndo != null) _node.OnUndo();
-        _current--;
         Console.WriteLine($"Undone {_node.GetType().Name}, current: {_current}, stack: {_commands.Count}");
+        _current--;
       }
       catch (Exception)
       {
@@ -98,9 +98,11 @@ namespace Raven
     /// </summary> 
     public void Record(Command command)
     {
-      if (_current >= 0)
+      var next = _current + 1;
+      if (next < _commands.Count())
       {
-        _commands.RemoveRange(_current, _commands.Count() - 1 - _current);
+        Console.WriteLine($"Removing {next} - {_commands.Count() - next}");
+        _commands.RemoveRange(next, _commands.Count() - next);
       }
       _commands.Add(command);
       _current++;
