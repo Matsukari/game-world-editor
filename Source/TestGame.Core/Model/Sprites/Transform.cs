@@ -4,7 +4,7 @@ using Nez;
 
 namespace Raven 
 {
-  public class Transform 
+  public class Transform : ICloneable
   {
     public static Transform Default = new Transform();
 
@@ -77,5 +77,7 @@ namespace Raven
       transform.Scale = Scale;
       return transform;
     }
+
+    object ICloneable.Clone() => Duplicate();
   }
 }

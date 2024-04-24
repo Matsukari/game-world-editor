@@ -136,6 +136,20 @@ namespace Raven
             + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) 
             + (sels[i].Origin * contentScale)
             + (contentScale * (_initialTransform[i].Position - Selection.InitialBounds.Location));
+
+        }
+        if (Input.LeftMouseButtonPressed && !InputManager.IsImGuiBlocking) 
+        {
+          _startTransform.Clear();
+          for (int i = 0; i < sels.Count(); i++)
+          {
+            _startTransform.Add(sels[i].Transform.Duplicate());
+          }
+        }
+        if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking) 
+        {
+          Core.GetGlobalManager<CommandManager>().Record(new SceneSpriteListTransformModifyCommand(sels, _startTransform), 
+              ()=>Selection.ContentBounds=sels.EnclosedBounds());
         }
       }
       if (Mover.Capture is List<ISceneSprite> moving)
@@ -153,6 +167,7 @@ namespace Raven
         }
       }
     }  
+    List<Transform> _startTransform = new List<Transform>();
     List<Transform> _initialTransform = new List<Transform>();
     List<ISceneSprite> _multiSels = new List<ISceneSprite>();
     RectangleF _multiSelection = new RectangleF();

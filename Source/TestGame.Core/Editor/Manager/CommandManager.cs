@@ -2,6 +2,63 @@ using Microsoft.Xna.Framework;
 
 namespace Raven 
 {
+  class SceneSpriteListTransformModifyCommand : Command
+  {
+    List<ISceneSprite> _sprites;
+    List<Transform> _last;
+    List<Transform> _start;
+
+    public SceneSpriteListTransformModifyCommand(List<ISceneSprite> sprites, List<Transform> start)
+    {
+
+      _sprites = sprites;
+      _last = new List<Transform>();
+      foreach (var s in sprites)
+      {
+        _last.Add(s.Transform);
+      }
+      _start = start.CloneItems(); 
+    }
+
+    internal override void Redo()
+    {
+      for (int i = 0; i < _sprites.Count(); i++)
+      {
+        _sprites[i].Transform = _last[i].Duplicate();
+      }
+    }
+    internal override void Undo()
+    {
+      for (int i = 0; i < _sprites.Count(); i++)
+      {
+        _sprites[i].Transform = _start[i].Duplicate();
+      }
+    }
+
+  }
+  class TransformModifyCommand : Command
+  {
+    Transform _transform;
+    Transform _last;
+    Transform _start;
+
+    public TransformModifyCommand(Transform transform, Transform start)
+    {
+      _transform = transform;
+      _last = _transform;
+      _start = start; 
+    }
+
+    internal override void Redo()
+    {
+      _transform = _last.Duplicate();
+    }
+    internal override void Undo()
+    {
+      _transform = _start.Duplicate();
+    }
+
+  }
   class TransformMoveCommand : Command
   {
     Transform _transform;

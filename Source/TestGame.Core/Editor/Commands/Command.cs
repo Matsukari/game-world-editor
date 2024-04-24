@@ -13,4 +13,17 @@ namespace Raven
     internal abstract void Redo();
     internal abstract void Undo();
   }
+
+  public class CommandGroup : Command
+  {
+    public List<Command> Commands = new List<Command>();
+    internal override void Redo() 
+    {
+      foreach (var c in Commands) c.Redo();
+    }
+    internal override void Undo()
+    {
+      foreach (var c in Commands) c.Undo();
+    }
+  }
 }
