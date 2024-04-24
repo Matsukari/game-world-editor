@@ -41,7 +41,7 @@ namespace Raven
       var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
-      if (SelectedSprite != null && Nez.Input.RightMouseButtonReleased && !input.IsImGuiBlocking) SelectedSprite = null;
+      if (SelectedSprite != null && Nez.Input.RightMouseButtonReleased && !InputManager.IsImGuiBlocking) SelectedSprite = null;
 
       if (OpenSheet == null) 
       {

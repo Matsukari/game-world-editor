@@ -1,7 +1,7 @@
 
 namespace Raven
 {
-  public class EditorGraphicsPref
+  public class EditorGraphics
   {
     public bool DrawSheetGrid = true;
 

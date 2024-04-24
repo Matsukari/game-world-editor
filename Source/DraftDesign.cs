@@ -8,27 +8,6 @@ interface EditorAction
 	void Undo();
 }
 
-class Move : EditorAction
-{
-  Vector2 position;
-  Vector2 lastPosition;
-
-  public Move(ref whose = camera)
-  {
-    lastPosition = camera.position;
-  }
-
-	void Do()
-	{
-    camera.position = position;
-	}
-  void Undo()
-  {
-    camera.position = lastPosition;
-  }
-
-}
-
 class Rotate : EditorAction {}
 class Scale : EditorAction {}
 class ChangeProperty : EditorAction {}
@@ -78,6 +57,27 @@ class EditorActionManager
     current++;
   }
 }
+class Move : EditorAction
+{
+  Vector2 position;
+  Vector2 lastPosition;
+
+  public Move(ref whose = camera)
+  {
+    lastPosition = camera.position;
+  }
+
+	void Do()
+	{
+    camera.position = position;
+	}
+  void Undo()
+  {
+    camera.position = lastPosition;
+  }
+
+}
+
 
 
 static void main()
@@ -87,11 +87,8 @@ static void main()
   history.do(Rotate(sprite, 32)); // 0
   history.do(Rotate(sprite, 50)); // 1
   history.do(Move(sprite, 50)); // 2
-  history.do(ChangeProperty(sprite, name)); // 3
+  // history.do(ChangeProperty(sprite, name)); // 3
 
-  history.undo(); // undo ChangeProperty
-  history.redo(); // ChangeProperty again
-  history.undo(); // undo ChangeProperty
   history.undo(); // undo Move
 
   // Action left: 0, 1

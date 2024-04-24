@@ -1,4 +1,3 @@
-using Nez.Persistence;
 
 namespace Raven
 {
@@ -6,7 +5,9 @@ namespace Raven
   {
     public EditorColors Colors = new EditorColors();
 
-    public EditorGraphicsPref Graphics = new EditorGraphicsPref();
+    public EditorGraphics Graphics = new EditorGraphics();
+
+    public EditorHotkeys Hotkeys = new EditorHotkeys();
 
     public List<EditorContentData> LastFiles = new List<EditorContentData>();
 

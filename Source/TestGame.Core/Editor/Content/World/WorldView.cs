@@ -131,6 +131,8 @@ namespace Raven
       {
         lev.LocalOffset = Selection.ContentBounds.Location;
         lev.ContentSize = Selection.ContentBounds.Size.ToPoint();
+        if (Input.LeftMouseButtonPressed && !InputManager.IsImGuiBlocking) _startLevel = lev.LocalOffset;
+        if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking) Core.GetGlobalManager<CommandManager>().Record(new LevelMoveCommand(lev, _startLevel), ()=>Selection.ContentBounds.Location = lev.LocalOffset);
       }
       else if (Selection.Capture is SpriteSceneInstance instance)
       {
@@ -144,5 +146,6 @@ namespace Raven
         batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds, settings.Colors.LevelSelOutline.ToColor());
       }
     }
+    Vector2 _startLevel = Vector2.Zero;
   }
 }

@@ -10,6 +10,8 @@ public class TestGameProcess : Core
     {
         base.Initialize();
         RegisterGlobalManager(new Raven.InputManager());
+        RegisterGlobalManager(new Raven.CommandManager());
+
         ExitOnEscapeKeypress = false;
 
         Window.IsBorderless = true; 

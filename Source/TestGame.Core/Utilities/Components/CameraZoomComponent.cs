@@ -8,8 +8,7 @@ namespace Raven.Utils.Components
     public bool ZoomInOnly = true;
     void IUpdatable.Update()
     {
-      var input = Core.GetGlobalManager<Raven.InputManager>();
-      if (input.IsImGuiBlocking) return;
+      if (InputManager.IsImGuiBlocking) return;
       if (Nez.Input.MouseWheelDelta != 0 ) 
       {
         float zoomFactor = 1.2f;

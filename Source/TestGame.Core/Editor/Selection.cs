@@ -133,11 +133,11 @@ namespace Raven
         ContentBounds = _bounds;
       }
       // move selection
-      else if (input.IsDrag && _isDragInsideArea && Nez.Input.LeftMouseButtonDown && !input.IsImGuiBlocking)
+      else if (input.IsDrag && _isDragInsideArea && Nez.Input.LeftMouseButtonDown)
       {
         _bounds.Location = _selectionInitial.Location + delta;
         ContentBounds = _bounds;
-        Console.WriteLine("Inside draggin");
+        // Console.WriteLine("Inside draggin");
         return true;
       }
 
