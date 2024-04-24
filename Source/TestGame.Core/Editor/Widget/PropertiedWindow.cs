@@ -14,7 +14,6 @@ namespace Raven.Widget
     {
       if (!IsOpen) return;
 
-      var name = Name;
       ImGuiManager = imgui;
 
       var windowname = GetIcon() + "   " + GetName();
@@ -27,6 +26,14 @@ namespace Raven.Widget
       if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
       Bounds.Location = ImGui.GetWindowPos();
       Bounds.Size = ImGui.GetWindowSize();
+
+      RenderContent(imgui);
+
+      ImGui.End();
+    }
+    internal void RenderContent(ImGuiWinManager imgui)
+    {
+      var name = Name;
       OnRender(imgui);
 
       OnRenderBeforeName();
@@ -39,8 +46,6 @@ namespace Raven.Widget
 
       if (PropertiesRenderer.Render(imgui, this)) this.OnChangeProperty(name);
       PropertiesRenderer.HandleNewProperty(this, imgui, OnChangeProperty); 
-
-      ImGui.End();
     }
     public bool HasName() => Name != null && Name != string.Empty;
     public virtual string GetIcon() => "";

@@ -66,6 +66,11 @@ namespace Raven
       _image = new SpriteRenderer(_sheet.Texture);
       _image.Entity = Entity;
     }
+    public override void OnContentClose()
+    {
+      Selection.End();
+    }
+        
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
       _imgui.Update(_sheet, ContentData.SelectionList);

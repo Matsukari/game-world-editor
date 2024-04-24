@@ -2,6 +2,39 @@ using ImGuiNET;
 
 namespace Raven
 {
+  public class SheetObjectInspector : Widget.PropertiedWindow
+  {
+    public override string Name { get => Inspector.Name; set => Inspector.Name = value;}
+    public override PropertyList Properties { get => Inspector.Properties; set => Inspector.Properties = value; }
+
+    public Widget.PropertiedWindow Inspector;
+    public override void Render(ImGuiWinManager imgui)
+    {
+      if (!IsOpen || Inspector == null) return;
+
+      ImGuiManager = imgui;
+
+      var windowname = GetIcon() + "   " + GetName();
+
+      if (NoClose) 
+        ImGui.Begin(windowname, Flags);
+      else
+        ImGui.Begin(windowname, ref _isOpen, Flags);
+      
+      if (ImGui.IsWindowHovered()) ImGui.SetWindowFocus();
+      Bounds.Location = ImGui.GetWindowPos();
+      Bounds.Size = ImGui.GetWindowSize();
+
+      if (Inspector != null)
+        Inspector.RenderContent(imgui);
+      else 
+      {
+        ImGuiUtils.TextMiddle("No object selected");
+      }
+
+      ImGui.End();
+    }    
+  }
   public class TileInspector : Widget.PropertiedWindow
   { 
     public override string Name { get => Tile.Name; set => Tile.Name = value;}

@@ -5,30 +5,14 @@ using Num = System.Numerics;
 
 namespace Raven
 {
-  public interface IInputHandler
-  {
-    /// <summary>
-    /// Hihger numbers go first
-    /// </summary> 
-    public int Priority() => 0;
-
-    public bool CanHandleInput() => true;
-
-    public bool OnHandleInput(InputManager input) => false;
-
-    /// <summary>
-    /// Called when some IInputHandler returns true and cannot handle any further events
-    /// </summary> 
-    public void OnInputBlocked(InputManager input) {}
-
-  }
   
   public class InputManager : GlobalManager
   {
     public bool IsDrag = false;
     public bool IsDragFirst = false;
     public bool IsDragLast = false; 
-    public static bool IsImGuiBlocking { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) || ImGui.GetIO().WantTextInput || ImGui.GetIO().WantCaptureMouse; }
+    public static bool IsImGuiBlocking 
+    { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) || ImGui.GetIO().WantTextInput || ImGui.GetIO().WantCaptureMouse; }
 
     public int MouseDragButton = -1; 
     public RectangleF MouseDragArea = new RectangleF();

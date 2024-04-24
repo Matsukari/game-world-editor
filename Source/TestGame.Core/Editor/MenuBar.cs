@@ -120,14 +120,21 @@ namespace Raven
             ImGui.EndMenu();
           }
         }
+        ImGuiUtils.SpanX(40);
+        var play = Icon.Play;
+        if (ImGui.Button(play))
+        {
+
+        }
         if (ImGui.Button(Icon.Undo) || _editor.Settings.Hotkeys.Undo.IsPressed())
         {
           Core.GetGlobalManager<CommandManager>().Undo();
         }
-        else if (ImGui.Button(Icon.Redo) || _editor.Settings.Hotkeys.Redo.IsPressed())
+        if (ImGui.Button(Icon.Redo) || _editor.Settings.Hotkeys.Redo.IsPressed())
         {
           Core.GetGlobalManager<CommandManager>().Redo();
         }
+
         ImGui.EndMainMenuBar();
       }
 

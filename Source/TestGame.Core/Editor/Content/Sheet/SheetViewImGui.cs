@@ -11,6 +11,7 @@ namespace Raven
     public readonly SheetViewPopup Popups;
     public SpriteSceneView SceneView;
     public SpriteAnimationEditor SpriteAnimEditor;
+    public SheetObjectInspector ObjectInspector = new SheetObjectInspector();
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
 
@@ -62,10 +63,12 @@ namespace Raven
       {
         // Evaluate to either one; 
         _tileInspector.Tile = _list.Selections.Last() as Tile;
-        _tileInspector.Render(imgui);
-
         _spriteInspector.Sprite = _list.Selections.Last() as Sprite;
-        _spriteInspector.Render(imgui);
+
+        if (_tileInspector.Tile != null) ObjectInspector.Inspector = _tileInspector;
+        else if (_spriteInspector.Sprite != null) ObjectInspector.Inspector = _spriteInspector;
+
+        ObjectInspector.Render(imgui);
       }
 
 

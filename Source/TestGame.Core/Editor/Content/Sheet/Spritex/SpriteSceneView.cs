@@ -82,6 +82,7 @@ namespace Raven
     void Clean()
     {
       IsEditing = false;
+      Selection.End();
     }
     void ReSelect(ISceneSprite part)
     {
