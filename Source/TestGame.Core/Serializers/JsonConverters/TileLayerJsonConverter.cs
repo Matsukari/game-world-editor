@@ -21,9 +21,9 @@ namespace Raven.Serializers
       encoder.EncodeKeyValuePair("TileHeight", instance.TileHeight);
  
       string tiles = "";
-      for (int x = 0; x < instance.TilesQuantity.X; x++)
+      for (int y = 0; y < instance.TilesQuantity.Y; y++)
       {
-        for (int y = 0; y < instance.TilesQuantity.Y; y++)
+        for (int x = 0; x < instance.TilesQuantity.X; x++)
         {
           var pos = new Microsoft.Xna.Framework.Point(x, y);
           var sheetIndex = -1;
@@ -43,34 +43,13 @@ namespace Raven.Serializers
       }
       tiles = string.Concat(tiles.SkipLast(1));
 
-      encoder.EncodeKeyValuePair("TileWorld", tiles);
+      encoder.EncodeKeyValuePair(instance.Level.Name+instance.Name+"TileWorld", tiles);
     }
     public override void OnFoundCustomData(TileLayer instance, string key, object value )
     {
-      // Console.WriteLine("OnFoundCustomData TileLayer: " + key);
-      // Console.WriteLine("value TileLayer: " + value);      
-      // if (key == "TileWorld")
-      // {
-      //   var tiles = JsonCache.Data.Dig(instance.Level.Name);
-      //   tiles[instance.Name] = value; 
-      //   
-      // }
-        if (key == "TileWorld" && value is string serializedTiles) 
-        {
-          var tiles = serializedTiles.Split(' ');
-          foreach (var tile in tiles)
-          {
-            var items = tile.Split(',');
-            var sheetIndex = Int32.Parse(items[0]);
-            var tileIndex = Int32.Parse(items[1]);
-            var pos = instance.GetTile(tileIndex);
-            var tileRef = instance.World.Sheets[sheetIndex].GetTileData(tileIndex);
-            instance.ReplaceTile(pos, tileRef);
-          }
-          Console.WriteLine(serializedTiles);
-          var tileWorld = Json.FromJson(serializedTiles);
-        }
-
+      Console.WriteLine("OnFoundCustomData TileLayer: " + key);
+      Console.WriteLine("value TileLayer: " + value);      
+      JsonCache.Data.Add(key, value);
     }
   }
 }

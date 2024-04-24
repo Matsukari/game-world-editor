@@ -65,7 +65,7 @@ namespace Raven.Serializers
     {
       var obj = Json.FromJson<T>(File.ReadAllText(file), new JsonSettings{TypeConverters = _converters});
       obj = BuildFrom(obj, JsonCache.Data);
-      JsonCache.Data.Clear();
+      // JsonCache.Data.Clear();
       return Realize(obj);
     }
   }

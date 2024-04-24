@@ -30,7 +30,8 @@ namespace Raven
     {
       var instance = MemberwiseClone() as TileInstance;
       instance.Properties = Properties.Copy();
-      instance.Props = Props.Copy();
+      if (Props != null)
+        instance.Props = Props.Copy();
       return instance;
 
     }
