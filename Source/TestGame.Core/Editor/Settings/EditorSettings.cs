@@ -7,6 +7,7 @@ namespace Raven
 
     public EditorGraphics Graphics = new EditorGraphics();
 
+    [Nez.Persistence.JsonExclude]
     public EditorHotkeys Hotkeys = new EditorHotkeys();
 
     public List<EditorContentData> LastFiles = new List<EditorContentData>();

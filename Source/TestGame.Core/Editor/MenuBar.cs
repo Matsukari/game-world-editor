@@ -120,11 +120,11 @@ namespace Raven
             ImGui.EndMenu();
           }
         }
-        if (ImGui.Button(Icon.Undo) || Nez.Input.IsKeyPressed(_editor.Settings.Hotkeys.Undo))
+        if (ImGui.Button(Icon.Undo) || _editor.Settings.Hotkeys.Undo.IsPressed())
         {
           Core.GetGlobalManager<CommandManager>().Undo();
         }
-        else if (ImGui.Button(Icon.Redo) || Nez.Input.IsKeyPressed(_editor.Settings.Hotkeys.Redo))
+        else if (ImGui.Button(Icon.Redo) || _editor.Settings.Hotkeys.Redo.IsPressed())
         {
           Core.GetGlobalManager<CommandManager>().Redo();
         }
