@@ -14,10 +14,7 @@ LOD system
 
 
 ## Misc
-Save world
 Undo & redo
-Shape & tile separate selection
-
 
 ## Rendering 
 Game integration

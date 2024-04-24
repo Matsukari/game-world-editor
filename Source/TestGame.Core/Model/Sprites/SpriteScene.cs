@@ -85,6 +85,11 @@ namespace Raven
     {
     }
 
+    internal SpriteScene(string name)
+    {
+      Name = name;
+    }
+
     public SpriteScene(string name, ISceneSprite main, Sheet sheet) 
     {
       Name = name;

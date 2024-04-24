@@ -14,13 +14,18 @@ namespace Raven.Serializers
       encoder.EncodeKeyValuePair("Name", instance.Name);
       encoder.EncodeKeyValuePair("Properties", instance.Properties);
       encoder.EncodeKeyValuePair("Props", instance.Props);
-      encoder.EncodeKeyValuePair("SceneSource", instance.Scene.Name);
+      encoder.EncodeKeyValuePair("SceneSource", instance.Scene.Name + "," + instance.Scene._sheet.Name);
     }
     public override void OnFoundCustomData(SpriteSceneInstance instance, string key, object value )
     {
       Console.WriteLine("OnFoundCustomData SceneIsntance: " + key);
       Console.WriteLine("value SceneIsntance: " + value);      
-      JsonCache.Data.Add(key, value);
+      if (key == "SceneSource")
+      {
+        Console.WriteLine(".." + value);      
+        instance.Scene = new SpriteScene(value as string);
+      }
+      // JsonCache.Data.Add(key, value);
     }
   }
 }

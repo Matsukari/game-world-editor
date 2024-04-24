@@ -11,18 +11,20 @@
 
 	],
 	"Source": "/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png",
-	"_tiles": {
-
+	"Tiles": {
+		"@id": "3",
+		"X": 62,
+		"Y": 33
 	},
 	"SpriteScenees": [
 		{
-			"@id": "3",
+			"@id": "4",
 			"Name": "asd",
 			"Properties": {
-				"@id": "4",
+				"@id": "5",
 				"Data": [
 					{
-						"@id": "5",
+						"@id": "6",
 						"Key": "level",
 						"Value": "power"
 					}
@@ -30,20 +32,20 @@
 			},
 			"Parts": [
 				{
-					"@id": "6",
+					"@id": "7",
 					"@type": "Raven.SourcedSprite",
 					"Name": "Main component",
 					"Properties": {
-						"@id": "7",
+						"@id": "8",
 						"Data": [
 							{
-								"@id": "8",
+								"@id": "9",
 								"Key": "master",
 								"Value": {
-									"@id": "9",
+									"@id": "10",
 									"@type": "Raven.RectangleModel",
 									"Bounds": {
-										"@id": "10",
+										"@id": "11",
 										"X": -35.716393,
 										"Y": 8.574668,
 										"Width": 162.11823,
@@ -52,13 +54,13 @@
 								}
 							},
 							{
-								"@id": "11",
+								"@id": "12",
 								"Key": "collider",
 								"Value": {
-									"@id": "12",
+									"@id": "13",
 									"@type": "Raven.PolygonModel",
 									"Bounds": {
-										"@id": "13",
+										"@id": "14",
 										"X": 0,
 										"Y": 0,
 										"Width": 0,
@@ -66,22 +68,22 @@
 									},
 									"Points": [
 										{
-											"@id": "14",
+											"@id": "15",
 											"X": 130.21523,
 											"Y": -12.533409
 										},
 										{
-											"@id": "15",
+											"@id": "16",
 											"X": 193.77293,
 											"Y": 29.8384
 										},
 										{
-											"@id": "16",
+											"@id": "17",
 											"X": 132.9786,
 											"Y": 111.81864
 										},
 										{
-											"@id": "17",
+											"@id": "18",
 											"X": 129.2941,
 											"Y": -11.612283
 										}
@@ -92,45 +94,45 @@
 					},
 					"IsVisible": true,
 					"Color": {
-						"@id": "18",
+						"@id": "19",
 						"X": 1,
 						"Y": 1,
 						"Z": 1,
 						"W": 1
 					},
 					"Origin": {
-						"@id": "19",
+						"@id": "20",
 						"X": 0,
 						"Y": 0
 					},
 					"Transform": {
-						"@id": "20",
+						"@id": "21",
 						"Position": {
-							"@ref": "19"
+							"@ref": "20"
 						},
 						"Scale": {
-							"@id": "21",
+							"@id": "22",
 							"X": 1,
 							"Y": 1
 						},
 						"Skew": {
-							"@ref": "21"
+							"@ref": "22"
 						},
 						"Rotation": 0
 					},
 					"IsLocked": false,
 					"SpriteEffects": "None",
 					"SourceSprite": {
-						"@id": "22",
+						"@id": "23",
 						"Name": "",
 						"Properties": {
-							"@id": "23",
+							"@id": "24",
 							"Data": [
 
 							]
 						},
 						"Region": {
-							"@id": "24",
+							"@id": "25",
 							"X": 0,
 							"Y": 16,
 							"Width": 128,
@@ -143,15 +145,201 @@
 
 			],
 			"Transform": {
-				"@id": "25",
+				"@id": "26",
 				"Position": {
-					"@ref": "19"
+					"@ref": "20"
 				},
 				"Scale": {
-					"@ref": "21"
+					"@ref": "22"
 				},
 				"Skew": {
-					"@ref": "21"
+					"@ref": "22"
+				},
+				"Rotation": 0
+			}
+		},
+		{
+			"@id": "27",
+			"Name": "tree1",
+			"Properties": {
+				"@id": "28",
+				"Data": [
+
+				]
+			},
+			"Parts": [
+				{
+					"@id": "29",
+					"@type": "Raven.SourcedSprite",
+					"Name": "Main component",
+					"Properties": {
+						"@id": "30",
+						"Data": [
+
+						]
+					},
+					"IsVisible": true,
+					"Color": {
+						"@ref": "19"
+					},
+					"Origin": {
+						"@ref": "20"
+					},
+					"Transform": {
+						"@id": "31",
+						"Position": {
+							"@id": "32",
+							"X": -85.579346,
+							"Y": -123.83475
+						},
+						"Scale": {
+							"@id": "33",
+							"X": 1.8498037,
+							"Y": 1.4269948
+						},
+						"Skew": {
+							"@ref": "22"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"@id": "34",
+						"Name": "",
+						"Properties": {
+							"@id": "35",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "36",
+							"X": 416,
+							"Y": 16,
+							"Width": 96,
+							"Height": 176
+						}
+					}
+				},
+				{
+					"@id": "37",
+					"@type": "Raven.SourcedSprite",
+					"Name": "Component",
+					"Properties": {
+						"@id": "38",
+						"Data": [
+
+						]
+					},
+					"IsVisible": true,
+					"Color": {
+						"@ref": "19"
+					},
+					"Origin": {
+						"@ref": "20"
+					},
+					"Transform": {
+						"@id": "39",
+						"Position": {
+							"@id": "40",
+							"X": 22.643759,
+							"Y": 89.32699
+						},
+						"Scale": {
+							"@ref": "22"
+						},
+						"Skew": {
+							"@ref": "22"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"@id": "41",
+						"Name": "",
+						"Properties": {
+							"@id": "42",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "43",
+							"X": 144,
+							"Y": 0,
+							"Width": 128,
+							"Height": 160
+						}
+					}
+				},
+				{
+					"@id": "44",
+					"@type": "Raven.SourcedSprite",
+					"Name": "Component-1",
+					"Properties": {
+						"@id": "45",
+						"Data": [
+
+						]
+					},
+					"IsVisible": true,
+					"Color": {
+						"@ref": "19"
+					},
+					"Origin": {
+						"@ref": "20"
+					},
+					"Transform": {
+						"@id": "46",
+						"Position": {
+							"@id": "47",
+							"X": -165.68956,
+							"Y": 98.49364
+						},
+						"Scale": {
+							"@ref": "22"
+						},
+						"Skew": {
+							"@ref": "22"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"@id": "48",
+						"Name": "",
+						"Properties": {
+							"@id": "49",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "50",
+							"X": 560,
+							"Y": 96,
+							"Width": 80,
+							"Height": 64
+						}
+					}
+				}
+			],
+			"Animations": [
+
+			],
+			"Transform": {
+				"@id": "51",
+				"Position": {
+					"@ref": "20"
+				},
+				"Scale": {
+					"@ref": "22"
+				},
+				"Skew": {
+					"@ref": "22"
 				},
 				"Rotation": 0
 			}

@@ -19,7 +19,26 @@ namespace Raven.Serializers
       {
         foreach (var layer in level.Layers)
         {
-          if (layer is TileLayer tileLayer)
+          if (layer is FreeformLayer freeform)
+          {
+            foreach (var instance in freeform.SpriteScenees)
+            {
+              var sourceData = instance.Scene.Name.Split(',');
+              var sheetName = sourceData[1];
+              var sceneName = sourceData[0];
+              try 
+              {
+                var sheet = model.Sheets.Find(item => item.Name == sheetName);
+                var scene = sheet.GetSpriteScene(sceneName);
+                instance.Scene = scene;
+              }
+              catch (Exception)
+              {
+                Console.WriteLine($"Ignored scene {sheetName},{sceneName}");
+              }
+            }
+          }
+          else if (layer is TileLayer tileLayer)
           {
             object datHolder;
             if (cache.TryGetValue(level.Name+layer.Name+"TileWorld", out datHolder))

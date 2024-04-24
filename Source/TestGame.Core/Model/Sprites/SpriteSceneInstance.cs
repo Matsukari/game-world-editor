@@ -15,7 +15,7 @@ namespace Raven
     /// <summary>
     /// The reference to the content, modifying this will modify all instances that depends on this scene
     /// </summary> 
-    public SpriteScene Scene { get; private set; }
+    public SpriteScene Scene { get; internal set; }
 
     /// <summary>
     /// Options, transform for rendering
@@ -36,6 +36,11 @@ namespace Raven
       Scene = scene;
       if (props == null) props = new RenderProperties();
       Props = props;
+    }
+
+    public string GetDimensionId() 
+    {
+      return Props.Transform.Position.ToString()+Props.Transform.Scale.ToString() + Props.Transform.Scale.ToString();
     }
 
     object ICloneable.Clone()
