@@ -27,6 +27,7 @@ public class TestGameProcess : Core
         NezImGuiThemes.HighContrast();
         Raven.GuiStyles.StyleViolet();
         ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
+        
 
         imGuiManager.ShowMenuBar = false;
         Scene = new EditorScene();

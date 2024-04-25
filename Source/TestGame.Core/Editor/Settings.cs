@@ -12,49 +12,61 @@ namespace Raven
       _settings = settings;
       IsOpen = false;
     }
+    public void Theme()
+    {
+      var colorY = Math.Min(ImGui.GetWindowHeight(), ImGui.GetContentRegionAvail().Y);
+      colorY -= 20;
+
+      if (ImGui.CollapsingHeader("Window", ImGuiTreeNodeFlags.DefaultOpen))
+      {
+        ImGui.BeginChild("window-theme", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, colorY));
+        for (int i = 0; i < _settings.ImGuiColors.Count; i++)
+        {
+          var numerics = _settings.ImGuiColors[i]; 
+          var name = Enum.GetName(typeof(ImGuiCol), i).PascalToWords();
+          if (ImGui.ColorEdit4(name, ref numerics, ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) 
+          {
+            _settings.ImGuiColors[i] = numerics;
+            _settings.ApplyImGui();
+          }
+        }
+        ImGui.EndChild();
+      }
+      if (ImGui.CollapsingHeader("Miscellaneous", ImGuiTreeNodeFlags.DefaultOpen))
+      {
+        ImGui.BeginChild("miscellaneous-theme", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, colorY));
+        var fields = _settings.Colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        ImGui.SeparatorText("Miscellaneous");
+        foreach (var field in fields)
+        {
+          var colorField = field.GetValue(_settings.Colors);
+          var name = field.Name.PascalToWords();
+          if (colorField is Vector4 vec)
+          {
+            var numerics = ((Vector4)field.GetValue(_settings.Colors)).ToNumerics();
+            if (ImGui.ColorEdit4(name, ref numerics, 
+                  ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_settings.Colors, numerics.ToVector4());
+          }
+        }
+        ImGui.EndChild();
+      }
+
+    }
+    public void General()
+    {
+
+    }
+    public void Shortcuts()
+    {
+
+    }
     public override void OnRender(ImGuiWinManager imgui)
     {
       if (ImGui.BeginTabBar("settings-tab"))
       {
-        if (ImGui.BeginTabItem("Theme"))
-        {
-          var colorY = Math.Min(ImGui.GetWindowHeight(), ImGui.GetContentRegionAvail().Y);
-
-          if (ImGui.CollapsingHeader("Window"))
-          {
-            ImGui.BeginChild("window-theme", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, colorY));
-            for (int i = 0; i < _settings.ImGuiColors.Count; i++)
-            {
-              var numerics = _settings.ImGuiColors[i]; 
-              var name = Enum.GetName(typeof(ImGuiCol), i).PascalToWords();
-              if (ImGui.ColorEdit4(name, ref numerics, ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) 
-              {
-                _settings.ImGuiColors[i] = numerics;
-                _settings.ApplyImGui();
-              }
-            }
-            ImGui.EndChild();
-          }
-          if (ImGui.CollapsingHeader("Miscellaneous"))
-          {
-            ImGui.BeginChild("miscellaneous-theme", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, colorY));
-            var fields = _settings.Colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-            ImGui.SeparatorText("Miscellaneous");
-            foreach (var field in fields)
-            {
-              var colorField = field.GetValue(_settings.Colors);
-              var name = field.Name.PascalToWords();
-              if (colorField is Vector4 vec)
-              {
-                var numerics = ((Vector4)field.GetValue(_settings.Colors)).ToNumerics();
-                if (ImGui.ColorEdit4(name, ref numerics, 
-                      ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_settings.Colors, numerics.ToVector4());
-              }
-            }
-            ImGui.EndChild();
-          }
-          ImGui.EndTabItem();
-        }
+        ImGuiUtils.TabItem("General", General);
+        ImGuiUtils.TabItem("Theme", Theme);
+        ImGuiUtils.TabItem("Shortcuts", Shortcuts);
         ImGui.EndTabBar();
       }
       var size = new System.Numerics.Vector2(ImGui.GetWindowWidth() * 0.15f, 20);

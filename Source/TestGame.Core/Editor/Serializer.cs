@@ -1,3 +1,4 @@
+using ImGuiNET;
 using Raven.Serializers;
 
 namespace Raven
@@ -55,6 +56,18 @@ namespace Raven
       new SettingsSerializer().Save(ApplicationSavePath, loadedSettings);
 
       _contentManager.Settings.Colors = loadedSettings.Colors;
+      _contentManager.Settings.Graphics = loadedSettings.Graphics;
+      _contentManager.Settings.Hotkeys = loadedSettings.Hotkeys;
+      _contentManager.Settings.ImGuiColors = loadedSettings.ImGuiColors;
+      if (_contentManager.Settings.ImGuiColors.Count != ImGui.GetStyle().Colors.Count)
+      {
+        Console.WriteLine("First time; default theme used");
+        for (int i = 0; i < ImGui.GetStyle().Colors.Count; i++)
+          _contentManager.Settings.ImGuiColors.Add(ImGui.GetStyle().Colors[i]);
+      }
+
+      _contentManager.Settings.ApplyImGui();
+      
     }
     public EditorSettings LoadSettings()
     {

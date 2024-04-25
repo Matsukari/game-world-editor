@@ -8,6 +8,15 @@ namespace Raven
 {
   public class ImGuiUtils
   {
+    public static void TabItem(string label, Action content)
+    {
+      if (ImGui.BeginTabItem(label))
+      {
+        content.Invoke();
+        ImGui.EndTabItem();
+      }
+    }
+
     public static void SpanX(float x)
     {
       ImGui.SameLine();
