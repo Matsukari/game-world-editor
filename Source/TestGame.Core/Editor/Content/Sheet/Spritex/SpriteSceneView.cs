@@ -145,8 +145,9 @@ namespace Raven
           {
             _startTransform.Add(sels[i].Transform.Duplicate());
           }
+          Console.WriteLine("Got " + _startTransform.Count());
         }
-        if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking) 
+        if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking && _startTransform.Count() == sels.Count()) 
         {
           Core.GetGlobalManager<CommandManager>().Record(new SceneSpriteListTransformModifyCommand(sels, _startTransform), 
               ()=>Selection.ContentBounds=sels.EnclosedBounds());

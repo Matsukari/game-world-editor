@@ -11,11 +11,15 @@ namespace Raven
     public SceneSpriteListTransformModifyCommand(List<ISceneSprite> sprites, List<Transform> start)
     {
 
-      _sprites = sprites;
+      _sprites = new List<ISceneSprite>();
+      foreach (var sprite in sprites)
+      {
+        _sprites.Add(sprite);
+      }
       _last = new List<Transform>();
       foreach (var s in sprites)
       {
-        _last.Add(s.Transform);
+        _last.Add(s.Transform.Duplicate());
       }
       _start = start.CloneItems(); 
     }
@@ -112,28 +116,25 @@ namespace Raven
 
     public void Undo()
     {
-      try 
+      if (_current >= 0)
       {
         _node.Undo();
         if (_node.OnUndo != null) _node.OnUndo();
         Console.WriteLine($"Undone {_node.GetType().Name}, current: {_current}, stack: {_commands.Count}");
         _current--;
       }
-      catch (Exception)
-      {
+      else 
         Console.WriteLine($"Nothing to undo");
-      }
     }
     public void Redo()
     {
-      try 
+      if (_commands.Count() > ++_current)
       {
-        _current++;
         _node.Redo();
         if (_node.OnRedo != null) _node.OnRedo();
         Console.WriteLine($"Redone {_node.GetType().Name}, current: {_current}, stack: {_commands.Count}");
       }
-      catch (Exception)
+      else 
       {
         _current--;
         Console.WriteLine($"Max stack");
