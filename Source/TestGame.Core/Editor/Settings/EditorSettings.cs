@@ -1,3 +1,5 @@
+using System.Numerics;
+using ImGuiNET;
 
 namespace Raven
 {
@@ -12,8 +14,16 @@ namespace Raven
 
     public List<EditorContentData> LastFiles = new List<EditorContentData>();
 
+    public List<Vector4> ImGuiColors = new List<Vector4>();
+
     public int LastFile = 0;
 
     public bool IsEditorBusy = false;
+
+    public void ApplyImGui()
+    {
+      for (int i = 0; i < ImGuiColors.Count; i++)
+        ImGui.GetStyle().Colors[i] = ImGuiColors[i];
+    }
   } 
 }

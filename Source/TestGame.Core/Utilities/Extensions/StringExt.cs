@@ -1,8 +1,16 @@
+using System.Text.RegularExpressions;
+
 
 namespace Raven 
 {
   public static class StringExt
   {
+    static public string PascalToWords(this string text)
+    {
+      Regex r = new Regex(@"(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])");
+      return r.Replace(text, " ");
+
+    }
     static public object AttemptCopy(this object obj)
     {
       if (obj.GetType().IsValueType) return obj;

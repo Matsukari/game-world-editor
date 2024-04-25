@@ -18,26 +18,53 @@ namespace Raven
       {
         if (ImGui.BeginTabItem("Theme"))
         {
-          var fields = _settings.Colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-          foreach (var field in fields)
+          var colorY = Math.Min(ImGui.GetWindowHeight(), ImGui.GetContentRegionAvail().Y);
+
+          if (ImGui.CollapsingHeader("Window"))
           {
-            var colorField = field.GetValue(_settings.Colors);
-            if (colorField is Vector4 vec)
+            ImGui.BeginChild("window-theme", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, colorY));
+            for (int i = 0; i < _settings.ImGuiColors.Count; i++)
             {
-              var numerics = ((Vector4)field.GetValue(_settings.Colors)).ToNumerics();
-              if (ImGui.ColorEdit4(field.Name, ref numerics, 
-                    ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_settings.Colors, numerics.ToVector4());
+              var numerics = _settings.ImGuiColors[i]; 
+              var name = Enum.GetName(typeof(ImGuiCol), i).PascalToWords();
+              if (ImGui.ColorEdit4(name, ref numerics, ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) 
+              {
+                _settings.ImGuiColors[i] = numerics;
+                _settings.ApplyImGui();
+              }
             }
+            ImGui.EndChild();
+          }
+          if (ImGui.CollapsingHeader("Miscellaneous"))
+          {
+            ImGui.BeginChild("miscellaneous-theme", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, colorY));
+            var fields = _settings.Colors.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            ImGui.SeparatorText("Miscellaneous");
+            foreach (var field in fields)
+            {
+              var colorField = field.GetValue(_settings.Colors);
+              var name = field.Name.PascalToWords();
+              if (colorField is Vector4 vec)
+              {
+                var numerics = ((Vector4)field.GetValue(_settings.Colors)).ToNumerics();
+                if (ImGui.ColorEdit4(name, ref numerics, 
+                      ImGuiColorEditFlags.AlphaBar | ImGuiColorEditFlags.HDR)) field.SetValue(_settings.Colors, numerics.ToVector4());
+              }
+            }
+            ImGui.EndChild();
           }
           ImGui.EndTabItem();
         }
         ImGui.EndTabBar();
       }
-      if (ImGui.Button("Cancel"))
+      var size = new System.Numerics.Vector2(ImGui.GetWindowWidth() * 0.15f, 20);
+      if (ImGui.Button("Cancel", size))
       {
         IsOpen = false;
       }
-      if (ImGui.Button("Save"))
+      ImGui.SameLine();
+
+      if (ImGui.Button("Save", size))
       {
         if (OnSaveSettings != null) OnSaveSettings();
         IsOpen = false;
