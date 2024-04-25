@@ -78,6 +78,7 @@ namespace Raven
       WindowManager.Renderables.Add(ShapeAnnotator);
 
       WindowManager.GetRenderable<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
+      Serializer.LoadStartup();
 
       AddComponent(new Utils.Components.CameraMoveComponent());
       AddComponent(new Utils.Components.CameraZoomComponent()); 
@@ -91,7 +92,6 @@ namespace Raven
       input.RegisterInputHandler(Rotator);
       input.RegisterInputHandler(GetComponent<SelectionRenderer>());
 
-      Serializer.LoadStartup();
 
       if (Settings.LastFiles.Count() == 0)
       {

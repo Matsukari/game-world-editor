@@ -124,8 +124,6 @@ namespace Raven
 
       View.OnInitialize(Settings);
 
-      // First tab in the list yet
-      if (_tabs.Count() == 1 || isSwitch) Switch(_tabs.Count()-1);
     }
   }
 
