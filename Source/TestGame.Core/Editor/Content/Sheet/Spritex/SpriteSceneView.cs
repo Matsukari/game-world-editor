@@ -149,8 +149,9 @@ namespace Raven
         }
         if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking && _startTransform.Count() == sels.Count()) 
         {
-          Core.GetGlobalManager<CommandManager>().Record(new SceneSpriteListTransformModifyCommand(sels, _startTransform), 
-              ()=>Selection.ContentBounds=sels.EnclosedBounds());
+          var command = new SceneSpriteListTransformModifyCommand(sels, _startTransform);
+          Core.GetGlobalManager<CommandManager>().Record(command, 
+              ()=>Selection.ContentBounds=command._sprites.EnclosedBounds());
         }
       }
       if (Mover.Capture is List<ISceneSprite> moving)

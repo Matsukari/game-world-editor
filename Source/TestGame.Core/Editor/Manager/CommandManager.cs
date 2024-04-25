@@ -4,7 +4,7 @@ namespace Raven
 {
   class SceneSpriteListTransformModifyCommand : Command
   {
-    List<ISceneSprite> _sprites;
+    internal readonly List<ISceneSprite> _sprites;
     List<Transform> _last;
     List<Transform> _start;
 
@@ -87,7 +87,7 @@ namespace Raven
   }
   class LevelMoveCommand : Command
   {
-    Level _level;
+    internal readonly Level _level;
     Vector2 _start;
     Vector2 _last;
 
