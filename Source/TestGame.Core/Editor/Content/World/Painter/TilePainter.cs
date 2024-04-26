@@ -57,8 +57,8 @@ namespace Raven
           // Rectangle painting
           if (_view.PaintType == PaintType.Rectangle)
           {
-            if (input.IsDragFirst) _mouseStart = Camera.MouseToWorldPoint();
-            if (input.IsDragLast) 
+            if (input.IsDragFirst && Nez.Input.LeftMouseButtonDown) _mouseStart = Camera.MouseToWorldPoint();
+            if (input.IsDragLast && Nez.Input.LeftMouseButtonReleased) 
             {
               var rect = new RectangleF(); 
               rect.Location = _mouseStart;
@@ -150,18 +150,19 @@ namespace Raven
         {
           case PaintType.Single: PaintPreviewAt(tilePos); break;
           case PaintType.Rectangle:
-            if (input.IsDrag)
+            if (Nez.Input.LeftMouseButtonDown && !input.IsDragFirst)
             {
               if (_view.PaintMode == PaintMode.Pen)
               {
-                for (float x = 0; x < input.MouseDragArea.Size.X; x+=sprite.Region.Size.X * Camera.RawZoom)
+                var dragArea = input.MouseDragArea.AlwaysPositive();
+                for (float x = 0; x < dragArea.Size.X; x+=sprite.Region.Size.X * Camera.RawZoom)
                 {
-                  for (float y = 0; y < input.MouseDragArea.Size.Y; y+=sprite.Region.Size.Y * Camera.RawZoom)
+                  for (float y = 0; y < dragArea.Size.Y; y+=sprite.Region.Size.Y * Camera.RawZoom)
                   {
                     ImGui.GetForegroundDrawList().AddImage(
                         Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
-                        (input.MouseDragArea.Location + new Vector2(x, y)).ToNumerics(), 
-                        (input.MouseDragArea.Location + new Vector2(x, y)).ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics() * Camera.RawZoom,
+                        (dragArea.Location + new Vector2(x, y)).ToNumerics(), 
+                        (dragArea.Location + new Vector2(x, y)).ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics() * Camera.RawZoom,
                         min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
                   }
                 }

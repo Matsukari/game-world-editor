@@ -75,7 +75,6 @@ namespace Raven
         MouseDragArea.Size = new Vector2(
             pos.X - MouseDragArea.X, 
             pos.Y - MouseDragArea.Y);
-        MouseDragArea = MouseDragArea.AlwaysPositive();
       }
       if (!IsDrag && (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed || Nez.Input.MiddleMouseButtonPressed))
       {

@@ -7,7 +7,7 @@ namespace TestGame
     public override void Initialize()
     {
       base.Initialize();
-			SetDesignResolution(1280, 720, SceneResolutionPolicy.None);      
+			SetDesignResolution(1280, 720, SceneResolutionPolicy.NoBorder);      
 			Screen.SetSize(1280, 720);
       Content.RootDirectory = "Assets";
        

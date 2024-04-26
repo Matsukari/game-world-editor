@@ -88,7 +88,7 @@ namespace Raven
       }
       if (ImGui.BeginPopup("world-options-popup"))
       {
-        if (ImGui.MenuItem(Icon.PlusSquare + "  Add level here"))
+        if (ImGui.MenuItem(Icon.ArrowDown + "  Add level here"))
         {
           _mouseWhenLevelAdd = Camera.MouseToWorldPoint();
           imgui.NameModal.Open((name)=> _world.CreateLevel(name).LocalOffset = _mouseWhenLevelAdd );

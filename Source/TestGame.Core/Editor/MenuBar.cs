@@ -121,11 +121,6 @@ namespace Raven
           }
         }
         ImGuiUtils.SpanX(40);
-        var play = Icon.Play;
-        if (ImGui.Button(play))
-        {
-
-        }
         if (ImGui.Button(Icon.Undo) || _editor.Settings.Hotkeys.Undo.IsPressed())
         {
           Core.GetGlobalManager<CommandManager>().Undo();
@@ -259,6 +254,11 @@ namespace Raven
         if (Widget.ImGuiWidget.ToggleButton(Icon.Dice, ref _isRandomPaint))
         {
           worldView.IsRandomPaint = !worldView.IsRandomPaint;
+        }
+
+        ImGuiUtils.SpanX(20);
+        if (ImGui.Button(Icon.Play))
+        {
         }
       }
 
