@@ -140,26 +140,19 @@ namespace Raven
     void DrawLayerOptions(Layer layer, ref Layer removeLayer)
     {
       // Options next to name
-      ImGui.SameLine();
-      ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(layer.Name).X - 140, 0f));
-      ImGui.SameLine();
-      ImGui.PushID($"level-{layer.Name}-id");
       var visibState = (!layer.IsVisible) ? Icon.EyeSlash : Icon.Eye;
-      if (ImGui.SmallButton(visibState))
-      {
-        layer.IsVisible = !layer.IsVisible;
-      }
-      ImGui.SameLine();
       var lockState = (!layer.IsLocked) ? Icon.LockOpen: Icon.Lock;
+
+      ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(layer.Name).X - 140));
+      ImGui.PushID($"level-{layer.Name}-id");
+      if (ImGui.SmallButton(visibState))
+        layer.IsVisible = !layer.IsVisible;
+      ImGui.SameLine();
       if (ImGui.SmallButton(lockState))
-      {
         layer.IsLocked = !layer.IsLocked;
-      }
       ImGui.SameLine();
       if (ImGui.SmallButton(Icon.Times))
-      {
         removeLayer = layer;
-      }
       ImGui.PopID();
 
     }

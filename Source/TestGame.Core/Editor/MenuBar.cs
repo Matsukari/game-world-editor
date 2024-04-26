@@ -202,7 +202,7 @@ namespace Raven
           fallback: null,
           color: EditorColors.Get(ImGuiCol.ButtonHovered));
 
-      if (_editor.ContentManager.View is WorldView worldView)
+      if (_editor.ContentManager.View is WorldView|| (_editor.ContentManager.View is SheetView sheetView && sheetView.SceneView.IsEditing))
       {
         // Geometry opeionts
         ImGuiUtils.SpanX(20);
@@ -211,13 +211,16 @@ namespace Raven
           ImGui.SameLine();
           var shapeInstance = shapeModel;
           var icon = shapeModel.Icon;
-          IPropertied context = worldView.World;
+          IPropertied context = (_editor.ContentManager.View is WorldView w) ? w.World : (_editor.ContentManager.View as SheetView).SceneView.SpriteScene;
           if (_editor.Selection.Capture is IPropertied prop) context = prop;
 
           // pressed; begin annotation
           if (ImGui.Button(icon)) _editor.ShapeAnnotator.Annotate(context, shapeInstance);
         }
+      }
 
+      if (_editor.ContentManager.View is WorldView worldView)
+      {
         ImGuiUtils.SpanX(20);
         Widget.ImGuiWidget.ToggleButtonGroup(
             ids: new []{Icon.PaintBrush, Icon.Eraser},

@@ -199,26 +199,17 @@ namespace Raven
     void DrawComponentOptions(ISceneSprite sprite, ref ISceneSprite removeSprite)
     {
       // Options next to name
-      ImGui.SameLine();
-      ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(sprite.Name).X - 140, 0f));
-      ImGui.SameLine();
-      ImGui.PushID($"spriteScene-component-{sprite.Name}-options");
       var visibState = (!sprite.IsVisible) ? Icon.EyeSlash : Icon.Eye;
-      if (ImGui.SmallButton(visibState))
-      {
-        sprite.IsVisible = !sprite.IsVisible;
-      }
-      ImGui.SameLine();
       var lockState = (!sprite.IsLocked) ? Icon.LockOpen: Icon.Lock;
-      if (ImGui.SmallButton(lockState))
-      {
-        sprite.IsLocked = !sprite.IsLocked;
-      }
+      var deleteState = Icon.Times;
+      ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(sprite.Name).X - 140));
+
+      ImGui.PushID($"spriteScene-component-{sprite.Name}-options");
+      if (ImGui.SmallButton(visibState)) sprite.IsVisible = !sprite.IsVisible;
       ImGui.SameLine();
-      if (ImGui.SmallButton(Icon.Times))
-      {
-        removeSprite = sprite;
-      }
+      if (ImGui.SmallButton(lockState)) sprite.IsLocked = !sprite.IsLocked;
+      ImGui.SameLine();
+      if (ImGui.SmallButton(deleteState)) removeSprite = sprite;
       ImGui.PopID();
 
     }

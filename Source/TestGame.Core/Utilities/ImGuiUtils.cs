@@ -8,6 +8,16 @@ namespace Raven
 {
   public class ImGuiUtils
   {
+    public static Vector2 CalcTextSizeHorizontal(params string[] texts)
+    {
+      Vector2 size = Vector2.Zero;
+      foreach (var text in texts)
+      {
+        size.X += ImGui.CalcTextSize(text).X;
+        size.Y = Math.Max(ImGui.CalcTextSize(text).Y, size.Y);
+      }
+      return size;
+    }
     public static void TabItem(string label, Action content)
     {
       if (ImGui.BeginTabItem(label))

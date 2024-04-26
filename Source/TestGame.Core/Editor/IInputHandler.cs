@@ -11,6 +11,8 @@ namespace Raven
 
     public bool CanHandleInput() => true;
 
+    public bool CanPassImGui() => false;
+
     public bool OnHandleInput(InputManager input) => false;
 
     /// <summary>

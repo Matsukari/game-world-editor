@@ -35,7 +35,22 @@ namespace Raven
     {
       HandleGuiDrags();
 
-      if (IsImGuiBlocking || Core.Scene == null) return;
+      if (Core.Scene == null) return;
+
+      if (IsImGuiBlocking)
+      {
+        for (int i = 0; i < _inputHandlers.Count; i++)
+        {
+          if (_inputHandlers[i].CanHandleInput() && _inputHandlers[i].CanPassImGui() && _inputHandlers[i].OnHandleInput(this)) 
+          {
+            for (int j = 0; j < _inputHandlers.Count; j++)
+            {
+              if (i != j && _inputHandlers[j].CanPassImGui()) _inputHandlers[j].OnInputBlocked(this);
+            }
+          }
+        }
+        return;
+      }
 
       for (int i = 0; i < _inputHandlers.Count; i++)
       {
@@ -59,7 +74,7 @@ namespace Raven
         MouseDragArea.Size = new Vector2(
             pos.X - MouseDragArea.X, 
             pos.Y - MouseDragArea.Y);
-        MouseDragArea = MouseDragArea.ConsumePoint(pos.ToVector2().ToNumerics());
+        MouseDragArea = MouseDragArea.AlwaysPositive();
       }
       if (!IsDrag && (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed || Nez.Input.MiddleMouseButtonPressed))
       {

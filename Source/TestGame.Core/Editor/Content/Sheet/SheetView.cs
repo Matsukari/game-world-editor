@@ -8,6 +8,7 @@ namespace Raven
   {
     public override IImGuiRenderable ImGuiHandler => _imgui;
     public override IInputHandler InputHandler => _input;
+    public SpriteSceneView SceneView => _scene;
     public Sheet Sheet { get => _sheet; }
  
     SheetViewImGui _imgui;

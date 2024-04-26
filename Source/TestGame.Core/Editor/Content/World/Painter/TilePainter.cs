@@ -61,6 +61,7 @@ namespace Raven
               var rect = new RectangleF(); 
               rect.Location = _mouseStart;
               rect.Size = Camera.MouseToWorldPoint() - _mouseStart;
+              rect = rect.AlwaysPositive();
 
               for (int x = 0; x < rect.Size.X; x+=sprite.Region.Size.X)
               {
@@ -98,6 +99,7 @@ namespace Raven
     }
     void PaintAtLayer(List<Tile> tilesToPaint, TileLayer tileLayer, Point tileInLayer)
     {
+      if (tilesToPaint.Count() == 0) return;
       var tileStart = tilesToPaint.First();
       for (int i = 0; i < tilesToPaint.Count(); i++)
       {
@@ -154,7 +156,7 @@ namespace Raven
             {
               ImGui.GetForegroundDrawList().AddRectFilled(
                   input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
-                  _view.Settings.Colors.PickFill.ToColor().Add(new Color(0.5f, 0.5f, 0.6f, 0.1f)).ToImColor());
+                  _view.Settings.Colors.PickFill.ToColor().Add(new Color(0.3f, 0.3f, 0.3f, 0.3f)).ToImColor());
             } 
             break;
         }

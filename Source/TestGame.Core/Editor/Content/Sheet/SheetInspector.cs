@@ -6,7 +6,7 @@ namespace Raven
 { 
 	public class SheetInspector : Widget.PropertiedWindow
 	{
-    public override string Name { get => Sheet.Name; set => Sheet.Name = value;}
+    public override string Name { get => Sheet.Name.BestWrap(); set => Sheet.Name = value;}
     public override PropertyList Properties { get => Sheet.Properties; set => Sheet.Properties = value; }
 
     public Sheet Sheet 

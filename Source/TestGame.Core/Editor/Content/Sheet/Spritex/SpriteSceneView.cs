@@ -108,7 +108,7 @@ namespace Raven
 
       foreach (var part in _multiSels)
       {
-        batcher.DrawRectOutline(camera, part.PlainBounds.AddTransform(part.SpriteScene.Transform), Settings.Colors.PickSelectedOutline.ToColor());
+        batcher.DrawRectOutline(camera, part.SceneBounds, Settings.Colors.PickSelectedOutline.ToColor());
       }
       batcher.DrawRect(_multiSelection, Settings.Colors.SelectionFill.ToColor());
       batcher.DrawRectOutline(camera, _multiSels.EnclosedBounds(), Settings.Colors.SelectionOutline.ToColor());
@@ -116,13 +116,15 @@ namespace Raven
 
       foreach (var part in _sceneInspector.SpriteScene.Parts)
       {
-        batcher.DrawCircle(part.PlainBounds.AddTransform(part.SpriteScene.Transform).Location, 4f/camera.RawZoom, Settings.Colors.OriginPoint.ToColor());
+        var origin = part.PlainBounds.AddTransform(part.SpriteScene.Transform);
+        origin.Size = new Vector2(4);
+        batcher.DrawRectOutline(camera, origin, Settings.Colors.OriginPoint.ToColor());
 
         batcher.DrawString(
             Graphics.Instance.BitmapFont, 
             part.Name,
             _renderer.GetPartWorldBounds(part).BottomLeft(),
-            color: Color.DarkGray, 
+            color: Settings.Colors.ShapeName.ToColor(), 
             rotation: 0f, 
             origin: Vector2.Zero, 
             scale: Math.Clamp(1f/camera.RawZoom, 1f, 10f), 
@@ -148,7 +150,7 @@ namespace Raven
           {
             _startTransform.Add(sels[i].Transform.Duplicate());
           }
-          Console.WriteLine("Got " + _startTransform.Count());
+          // Console.WriteLine("Got " + _startTransform.Count());
         }
         if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking && _startTransform.Count() == sels.Count()) 
         {
@@ -230,16 +232,28 @@ namespace Raven
       {
         _multiSelection = RectangleF.FromMinMax(Camera.ScreenToWorldPoint(input.MouseDragStart), mouse).AlwaysPositive();
 
-        foreach (var comp in SpriteScene.Parts)
+        if (_multiSelection.Size.X >= 10 || _multiSelection.Size.Y >= 10)
         {
-          if (_multiSelection.Intersects(comp.SceneBounds))
+          foreach (var comp in SpriteScene.Parts)
           {
-            if (_multiSels.Find(item => item.Name == comp.Name) == null)
-              _multiSels.AddIfNotPresent(comp);
+            if (_multiSelection.Intersects(comp.SceneBounds))
+            {
+              if (_multiSels.Find(item => item.Name == comp.Name) == null)
+                _multiSels.AddIfNotPresent(comp);
+            }
+            else 
+            {
+              _multiSels.RemoveAll(item => item.Name == comp.Name);
+            }
           }
-          else 
+        }
+        else
+        {
+          _multiSels.Clear();
+          var scene = SpriteScene.Parts.FindLast(item => item.SceneBounds.Intersects(_multiSelection));
+          if (scene != null)
           {
-            _multiSels.RemoveAll(item => item.Name == comp.Name);
+            _multiSels.Add(scene);
           }
         }
       }
