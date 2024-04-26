@@ -22,20 +22,20 @@ namespace Raven
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
 
+      ImGuiUtils.SpanX(20f);
 
-      ImGui.Dummy(new System.Numerics.Vector2(20f, 0f));
-
-      ImGui.SameLine();
-      ImGui.Dummy(new System.Numerics.Vector2(10, 0));
-      ImGui.SameLine();
       var zoom = (int)(_editor.Scene.Camera.RawZoom * 100);
-      ImGui.TextDisabled($"Zoom: {zoom}%%");
+      ImGui.SameLine();
+      if (ImGui.Button(Icon.SearchMinus)) _editor.Scene.Camera.RawZoom *= 0.5f;
+      ImGui.SameLine();
+      ImGui.SetNextItemWidth(40);
+      if (ImGui.DragInt("##1", ref zoom)) _editor.Scene.Camera.RawZoom = zoom / 100f;
+      ImGui.SameLine();
+      if (ImGui.Button(Icon.SearchPlus)) _editor.Scene.Camera.RawZoom *= 2f;
 
       if (_editor.ContentManager.View is SheetView sheetView)
       {
-        ImGui.SameLine();
-        ImGui.Dummy(new System.Numerics.Vector2(10, 0));
-        ImGui.SameLine();
+        ImGuiUtils.SpanX(10);
         ImGui.Text($"Tile: {sheetView.TileInMouse.Location.SimpleStringFormat()}");
       }
       else if (_editor.ContentManager.View is WorldView worldView)
