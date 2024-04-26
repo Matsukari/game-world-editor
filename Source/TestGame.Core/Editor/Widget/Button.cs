@@ -4,11 +4,14 @@ namespace Raven.Widget
 { 
   public partial class ImGuiWidget
   {
-    public static bool ToggleButton(string id, ref bool toggled, uint color)
+    public static bool ToggleButton(string id, ref bool toggled, uint color, bool textColor = true)
     { 
-      uint backgroundColor = toggled ? color : ImGui.GetColorU32(ImGuiCol.Button);
+      uint col = toggled ? color : ImGui.GetColorU32(ImGuiCol.Button);
 
-      ImGui.PushStyleColor(ImGuiCol.Button, backgroundColor);
+      if (textColor) 
+        ImGui.PushStyleColor(ImGuiCol.Text, toggled ? color : ImGui.GetColorU32(ImGuiCol.Text));
+      else 
+        ImGui.PushStyleColor(ImGuiCol.Button, col);
       var pressed = ImGui.Button(id);
       if (pressed)
         toggled = !toggled;
@@ -36,9 +39,9 @@ namespace Raven.Widget
         }
       }
     }
-    public static bool ToggleButton(string id, ref bool toggled) => ToggleButton(id, ref toggled, ImGui.GetColorU32(ImGuiCol.ButtonHovered));
+    public static bool ToggleButton(string id, ref bool toggled) => ToggleButton(id, ref toggled, ImGui.GetColorU32(ImGuiCol.ButtonActive));
 
-    public static bool DelegateToggleButton(string id, Action callback) => DelegateToogleButton(id, ImGui.GetColorU32(ImGuiCol.ButtonHovered), callback);
+    public static bool DelegateToggleButton(string id, Action callback) => DelegateToogleButton(id, ImGui.GetColorU32(ImGuiCol.ButtonActive), callback);
 
     public static void TextTooltip(string descr)
     {

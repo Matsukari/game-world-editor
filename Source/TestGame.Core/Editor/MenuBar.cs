@@ -150,11 +150,19 @@ namespace Raven
       for (int i = 0; i < tabs.Count(); i++)
       {
         var open = true;
+
+        ImGui.PushStyleColor(ImGuiCol.Text, (i == _editor.ContentManager.CurrentIndex) ? EditorColors.Get(ImGuiCol.Text) : EditorColors.Get(ImGuiCol.TextDisabled));
         if (ImGui.BeginTabItem(tabs[i].Content.Name.BestWrap(), ref open))
         {
+          var bottomLeft = new System.Numerics.Vector2();
+          bottomLeft.X = ImGui.GetItemRectMin().X;
+          bottomLeft.Y = ImGui.GetItemRectMax().Y;
+          ImGui.GetWindowDrawList().AddRect(bottomLeft, 
+              bottomLeft + new System.Numerics.Vector2(ImGui.GetItemRectSize().X, 2), _editor.Settings.Colors.Accent.ToImColor());
           if (_editor.ContentManager.Content.Name != tabs[i].Content.Name) _editor.ContentManager.Switch(i);
           ImGui.EndTabItem();
         }
+        ImGui.PopStyleColor();
         if (!open)
         {
           remove = i;
@@ -165,7 +173,9 @@ namespace Raven
       ImGui.EndTabBar();
 
       // Start of tools bar
+      ImGui.PushStyleColor(ImGuiCol.WindowBg, _editor.Settings.Colors.ToolbarBg.ToImColor());
       BeginStackBar("tools-bar", 37);
+      ImGui.PopStyleColor();
 
       ImGuiUtils.SpanX(270);
       Widget.ImGuiWidget.ToggleButtonGroup(
@@ -179,7 +189,7 @@ namespace Raven
           ()=>_editor.Operator = EditorOperator.Rotator,           
           },
           fallback: null,
-          color: EditorColors.Get(ImGuiCol.ButtonHovered));
+          color: EditorColors.Get(ImGuiCol.ButtonActive));
 
       ImGuiUtils.SpanX(10);
       var gridToggle = (_editor.ContentManager.View is WorldView world) ? _editor.Settings.Graphics.DrawLayerGrid : _editor.Settings.Graphics.DrawSheetGrid; 
@@ -200,7 +210,7 @@ namespace Raven
           ()=>{}, 
           },
           fallback: null,
-          color: EditorColors.Get(ImGuiCol.ButtonHovered));
+          color: EditorColors.Get(ImGuiCol.ButtonActive));
 
       if (_editor.ContentManager.View is WorldView|| (_editor.ContentManager.View is SheetView sheetView && sheetView.SceneView.IsEditing))
       {
@@ -230,7 +240,7 @@ namespace Raven
               ()=>{worldView.PaintMode = PaintMode.Eraser; }, 
             },
             fallback: null,
-            color: EditorColors.Get(ImGuiCol.ButtonHovered));
+            color: EditorColors.Get(ImGuiCol.ButtonActive));
 
 
         Widget.ImGuiWidget.ToggleButtonGroup(
@@ -242,7 +252,7 @@ namespace Raven
               ()=>{worldView.PaintType = PaintType.Fill; }, 
             },
             fallback: ()=>{worldView.PaintType = PaintType.Single;},
-            color: EditorColors.Get(ImGuiCol.ButtonHovered));
+            color: EditorColors.Get(ImGuiCol.ButtonActive));
 
         ImGui.SameLine();
 
@@ -252,7 +262,9 @@ namespace Raven
         }
       }
 
+
       DrawSnappingPopup();
+
 
       ImGui.End();
     }

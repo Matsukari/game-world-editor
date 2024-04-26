@@ -9,6 +9,7 @@ namespace Raven
     public Vector4 Accent = new Vector4(0.561f, 0.386f, 0.712f, 1f); 
     public Vector4 Background = new Vector4(0.15f, 0.15f, 0.15f, 1f);
 
+    public Vector4 ToolbarBg = new Vector4(0.561f, 0.386f, 0.712f, 1f); 
 
     // Animation colors
     public uint FrameInactive { get => Get(ImGuiCol.TextDisabled); }

@@ -2,6 +2,7 @@
 using ImGuiNET;
 using Nez;
 using Microsoft.Xna.Framework;
+using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
@@ -30,11 +31,6 @@ namespace Raven
       var zoom = (int)(_editor.Scene.Camera.RawZoom * 100);
       ImGui.TextDisabled($"Zoom: {zoom}%%");
 
-      // ImGui.SameLine();
-      // ImGui.Dummy(new System.Numerics.Vector2(10, 0));
-      // ImGui.SameLine();
-      // ImGui.TextDisabled($"State: {_editor.EditState}");
-
       if (_editor.ContentManager.View is SheetView sheetView)
       {
         ImGui.SameLine();
@@ -52,7 +48,14 @@ namespace Raven
           ImGui.Text($"Paint {worldView.PaintMode} > {worldView.PaintType}");
         }
       }
-    
+
+      if (!InputManager.IsImGuiBlocking)
+      {
+        ImGui.GetWindowDrawList().AddRectFilled(
+            ImGui.GetWindowPos(), 
+            ImGui.GetWindowPos() + new System.Numerics.Vector2(ImGui.GetWindowSize().X, 1), _editor.Settings.Colors.Accent.ToImColor());
+      }
+
       ImGui.End();
     }
   }
