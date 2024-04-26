@@ -17,6 +17,7 @@ namespace Raven
     public int MouseDragButton = -1; 
     public RectangleF MouseDragArea = new RectangleF();
     public Num.Vector2 MouseDragStart = new Num.Vector2();
+    public Num.Vector2 MouseDragStartInWorld = new Num.Vector2();
     public Camera Camera { get => Core.Scene.Camera; }
 
     public List<IInputHandler> InputHandlers { get => _inputHandlers; }

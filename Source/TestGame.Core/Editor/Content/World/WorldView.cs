@@ -109,7 +109,7 @@ namespace Raven
           }
           WorldRenderer.RenderLayer(batcher, camera, layer, color);
 
-          if (mouseInLayer && !Selection.HasBegun())
+          if (mouseInLayer && !Selection.HasBegun() && Nez.Input.LeftMouseButtonReleased)
           {
             enterLayer = true;
             _imgui.SelectedLevel = i;

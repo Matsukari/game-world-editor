@@ -26,21 +26,23 @@ namespace Raven
       if (layer == null) return false;
 
       // Handles spriteScene
-      if (Nez.Input.LeftMouseButtonPressed 
-          && layer is FreeformLayer freeformLayer 
-          && _view.SpritePicker.SelectedSprite is SpriteScene spriteScene)
+      if (Nez.Input.LeftMouseButtonPressed && layer is FreeformLayer freeformLayer)
       {
-
-        if (_view.PaintType == PaintType.Single)
-          PaintSpriteScene(freeformLayer, spriteScene);
+        if (_view.SpritePicker.SelectedSprite is SpriteScene spriteScene)
+        {
+          if (_view.PaintType == PaintType.Single)
+            PaintSpriteScene(freeformLayer, spriteScene);
+        }
+        else if (_view.PaintMode == PaintMode.Eraser)
+          PaintSpriteScene(freeformLayer, null);
 
         return true;
       }
 
       // Handles tile and sprites
-      else if (
-             layer is TileLayer tileLayer
-          && _view.SpritePicker.SelectedSprite is Sprite sprite)
+      else if (layer is TileLayer tileLayer)
+      {
+        if (_view.SpritePicker.SelectedSprite is Sprite sprite)
         {
           var spriteCenter = Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
           var tilesToPaint = sprite.GetRectTiles();
@@ -95,6 +97,7 @@ namespace Raven
             }
           }
         }
+      }
       return false;
     }
     void PaintAtLayer(List<Tile> tilesToPaint, TileLayer tileLayer, Point tileInLayer)
@@ -122,10 +125,6 @@ namespace Raven
         freeformLayer.RemoveSpriteSceneAt(Camera.MouseToWorldPoint());
       }
     }
-    void PaintTile(Point coord)
-    {
-
-    }
     public override void OnHandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<InputManager>();
@@ -138,7 +137,6 @@ namespace Raven
         var tilePos = rawMouse; 
         void PaintPreviewAt(System.Numerics.Vector2 screenPos)
         { 
-
           ImGui.GetForegroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
               screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom, 
@@ -152,12 +150,32 @@ namespace Raven
         {
           case PaintType.Single: PaintPreviewAt(tilePos); break;
           case PaintType.Rectangle:
-            if (input.IsDrag && !input.IsDragFirst)
+            if (input.IsDrag)
             {
-              ImGui.GetForegroundDrawList().AddRectFilled(
-                  input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
-                  _view.Settings.Colors.PickFill.ToColor().Add(new Color(0.3f, 0.3f, 0.3f, 0.3f)).ToImColor());
-            } 
+              if (_view.PaintMode == PaintMode.Pen)
+              {
+                for (float x = 0; x < input.MouseDragArea.Size.X; x+=sprite.Region.Size.X * Camera.RawZoom)
+                {
+                  for (float y = 0; y < input.MouseDragArea.Size.Y; y+=sprite.Region.Size.Y * Camera.RawZoom)
+                  {
+                    ImGui.GetForegroundDrawList().AddImage(
+                        Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
+                        (input.MouseDragArea.Location + new Vector2(x, y)).ToNumerics(), 
+                        (input.MouseDragArea.Location + new Vector2(x, y)).ToNumerics() + sprite.Region.Size.ToVector2().ToNumerics() * Camera.RawZoom,
+                        min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+                  }
+                }
+              }
+              else
+              {
+                ImGui.GetBackgroundDrawList().AddRectFilled(
+                    input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
+                    _view.Settings.Colors.PickFill.ToColor().ToImColor());
+                ImGui.GetBackgroundDrawList().AddRect(
+                    input.MouseDragArea.Location.ToNumerics(), input.MouseDragArea.Max.ToNumerics(), 
+                    _view.Settings.Colors.PickHoverOutline.ToColor().ToImColor());
+              } 
+            }
             break;
         }
       }
