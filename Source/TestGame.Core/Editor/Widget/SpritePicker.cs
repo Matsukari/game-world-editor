@@ -135,7 +135,10 @@ namespace Raven
           {
             if (SelectedSprite is Sprite sprite)
             {
-              if (sprite.Region.Contains(mouse)) IsHoverSelected = true;
+              if (sprite.Region.Contains(mouse)) 
+              {
+                IsHoverSelected = true;
+              }
               var regionWorld = TranslateToWorld(sprite.Region.ToRectangleF());
               ImGui.GetWindowDrawList().AddRectFilled(
                   (regionWorld.Location).ToNumerics(), 

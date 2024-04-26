@@ -19,27 +19,9 @@ namespace Raven
 
       if (SelectedSprite is Sprite || SelectedSprite is AnimatedSprite)
       {
-
-        // var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
-        // var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
-        // var tilePos = rawMouse.ToVector2().RoundFloor(sprite.TileSize).ToNumerics(); 
-        // var tilesToPaint = sprite.GetRectTiles();
-        //
-        // void PaintPreviewAt(System.Numerics.Vector2 screenPos)
-        // { 
-        //   ImGui.GetForegroundDrawList().AddImage(
-        //       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
-        //       screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom, 
-        //       screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom + sprite.Region.Size.ToVector2().ToNumerics() 
-        //       * Camera.RawZoom,
-        //       min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
-        //
-        // }
-
-
         if (IsHoverSelected && Nez.Input.LeftMouseButtonDown) _isStartDrag = true;
 
-        if (_isStartDrag && input.IsDrag)
+        if (_isStartDrag && Nez.Input.LeftMouseButtonDown)
         {
           Sprite sprite = null;
           if (SelectedSprite is Sprite s) sprite = s;

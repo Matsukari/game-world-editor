@@ -103,8 +103,8 @@ namespace Raven
       _popups.Update(SelectedLevelInspector?.CurrentLayer);
       (_popups as IImGuiRenderable).Render(imgui);
 
-      RenderAnnotations(_world, Settings);
-      if (SelectedLevelInspector != null) RenderAnnotations(SelectedLevelInspector.Level, Settings);
+      RenderAnnotations(_world);
+      if (SelectedLevelInspector != null) RenderAnnotations(SelectedLevelInspector.Level);
     }
   }
 }

@@ -36,7 +36,8 @@ namespace Raven
     public override void OutRender(ImGuiWinManager imgui)
     {
       DrawOptions();
-      DrawAnimationOptionPopup();
+      DrawAnimationOptionPopup();  
+
     }
         
     public static bool RenderSprite(ImGuiWinManager imgui, ISceneSprite sprite, bool drawName = true)

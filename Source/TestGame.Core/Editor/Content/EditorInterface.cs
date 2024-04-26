@@ -29,12 +29,12 @@ namespace Raven
       Mover = editor.Mover;
       Rotator = editor.Rotator;
     }
-    protected void RenderAnnotations(IPropertied propertied, EditorSettings settings)
+    protected void RenderAnnotations(IPropertied propertied)
     {
       foreach (var shape in propertied.Properties)
       {
         if (shape.Value is ShapeModel model)
-          model.Render(ImGuiNET.ImGui.GetBackgroundDrawList(), Camera, settings.Colors.ShapeInactive.ToColor(), settings.Colors.ShapeOutlineActive.ToColor()); 
+          model.Render(ImGuiNET.ImGui.GetBackgroundDrawList(), Camera, Settings.Colors.ShapeInactive.ToColor(), Settings.Colors.ShapeOutlineActive.ToColor()); 
       }
     }
     public override bool Equals(object obj)

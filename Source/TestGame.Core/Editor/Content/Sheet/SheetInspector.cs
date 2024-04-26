@@ -42,11 +42,7 @@ namespace Raven
     {
       _settings = settings;
       SpritePicker = new SpriteSceneSpritePicker(camera);
-    }
-    public override void Render(ImGuiWinManager imgui)
-    {
       SpritePicker.EnableReselect = false;
-      base.Render(imgui);
     }
     public override string GetIcon()
     {
@@ -55,7 +51,7 @@ namespace Raven
     protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       int w = Sheet.TileWidth, h = Sheet.TileHeight;
-      ImGui.LabelText(Icon.File + " File", Sheet.Source);
+      ImGui.LabelText("File", Sheet.Source.BestWrap());
       if (ImGui.InputInt("Tile Width", ref w)) Sheet.SetTileSize(w, Sheet.TileHeight);
       if (ImGui.InputInt("Tile Height", ref h)) Sheet.SetTileSize(Sheet.TileWidth, h);
 

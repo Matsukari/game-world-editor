@@ -23,6 +23,7 @@ namespace Raven.Widget
 
     protected bool _isOpen = true;
 
+    public event Action<ImGuiWinManager> RenderAttachments;
     public event Action OnClose;
     public event Action OnOpen;
 
@@ -56,6 +57,9 @@ namespace Raven.Widget
       ImGui.End();  
 
       OutRender(imgui);
+
+      if (RenderAttachments != null)
+        RenderAttachments(imgui);
     }
   }
 }

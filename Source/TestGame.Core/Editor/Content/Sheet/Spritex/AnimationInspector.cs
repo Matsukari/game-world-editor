@@ -20,6 +20,7 @@ namespace Raven
     {
       _animEditor = animEditor;
       NoClose = false;
+      Flags |= ImGuiWindowFlags.AlwaysVerticalScrollbar;
     }
     public override void Render(ImGuiWinManager imgui)
     {

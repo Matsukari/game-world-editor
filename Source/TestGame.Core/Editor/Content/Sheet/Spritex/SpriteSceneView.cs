@@ -49,6 +49,7 @@ namespace Raven
 
       // Prepare
       _sceneInspector = new SpriteSceneInspector(spriteScene);
+      _sceneInspector.RenderAttachments += imgui => RenderAnnotations(SpriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => 
       {
         if (anim is AnimatedSprite animatedSprite)
