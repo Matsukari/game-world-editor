@@ -72,10 +72,12 @@ namespace Raven
       Rotator.RenderLayer = -1;
 
       WindowManager = new ImGuiWinManager();
-      WindowManager.Renderables.Add(new Settings(Settings));
-      WindowManager.Renderables.Add(new StatusBar(this));
-      WindowManager.Renderables.Add(new Menubar(this));
-      WindowManager.Renderables.Add(ShapeAnnotator);
+      WindowManager.AddImmediate(new Settings(Settings));
+      WindowManager.AddImmediate(new StatusBar(this));
+      WindowManager.AddImmediate(new Menubar(this));
+      WindowManager.AddImmediate(ShapeAnnotator);
+      WindowManager.AddImmediate(new WindowHolder("Content"), "main");
+      WindowManager.AddImmediate(new WindowHolder("Inspector"), "sub");
 
       WindowManager.GetRenderable<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
       Serializer.LoadStartup();

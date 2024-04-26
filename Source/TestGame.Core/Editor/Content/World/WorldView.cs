@@ -71,6 +71,7 @@ namespace Raven
       _initialPos = instance.Props.Transform.Position;
       _imgui.SceneInstanceInspector.Scene = instance;
       _imgui.SceneInstanceInspector.Layer = layer as FreeformLayer;
+      _imgui._objHolder.Content = _imgui.SceneInstanceInspector;
     }
     void OnLeftClickLevel(Level level, int i)
     {

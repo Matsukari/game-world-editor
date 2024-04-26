@@ -12,7 +12,8 @@ namespace Raven
   {
     public override string Name { get => SpriteScene.Name; set => SpriteScene.Name = value; }
     public override PropertyList Properties { get => SpriteScene.Properties; set => SpriteScene.Properties = value; }
-    
+    public override bool CanOpen => SpriteScene != null;
+
     public ISceneSprite ChangePart = null;
     ISceneSprite  _spriteScenePart;
     // Gui state data
@@ -32,12 +33,12 @@ namespace Raven
     {
       SpriteScene = spriteScene;
     }
-    public override void Render(ImGuiWinManager imgui)
+    public override void OutRender(ImGuiWinManager imgui)
     {
-      if (SpriteScene != null) base.Render(imgui);
       DrawOptions();
       DrawAnimationOptionPopup();
     }
+        
     public static bool RenderSprite(ImGuiWinManager imgui, ISceneSprite sprite, bool drawName = true)
     {
       string name = sprite.Name;
@@ -262,7 +263,7 @@ namespace Raven
     bool _isOpenAnimationOperations = false;
     Animation _onOpenAnimtaionOperations;
 
-    protected override void OnRenderAfterName()
+    protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       _selectedSprites.EqualFalseRange(SpriteScene.Parts.Count());      
       _selectedAnims.EqualFalseRange(SpriteScene.Animations.Count());
@@ -339,7 +340,7 @@ namespace Raven
           if (spriteNode)
           {
             ImGui.PushID("spriteScene-component-content-" + part.Name);
-            if (RenderSprite(ImGuiManager, part)) OnModifiedPart(part);
+            if (RenderSprite(imgui, part)) OnModifiedPart(part);
             ImGui.PopID();
 
             ImGui.TreePop();

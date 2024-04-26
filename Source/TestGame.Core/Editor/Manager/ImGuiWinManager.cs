@@ -4,60 +4,72 @@ namespace Raven
  
 	public class ImGuiWinManager
   {
-    public List<IImGuiRenderable> Renderables = new List<IImGuiRenderable>();
+    public class Entry
+    {
+      public string Tag = "";
+      public IImGuiRenderable Renderable;
+      public Entry(IImGuiRenderable renderable) => Renderable = renderable;
+    }
+    public List<Entry> Renderables = new List<Entry>();
+
     public Widget.FilePicker FilePicker = new Widget.FilePicker();
     public Widget.NameModal NameModal = new Widget.NameModal();
     public Widget.ConfirmModal ConfirmModal = new Widget.ConfirmModal();
 
-    List<IImGuiRenderable> _renderablesToAdd = new List<IImGuiRenderable>();
-    List<IImGuiRenderable> _renderablesToRemove = new List<IImGuiRenderable>();
+    List<IImGuiRenderable> _entrysToAdd = new List<IImGuiRenderable>();
+    List<IImGuiRenderable> _entrysToRemove = new List<IImGuiRenderable>();
 
-    public IImGuiRenderable ContentRenderable;
+    public void AddImmediate(IImGuiRenderable renderable, string tag="")
+    {
+      var entry = new Entry(renderable);
+      entry.Tag = tag;
+      Renderables.Add(entry);
+    }
+    public T GetRenderable<T>(string tag) where T: IImGuiRenderable => (T)Renderables.Find(item => item.Tag == tag).Renderable;
 
     public T GetRenderable<T>() 
     {
-      foreach (var window in Renderables) 
+      foreach (var entry in Renderables) 
       {
-        if (window is T windowType) return windowType;
+        if (entry.Renderable is T windowType) return windowType;
       }
       throw new Exception();
     }
     public void AddRenderable(IImGuiRenderable guiRenderable)
     {
       if (guiRenderable != null) 
-        _renderablesToAdd.Add(guiRenderable);
+        _entrysToAdd.Add(guiRenderable);
     }
     public void RemoveRenderable(IImGuiRenderable guiRenderable)
     {
       if (guiRenderable != null) 
-        _renderablesToRemove.Add(guiRenderable);
+        _entrysToRemove.Add(guiRenderable);
     }
     public void Render()
     {
-      foreach (var renderableToRemove in _renderablesToRemove)
+      foreach (var entryToRemove in _entrysToRemove)
       {
         // Console.WriteLine($"Attempting to remove: {Renderables.Count}");
-        Renderables.Remove(renderableToRemove);
+        Renderables.RemoveAll(item => item.Renderable == entryToRemove);
         // Console.WriteLine($"After: {Renderables.Count}");
       }
-      _renderablesToRemove.Clear();
+      _entrysToRemove.Clear();
 
-      foreach (var renderableToAdd in _renderablesToAdd)
+      foreach (var entryToAdd in _entrysToAdd)
       {
-        if (Renderables.Contains(renderableToAdd)) continue;
-        Renderables.Add(renderableToAdd);
+        if (Renderables.Find(item => item.Renderable == entryToAdd) != null) continue;
+        Renderables.Add(new Entry(entryToAdd));
       }
-      _renderablesToAdd.Clear();
+      _entrysToAdd.Clear();
 
-      foreach (var renderable in Renderables) 
+      foreach (var entry in Renderables) 
       {
-        if (renderable.IsVisible())
+        if (entry.Renderable.IsVisible())
         {
-          renderable.Render(this);
+          entry.Renderable.Render(this);
         }
       }
 
-      if (ContentRenderable != null) ContentRenderable.Render(this);
       FilePicker.Draw(this);
       NameModal.Draw();
       ConfirmModal.Draw();

@@ -30,6 +30,7 @@ namespace Raven
     public bool ShowPicker = false;
     public SpriteSceneSpritePicker SpritePicker;
     readonly internal EditorSettings _settings;
+    public override bool CanOpen => Sheet != null;
 
     public event Action<AnimatedSprite> OnClickAnimation;
     public event Action<AnimatedSprite> OnDeleteAnimation;
@@ -45,13 +46,13 @@ namespace Raven
     public override void Render(ImGuiWinManager imgui)
     {
       SpritePicker.EnableReselect = false;
-      if (Sheet != null) base.Render(imgui);
+      base.Render(imgui);
     }
     public override string GetIcon()
     {
       return IconFonts.FontAwesome5.ThLarge;
     }
-    protected override void OnRenderAfterName()
+    protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       int w = Sheet.TileWidth, h = Sheet.TileHeight;
       ImGui.LabelText(Icon.File + " File", Sheet.Source);
@@ -120,7 +121,7 @@ namespace Raven
       {
         if (ImGui.MenuItem(Icon.Pen + "   Rename"))
         {
-          ImGuiManager.NameModal.Open((name)=>{Sheet.Animations.Find(item => item.Name == _animOnOption.Name).Name = name;});
+          imgui.NameModal.Open((name)=>{Sheet.Animations.Find(item => item.Name == _animOnOption.Name).Name = name;});
         }
         if (ImGui.MenuItem(Icon.Trash + "   Delete"))
         {
@@ -162,7 +163,7 @@ namespace Raven
       {
         if (ImGui.MenuItem(Icon.Pen + "   Rename"))
         {
-          ImGuiManager.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
+          imgui.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
         }
         if (ImGui.MenuItem(Icon.Trash + "   Delete"))
         {

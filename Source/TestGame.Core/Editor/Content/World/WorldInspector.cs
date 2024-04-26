@@ -45,7 +45,7 @@ namespace Raven
         ImGui.EndPopup();
       }
     }    
-    protected override void OnRenderAfterName()
+    protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       ImGui.BeginDisabled();
       ImGui.LabelText("Position", $"{World.Bounds.Location}");

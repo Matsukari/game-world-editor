@@ -10,7 +10,7 @@ namespace Raven
     AnimationEditor _animEditor;
     public AnimationPlayer Animator;
     public Animation Animation { get => Animator.Animation; }
-    public bool CanOpen { get => 
+    public override bool CanOpen { get => 
         !(   Animator == null 
           || Animation == null 
           || _animEditor.SpriteScene.Animations.Find(item => item.Name == _animEditor.Animation.Name) == null); 
@@ -18,7 +18,6 @@ namespace Raven
 
     public AnimationInspector(AnimationEditor animEditor) 
     {
-      Name = GetType().Name;
       _animEditor = animEditor;
       NoClose = false;
     }

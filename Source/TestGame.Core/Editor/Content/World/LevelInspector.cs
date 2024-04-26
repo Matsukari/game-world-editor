@@ -7,6 +7,7 @@ namespace Raven
   {
     public override string Name { get => Level.Name; set => Level.Name = value;}
     public override PropertyList Properties { get => Level.Properties; set => Level.Properties = value; }
+        
     public readonly Level Level;
     public bool Selected = false;
 
@@ -19,9 +20,8 @@ namespace Raven
     public override string GetIcon() => Icon.ObjectGroup;
     public override string GetName() => "Level";   
 
-    public override void Render(ImGuiWinManager imgui)
+    public override void OutRender(ImGuiWinManager imgui)
     {
-      base.Render(imgui);
       DrawLayerOptionsPopup();
       DrawLayerHeaderPopup();
     }
@@ -204,7 +204,7 @@ namespace Raven
     Layer _layerOnOptions = null;
     bool _isOpenLayerHeaderPopup = false;
     bool _isOpenLayerOptionPopup = false;
-    protected override void OnRenderAfterName()
+    protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       SyncLayersGui();
       DrawLevelContent();

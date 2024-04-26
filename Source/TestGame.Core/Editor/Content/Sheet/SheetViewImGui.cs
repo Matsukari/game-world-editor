@@ -11,7 +11,6 @@ namespace Raven
     public readonly SheetViewPopup Popups;
     public SpriteSceneView SceneView;
     public SpriteAnimationEditor SpriteAnimEditor;
-    public SheetObjectInspector ObjectInspector = new SheetObjectInspector();
     TileInspector _tileInspector = new TileInspector();
     SpriteInspector _spriteInspector = new SpriteInspector();
 
@@ -47,14 +46,15 @@ namespace Raven
     void IImGuiRenderable.Render(ImGuiWinManager imgui)
     {
       Inspector.Sheet = _sheet;
-      Inspector.Render(imgui);
+      imgui.GetRenderable<WindowHolder>("main").Content = Inspector;
 
       var animEditor = SpriteAnimEditor as IImGuiRenderable;
       animEditor.Render(imgui);
 
+      var windowHolder = imgui.GetRenderable<WindowHolder>("sub"); 
       if (SceneView != null && SceneView.IsEditing)
       {
-        SceneView.SceneInspector.Render(imgui);
+        windowHolder.Content = SceneView.SceneInspector;
         SceneView.AnnotatorPane.Render(imgui);
         (SceneView.AnimationEditor as IImGuiRenderable).Render(imgui);
         return;
@@ -65,10 +65,8 @@ namespace Raven
         _tileInspector.Tile = _list.Selections.Last() as Tile;
         _spriteInspector.Sprite = _list.Selections.Last() as Sprite;
 
-        if (_tileInspector.Tile != null) ObjectInspector.Inspector = _tileInspector;
-        else if (_spriteInspector.Sprite != null) ObjectInspector.Inspector = _spriteInspector;
-
-        ObjectInspector.Render(imgui);
+        if (_tileInspector.Tile != null) windowHolder.Content = _tileInspector;
+        else if (_spriteInspector.Sprite != null) windowHolder.Content = _spriteInspector;
       }
 
 

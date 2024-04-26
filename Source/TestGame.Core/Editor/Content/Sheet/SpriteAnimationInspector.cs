@@ -3,7 +3,6 @@
 using Microsoft.Xna.Framework;
 using ImGuiNET;
 using Icon = IconFonts.FontAwesome5;
-using Nez;
 
 namespace Raven
 {
@@ -12,7 +11,7 @@ namespace Raven
     SpriteAnimationEditor _animEditor;
     public AnimationPlayer Animator;
     public AnimatedSprite Animation { get => Animator.Animation as AnimatedSprite; }
-    public bool CanOpen { get => 
+    public override bool CanOpen { get => 
       (  
        Animator != null 
        && Animation != null 
@@ -25,7 +24,6 @@ namespace Raven
 
     public SpriteAnimationInspector(SpriteAnimationEditor animEditor) 
     {
-      Name = GetType().Name;
       _animEditor = animEditor;
       NoClose = false;
     }

@@ -5,7 +5,6 @@ namespace Raven.Widget
 {
   public class Window : IImGuiRenderable
   {
-    public string Name = "";
     public ImGuiWindowFlags Flags = ImGuiWindowFlags.None;
     public RectangleF Bounds = new RectangleF();
     public bool IsOpen 
@@ -19,6 +18,7 @@ namespace Raven.Widget
         else if (OnClose != null) OnClose();
       }
     }
+    public virtual bool CanOpen => true;
     public bool NoClose = true;
 
     protected bool _isOpen = true;
@@ -26,30 +26,36 @@ namespace Raven.Widget
     public event Action OnClose;
     public event Action OnOpen;
 
-    public Window() => Name = GetType().Name
-      ;
+    public virtual string GetIcon() => "";
+
+    public virtual string GetName() => GetType().Name;
+
     public virtual void OnRender(ImGuiWinManager imgui) {}
 
-    public virtual void OnHovered() {}
+    public virtual void OnHovered(ImGuiWinManager imgui) {}
+
+    public virtual void OutRender(ImGuiWinManager imgui) {}
 
     public virtual void Render(ImGuiWinManager imgui)
     {
-      if (!IsOpen) return;
+      if (!IsOpen || !CanOpen) return;
 
       if (NoClose) 
-        ImGui.Begin(Name, Flags);
+        ImGui.Begin(GetName(), Flags);
       else 
-        ImGui.Begin(Name, ref _isOpen, Flags);
+        ImGui.Begin(GetName(), ref _isOpen, Flags);
 
       if (ImGui.IsWindowHovered()) 
       {
-        OnHovered();
+        OnHovered(imgui);
         ImGui.SetWindowFocus();
       }
       Bounds.Location = ImGui.GetWindowPos();
       Bounds.Size = ImGui.GetWindowSize();
       OnRender(imgui);
       ImGui.End();  
+
+      OutRender(imgui);
     }
   }
 }

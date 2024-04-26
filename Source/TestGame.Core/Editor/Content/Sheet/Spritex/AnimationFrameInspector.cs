@@ -6,6 +6,7 @@ namespace Raven
   {
     public override string Name { get => Frame.Name; set => Frame.Name = value;}
     public override PropertyList Properties { get => Frame.Properties; set => Frame.Properties = value; }
+    public override bool CanOpen => Animator != null;
 
     AnimationEditor _animEditor;
     public AnimationPlayer Animator;
@@ -17,16 +18,12 @@ namespace Raven
       _animEditor = animEditor;
       NoClose = false;
     } 
-    public override void Render(ImGuiWinManager imgui)
-    {
-      if (Animator != null) base.Render(imgui);
-    }
-    protected override void OnRenderAfterName()
+    protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       ImGui.LabelText("Frame", Animator.CurrentIndex.ToString());
       ImGui.InputFloat("Duration", ref Frame.Duration);
       // FramePart.Transform.RenderImGui();
-      SpriteSceneInspector.RenderSprite(ImGuiManager, FramePart, false);
+      SpriteSceneInspector.RenderSprite(imgui, FramePart, false);
     }
   }
 }

@@ -6,6 +6,8 @@ namespace Raven
   {
     public override string Name { get => Sprite.Name; set => Sprite.Name = value;}
     public override PropertyList Properties { get => Sprite.Properties; set => Sprite.Properties = value; }
+    public override bool CanOpen => Sprite != null;
+     
 
     public Sprite Sprite;
     public override void Render(ImGuiWinManager imgui)
@@ -36,7 +38,7 @@ namespace Raven
         existingTile.Name = curr;
       }
     } 
-    protected override void OnRenderAfterName()
+    protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       ImGui.BeginDisabled();
       ImGui.LabelText("Tiles", Sprite._tiles.Count.ToString());
