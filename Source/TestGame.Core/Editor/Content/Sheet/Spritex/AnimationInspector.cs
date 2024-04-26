@@ -20,7 +20,7 @@ namespace Raven
     {
       _animEditor = animEditor;
       NoClose = false;
-      Flags |= ImGuiWindowFlags.AlwaysVerticalScrollbar;
+      Flags |= ImGuiWindowFlags.AlwaysHorizontalScrollbar;
     }
     public override void Render(ImGuiWinManager imgui)
     {
@@ -120,7 +120,7 @@ namespace Raven
     void DrawComponentsTrack()
     {
       ImGui.PushStyleVar(ImGuiStyleVar.FramePadding, new System.Numerics.Vector2(2, 2));
-      if (ImGui.BeginTable("##split", 2, ImGuiTableFlags.BordersOuter | ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY))
+      if (ImGui.BeginTable("##split", 2, ImGuiTableFlags.BordersOuter | ImGuiTableFlags.Resizable | ImGuiTableFlags.ScrollY | ImGuiTableFlags.ScrollX))
       {
         ImGui.TableSetupScrollFreeze(0, 1);
         ImGui.TableSetupColumn("components");

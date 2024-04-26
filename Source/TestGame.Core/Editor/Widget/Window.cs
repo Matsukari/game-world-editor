@@ -37,6 +37,12 @@ namespace Raven.Widget
 
     public virtual void OutRender(ImGuiWinManager imgui) {}
 
+    public virtual void InterpretRenderAttachments(ImGuiWinManager imgui) 
+    {
+      if (RenderAttachments != null)
+        RenderAttachments(imgui);
+    }
+
     public virtual void Render(ImGuiWinManager imgui)
     {
       if (!IsOpen || !CanOpen) return;
@@ -58,8 +64,7 @@ namespace Raven.Widget
 
       OutRender(imgui);
 
-      if (RenderAttachments != null)
-        RenderAttachments(imgui);
+      InterpretRenderAttachments(imgui);
     }
   }
 }

@@ -26,7 +26,6 @@ namespace Raven
     {
       _animEditor = animEditor;
       NoClose = false;
-      Flags |= ImGuiWindowFlags.AlwaysVerticalScrollbar;
     }
     public override void Render(ImGuiWinManager imgui)
     {
@@ -110,7 +109,7 @@ namespace Raven
       ImGuiUtils.SpanX(10f);
       Widget.ImGuiWidget.DelegateToggleButton(Icon.ThLarge, ()=>IsGridView = !IsGridView);
 
-      ImGui.BeginChild("animation-content");
+      ImGui.BeginChild("animation-content", new System.Numerics.Vector2(), true, ImGuiWindowFlags.AlwaysHorizontalScrollbar);
       _trackContentMin = ImGui.GetItemRectMax();
       var childSize = ImGui.GetWindowSize() - _trackContentMin;
 

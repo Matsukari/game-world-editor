@@ -37,7 +37,6 @@ namespace Raven
     {
       DrawOptions();
       DrawAnimationOptionPopup();  
-
     }
         
     public static bool RenderSprite(ImGuiWinManager imgui, ISceneSprite sprite, bool drawName = true)
