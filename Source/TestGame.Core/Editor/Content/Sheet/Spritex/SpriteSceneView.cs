@@ -44,6 +44,9 @@ namespace Raven
       Clean();
       IsEditing = true;
 
+      ContentData.Position = Camera.Position;
+      ContentData.Zoom = Camera.RawZoom;
+
       // Prepare
       _sceneInspector = new SpriteSceneInspector(spriteScene);
       _sceneInspector.OnOpenAnimation += (scene, anim) => 
