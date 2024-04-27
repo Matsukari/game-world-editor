@@ -237,6 +237,6 @@ namespace Raven.Widget
         Position = _initialPosition - (input.MouseDragStart - ImGui.GetMousePos()) ;        
       } 
     }
-    Vector2 ToWindow(Vector2 screen) => new Vector2(screen.X-Bounds.X, screen.Y-Bounds.Y);
+    Vector2 ToWindow(Vector2 screen) => new Vector2(screen.X-ImGui.GetWindowPos().X, screen.Y-ImGui.GetWindowPos().Y);
   }
 }

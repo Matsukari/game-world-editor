@@ -1,4 +1,5 @@
 using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Nez;
 
 namespace Raven.Widget
@@ -6,7 +7,6 @@ namespace Raven.Widget
   public class Window : IImGuiRenderable
   {
     public ImGuiWindowFlags Flags = ImGuiWindowFlags.None;
-    public RectangleF Bounds = new RectangleF();
     public bool IsOpen 
     { 
       get => _isOpen; 
@@ -18,8 +18,11 @@ namespace Raven.Widget
         else if (OnClose != null) OnClose();
       }
     }
+    public RectangleF Bounds = new RectangleF();
     public virtual bool CanOpen => true;
     public bool NoClose = true;
+    public Vector2 SchedWindowSize = Vector2.Zero;
+    public Vector2 SchedWindowPos = Vector2.Zero;
 
     protected bool _isOpen = true;
 
@@ -52,13 +55,24 @@ namespace Raven.Widget
       else 
         ImGui.Begin(GetName(), ref _isOpen, Flags);
 
+      if (SchedWindowSize != Vector2.Zero) 
+      {
+        ImGui.SetWindowSize(SchedWindowSize.ToNumerics());
+        SchedWindowSize = Vector2.Zero;
+      }
+      if (SchedWindowPos != Vector2.Zero) 
+      {
+        ImGui.SetWindowPos(SchedWindowPos.ToNumerics());
+        SchedWindowPos = Vector2.Zero;
+      }
+      Bounds.Location = ImGui.GetWindowPos();
+      Bounds.Size = ImGui.GetWindowSize();
+
       if (ImGui.IsWindowHovered()) 
       {
         OnHovered(imgui);
         ImGui.SetWindowFocus();
       }
-      Bounds.Location = ImGui.GetWindowPos();
-      Bounds.Size = ImGui.GetWindowSize();
       OnRender(imgui);
       ImGui.End();  
 

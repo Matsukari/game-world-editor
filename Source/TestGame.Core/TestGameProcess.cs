@@ -12,7 +12,10 @@ public class TestGameProcess : Core
         RegisterGlobalManager(new Raven.InputManager());
         RegisterGlobalManager(new Raven.CommandManager());
 
-
+        Window.IsBorderless = true;
+        Window.Title = "World Editor";
+        Window.AllowUserResizing = true;
+        Window.ClientSizeChanged += OnResize;
         ExitOnEscapeKeypress = false;
 
         Window.IsBorderless = true; 
@@ -23,15 +26,24 @@ public class TestGameProcess : Core
         imGuiOptions.IncludeDefaultFont(false);
         
         var imGuiManager = new ImGuiManager(imGuiOptions);
+        imGuiManager.ShowSeperateGameWindow = false;
+        imGuiManager.ShowCoreWindow = false;
+        imGuiManager.ShowSceneGraphWindow = false;
+        imGuiManager.ShowMenuBar = false;
         Core.RegisterGlobalManager( imGuiManager );
         NezImGuiThemes.HighContrast();
         Raven.GuiStyles.StyleViolet();
-        ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;
-        
+        ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;        
 
-        imGuiManager.ShowMenuBar = false;
         Scene = new EditorScene();
         
+    }
+    void OnResize(object sender, EventArgs e)
+    {
+      if (Scene is EditorScene scene)  
+      {
+        
+      }
     }
     [Nez.Console.Command( "show", "Shows something which would be otherwise hidden." )]
     static void ShowCommand( string which = "imdemo" )

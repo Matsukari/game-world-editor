@@ -6,14 +6,14 @@ using Icon = IconFonts.FontAwesome5;
 
 namespace Raven
 {
-  public class StatusBar : IImGuiRenderable
+  public class StatusBar : Widget.Window
   {
     readonly Editor _editor;
     public StatusBar(Editor editor)
     {
       _editor = editor;
     }
-    void IImGuiRenderable.Render(ImGuiWinManager imgui)
+    public override void Render(ImGuiWinManager imgui)
     {
       ImGui.Begin(GetType().Name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoDocking);
       var size = Screen.Size;
@@ -21,6 +21,9 @@ namespace Raven
       var position = new Vector2(0f, Screen.Height-size.Y-1);
       ImGui.SetWindowPos(position.ToNumerics());
       ImGui.SetWindowSize(size.ToNumerics());
+
+      Bounds.Location = ImGui.GetWindowPos();
+      Bounds.Size = ImGui.GetWindowSize(); 
 
       ImGuiUtils.SpanX(20f);
 

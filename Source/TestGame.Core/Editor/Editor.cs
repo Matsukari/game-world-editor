@@ -1,4 +1,5 @@
 using Nez;
+using Microsoft.Xna.Framework;
 
 namespace Raven
 {
@@ -115,6 +116,27 @@ namespace Raven
       Settings.IsEditorBusy = Selection.HasBegun() || ShapeAnnotator.IsAnnotating;
       ContentManager.Update();
       UpdateSelections();
+
+    
+      if (!Settings.Graphics.FixedWindowSize) return;
+
+      var main = WindowManager.GetRenderable<WindowHolder>("main");
+      var sub = WindowManager.GetRenderable<WindowHolder>("sub");
+
+      if (sub.Bounds.Size != Vector2.Zero)
+      {
+        sub.SchedWindowPos = new Vector2(Screen.Width-Settings.Graphics.InitialInspectorWindowWidth, 30);
+        sub.SchedWindowSize.X = Settings.Graphics.InitialInspectorWindowWidth;        
+        sub.SchedWindowSize.Y = WindowManager.GetRenderable<StatusBar>().Bounds.Y - WindowManager.GetRenderable<StatusBar>().Bounds.Size.Y;
+      }
+
+      if (main.Bounds.Size != Vector2.Zero)
+      {
+        main.SchedWindowPos = new Vector2(0f, 30);
+        main.SchedWindowSize.X = Settings.Graphics.InitialContentWindowWidth;        
+        main.SchedWindowSize.Y = WindowManager.GetRenderable<StatusBar>().Bounds.Y - WindowManager.GetRenderable<StatusBar>().Bounds.Size.Y;
+      }
+
     }
     public void UpdateSelections()
     {
