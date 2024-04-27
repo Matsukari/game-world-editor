@@ -22,10 +22,8 @@ namespace Raven.Widget
       OnRenderAfterName(imgui);
 
       if (PropertiesRenderer.Render(imgui, this)) this.OnChangeProperty(name);
-      PropertiesRenderer.HandleNewProperty(this, imgui, OnChangeProperty); 
     }
     public bool HasName() => Name != null && Name != string.Empty;
-
 
     protected virtual void OnChangeProperty(string name) 
     {

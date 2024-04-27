@@ -67,7 +67,94 @@ namespace Raven
       return null;
     }
     public static int MinimumPropChildHeight = 250;
-    public static bool Render(ImGuiWinManager manager, IPropertied propertied, bool tree=false)
+    static bool _isOpenPropPopup = false;
+    static bool _isOpenPropOptions = false;
+
+    public static void Update(ImGuiWinManager manager)
+    {
+      if (_isOpenPropPopup)
+      {
+        _isOpenPropPopup = false;
+        ImGui.OpenPopup("prop-popup");
+      }
+      if (_isOpenPropOptions)
+      {
+        _isOpenPropOptions = false;
+        ImGui.OpenPopup("prop-options");
+      }
+
+      if (ImGui.BeginPopup("prop-popup"))
+      {
+        if ((_cutProperty != null || _copiedProperty != null) && ImGui.MenuItem(Icon.Paste + "  Paste Property"))
+        {
+          Tuple<string, object> gotProperty;
+          if (_cutProperty != null)
+          {
+            gotProperty = _cutProperty;
+            _cutProperty = null;
+          }
+          else 
+          {
+            gotProperty = new Tuple<string, object>(_copiedProperty.Item1, _copiedProperty.Item2.AttemptCopy());
+          }
+
+          _lastPropertied.Properties.Add(gotProperty.Item2);
+        }
+        if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + "  New Property"))
+        {
+          foreach (var (name, type) in _propertyTypes)
+          {
+            if (ImGui.MenuItem(name)) 
+            {
+              _pickedPropertyType = type;
+              Console.WriteLine("Started...");
+            }
+          }
+          ImGui.EndMenu();
+        }
+
+
+        ImGui.EndPopup();
+      }
+      if (_propOnOptions != null && ImGui.BeginPopup("prop-options"))
+      {
+        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
+        {
+          _lastPropertied.Properties.Remove(_propOnOptions.Item1);
+        }
+        if (ImGui.MenuItem(Icon.Copy + "  Copy"))
+        {
+          _copiedProperty = _propOnOptions;
+          _cutProperty = null;
+        }
+        if (ImGui.MenuItem(Icon.Cut + "  Cut"))
+        {
+          _cutProperty = _propOnOptions;
+          _lastPropertied.Properties.Remove(_cutProperty.Item1);
+          _copiedProperty = null;
+        }
+        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        {
+          if (_propOnOptions.Item2.GetType().IsValueType)
+            _lastPropertied.Properties.Add(_propOnOptions.Item2);
+          else if (_propOnOptions.Item2 is ICloneable cloner)
+            _lastPropertied.Properties.Add(cloner.Clone());
+        }
+
+        ImGui.EndPopup();
+      }
+
+      if (_pickedPropertyType != null)
+      {
+        Console.WriteLine("Naming...");
+        var lastPick = _pickedPropertyType;
+        manager.NameModal.Open((name)=>{NameProperty(_lastPropertied, lastPick, name); if (_lastCreator != null) _lastCreator.Invoke("");});
+        _pickedPropertyType = null;
+      }
+
+    }
+
+    public static bool Render(ImGuiWinManager manager, IPropertied propertied, Action<string> creator=null, bool tree=false)
     {
       object changedProperty = null;
       string changedNameOfProperty = null;
@@ -80,7 +167,12 @@ namespace Raven
       else
         header = ImGui.CollapsingHeader("Properties", ImGuiTreeNodeFlags.DefaultOpen);
 
-      if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) ImGui.OpenPopup("prop-popup");
+      if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowFocused() && ImGui.IsWindowHovered()) 
+      {
+        _lastPropertied = propertied;
+        _lastCreator = creator;
+        _isOpenPropPopup = true;
+      }
 
       if (header)
       {
@@ -97,7 +189,9 @@ namespace Raven
           var node = ImGui.TreeNode(property);
           if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
           {
-            ImGui.OpenPopup("prop-options");
+            _isOpenPropOptions = true;
+            _lastCreator = creator;
+            _lastPropertied = propertied;
             _propOnOptions = new Tuple<string, object>(property, propertyData);
           }
           if (node)
@@ -164,103 +258,25 @@ namespace Raven
     }
 
 
-    static Type _pickedPropertyType = null;
-    public static bool HandleNewProperty(IPropertied propertied, ImGuiWinManager manager, Action<string> onCreate=null)
-    {
-      if (ImGui.BeginPopupContextItem("prop-popup"))
-      {
-        if ((_cutProperty != null || _copiedProperty != null) && ImGui.MenuItem(Icon.Paste + "  Paste Property"))
-        {
-          Tuple<string, object> gotProperty;
-          if (_cutProperty != null)
-          {
-            gotProperty = _cutProperty;
-            _cutProperty = null;
-          }
-          else 
-          {
-            gotProperty = new Tuple<string, object>(_copiedProperty.Item1, _copiedProperty.Item2.AttemptCopy());
-          }
+    static Type _pickedPropertyType;
+    static IPropertied _lastPropertied;
+    static Action<string> _lastCreator;
 
-
-          propertied.Properties.Add(gotProperty.Item2);
-        }
-        if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + "  New Property"))
-        {
-          foreach (var (name, type) in _propertyTypes)
-          {
-            if (ImGui.MenuItem(name)) 
-            {
-              ImGui.EndMenu();
-              ImGui.EndPopup();
-              ImGui.CloseCurrentPopup();
-              ImGui.OpenPopup("property-name");
-              _pickedPropertyType = type;
-              _once = true;
-              return false;
-            }
-          }
-          ImGui.EndMenu();
-        }
-
-
-        ImGui.EndPopup();
-      }
-      if (_propOnOptions != null && ImGui.BeginPopupContextItem("prop-options"))
-      {
-        if (ImGui.MenuItem(Icon.Trash + "  Delete"))
-        {
-          propertied.Properties.Remove(_propOnOptions.Item1);
-        }
-        if (ImGui.MenuItem(Icon.Copy + "  Copy"))
-        {
-          _copiedProperty = _propOnOptions;
-          _cutProperty = null;
-        }
-        if (ImGui.MenuItem(Icon.Cut + "  Cut"))
-        {
-          _cutProperty = _propOnOptions;
-          propertied.Properties.Remove(_cutProperty.Item1);
-          _copiedProperty = null;
-        }
-        if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
-        {
-          if (_propOnOptions.Item2.GetType().IsValueType)
-            propertied.Properties.Add(_propOnOptions.Item2);
-          else if (_propOnOptions.Item2 is ICloneable cloner)
-            propertied.Properties.Add(cloner.Clone());
-        }
-
-        ImGui.EndPopup();
-      }
-      if (_once && _propCreated)
-      {
-        _once = false;
-        _propCreated = false;
-        return true;
-      }
-      if (_pickedPropertyType != null)
-      {
-        manager.NameModal.Open((name)=>{NameProperty(propertied, name); if (onCreate != null) onCreate.Invoke("");});
-      }
-      return _propCreated;
-    }
     static bool _once = true;
     static bool _propCreated = false;
     static Tuple<string, object> _propOnOptions;
     static Tuple<string, object> _cutProperty;
     static Tuple<string, object> _copiedProperty;
 
-    static void NameProperty(IPropertied propertied, string name)
+    static void NameProperty(IPropertied propertied, Type pickedType, string name)
     {
       // String doesnt have a parameterless constructor
-      if (_pickedPropertyType == typeof(string)) propertied.Properties.AddOrSet("", name);
+      if (pickedType == typeof(string)) propertied.Properties.AddOrSet("", name);
       else 
       {
-        propertied.Properties.AddOrSet(System.Convert.ChangeType(System.Activator.CreateInstance(_pickedPropertyType), _pickedPropertyType), name); 
+        propertied.Properties.AddOrSet(System.Convert.ChangeType(System.Activator.CreateInstance(pickedType), pickedType), name); 
       }
       _propCreated = true;
-      _pickedPropertyType = null;
     }
   }
 }

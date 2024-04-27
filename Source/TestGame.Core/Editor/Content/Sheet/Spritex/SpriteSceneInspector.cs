@@ -81,8 +81,6 @@ namespace Raven
       if (ImGui.Checkbox("Flip Y", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
 
       PropertiesRenderer.Render(imgui, sprite);
-      PropertiesRenderer.HandleNewProperty(sprite, imgui);
-
 
       return mod;
     }

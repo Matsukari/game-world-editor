@@ -70,6 +70,7 @@ namespace Raven
         }
       }
 
+      PropertiesRenderer.Update(this);
       FilePicker.Draw(this);
       NameModal.Draw();
       ConfirmModal.Draw();

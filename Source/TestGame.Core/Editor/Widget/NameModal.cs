@@ -11,6 +11,7 @@ namespace Raven.Widget
     {
       _nameCallback = callback;
       _isNameModal = true;
+      Console.WriteLine("Openning");
     }
     string _input = "";
     public void Draw()
@@ -18,11 +19,13 @@ namespace Raven.Widget
       if (_isNameModal)
       {
         ImGui.OpenPopup("name-action-modal");
+        Console.WriteLine("In here, modalling...");
         _isNameModal = false;
       }
       var open = true;
       if (ImGui.BeginPopupModal("name-action-modal", ref open, ImGuiWindowFlags.NoDecoration))
       {
+        Console.WriteLine("Appears1");
         ImGui.SetWindowSize(new Num.Vector2(240, 74));
 
         ImGuiUtils.TextMiddleX("Enter a name");

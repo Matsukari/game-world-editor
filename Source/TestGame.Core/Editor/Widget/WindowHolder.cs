@@ -34,5 +34,6 @@ namespace Raven
       if (Content != null && Content.CanOpen && Content.IsOpen)
         Content.OutRender(imgui);
     }
+
   }
 }
