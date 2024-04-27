@@ -2,6 +2,7 @@ using ImGuiNET;
 using Microsoft.Xna.Framework;
 using Nez;
 using Microsoft.Xna.Framework.Input;
+using Icon = IconFonts.FontAwesome5;
 
 
 namespace Raven.Widget
@@ -24,7 +25,7 @@ namespace Raven.Widget
       _isOpen = false;
       _colors = colors;
       NoClose = false;
-
+      RenderAttachments += _shapePopup.Render;
     } 
 
     public void Edit(ISceneSprite sprite, IPropertied propertied, Action<ShapeModel> onFinish=null)
@@ -40,6 +41,19 @@ namespace Raven.Widget
       _isOpen = false;
     }
 
+    ShapeModel _dragShape;
+    RectangleF _dragStart;
+    PopupDelegate<(IPropertied, string, ShapeModel)> _shapePopup = new PopupDelegate<(IPropertied, string, ShapeModel)>("shape-options-popup");
+
+    void DrawShapePopup(ImGuiWinManager imgui)
+    {
+      if (ImGui.MenuItem(Icon.Trash + "  Delete"))
+        _shapePopup.Capture.Item1.Properties.Remove(_shapePopup.Capture.Item2);
+
+      if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
+        _shapePopup.Capture.Item1.Properties.Add(_shapePopup.Capture.Item3.Duplicate(), _shapePopup.Capture.Item2);
+    }
+
     public override void OnRender(ImGuiWinManager imgui)
     {
       if (_isStartEdit)
@@ -48,8 +62,6 @@ namespace Raven.Widget
         var max2 = Math.Max(ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
         Zoom = max2 / max1;
         Position = Vector2.Zero;
-        // Position += ImGui.GetWindowSize() / 2 - (SourcedSprite.SourceSprite.Region.Size.ToVector2() * Zoom);
-        // Position.Y += SourcedSprite.SourceSprite.Region.Size.Y * Zoom;
         _startZoom = Zoom;
         _isStartEdit = false;
       }
@@ -67,13 +79,36 @@ namespace Raven.Widget
 
       if (_propertied != null)
       {
+        if (_dragShape != null && ImGui.IsMouseDown(ImGuiMouseButton.Left))
+        {
+          var bounds = _dragShape.Bounds;
+          bounds.Location = _dragStart.Location + (Nez.Input.RawMousePosition.ToVector2() - Core.GetGlobalManager<InputManager>().MouseDragStart) / Zoom;
+          _dragShape.Bounds = bounds;
+        }
+        else _dragShape = null;
         foreach (var prop in _propertied.Properties)
         {
           if (prop.Value is ShapeModel shape) 
           {
-            shape.Render(ImGui.GetWindowDrawList(), sourcePosition, Zoom, _colors.ShapeInactive.ToColor(), _colors.ShapeOutlineActive.ToColor());
+            var color = (_dragShape != null || _shapePopup.IsOpen) ? _colors.ShapeActive : _colors.ShapeInactive;
+            shape.Render(ImGui.GetWindowDrawList(), sourcePosition, Zoom, color.ToColor(), _colors.ShapeOutlineActive.ToColor());
+
+            var mouse = ToSourcePoint(ImGui.GetMousePos());
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && shape.CollidesWith(mouse)) 
+            {
+              Console.WriteLine("Mouse: " + mouse);
+              _dragShape = shape;
+              _dragStart = shape.Bounds;
+              break;
+            }
+            else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right)) 
+            {
+              _shapePopup.Open(DrawShapePopup, (_propertied, prop.Key, shape));
+              break;
+            }
           }
         }
+
       }
       if (ImGui.IsWindowHovered())
       {
@@ -168,7 +203,7 @@ namespace Raven.Widget
     }
     Vector2 ToSourcePoint(Vector2 point)
     {
-      var screenMouse = _initialMouse - ImGui.GetCursorScreenPos();
+      var screenMouse = point - ImGui.GetCursorScreenPos();
       point = screenMouse - Position;
       point /= Zoom;
       return point;

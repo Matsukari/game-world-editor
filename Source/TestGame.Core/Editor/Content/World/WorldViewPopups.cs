@@ -18,6 +18,7 @@ namespace Raven
     bool _isOpenWorldOptions = false;
     bool _isOpenLevelOptions = false;
     Vector2 _mouseWhenLevelAdd = Vector2.Zero;
+    public Widget.PopupDelegate<(IPropertied, string, ShapeModel)> ShapePopup = new Widget.PopupDelegate<(IPropertied, string, ShapeModel)>("shape-popup");
 
     public event Action<Level> OnDeleteLevel;
     public event Action<Level> OnCutLevel;
@@ -40,6 +41,7 @@ namespace Raven
     }
     void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {
+      ShapePopup.Render(imgui);
       if (Layer != null) 
       {
         ImGui.SetNextWindowPos(new System.Numerics.Vector2(263f, 93));

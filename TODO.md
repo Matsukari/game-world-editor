@@ -1,6 +1,5 @@
 
 ## Geometry
-Input selection 
 Polygon points inspector
 Polygon in pane's respective to zoom
 Mouse snappning

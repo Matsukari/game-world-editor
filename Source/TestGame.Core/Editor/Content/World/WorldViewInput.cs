@@ -24,6 +24,9 @@ namespace Raven
       IInputHandler paintInput = Painter;
       if (paintInput.OnHandleInput(input)) return true;
 
+      var popup = HandleAnnotationsInput(_view.World, input.Camera.MouseToWorldPoint());
+      if (popup != null) _view.Window.Popups.ShapePopup = popup;
+
       var selectLevel = false;
       for (var i = 0; i < _view.World.Levels.Count(); i++)
       {

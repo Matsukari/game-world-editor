@@ -107,7 +107,6 @@ namespace Raven
             if (ImGui.MenuItem(name)) 
             {
               _pickedPropertyType = type;
-              Console.WriteLine("Started...");
             }
           }
           ImGui.EndMenu();
@@ -178,7 +177,9 @@ namespace Raven
       {
         var width = ImGui.GetContentRegionAvail().X;
         var height = Math.Max(ImGui.GetContentRegionAvail().Y, MinimumPropChildHeight);
-        ImGui.BeginChild("Properties", new System.Numerics.Vector2(width, height));
+
+        if (!tree)
+          ImGui.BeginChild("Properties", new System.Numerics.Vector2(width, height));
  
         if (propertied.Properties.Data.Count() == 0) ImGuiUtils.TextMiddle("No properties yet.");
 
@@ -186,6 +187,7 @@ namespace Raven
         {
           var property = pObject.Key;
           var propertyData = pObject.Value;
+          if (property == null) continue;
           var node = ImGui.TreeNode(property);
           if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) 
           {
@@ -206,7 +208,8 @@ namespace Raven
             ImGui.TreePop();
           }
         }
-        ImGui.EndChild();
+        if (!tree)
+          ImGui.EndChild();
         if (tree) ImGui.TreePop();
       }
       if (changedProperty != null)

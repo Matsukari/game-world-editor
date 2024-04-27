@@ -51,7 +51,6 @@ namespace Raven
       _imgui.Popups.OnCutLevel += level => Selection.End();
       _imgui.SpritePicker.OnLeave += () => { if (CanPaint) Selection.End(); };
       _imgui.SceneInstanceInspector.OnSceneModified += ReSelect;
-
     }
     public void ReSelect(SpriteSceneInstance instance, FreeformLayer layer)
     {
@@ -137,6 +136,13 @@ namespace Raven
           var command = new LevelMoveCommand(lev, _startLevel); 
           Core.GetGlobalManager<CommandManager>().Record(command, ()=>Selection.ContentBounds.Location = command._level.LocalOffset);
         }
+      }
+      else if (Selection.Capture is ShapeModel model)
+      {
+        var bounds = model.Bounds;
+        bounds.Location = Selection.ContentBounds.Location;
+        bounds.Size = Selection.ContentBounds.Size;
+        model.Bounds = bounds;
       }
       else if (Selection.Capture is SpriteSceneInstance instance)
       {

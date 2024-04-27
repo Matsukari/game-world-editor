@@ -25,8 +25,8 @@
 				"Data": [
 					{
 						"@id": "6",
-						"Key": "level",
-						"Value": "power"
+						"Value": "power",
+						"Name": null
 					}
 				]
 			},
@@ -38,101 +38,50 @@
 					"Properties": {
 						"@id": "8",
 						"Data": [
-							{
-								"@id": "9",
-								"Key": "master",
-								"Value": {
-									"@id": "10",
-									"@type": "Raven.RectangleModel",
-									"Bounds": {
-										"@id": "11",
-										"X": -35.716393,
-										"Y": 8.574668,
-										"Width": 162.11823,
-										"Height": 148.30133
-									}
-								}
-							},
-							{
-								"@id": "12",
-								"Key": "collider",
-								"Value": {
-									"@id": "13",
-									"@type": "Raven.PolygonModel",
-									"Bounds": {
-										"@id": "14",
-										"X": 0,
-										"Y": 0,
-										"Width": 0,
-										"Height": 0
-									},
-									"Points": [
-										{
-											"@id": "15",
-											"X": 130.21523,
-											"Y": -12.533409
-										},
-										{
-											"@id": "16",
-											"X": 193.77293,
-											"Y": 29.8384
-										},
-										{
-											"@id": "17",
-											"X": 132.9786,
-											"Y": 111.81864
-										},
-										{
-											"@id": "18",
-											"X": 129.2941,
-											"Y": -11.612283
-										}
-									]
-								}
-							}
+
 						]
 					},
 					"IsVisible": true,
 					"Color": {
-						"@id": "19",
+						"@id": "9",
 						"X": 1,
 						"Y": 1,
 						"Z": 1,
 						"W": 1
 					},
 					"Origin": {
-						"@id": "20",
+						"@id": "10",
 						"X": 0,
 						"Y": 0
 					},
 					"Transform": {
-						"@id": "21",
+						"@id": "11",
 						"Position": {
-							"@ref": "20"
+							"@ref": "10"
 						},
 						"Scale": {
-							"@id": "22",
+							"@id": "12",
 							"X": 1,
 							"Y": 1
 						},
 						"Skew": {
-							"@ref": "22"
+							"@ref": "12"
 						},
 						"Rotation": 0
 					},
 					"IsLocked": false,
 					"SpriteEffects": "None",
 					"SourceSprite": {
-						"@id": "23",
+						"@id": "13",
 						"Name": "",
 						"Properties": {
-							"@id": "24",
+							"@id": "14",
 							"Data": [
 
 							]
 						},
 						"Region": {
-							"@id": "25",
+							"@id": "15",
 							"X": 0,
 							"Y": 16,
 							"Width": 128,
@@ -145,76 +94,76 @@
 
 			],
 			"Transform": {
-				"@id": "26",
+				"@id": "16",
 				"Position": {
-					"@ref": "20"
+					"@ref": "10"
 				},
 				"Scale": {
-					"@ref": "22"
+					"@ref": "12"
 				},
 				"Skew": {
-					"@ref": "22"
+					"@ref": "12"
 				},
 				"Rotation": 0
 			}
 		},
 		{
-			"@id": "27",
+			"@id": "17",
 			"Name": "tree1",
 			"Properties": {
-				"@id": "28",
+				"@id": "18",
 				"Data": [
 
 				]
 			},
 			"Parts": [
 				{
-					"@id": "29",
+					"@id": "19",
 					"@type": "Raven.SourcedSprite",
 					"Name": "Main component",
 					"Properties": {
-						"@id": "30",
+						"@id": "20",
 						"Data": [
 
 						]
 					},
 					"IsVisible": true,
 					"Color": {
-						"@ref": "19"
+						"@ref": "9"
 					},
 					"Origin": {
-						"@ref": "20"
+						"@ref": "10"
 					},
 					"Transform": {
-						"@id": "31",
+						"@id": "21",
 						"Position": {
-							"@id": "32",
+							"@id": "22",
 							"X": -85.579346,
 							"Y": -123.83475
 						},
 						"Scale": {
-							"@id": "33",
+							"@id": "23",
 							"X": 1.8498037,
 							"Y": 1.4269948
 						},
 						"Skew": {
-							"@ref": "22"
+							"@ref": "12"
 						},
 						"Rotation": 0
 					},
 					"IsLocked": false,
 					"SpriteEffects": "None",
 					"SourceSprite": {
-						"@id": "34",
+						"@id": "24",
 						"Name": "",
 						"Properties": {
-							"@id": "35",
+							"@id": "25",
 							"Data": [
 
 							]
 						},
 						"Region": {
-							"@id": "36",
+							"@id": "26",
 							"X": 416,
 							"Y": 16,
 							"Width": 96,
@@ -223,50 +172,50 @@
 					}
 				},
 				{
-					"@id": "37",
+					"@id": "27",
 					"@type": "Raven.SourcedSprite",
 					"Name": "Component",
 					"Properties": {
-						"@id": "38",
+						"@id": "28",
 						"Data": [
 
 						]
 					},
 					"IsVisible": true,
 					"Color": {
-						"@ref": "19"
+						"@ref": "9"
 					},
 					"Origin": {
-						"@ref": "20"
+						"@ref": "10"
 					},
 					"Transform": {
-						"@id": "39",
+						"@id": "29",
 						"Position": {
-							"@id": "40",
+							"@id": "30",
 							"X": 22.643759,
 							"Y": 89.32699
 						},
 						"Scale": {
-							"@ref": "22"
+							"@ref": "12"
 						},
 						"Skew": {
-							"@ref": "22"
+							"@ref": "12"
 						},
 						"Rotation": 0
 					},
 					"IsLocked": false,
 					"SpriteEffects": "None",
 					"SourceSprite": {
-						"@id": "41",
+						"@id": "31",
 						"Name": "",
 						"Properties": {
-							"@id": "42",
+							"@id": "32",
 							"Data": [
 
 							]
 						},
 						"Region": {
-							"@id": "43",
+							"@id": "33",
 							"X": 144,
 							"Y": 0,
 							"Width": 128,
@@ -275,50 +224,50 @@
 					}
 				},
 				{
-					"@id": "44",
+					"@id": "34",
 					"@type": "Raven.SourcedSprite",
 					"Name": "Component-1",
 					"Properties": {
-						"@id": "45",
+						"@id": "35",
 						"Data": [
 
 						]
 					},
 					"IsVisible": true,
 					"Color": {
-						"@ref": "19"
+						"@ref": "9"
 					},
 					"Origin": {
-						"@ref": "20"
+						"@ref": "10"
 					},
 					"Transform": {
-						"@id": "46",
+						"@id": "36",
 						"Position": {
-							"@id": "47",
+							"@id": "37",
 							"X": -165.68956,
 							"Y": 98.49364
 						},
 						"Scale": {
-							"@ref": "22"
+							"@ref": "12"
 						},
 						"Skew": {
-							"@ref": "22"
+							"@ref": "12"
 						},
 						"Rotation": 0
 					},
 					"IsLocked": false,
 					"SpriteEffects": "None",
 					"SourceSprite": {
-						"@id": "48",
+						"@id": "38",
 						"Name": "",
 						"Properties": {
-							"@id": "49",
+							"@id": "39",
 							"Data": [
 
 							]
 						},
 						"Region": {
-							"@id": "50",
+							"@id": "40",
 							"X": 560,
 							"Y": 96,
 							"Width": 80,
@@ -331,15 +280,15 @@
 
 			],
 			"Transform": {
-				"@id": "51",
+				"@id": "41",
 				"Position": {
-					"@ref": "20"
+					"@ref": "10"
 				},
 				"Scale": {
-					"@ref": "22"
+					"@ref": "12"
 				},
 				"Skew": {
-					"@ref": "22"
+					"@ref": "12"
 				},
 				"Rotation": 0
 			}
