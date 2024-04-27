@@ -210,7 +210,7 @@ namespace Raven
       }
       if (header)
       {
-        ImGui.BeginChild($"level-layers-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        ImGui.BeginChild($"level-layers-content-child");
         // Draw layers
         Layer removeLayer = null;
         for (int i = Level.Layers.Count()-1; i >= 0; i--)

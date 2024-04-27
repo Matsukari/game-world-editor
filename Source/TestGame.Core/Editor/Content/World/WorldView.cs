@@ -19,7 +19,6 @@ namespace Raven
 
     // Settings
     public bool IsRandomPaint = false;
-    public bool HighlightCurrentLayer = true;
     public PaintMode PaintMode = PaintMode.Pen;
     public PaintType PaintType = PaintType.Single;
     Vector2 _initialScale = new Vector2();
@@ -98,7 +97,7 @@ namespace Raven
         {
           bool mouseInLayer = layer.Bounds.Contains(Camera.MouseToWorldPoint());
           Color color = default;
-          if (HighlightCurrentLayer 
+          if (settings.Graphics.HighlightCurrentLayer 
               && mouseInLayer
               && CanPaint
               && _imgui.SelectedLevelInspector != null 

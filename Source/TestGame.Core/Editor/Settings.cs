@@ -54,11 +54,41 @@ namespace Raven
     }
     public void General()
     {
+      ImGui.Checkbox("Highlight Current Layer", ref _settings.Graphics.HighlightCurrentLayer);
+      ImGui.Checkbox("Draw Grid on Sheets", ref _settings.Graphics.DrawSheetGrid);
+      ImGui.Checkbox("Draw Grid on Levels", ref _settings.Graphics.DrawLayerGrid);
+
+      ImGui.NewLine();
+      ImGui.Checkbox("Right Click To Remove Brush", ref _settings.RightClickRemoveBrush);
+      ImGui.Checkbox("Right Click To Erase", ref _settings.RightClickErase);
 
     }
     public void Shortcuts()
     {
+      var fields = _settings.Hotkeys.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+      if (ImGui.BeginTable("##split", 2, ImGuiTableFlags.Resizable))
+      {
+        ImGui.TableSetupScrollFreeze(0, 1);
+        ImGui.TableSetupColumn("names");
+        ImGui.TableSetupColumn("keys");
+        ImGui.TableNextRow();
+        ImGui.TableSetColumnIndex(1);
 
+        foreach (var field in fields)
+        {
+          var keyField = field.GetValue(_settings.Hotkeys);
+          var name = field.Name.PascalToWords();
+          if (keyField is KeyCombination keyCombination)
+          {
+            ImGui.TableNextRow();
+            ImGui.TableSetColumnIndex(0);
+            ImGui.Text(name);
+            ImGui.TableSetColumnIndex(1);
+            ImGui.Text(keyCombination.GetKeyString(0));
+          }
+        }
+        ImGui.EndTable();
+      }
     }
     public override void OnRender(ImGuiWinManager imgui)
     {
@@ -70,6 +100,8 @@ namespace Raven
         ImGui.EndTabBar();
       }
       var size = new System.Numerics.Vector2(ImGui.GetWindowWidth() * 0.15f, 20);
+
+      ImGui.Dummy(new System.Numerics.Vector2(0f, ImGui.GetContentRegionAvail().Y - size.Y));
       if (ImGui.Button("Cancel", size))
       {
         IsOpen = false;

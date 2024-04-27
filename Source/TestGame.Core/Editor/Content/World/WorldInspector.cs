@@ -81,9 +81,7 @@ namespace Raven
             }
             level.Selected = true;
           }
-          ImGui.SameLine();
-          ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(level.Name).X - 100, 0f));
-          ImGui.SameLine();
+          ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(level.Name).X - 100));
           ImGui.PushID($"level-{level.Name}-id");
           var visibState = (!level.Level.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
           if (ImGui.SmallButton(visibState))
@@ -132,9 +130,7 @@ namespace Raven
             sheet.Selected = true;
           }
 
-          ImGui.SameLine();
-          ImGui.Dummy(new System.Numerics.Vector2(ImGui.GetWindowSize().X - ImGui.CalcTextSize(sheet.Sheet.Name).X - 100 , 0f));
-          ImGui.SameLine();
+          ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(sheet.Sheet.Name.BestWrap()).X - 100));
           if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
           {
             removeSheet = sheet;

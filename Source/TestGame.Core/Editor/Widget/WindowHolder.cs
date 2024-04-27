@@ -10,7 +10,12 @@ namespace Raven
         
     string _windowName;
 
-    public WindowHolder(string name) => _windowName = name;
+    public WindowHolder(string name)
+    {
+      _windowName = name;
+      Flags |= ImGuiNET.ImGuiWindowFlags.AlwaysVerticalScrollbar;
+
+    } 
 
     public override string GetName() => _windowName;
 

@@ -7,5 +7,6 @@ namespace Raven
 
     public bool DrawLayerGrid = true;
 
+    public bool HighlightCurrentLayer = true;
   } 
 }
