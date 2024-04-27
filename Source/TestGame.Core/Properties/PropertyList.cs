@@ -8,8 +8,9 @@ namespace Raven
   {
     public class Property 
     {
-      public string Key;
+      public string Key { get => Name; set => Name = value; }
       public Object Value;
+      public string Name;
 
       private Property() 
       {
@@ -31,6 +32,7 @@ namespace Raven
     {
       if (name == string.Empty) name = obj.GetType().Name;
       Data.Add(new Property(name, obj));
+      Data.EnsureNoRepeatNameField();
     }
 
     public void AddOrSet<T>(T obj, string name)

@@ -98,7 +98,7 @@ namespace Raven
             gotProperty = new Tuple<string, object>(_copiedProperty.Item1, _copiedProperty.Item2.AttemptCopy());
           }
 
-          _lastPropertied.Properties.Add(gotProperty.Item2);
+          _lastPropertied.Properties.Add(gotProperty.Item2, gotProperty.Item1);
         }
         if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + "  New Property"))
         {
@@ -136,9 +136,9 @@ namespace Raven
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
           if (_propOnOptions.Item2.GetType().IsValueType)
-            _lastPropertied.Properties.Add(_propOnOptions.Item2);
+            _lastPropertied.Properties.Add(_propOnOptions.Item2, _propOnOptions.Item1);
           else if (_propOnOptions.Item2 is ICloneable cloner)
-            _lastPropertied.Properties.Add(cloner.Clone());
+            _lastPropertied.Properties.Add(cloner.Clone(), _propOnOptions.Item1);
         }
 
         ImGui.EndPopup();
