@@ -145,7 +145,6 @@ namespace Raven
 
       if (_pickedPropertyType != null)
       {
-        Console.WriteLine("Naming...");
         var lastPick = _pickedPropertyType;
         manager.NameModal.Open((name)=>{NameProperty(_lastPropertied, lastPick, name); if (_lastCreator != null) _lastCreator.Invoke("");});
         _pickedPropertyType = null;
@@ -181,7 +180,7 @@ namespace Raven
         if (!tree)
           ImGui.BeginChild("Properties", new System.Numerics.Vector2(width, height));
  
-        if (propertied.Properties.Data.Count() == 0) ImGuiUtils.TextMiddle("No properties yet.");
+        if (propertied.Properties.Data.Count() == 0 && !tree) ImGuiUtils.TextMiddle("No properties yet.");
 
         foreach (var pObject in propertied.Properties)
         {

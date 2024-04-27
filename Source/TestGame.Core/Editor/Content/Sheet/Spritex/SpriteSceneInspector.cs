@@ -293,8 +293,7 @@ namespace Raven
       ISceneSprite removeSprite = null;
       if (ImGui.CollapsingHeader("Components", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.FramePadding))
       {
-        ImGui.BeginChild($"spriteScene-comp-content-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 300), 
-            false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        ImGui.BeginChild($"spriteScene-comp-content-child");
 
         if (_selectedSprites.Count == 0)
           ImGuiUtils.TextMiddle("No components found.");
