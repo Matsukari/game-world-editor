@@ -7,9 +7,9 @@ namespace Raven
   {
     public static string[] SheetStdExtensions = new [] {".rvsheet", ".rv"};
     public static string[] WorldStdExtensions = new [] {".rvworld", ".rvw"};
-    public string ApplicationSaveFolder;
-    public string ApplicationSaveFilename;
-    public string ApplicationSavePath { get => ApplicationSaveFolder + "/" + ApplicationSaveFilename; }
+    public static string ApplicationSaveFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+    public static string ApplicationSaveFilename = "moneditor.app-settings";
+    public static string ApplicationSavePath { get => ApplicationSaveFolder + "/" + ApplicationSaveFilename; }
     readonly ContentManager _contentManager;
 
     public Serializer(ContentManager contentManager)
@@ -26,6 +26,8 @@ namespace Raven
         return;
       }
       var loadedSettings = LoadSettings();
+
+      JsonCache.Data.Clear();
 
       List<int> invalidFiles = new List<int>();
       for (int i = 0; i < loadedSettings.LastFiles.Count(); i++)
@@ -59,6 +61,9 @@ namespace Raven
       _contentManager.Settings.Graphics = loadedSettings.Graphics;
       _contentManager.Settings.Hotkeys = loadedSettings.Hotkeys;
       _contentManager.Settings.ImGuiColors = loadedSettings.ImGuiColors;
+      _contentManager.Settings.LastFile = loadedSettings.LastFile;
+
+      // _contentManager.Settings = loadedSettings;
       if (_contentManager.Settings.ImGuiColors.Count != ImGui.GetStyle().Colors.Count)
       {
         Console.WriteLine("First time; default theme used");
@@ -69,7 +74,7 @@ namespace Raven
       _contentManager.Settings.ApplyImGui();
       
     }
-    public EditorSettings LoadSettings()
+    public static EditorSettings LoadSettings()
     {
       Console.WriteLine($"Loading {ApplicationSavePath}");
       return new SettingsSerializer().Load(ApplicationSavePath);
@@ -77,6 +82,13 @@ namespace Raven
     public void SaveSettings()
     {
       Console.WriteLine($"Saving at {ApplicationSavePath}");
+      _contentManager.Settings.LastFile = _contentManager.CurrentIndex;
+
+      foreach (var file in _contentManager._tabs)
+      {
+        if (_contentManager.Settings.FileHistory.Find(item => item.Filename == file.Content.Name) == null)
+          _contentManager.Settings.FileHistory.Add(file.Data.Copy());
+      }
       new SettingsSerializer().Save(ApplicationSavePath, _contentManager.Settings);
     }
     public static T LoadContent<T>(string file) where T: class
@@ -86,13 +98,13 @@ namespace Raven
       {
         throw new FileNotFoundException();
       }
-      
       if (typeof(T) == typeof(Sheet)) return new SheetSerializer().Load(file) as T;
       else if (typeof(T) == typeof(World)) return new WorldSerializer().Load(file) as T;
       else 
       {
         throw new NotSupportedException($"Cannot load type {typeof(T).Name}");
       }
+
     }
     public void SaveContent(string filepath)
     {

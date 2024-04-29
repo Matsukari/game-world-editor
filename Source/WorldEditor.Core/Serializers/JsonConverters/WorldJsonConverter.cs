@@ -27,7 +27,7 @@ namespace Raven.Serializers
     {
       Console.WriteLine("OnFoundCustomData World: " + key);
       Console.WriteLine("value World: " + value);      
-      JsonCache.Data.Add(key, value);
+      JsonCache.Data.TryAdd(key, value);
        
     }
   }

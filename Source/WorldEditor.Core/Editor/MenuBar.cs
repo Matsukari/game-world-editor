@@ -22,11 +22,11 @@ namespace Raven
     {
       var type = (_editor.ContentManager.View is WorldView) ? "World" : "Sheet";
       if (ImGui.MenuItem("Project Settings")) _editor.WindowManager.GetRenderable<Settings>().IsOpen = true;
-      if (ImGui.MenuItem("Project Dashboard")) {}
-      ImGui.Separator();
-      if (ImGui.MenuItem($"Save ({type})")) SaveFile();
-      if (ImGui.MenuItem("Save as")) SaveFile();
-      if (ImGui.MenuItem("Close")) Core.Exit();
+      if (ImGui.MenuItem("Project Dashboard")) Core.StartSceneTransition(new FadeTransition(()=>new DashboardScene()));
+      if (ImGui.MenuItem("Save")) SaveFile();
+      if (ImGui.MenuItem("Save As...")) SaveFile();
+      if (ImGui.MenuItem("Close File")) _editor.ContentManager.RemoveTab(_editor.ContentManager.CurrentIndex);
+      if (ImGui.MenuItem("Quit")) Core.Exit();
     }
     void WorldOptions()
     {
@@ -157,6 +157,17 @@ namespace Raven
         var open = true;
 
         ImGui.PushStyleColor(ImGuiCol.Text, (i == _editor.ContentManager.CurrentIndex) ? EditorColors.Get(ImGuiCol.Text) : EditorColors.Get(ImGuiCol.TextDisabled));
+        if (i == _editor.Settings.LastFile && _once)
+        {
+          Console.WriteLine("Open at: " + i.ToString());
+          ImGui.SetNextItemOpen(true);
+          for (int j = 0; j < tabs.Count(); j++)
+          {
+            if (j != i)
+              ImGui.SetTabItemClosed(tabs[j].Content.Name.BestWrap());
+          }
+          _once = false;
+        }
         if (ImGui.BeginTabItem(tabs[i].Content.Name.BestWrap(), ref open))
         {
           var bottomLeft = new System.Numerics.Vector2();
@@ -280,6 +291,7 @@ namespace Raven
 
       ImGui.End();
     }
+    bool _once = true;
     ShapeModel[] _shapeModels = new ShapeModel[]{new RectangleModel(), new EllipseModel(), new PointModel(), new PolygonModel()};
     bool[] _editorOpToggled = new []{true, false, false, false, false};
     bool[] _selTypeToggled = new []{false, false};

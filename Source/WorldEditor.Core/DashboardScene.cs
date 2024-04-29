@@ -6,6 +6,8 @@ namespace Raven
 {
   public class DashboardScene : Scene
   {
+    EditorSettings _settings;
+    ImGuiWinManager _imgui = new ImGuiWinManager();
     public DashboardScene()
     {
       ClearColor = Color.Black;
@@ -14,16 +16,53 @@ namespace Raven
     {
       var imgui = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>();
       imgui.RegisterDrawCommand(RenderImGui);
+      if (!Path.Exists(Serializer.ApplicationSavePath))
+        _settings = new EditorSettings();
+      else
+        _settings = Serializer.LoadSettings();
     }    
     void RenderImGui()
     {
-      Console.WriteLine("rendering");
       RenderDockSpace();
 
-      ImGui.Begin("Main");
-
-      if (ImGui.Button("Start")) Core.Scene = new EditorScene();
+      ImGui.Begin("Updates");
+      ImGuiUtils.TextMiddle("This is the latest version. Debug 1.");
       ImGui.End();
+
+      ImGui.Begin("File Manager");
+
+      var size = new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X * 0.5f - ImGui.GetStyle().ItemSpacing.X, 20);
+      if (ImGui.Button("New Sheet", size))
+      {
+        _imgui.FilePicker.Open(path => 
+            Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new SheetView(), new Sheet(path))))), "New Sheet");
+      }
+      ImGui.SameLine();
+      if (ImGui.Button("New World", size))
+      { 
+        Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), new World()))));
+      }
+      var i = 0;
+      foreach (var recent in _settings.FileHistory)
+      {
+        if (ImGui.MenuItem(recent.Filename.BestWrap())) 
+        {
+          if (_settings.LastFiles.Find(item => item.Filename == recent.Filename) == null)
+          {
+            _settings.LastFiles.Add(recent);
+            _settings.LastFile = _settings.LastFiles.Count() - 1;
+          }
+          else _settings.LastFile = i;
+          
+          new Serializers.SettingsSerializer().Save(Serializer.ApplicationSavePath, _settings);
+          Core.StartSceneTransition(new FadeTransition(()=>new EditorScene()));
+        }
+        i++;
+      }
+
+      ImGui.End();
+
+      _imgui.Render();
     }
     void RenderDockSpace()
     {

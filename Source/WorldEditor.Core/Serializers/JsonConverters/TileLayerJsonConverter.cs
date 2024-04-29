@@ -49,7 +49,7 @@ namespace Raven.Serializers
     {
       Console.WriteLine("OnFoundCustomData TileLayer: " + key);
       Console.WriteLine("value TileLayer: " + value);      
-      JsonCache.Data.Add(key, value);
+      JsonCache.Data.TryAdd(key, value);
     }
   }
 }

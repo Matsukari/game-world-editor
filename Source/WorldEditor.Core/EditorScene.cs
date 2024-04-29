@@ -6,6 +6,7 @@ namespace Raven
   {
     public Raven.Editor Editor;
     bool _once = true;
+
     public override void Begin()
     {
       if (_once)
@@ -15,8 +16,16 @@ namespace Raven
 
       _once = false;
     }
-    public override void End()
+    public override void End() {}
+
+    public EditorScene()
     {
+      Editor = AddEntity(new Raven.Editor());
+    }
+    public EditorScene(Editor editor)
+    {
+      Editor = editor;
+      AddEntity(Editor);
     }
     public override void Initialize()
     {
@@ -24,9 +33,6 @@ namespace Raven
 			SetDesignResolution(1280, 720, SceneResolutionPolicy.None);      
 			Screen.SetSize(1280, 720);
       Content.RootDirectory = "Assets";
-
-      Editor = AddEntity(new Raven.Editor());
-
     }   
   }
 }

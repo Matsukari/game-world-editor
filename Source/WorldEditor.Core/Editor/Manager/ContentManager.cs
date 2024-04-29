@@ -90,7 +90,7 @@ namespace Raven
     public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=false, bool forceAdd=true)
     {
       if (!contentView.CanDealWithType(content))
-        throw new Exception();
+        throw new Exception($"Cannot deal with type: {content.GetType()}");
 
       var contentData = new EditorContentData(content.Name, content.GetType().Name);
 

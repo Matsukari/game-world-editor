@@ -11,6 +11,8 @@ namespace Raven
     public float Zoom = 1f;
     public Vector2 Position = Vector2.Zero;
 
+    public EditorContentData Copy() => MemberwiseClone() as EditorContentData;
+
     [JsonExclude]
     public IPropertied PropertiedContext = null;
 

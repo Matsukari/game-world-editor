@@ -14,6 +14,8 @@ namespace Raven
 
     public List<EditorContentData> LastFiles = new List<EditorContentData>();
 
+    public List<EditorContentData> FileHistory = new List<EditorContentData>();
+
     public List<Vector4> ImGuiColors = new List<Vector4>();
 
     public int LastFile = 0;

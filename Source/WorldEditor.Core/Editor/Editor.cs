@@ -21,6 +21,17 @@ namespace Raven
 
     public static PrimitiveBatch PrimitiveBatch = new PrimitiveBatch();
 
+    ContentView _nextView;
+    IPropertied _nextContent;
+    public Editor(ContentView view, IPropertied content)
+    {
+      _nextView = view;
+      _nextContent = content;
+    }
+    public Editor()
+    {
+    }
+
     void OnCloseContent(EditorContent content, ContentView view)
     {
       // Store last state
@@ -103,6 +114,12 @@ namespace Raven
         var world = new World();
         world.AddSheet(sheet);
         ContentManager.AddTab(new WorldView(), world);
+      }
+
+      if (_nextView != null && _nextContent != null)
+      {
+        ContentManager.AddTab(_nextView, _nextContent);
+        Settings.LastFile = ContentManager._tabs.Count - 1;
       }
 
       ContentManager.Switch(0, true);
