@@ -58,7 +58,7 @@ namespace Raven
     {
       HandleGuiDrags();
 
-      if (Core.Scene is not TestGame.EditorScene) return;
+      if (Core.Scene is not EditorScene) return;
 
       if (IsImGuiBlocking)
       {

@@ -15,7 +15,6 @@ public class TestGameProcess : Core
         Window.IsBorderless = true;
         Window.Title = "World Editor";
         Window.AllowUserResizing = true;
-        Window.ClientSizeChanged += OnResize;
         ExitOnEscapeKeypress = false;
 
         Window.IsBorderless = true; 
@@ -35,15 +34,8 @@ public class TestGameProcess : Core
         Raven.GuiStyles.StyleViolet();
         ImGui.GetIO().ConfigFlags |= ImGuiNET.ImGuiConfigFlags.DockingEnable;        
 
-        Scene = new EditorScene();
+        Scene = new Raven.DashboardScene();
         
-    }
-    void OnResize(object sender, EventArgs e)
-    {
-      if (Scene is EditorScene scene)  
-      {
-        
-      }
     }
     [Nez.Console.Command( "show", "Shows something which would be otherwise hidden." )]
     static void ShowCommand( string which = "imdemo" )

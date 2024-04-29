@@ -1,6 +1,6 @@
 using Nez;
 
-namespace TestGame
+namespace Raven
 {
   public class EditorScene : Scene
   {

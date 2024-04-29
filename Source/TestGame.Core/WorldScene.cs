@@ -15,9 +15,8 @@ namespace Raven
     }
     public override void Initialize()
     {
-      SetDesignResolution(1280, 720, SceneResolutionPolicy.None);      
-      Screen.SetSize(1280, 720);
-      Content.RootDirectory = "Assets";
+      // SetDesignResolution(1280, 720, SceneResolutionPolicy.None);     
+      // Content.RootDirectory = "Assets";
     }    
     public override void OnStart()
     {
