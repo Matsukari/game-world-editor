@@ -15,7 +15,7 @@ namespace Raven
     public override void OnHandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<InputManager>();
-      var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
+      var rawMouse = InputManager.ScreenMousePosition.ToNumerics();
 
       if (SelectedSprite is Sprite || SelectedSprite is AnimatedSprite)
       {

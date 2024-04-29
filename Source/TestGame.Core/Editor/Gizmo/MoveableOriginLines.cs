@@ -45,13 +45,13 @@ namespace Raven.Guidelines
       var pos = LocalOffset;
       if (Axis == AxisType.X)
       {
-        pos.X = InitialPosition.X + (Nez.Input.RawMousePosition.X - input.MouseDragStart.X) / input.Camera.RawZoom;
+        pos.X = InitialPosition.X + (InputManager.ScreenMousePosition.X - input.MouseDragStart.X) / input.Camera.RawZoom;
         Thickness.X = MaxThickness;
         Thickness.Y = MinThickness;
       }
       else if (Axis == AxisType.Y)
       {
-        pos.Y = InitialPosition.Y + (Nez.Input.RawMousePosition.Y - input.MouseDragStart.Y) / input.Camera.RawZoom;
+        pos.Y = InitialPosition.Y + (InputManager.ScreenMousePosition.Y - input.MouseDragStart.Y) / input.Camera.RawZoom;
         Thickness.X = MinThickness;
         Thickness.Y = MaxThickness;
       }

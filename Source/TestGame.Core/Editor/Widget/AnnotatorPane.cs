@@ -82,7 +82,7 @@ namespace Raven.Widget
         if (_dragShape != null && ImGui.IsMouseDown(ImGuiMouseButton.Left))
         {
           var bounds = _dragShape.Bounds;
-          bounds.Location = _dragStart.Location + (Nez.Input.RawMousePosition.ToVector2() - Core.GetGlobalManager<InputManager>().MouseDragStart) / Zoom;
+          bounds.Location = _dragStart.Location + (InputManager.ScreenMousePosition - Core.GetGlobalManager<InputManager>().MouseDragStart) / Zoom;
           _dragShape.Bounds = bounds;
         }
         else _dragShape = null;
@@ -93,7 +93,7 @@ namespace Raven.Widget
             var color = (_dragShape != null || _shapePopup.IsOpen) ? _colors.ShapeActive : _colors.ShapeInactive;
             shape.Render(ImGui.GetWindowDrawList(), sourcePosition, Zoom, color.ToColor(), _colors.ShapeOutlineActive.ToColor());
 
-            var mouse = ToSourcePoint(ImGui.GetMousePos());
+            var mouse = ToSourcePoint(InputManager.ScreenMousePosition);
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && shape.CollidesWith(mouse)) 
             {
               Console.WriteLine("Mouse: " + mouse);
@@ -146,7 +146,7 @@ namespace Raven.Widget
     {
       if (Nez.Input.LeftMouseButtonPressed)
       {
-        _initialMouse = ImGui.GetMousePos();
+        _initialMouse = InputManager.ScreenMousePosition;
         if (_shape is PointModel shape)
         {
           shape.Bounds = new RectangleF(_initialMouse, Vector2.Zero);
@@ -164,7 +164,7 @@ namespace Raven.Widget
         // calculate position of area between mous drag
         var rect = new RectangleF();
         rect.Location = _initialMouse;
-        rect.Size = ImGui.GetMousePos() - _initialMouse; 
+        rect.Size = InputManager.ScreenMousePosition - _initialMouse; 
         _shape.Bounds = rect; 
       }
       if (Nez.Input.LeftMouseButtonReleased && _shape is not PolygonModel)
@@ -211,8 +211,8 @@ namespace Raven.Widget
     void HandleMoveZoom()
     {
       var input = Core.GetGlobalManager<InputManager>();
-      var mouse = ImGui.GetMousePos();
-      mouse = ToWindow(mouse.ToVector2()).ToNumerics();
+      var mouse = InputManager.ScreenMousePosition;
+      mouse = ToWindow(mouse).ToNumerics();
 
       // zooms
       if (ImGui.GetIO().MouseWheel != 0)
@@ -234,7 +234,7 @@ namespace Raven.Widget
       }
       if (input.IsDrag && input.MouseDragButton == 2) 
       {
-        Position = _initialPosition - (input.MouseDragStart - ImGui.GetMousePos()) ;        
+        Position = _initialPosition - (input.MouseDragStart - InputManager.ScreenMousePosition) ;        
       } 
     }
     Vector2 ToWindow(Vector2 screen) => new Vector2(screen.X-ImGui.GetWindowPos().X, screen.Y-ImGui.GetWindowPos().Y);

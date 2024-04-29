@@ -2,7 +2,6 @@
 ## Geometry
 Polygon points inspector
 Polygon in pane's respective to zoom
-Mouse snappning
 
 ## SpriteScene
 Choose ease type

@@ -153,7 +153,7 @@ namespace Raven
           }
           // Console.WriteLine("Got " + _startTransform.Count());
         }
-        if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking && _startTransform.Count() == sels.Count()) 
+        if (Input.LeftMouseButtonReleased && _startTransform.Count() == sels.Count()) 
         {
           var command = new SceneSpriteListTransformModifyCommand(sels, _startTransform);
           Core.GetGlobalManager<CommandManager>().Record(command, 

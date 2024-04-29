@@ -75,6 +75,9 @@ namespace Raven
     {
       if (!CanPaint) Selection.Begin(level.Bounds, level);
       _imgui.SelectedLevel = i;
+      if (Settings.Graphics.FocusOnOneLevel)
+      {
+      }
     }
     void OpenLevelOptions(Level level, int i)
     {
@@ -99,7 +102,9 @@ namespace Raven
           if (settings.Graphics.HighlightCurrentLayer 
               && mouseInLayer
               && CanPaint
-              && _imgui.SelectedLevelInspector != null 
+              && !InputManager.IsImGuiBlocking
+              && _imgui.SelectedLevelInspector != null
+              && _imgui.SelectedLevelInspector.Level.Name == level.Name
               && _imgui.SelectedLevelInspector.CurrentLayer != null 
               && _imgui.SelectedLevelInspector.CurrentLayer.Name != layer.Name)
           {
@@ -113,7 +118,13 @@ namespace Raven
             _imgui.SelectedLevel = i;
           }
 
-          if (layer is TileLayer tileLayer && layer.IsVisible && Settings.Graphics.DrawLayerGrid)
+          if (layer is TileLayer tileLayer 
+              && _imgui.SelectedLevelInspector != null
+              && _imgui.SelectedLevelInspector.Level.Name == level.Name
+              && _imgui.SelectedLevelInspector.CurrentLayer != null 
+              && _imgui.SelectedLevelInspector.CurrentLayer.Name == layer.Name
+              && layer.IsVisible 
+              && Settings.Graphics.DrawLayerGrid)
           {
             Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
               tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());

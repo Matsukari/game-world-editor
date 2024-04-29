@@ -44,7 +44,7 @@ namespace Raven
       {
         if (_view.SpritePicker.SelectedSprite is Sprite sprite)
         {
-          var spriteCenter = Camera.MouseToWorldPoint() - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
+          var spriteCenter = InputManager.GetWorldMousePosition(Camera) - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
           var tilesToPaint = sprite.GetRectTiles();
 
           // Single painting
@@ -57,21 +57,32 @@ namespace Raven
           // Rectangle painting
           if (_view.PaintType == PaintType.Rectangle)
           {
-            if (input.IsDragFirst && Nez.Input.LeftMouseButtonDown) _mouseStart = Camera.MouseToWorldPoint();
+            if (input.IsDragFirst && Nez.Input.LeftMouseButtonDown) _mouseStart = InputManager.GetWorldMousePosition(Camera);
             if (input.IsDragLast && Nez.Input.LeftMouseButtonReleased) 
             {
               var rect = new RectangleF(); 
               rect.Location = _mouseStart;
-              rect.Size = Camera.MouseToWorldPoint() - _mouseStart;
+              rect.Size = InputManager.GetWorldMousePosition(Camera) - _mouseStart;
               rect = rect.AlwaysPositive();
 
-              for (int x = 0; x < rect.Size.X; x+=sprite.Region.Size.X)
+              if (_view.PaintMode == PaintMode.Eraser)
               {
-                for (int y = 0; y < rect.Size.Y; y+=sprite.Region.Size.Y)
+                for (int x = 0; x < rect.Size.X; x+=tileLayer.TileWidth)
                 {
-                  PaintAtLayer(tilesToPaint, tileLayer, tileLayer.GetTileCoordFromWorld(rect.Location + new Vector2(x, y)));
+                  for (int y = 0; y < rect.Size.Y; y+=tileLayer.TileHeight)
+                  {
+                    tileLayer.RemoveTile(tileLayer.GetTileCoordFromWorld(rect.Location + new Vector2(x, y)));
+                  }
                 }
               }
+              else 
+                for (int x = 0; x < rect.Size.X; x+=sprite.Region.Size.X)
+                {
+                  for (int y = 0; y < rect.Size.Y; y+=sprite.Region.Size.Y)
+                  {
+                    PaintAtLayer(tilesToPaint, tileLayer, tileLayer.GetTileCoordFromWorld(rect.Location + new Vector2(x, y)));
+                  }
+                }
             }
             return input.IsDrag;
           }
@@ -114,7 +125,7 @@ namespace Raven
     }
     void PaintSpriteScene(FreeformLayer freeformLayer, SpriteScene scene)
     {
-      var pos = Camera.MouseToWorldPoint(); 
+      var pos = InputManager.GetWorldMousePosition(Camera); 
       if (_view.PaintMode == PaintMode.Pen)
       {
         var paint = freeformLayer.PaintSpriteScene(scene);
@@ -122,13 +133,13 @@ namespace Raven
       }
       else if (_view.PaintMode == PaintMode.Eraser)
       {
-        freeformLayer.RemoveSpriteSceneAt(Camera.MouseToWorldPoint());
+        freeformLayer.RemoveSpriteSceneAt(InputManager.GetWorldMousePosition(Camera));
       }
     }
     public override void OnHandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<InputManager>();
-      var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
+      var rawMouse = InputManager.ScreenMousePosition.ToNumerics();
 
       if (_view.SpritePicker.SelectedSprite is Sprite sprite)
       {
@@ -150,7 +161,7 @@ namespace Raven
         {
           case PaintType.Single: PaintPreviewAt(tilePos); break;
           case PaintType.Rectangle:
-            if (Nez.Input.LeftMouseButtonDown && !input.IsDragFirst)
+            if (Nez.Input.LeftMouseButtonDown)
             {
               if (_view.PaintMode == PaintMode.Pen)
               {

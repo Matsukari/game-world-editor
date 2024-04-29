@@ -89,12 +89,22 @@ namespace Raven
         if (ImGui.MenuItem("Snap to grid"))
         {
         }
-        if (ImGui.MenuItem("Snap to custom size"))
+
+        ImGui.SeparatorText("Snap to custom size");
         {
+          ImGui.InputInt("Width", ref _snapWidth);
+          ImGui.InputInt("Height", ref _snapHeight); 
+          if (ImGui.Button("Ok")) 
+          {
+            InputManager.MouseSnapSize.X = _snapWidth;
+            InputManager.MouseSnapSize.Y = _snapHeight;
+          }
         }
         ImGui.EndPopup();
       }
     }
+    int _snapWidth = 1;
+    int _snapHeight = 1;
     void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {
       Vector2 stackSize = new Vector2();

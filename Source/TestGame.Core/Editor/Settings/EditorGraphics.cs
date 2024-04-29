@@ -14,5 +14,7 @@ namespace Raven
     public int InitialInspectorWindowWidth = 260;
 
     public bool FixedWindowSize = true;
+
+    public bool FocusOnOneLevel = true;
   } 
 }

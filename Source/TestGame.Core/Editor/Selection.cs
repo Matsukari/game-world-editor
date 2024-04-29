@@ -59,7 +59,7 @@ namespace Raven
     {
       // The distance between the movement of the mouse
       var _bounds = ContentBounds;
-      var mouse = Nez.Input.RawMousePosition.ToVector2();
+      var mouse = InputManager.ScreenMousePosition;
       var delta = mouse - input.MouseDragStart;
       delta /= Entity.Scene.Camera.RawZoom;
 

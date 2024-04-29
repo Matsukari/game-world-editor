@@ -11,6 +11,28 @@ namespace Raven
     public bool IsDrag = false;
     public bool IsDragFirst = false;
     public bool IsDragLast = false; 
+    public static Point MouseSnapSize = Point.Zero;
+    public static Vector2 ScreenMousePosition 
+    {
+      get 
+      {
+        var pos = Nez.Input.MousePosition;
+        if (MouseSnapSize != Point.Zero)
+        {
+          pos = pos.RoundToPoint().ToVector2().RoundFloor(MouseSnapSize);
+        }
+        return pos;
+      }
+    }
+    public static Vector2 GetWorldMousePosition(Camera camera)
+    {
+      var pos = camera.MouseToWorldPoint();
+      if (MouseSnapSize != Point.Zero)
+      {
+        pos = pos.RoundToPoint().ToVector2().RoundFloor(MouseSnapSize);
+      }
+      return pos;
+    }
     public static bool IsImGuiBlocking 
     { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) || ImGui.GetIO().WantTextInput || ImGui.GetIO().WantCaptureMouse; }
 
