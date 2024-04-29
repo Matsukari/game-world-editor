@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME="TestGame"
+NAME="WorldEditor"
 ASSETS="Assets"
 CONTENT="Assets/Content"
 LEVEL_EDITOR="/home/ark/Documents/game/tools/ldtk"
