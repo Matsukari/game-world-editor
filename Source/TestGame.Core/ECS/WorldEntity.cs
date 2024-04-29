@@ -6,7 +6,21 @@ namespace Raven
   {
     public readonly World World;
     public List<LevelEntity> Levels = new List<LevelEntity>();
-    public WorldEntity(World world) => World = world;
+    public WorldEntity(World world) 
+    {
+      World = world;
+    }
+    public override void OnAddedToScene()
+    {
+      foreach (var level in World.Levels)
+      {
+        var levelEntity = new LevelEntity(level);
+        levelEntity.SetParent(this);
+        Scene.AddEntity(levelEntity);
+        Levels.Add(levelEntity);
+      }
+    }
+
     public void RemoveLevel(Level level)
     {
       World.RemoveLevel(level);
@@ -22,6 +36,7 @@ namespace Raven
       Level level = World.CreateLevel(name);
       var levelEntity = new LevelEntity(level);
       levelEntity.SetParent(this);
+      Scene.AddEntity(levelEntity);
       Levels.Add(levelEntity); 
       return levelEntity;
     }

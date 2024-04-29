@@ -51,6 +51,7 @@ namespace Raven
 
     public override void Render(Batcher batcher, Camera camera)
     {
+      Console.WriteLine("Rendering TileLayer...");
       foreach (var (tilePosition, tileInstance) in Layer.Tiles)
       {
         var tile = tileInstance.Tile;

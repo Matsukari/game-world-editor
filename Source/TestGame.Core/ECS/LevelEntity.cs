@@ -25,11 +25,16 @@ namespace Raven
     {
       Level = level;
     }
-
-    public void AddLayer(Layer layer) 
+    public override void OnAddedToScene()
     {
-      Level.AddLayer(layer);
-
+      foreach (var layer in Level.Layers)
+      {
+        AddLayerRenderer(layer);    
+      }
+    }
+        
+    public void AddLayerRenderer(Layer layer)
+    {
       if (layer is TileLayer tiled) 
         AddComponent(new TileLayerRenderer()).Initialize(tiled);
 
@@ -38,7 +43,11 @@ namespace Raven
 
       else 
         throw new Exception($"Layer of type {layer.GetType().Name} cannot be Added");
-
+    }
+    public void AddLayer(Layer layer) 
+    {
+      Level.AddLayer(layer);
+      AddLayerRenderer(layer);
     }
     public void RemoveLayer(Layer layer)
     {

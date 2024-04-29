@@ -269,6 +269,8 @@ namespace Raven
         ImGuiUtils.SpanX(20);
         if (ImGui.Button(Icon.Play))
         {
+          var scene = new WorldScene(Core.Scene, worldView.World, _editor.Settings.Colors.WorldBackground.ToColor());
+          Core.StartSceneTransition(new CrossFadeTransition(()=>scene));
         }
       }
 

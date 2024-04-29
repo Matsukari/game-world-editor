@@ -16,5 +16,6 @@ namespace Raven
     public bool FixedWindowSize = true;
 
     public bool FocusOnOneLevel = true;
+
   } 
 }
