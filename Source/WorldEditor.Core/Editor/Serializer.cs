@@ -86,7 +86,7 @@ namespace Raven
       for (int i = 0; i < settings.LastFiles.Count(); i++)
       {
         var file = settings.LastFiles[i];
-        if (Path.Exists(file.Filename) || (file.Type != "Sheet" || file.Type != "World"))
+        if (!Path.Exists(file.Filename))
         { 
           invalidFiles.Add(i);
           Console.WriteLine("Err; does not exist; ignoring, " + i);

@@ -20,6 +20,7 @@ namespace Raven
     /// <summary>
     /// The context of the play
     /// </summary>
+    [JsonExclude]
     public object Target;
 
     /// <summary>

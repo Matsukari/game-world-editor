@@ -75,6 +75,7 @@ namespace Raven
           {
             _settings.LastFiles.Add(recent);
             _settings.LastFile = _settings.LastFiles.Count() - 1;
+            Console.WriteLine("Adding history to lastfiles");
           }
           else _settings.LastFile = i;
           
