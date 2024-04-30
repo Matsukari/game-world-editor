@@ -45,6 +45,17 @@ namespace Raven
       { 
         Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), new World()))));
       }
+      if (ImGui.Button("Open Sheet", size))
+      { 
+        _imgui.FilePicker.Open(path=>
+            Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new SheetView(), Serializer.LoadContent<Sheet>(path))))), "Open Sheet"); 
+      }
+      ImGui.SameLine();
+      if (ImGui.Button("Open World", size))
+      { 
+        _imgui.FilePicker.Open(path=>
+            Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), Serializer.LoadContent<World>(path))))), "Open World"); 
+      }
  
       var i = 0;
       List<int> invalidFiles = new List<int>(); 

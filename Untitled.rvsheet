@@ -1,0 +1,551 @@
+{
+	"@id": "1",
+	"Name": "/home/ark/Documents/game/projects/WorldEditor/Untitled.rvsheet",
+	"Properties": {
+		"@id": "2",
+		"Data": [
+
+		]
+	},
+	"Animations": [
+		{
+			"@id": "3",
+			"Name": "Animation",
+			"Properties": {
+				"@id": "4",
+				"Data": [
+
+				]
+			},
+			"IsVisible": true,
+			"Color": {
+				"@id": "5",
+				"X": 1,
+				"Y": 1,
+				"Z": 1,
+				"W": 1
+			},
+			"Origin": {
+				"@id": "6",
+				"X": 0,
+				"Y": 0
+			},
+			"Transform": {
+				"@id": "7",
+				"Position": {
+					"@ref": "6"
+				},
+				"Scale": {
+					"@id": "8",
+					"X": 1,
+					"Y": 1
+				},
+				"Skew": {
+					"@ref": "8"
+				},
+				"Rotation": 0
+			},
+			"IsLocked": false,
+			"SpriteEffects": "None",
+			"IsContinous": false,
+			"CurrentFrame": 7,
+			"Frames": [
+				{
+					"@id": "9",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "10",
+						"Name": "",
+						"Properties": {
+							"@id": "11",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "12",
+							"X": 0,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "11"
+					}
+				},
+				{
+					"@id": "13",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "14",
+						"Name": "",
+						"Properties": {
+							"@id": "15",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "16",
+							"X": 16,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "15"
+					}
+				},
+				{
+					"@id": "17",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "18",
+						"Name": "",
+						"Properties": {
+							"@id": "19",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "20",
+							"X": 32,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "19"
+					}
+				},
+				{
+					"@id": "21",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "22",
+						"Name": "",
+						"Properties": {
+							"@id": "23",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "24",
+							"X": 48,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "23"
+					}
+				},
+				{
+					"@id": "25",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "26",
+						"Name": "",
+						"Properties": {
+							"@id": "27",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "28",
+							"X": 64,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "27"
+					}
+				},
+				{
+					"@id": "29",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "30",
+						"Name": "",
+						"Properties": {
+							"@id": "31",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "32",
+							"X": 80,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "31"
+					}
+				},
+				{
+					"@id": "33",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "34",
+						"Name": "",
+						"Properties": {
+							"@id": "35",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "36",
+							"X": 96,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "35"
+					}
+				},
+				{
+					"@id": "37",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "38",
+						"Name": "",
+						"Properties": {
+							"@id": "39",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "40",
+							"X": 112,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "39"
+					}
+				},
+				{
+					"@id": "41",
+					"@type": "Raven.SpriteAnimationFrame",
+					"Sprite": {
+						"@id": "42",
+						"Name": "",
+						"Properties": {
+							"@id": "43",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "44",
+							"X": 128,
+							"Y": 0,
+							"Width": 16,
+							"Height": 16
+						}
+					},
+					"Name": "",
+					"Duration": 0.1,
+					"EaseType": "Linear",
+					"Properties": {
+						"@ref": "43"
+					}
+				}
+			],
+			"Target": {
+				"@id": "45"
+			}
+		}
+	],
+	"Source": "/home/ark/Documents/game/projects/WorldEditor/Assets/deer-breathe.png",
+	"Tiles": {
+		"@id": "46",
+		"X": 4,
+		"Y": 1
+	},
+	"SpriteScenees": [
+		{
+			"@id": "47",
+			"Name": "sce",
+			"Properties": {
+				"@id": "48",
+				"Data": [
+
+				]
+			},
+			"Parts": [
+				{
+					"@id": "49",
+					"@type": "Raven.SourcedSprite",
+					"Name": "Main component",
+					"Properties": {
+						"@id": "50",
+						"Data": [
+
+						]
+					},
+					"IsVisible": true,
+					"Color": {
+						"@ref": "5"
+					},
+					"Origin": {
+						"@ref": "6"
+					},
+					"Transform": {
+						"@id": "51",
+						"Position": {
+							"@ref": "6"
+						},
+						"Scale": {
+							"@ref": "8"
+						},
+						"Skew": {
+							"@ref": "8"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"@id": "52",
+						"Name": "",
+						"Properties": {
+							"@id": "53",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "54",
+							"X": 0,
+							"Y": 0,
+							"Width": 32,
+							"Height": 31
+						}
+					}
+				},
+				{
+					"@id": "55",
+					"@type": "Raven.AnimatedSprite",
+					"Name": "Animation",
+					"Properties": {
+						"@id": "56",
+						"Data": [
+
+						]
+					},
+					"IsVisible": true,
+					"Color": {
+						"@ref": "5"
+					},
+					"Origin": {
+						"@ref": "6"
+					},
+					"Transform": {
+						"@id": "57",
+						"Position": {
+							"@id": "58",
+							"X": 33.14398,
+							"Y": -84.32836
+						},
+						"Scale": {
+							"@id": "59",
+							"X": 3.4280097,
+							"Y": 3.4280097
+						},
+						"Skew": {
+							"@ref": "8"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"IsContinous": false,
+					"CurrentFrame": 4,
+					"Frames": [
+						{
+							"@id": "60",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "10"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "11"
+							}
+						},
+						{
+							"@id": "61",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "14"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "15"
+							}
+						},
+						{
+							"@id": "62",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "18"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "19"
+							}
+						},
+						{
+							"@id": "63",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "22"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "23"
+							}
+						},
+						{
+							"@id": "64",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "26"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "27"
+							}
+						},
+						{
+							"@id": "65",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "30"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "31"
+							}
+						},
+						{
+							"@id": "66",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "34"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "35"
+							}
+						},
+						{
+							"@id": "67",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "38"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "39"
+							}
+						},
+						{
+							"@id": "68",
+							"@type": "Raven.SpriteAnimationFrame",
+							"Sprite": {
+								"@ref": "42"
+							},
+							"Name": "",
+							"Duration": 0.1,
+							"EaseType": "Linear",
+							"Properties": {
+								"@ref": "43"
+							}
+						}
+					],
+					"Target": {
+						"@ref": "45"
+					}
+				}
+			],
+			"Animations": [
+
+			],
+			"Transform": {
+				"@id": "69",
+				"Position": {
+					"@ref": "6"
+				},
+				"Scale": {
+					"@ref": "8"
+				},
+				"Skew": {
+					"@ref": "8"
+				},
+				"Rotation": 0
+			}
+		}
+	],
+	"TileWidth": 32,
+	"TileHeight": 31
+}

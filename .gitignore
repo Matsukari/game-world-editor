@@ -1,6 +1,6 @@
-Source/TestGame.Core/bin/*
-Source/TestGame.Core/obj/*
-Source/TestGame.Desktop/bin/*
-Source/TestGame.Desktop/obj/*
+Source/WorldEditor.Core/bin/*
+Source/WorldEditor.Core/obj/*
+Source/WorldEditor.Desktop/bin/*
+Source/WorldEditor.Desktop/obj/*
 Assets/bin/*
 Assets/obj/*

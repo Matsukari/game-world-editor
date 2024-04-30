@@ -31,6 +31,8 @@ namespace Raven
     void WorldOptions()
     {
       if (ImGui.MenuItem("New World")) _editor.ContentManager.AddTab(new WorldView(), new World());
+      if (ImGui.MenuItem("Open World")) 
+        _editor.WindowManager.FilePicker.Open(path=>_editor.ContentManager.AddTab(new WorldView(), Serializer.LoadContent<World>(path)), "Open Sheet"); 
       if (ImGui.BeginMenu("Worlds"))
       {
         foreach (var content in _editor.ContentManager._tabs)
@@ -45,7 +47,12 @@ namespace Raven
     }
     void SheetOptions()
     {
-      if (ImGui.MenuItem("New Sheet")) _editor.WindowManager.FilePicker.Open((filename)=> _editor.ContentManager.AddTab(new SheetView(), new Sheet(filename)), "Open Sheet"); 
+      if (ImGui.MenuItem("New Sheet")) 
+        _editor.WindowManager.FilePicker.Open((filename)=> _editor.ContentManager.AddTab(new SheetView(), new Sheet(filename)), "Open Sheet"); 
+
+      if (ImGui.MenuItem("Open World")) 
+        _editor.WindowManager.FilePicker.Open(path=>_editor.ContentManager.AddTab(new SheetView(), Serializer.LoadContent<Sheet>(path)), "Open Sheet"); 
+
       if (ImGui.BeginMenu("Sheets"))
       {
         foreach (var content in _editor.ContentManager._tabs)
