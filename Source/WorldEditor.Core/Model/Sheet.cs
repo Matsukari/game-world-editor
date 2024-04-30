@@ -85,7 +85,7 @@ namespace Raven
     /// </summary>
     public Sheet(string filename) 
     {
-      Name = Path.Combine(System.Environment.CurrentDirectory, "Untitled.rvsheet").GetUniqueFileName();
+      Name = Path.Combine(System.Environment.CurrentDirectory, "Untitled.rvsheet");
       var texture = Texture2D.FromStream(Core.GraphicsDevice, File.OpenRead(filename));
       texture.Name = filename;
       Source = filename;

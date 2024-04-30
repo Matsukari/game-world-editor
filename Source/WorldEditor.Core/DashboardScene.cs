@@ -11,6 +11,7 @@ namespace Raven
     ImGuiWinManager _imgui = new ImGuiWinManager();
     Widget.PopupDelegate _dialog = new Widget.PopupDelegate("dialog");
     Texture2D _appLogo;
+    Settings _settingsWindow;
     public DashboardScene()
     {
       ClearColor = Color.Black;
@@ -26,6 +27,11 @@ namespace Raven
         _settings = Serializer.LoadSettings();
 
       _appLogo = Content.LoadTexture(WorldEditor.Assets.Images.App_logo);
+      _settingsWindow = new Settings(_settings);
+      _settingsWindow.IsOpen = true;
+      _imgui.AddImmediate(_settingsWindow);
+
+      _settings.ApplyImGui();
     }    
     void RenderImGui()
     {
@@ -114,7 +120,8 @@ namespace Raven
 
       var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_appLogo);
       var imageSize = ImGuiUtils.ContainSize(_appLogo.GetSize().ToNumerics(), ImGui.GetContentRegionAvail());
-      ImGui.Image(texture, imageSize);
+      ImGui.Image(texture, imageSize, new System.Numerics.Vector2(0, 0), new System.Numerics.Vector2(1, 1), 
+          tint_col: new System.Numerics.Vector4(0.5f, 0.5f, 0.5f, 0.5f));
       ImGui.End();
     }
     void RenderDockSpace()

@@ -14,6 +14,9 @@ namespace Raven
     public EditorContentData Copy() => MemberwiseClone() as EditorContentData;
 
     [JsonExclude]
+    public bool HasChanges = false;
+
+    [JsonExclude]
     public IPropertied PropertiedContext = null;
 
     [JsonExclude]

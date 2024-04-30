@@ -116,6 +116,7 @@ namespace Raven
 
     public int Current { get => _current; }
     public List<Command> Commands { get => _commands; }
+    public event Action<Command> OnRecord;
     
     public void Undo()
     {
@@ -157,6 +158,8 @@ namespace Raven
       _commands.Add(command);
       _current++;
       Console.WriteLine($"Recording {command.GetType().Name}, stack: {_commands.Count}");
+
+      if (OnRecord != null) OnRecord(command);
     }
     public void Record(Command command, Action onUndoRedo) 
     {
