@@ -20,12 +20,11 @@ namespace Raven
 
     static public string BestWrap(this string name, int chars = 30)
     {
-      var file = Path.GetFileName(name);
-      if (file.Length > chars) file.Substring(file.Length-chars, file.Length);
-      if (Path.GetDirectoryName(name) != string.Empty) 
-        name = $"../{file}";
+      if (name.Length > chars) name = name.Substring(name.Length-chars, chars);
+      if (Path.GetDirectoryName(name) != string.Empty && Path.GetFileName(name).Length > chars) 
+        name = $"../{Path.GetFileName(name)}";
       else 
-        name = file;
+        name = "..." + name;
       return name; 
     }
 

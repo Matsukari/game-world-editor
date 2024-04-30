@@ -114,6 +114,9 @@ namespace Raven
     Command _node { get => _commands[_current]; }
     int _current = -1;
 
+    public int Current { get => _current; }
+    public List<Command> Commands { get => _commands; }
+    
     public void Undo()
     {
       if (_current >= 0)

@@ -90,6 +90,7 @@ namespace Raven
       WindowManager.AddImmediate(ShapeAnnotator);
       WindowManager.AddImmediate(new WindowHolder("Content"), "main");
       WindowManager.AddImmediate(new WindowHolder("Inspector"), "sub");
+      WindowManager.AddImmediate(new History());
 
       WindowManager.GetRenderable<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
       Serializer.LoadStartup();

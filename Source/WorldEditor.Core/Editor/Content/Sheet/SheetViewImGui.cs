@@ -48,6 +48,8 @@ namespace Raven
       Inspector.Sheet = _sheet;
       imgui.GetRenderable<WindowHolder>("main").Content = Inspector;
 
+      imgui.GetRenderable<History>().Update(Core.GetGlobalManager<CommandManager>());
+
       var animEditor = SpriteAnimEditor as IImGuiRenderable;
       animEditor.Render(imgui);
 
