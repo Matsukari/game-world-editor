@@ -42,7 +42,12 @@ namespace Raven
         catch (FileNotFoundException) 
         { 
           invalidFiles.Add(i);
-          Console.WriteLine("Err; does not exist; ignoring, " + i);
+          Console.WriteLine("Err; file not found; ignoring, " + i);
+          continue; 
+        }
+        catch (ArgumentNullException)
+        {
+          invalidFiles.Add(i);
           continue; 
         }
         catch (NotSupportedException) 
@@ -111,6 +116,19 @@ namespace Raven
       }
       new SettingsSerializer().Save(ApplicationSavePath, _contentManager.Settings);
     }
+    public static (ContentView, IPropertied) TryLoadContent(EditorContentData file) 
+    {
+      try 
+      {
+        if (file.Type == "Sheet") return (new SheetView(), LoadContent<Sheet>(file.Filename));
+        else if (file.Type == "World") return (new WorldView(), LoadContent<World>(file.Filename));
+        else throw new Exception($"Error in file metadata. Cannot load {file.Type} content");
+      } 
+      catch (Exception) 
+      { 
+      }
+      return (null, null);
+    }
     public static T LoadContent<T>(string file) where T: class
     {
       Console.WriteLine($"Loading content {file}");
@@ -118,13 +136,20 @@ namespace Raven
       {
         throw new FileNotFoundException();
       }
-      if (typeof(T) == typeof(Sheet)) return new SheetSerializer().Load(file) as T;
-      else if (typeof(T) == typeof(World)) return new WorldSerializer().Load(file) as T;
-      else 
+      try 
       {
-        throw new NotSupportedException($"Cannot load type {typeof(T).Name}");
+        if (typeof(T) == typeof(Sheet)) return new SheetSerializer().Load(file) as T;
+        else if (typeof(T) == typeof(World)) return new WorldSerializer().Load(file) as T;
+        else 
+        {
+          throw new NotSupportedException($"Cannot load type {typeof(T).Name}");
+        }
       }
-
+      catch (FileNotFoundException)
+      {
+        Console.WriteLine("Source file as required by the content no longer exist!");
+      }
+      return null;
     }
     public void SaveContent(string filepath)
     {

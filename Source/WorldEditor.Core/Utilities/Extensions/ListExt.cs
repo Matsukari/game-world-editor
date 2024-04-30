@@ -72,6 +72,15 @@ namespace Raven
       }
       return newList;
     }
+    public static List<T> CopyValues<T>(this List<T> list) where T: struct
+    {
+      List<T> newList = new List<T>();
+      foreach (var item in list)
+      {
+        newList.Add(item);
+      }
+      return newList;
+    }
     public static bool[] FalseRange(this bool[] list, int except=-1)
     {
       for (int i = 0; i < list.Count(); i++) 

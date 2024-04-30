@@ -89,6 +89,9 @@ namespace Raven
     }
     public void AddTab(ContentView contentView, IPropertied content, bool isSwitch=false, bool forceAdd=true)
     {
+      if (content == null || contentView == null) 
+        throw new ArgumentNullException("Argument passed is null.");
+
       if (!contentView.CanDealWithType(content))
         throw new Exception($"Cannot deal with type: {content.GetType()}");
 

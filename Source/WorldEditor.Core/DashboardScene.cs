@@ -70,17 +70,24 @@ namespace Raven
             continue;
           }
       
+          var content = Serializer.TryLoadContent(recent);
+          if (content.Item1 == null || content.Item2 == null)
+          {
+            invalidFiles.Add(i);
+            _dialog.Open(imgui => ImGuiUtils.TextMiddle("Oops! Cannot open file. An error occured."));
+            continue;
+          }
           // does not exist in the last file
           if (_settings.LastFiles.Find(item => item.Filename == recent.Filename) == null)
           {
-            _settings.LastFiles.Add(recent);
-            _settings.LastFile = _settings.LastFiles.Count() - 1;
-            Console.WriteLine("Adding history to lastfiles");
+            Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(content.Item1, content.Item2))));
           }
           else _settings.LastFile = i;
           
           new Serializers.SettingsSerializer().Save(Serializer.ApplicationSavePath, _settings);
-          Core.StartSceneTransition(new FadeTransition(()=>new EditorScene()));
+
+          var editor = new EditorScene();
+          Core.StartSceneTransition(new FadeTransition(()=>editor));
         }
         i++;
       }

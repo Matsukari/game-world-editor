@@ -25,7 +25,7 @@ namespace WorldEditor
 			public const string FontAwesome6BrandsRegular400 = @"Fonts/Font Awesome 6 Brands-Regular-400.otf";
 			public const string FontAwesome6FreeRegular400 = @"Fonts/Font Awesome 6 Free-Regular-400.otf";
 			public const string FontAwesome6FreeSolid900 = @"Fonts/Font Awesome 6 Free-Solid-900.otf";
-			public const string RobotoCondensedRegular = @"Fonts/RobotoCondensed-Regular";
+			public const string RobotoCondensedRegular = @"Fonts/RobotoCondensed-Regular.ttf";
 		}
 
 		public static class Images

@@ -3,7 +3,7 @@ using Nez.Persistence;
 
 namespace Raven
 {
-  public class EditorContentData
+  public class EditorContentData : ICloneable
   {
     public string Filename;
     public string Type;
@@ -26,6 +26,11 @@ namespace Raven
     {
       Filename = filename;
       Type = type;
+    }
+
+    object ICloneable.Clone() 
+    {
+      return MemberwiseClone();
     }
   }
 }

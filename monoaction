@@ -31,6 +31,10 @@ elif [[ $1 == "debug" ]]; then
   gdb gdb -ex "run" --args $PROJECT/bin/Release/net8.0/win-x64/$PROJECT_NAME.exe <<EOF
 y
 EOF
+elif [[ $1 == "debug_last" ]]; then
+  gdb gdb -ex "run" --args $PROJECT/bin/Release/net8.0/win-x64/$PROJECT_NAME.exe <<EOF
+y
+EOF
 
 elif [[ $1 == "content" ]]; then
   echo "Content pipeline $DESKTOP"
