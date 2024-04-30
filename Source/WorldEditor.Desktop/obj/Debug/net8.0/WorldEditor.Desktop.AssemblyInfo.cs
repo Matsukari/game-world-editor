@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WorldEditor.Desktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f148ac18c52ccaa8a2488fd13c2cdd133cd90c2c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e4196aa8f4eaecc98b410b6d3bc0f83aadfef4bc")]
 [assembly: System.Reflection.AssemblyProductAttribute("WorldEditor.Desktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WorldEditor.Desktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

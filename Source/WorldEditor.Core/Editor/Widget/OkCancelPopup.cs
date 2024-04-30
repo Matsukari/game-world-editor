@@ -32,6 +32,33 @@ namespace Raven.Widget
       }
     } 
   }
+  public class PopupDelegate : IImGuiRenderable
+  {
+    bool _isOpen;
+    public string Name;
+    Action<ImGuiWinManager> _renderDelegate;
+    public bool IsOpen { get => ImGui.IsPopupOpen(Name); }
+    public PopupDelegate(string name) => Name = name;
+    public void Open(Action<ImGuiWinManager> renderDelegate)
+    {
+      _isOpen = true;
+      _renderDelegate = renderDelegate;
+    }
+
+    public void Render(ImGuiWinManager imgui)
+    {
+      if (_isOpen)
+      {
+        ImGui.OpenPopup(Name);
+        _isOpen = false;
+      }
+      if (ImGui.BeginPopup(Name, ImGuiWindowFlags.NoDecoration))
+      {
+        _renderDelegate.Invoke(imgui);
+        ImGui.EndPopup();
+      }
+    } 
+  }
   public abstract class OkCancelPopup 
   {
     bool _isokCancel;

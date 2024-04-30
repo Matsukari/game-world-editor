@@ -88,9 +88,9 @@ namespace Raven
       WindowManager.AddImmediate(new StatusBar(this));
       WindowManager.AddImmediate(new Menubar(this));
       WindowManager.AddImmediate(ShapeAnnotator);
+      WindowManager.AddImmediate(new History());
       WindowManager.AddImmediate(new WindowHolder("Content"), "main");
       WindowManager.AddImmediate(new WindowHolder("Inspector"), "sub");
-      WindowManager.AddImmediate(new History());
 
       WindowManager.GetRenderable<Settings>().OnSaveSettings += () => Serializer.SaveSettings();
       Serializer.LoadStartup();
@@ -108,19 +108,15 @@ namespace Raven
       input.RegisterInputHandler(GetComponent<SelectionRenderer>());
 
 
-      if (Settings.LastFiles.Count() == 0)
-      {
-        var sheet = new Sheet("/home/ark/Documents/game/projects/WorldEditor/Assets/Raw/Unprocessed/big_forest.png");
-        ContentManager.AddTab(new SheetView(), sheet);
-        var world = new World();
-        world.AddSheet(sheet);
-        ContentManager.AddTab(new WorldView(), world);
-      }
 
       if (_nextView != null && _nextContent != null)
       {
         ContentManager.AddTab(_nextView, _nextContent);
         Settings.LastFile = ContentManager._tabs.Count - 1;
+      }
+      if (Settings.LastFiles.Count() == 0 && ContentManager._tabs.Count() == 0)
+      {
+        throw new Exception("Must provide a default content if there are no recent files");
       }
 
       ContentManager.Switch(0, true);

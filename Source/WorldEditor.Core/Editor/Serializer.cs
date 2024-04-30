@@ -42,18 +42,21 @@ namespace Raven
         catch (FileNotFoundException) 
         { 
           invalidFiles.Add(i);
-          Console.WriteLine("Err; does not exist; ignoring");
+          Console.WriteLine("Err; does not exist; ignoring, " + i);
           continue; 
         }
         catch (NotSupportedException) 
         { 
           invalidFiles.Add(i);
-          Console.WriteLine("Err; does not support type");
+          Console.WriteLine("Err; does not support type, " + i);
           continue; 
         }
       }
-      foreach (var inv in invalidFiles)
-        loadedSettings.LastFiles.RemoveAt(inv); 
+      for (int i = invalidFiles.Count()-1; i >= 0; i--) 
+      {
+        loadedSettings.LastFiles.RemoveAt(invalidFiles[i]); 
+      }
+
 
       new SettingsSerializer().Save(ApplicationSavePath, loadedSettings);
 
@@ -77,7 +80,24 @@ namespace Raven
     public static EditorSettings LoadSettings()
     {
       Console.WriteLine($"Loading {ApplicationSavePath}");
-      return new SettingsSerializer().Load(ApplicationSavePath);
+      var settings = new SettingsSerializer().Load(ApplicationSavePath);
+
+      List<int> invalidFiles = new List<int>();
+      for (int i = 0; i < settings.LastFiles.Count(); i++)
+      {
+        var file = settings.LastFiles[i];
+        if (Path.Exists(file.Filename) || (file.Type != "Sheet" || file.Type != "World"))
+        { 
+          invalidFiles.Add(i);
+          Console.WriteLine("Err; does not exist; ignoring, " + i);
+        }
+      }
+      for (int i = invalidFiles.Count()-1; i >= 0; i--) 
+      {
+        settings.LastFiles.RemoveAt(invalidFiles[i]); 
+      }
+      new SettingsSerializer().Save(ApplicationSavePath, settings);
+      return settings;
     }
     public void SaveSettings()
     {

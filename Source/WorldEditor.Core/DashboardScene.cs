@@ -8,6 +8,7 @@ namespace Raven
   {
     EditorSettings _settings;
     ImGuiWinManager _imgui = new ImGuiWinManager();
+    Widget.PopupDelegate _dialog = new Widget.PopupDelegate("dialog");
     public DashboardScene()
     {
       ClearColor = Color.Black;
@@ -24,6 +25,8 @@ namespace Raven
     void RenderImGui()
     {
       RenderDockSpace();
+
+      _dialog.Render(_imgui);
 
       ImGui.Begin("Updates");
       ImGuiUtils.TextMiddle("This is the latest version. Debug 1.");
@@ -42,11 +45,21 @@ namespace Raven
       { 
         Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), new World()))));
       }
+ 
       var i = 0;
+      List<int> invalidFiles = new List<int>(); 
       foreach (var recent in _settings.FileHistory)
       {
         if (ImGui.MenuItem(recent.Filename.BestWrap())) 
         {
+          if (!Path.Exists(recent.Filename))
+          {
+            invalidFiles.Add(i);
+            _dialog.Open(imgui => ImGuiUtils.TextMiddle("File no longer exist."));
+            continue;
+          }
+      
+          // does not exist in the last file
           if (_settings.LastFiles.Find(item => item.Filename == recent.Filename) == null)
           {
             _settings.LastFiles.Add(recent);
@@ -59,6 +72,11 @@ namespace Raven
         }
         i++;
       }
+      for (i = invalidFiles.Count()-1; i >= 0; i--) 
+      {
+        _settings.FileHistory.RemoveAt(invalidFiles[i]); 
+      }
+      new Serializers.SettingsSerializer().Save(Serializer.ApplicationSavePath, _settings);
 
       ImGui.End();
 
