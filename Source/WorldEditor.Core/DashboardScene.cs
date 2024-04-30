@@ -1,5 +1,6 @@
 using Nez;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 
 namespace Raven
@@ -9,9 +10,11 @@ namespace Raven
     EditorSettings _settings;
     ImGuiWinManager _imgui = new ImGuiWinManager();
     Widget.PopupDelegate _dialog = new Widget.PopupDelegate("dialog");
+    Texture2D _appLogo;
     public DashboardScene()
     {
       ClearColor = Color.Black;
+      Content.RootDirectory = "Assets";
     }
     public override void OnStart()
     {
@@ -21,6 +24,8 @@ namespace Raven
         _settings = new EditorSettings();
       else
         _settings = Serializer.LoadSettings();
+
+      _appLogo = Content.LoadTexture(WorldEditor.Assets.Images.App_logo);
     }    
     void RenderImGui()
     {
@@ -99,7 +104,18 @@ namespace Raven
 
       ImGui.End();
 
+      RenderContentArea();
+
       _imgui.Render();
+    }
+    void RenderContentArea()
+    {
+      ImGui.Begin("ContentArea", ImGuiWindowFlags.NoDecoration);
+
+      var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_appLogo);
+      var imageSize = ImGuiUtils.ContainSize(_appLogo.GetSize().ToNumerics(), ImGui.GetContentRegionAvail());
+      ImGui.Image(texture, imageSize);
+      ImGui.End();
     }
     void RenderDockSpace()
     {

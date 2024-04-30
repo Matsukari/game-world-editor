@@ -31,7 +31,7 @@
   </ItemGroup>
   <!-- Include the Content directory (except for .fx files, since we use .fxb at runtime) -->
   <ItemGroup>
-    <Content Include="../../Assets/Raw/**/*" Exclude="**\*.fx">
+    <Content Include="../../Assets/**/*" Exclude="**\*.fx;**\*.mgcb;**\*.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

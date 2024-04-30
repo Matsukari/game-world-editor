@@ -14,10 +14,10 @@ namespace WorldEditor
 		public static class Sheets
 		{
 			public const string Big_forest = @"Content/Sheets/big_forest";
-			public const string Body_parts = @"Content/Sheets/body_parts";
 			public const string Deerbreathe = @"Content/Sheets/deer-breathe";
 		}
 
+		public const string Body_parts = @"Content/body_parts";
 		public const string Content = @"Content/Content.mgcb";
 		public const string NuGet = @"Content/NuGet.config";
 		public static class Fonts
@@ -30,7 +30,8 @@ namespace WorldEditor
 
 		public static class Images
 		{
-			public const string Icon = @"Images/icon";
+			public const string App_logo = @"Images/app_logo.png";
+			public const string Icon = @"Images/icon.png";
 		}
 
 
