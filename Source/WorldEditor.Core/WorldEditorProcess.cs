@@ -12,6 +12,7 @@ public class WorldEditorProcess : Core
     RegisterGlobalManager(new Raven.InputManager());
     RegisterGlobalManager(new Raven.CommandManager());
 
+    Content.RootDirectory = "Assets";
     Window.IsBorderless = true;
     Window.Title = "World Editor";
     Window.AllowUserResizing = true;
@@ -20,8 +21,8 @@ public class WorldEditorProcess : Core
     Window.IsBorderless = true; 
     IsFixedTimeStep = true;
     var imGuiOptions = new ImGuiOptions();
-    imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.RobotoCondensedRegular, 16);
-    imGuiOptions.AddFont("Assets/Raw/" + Assets.Unprocessed.Fonts.FontAwesome6FreeSolid900, 18);
+    imGuiOptions.AddFont("Assets/" + Assets.Fonts.RobotoCondensedRegular, 16);
+    imGuiOptions.AddFont("Assets/" + Assets.Fonts.FontAwesome6FreeSolid900, 18);
     imGuiOptions.IncludeDefaultFont(false);
 
     var imGuiManager = new ImGuiManager(imGuiOptions);
