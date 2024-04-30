@@ -24,7 +24,7 @@ namespace Raven
     {
       _popups = new WorldViewPopup();
       _inspector = new WorldInspector(this);
-      _inspector.OnAddSheet += file => _world.AddSheet(Serializer.LoadContent<Sheet>(file));
+      // _inspector.OnAddSheet += file => _world.AddSheet(Serializer.LoadContent<Sheet>(file));
       _inspector.OnRemoveLevel += level => Selection.End();
      
       _spritePicker = painter;

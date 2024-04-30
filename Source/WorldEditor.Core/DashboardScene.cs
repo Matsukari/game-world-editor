@@ -56,16 +56,25 @@ namespace Raven
       { 
         Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), new World()))));
       }
+
+      void TryLoad(ContentView view, string path)
+      {
+        var content = Serializer.LoadContent<Sheet>(path);
+        if (content == null)
+        {
+          _dialog.Open(imgui => ImGuiUtils.TextMiddle("Oops! Cannot open file. An error occured.")); 
+          return;
+        }
+        Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(view, content)))); 
+      }
       if (ImGui.Button("Open Sheet", size))
       { 
-        _imgui.FilePicker.Open(path=>
-            Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new SheetView(), Serializer.LoadContent<Sheet>(path))))), "Open Sheet"); 
+        _imgui.FilePicker.Open(path=>TryLoad(new SheetView(), path), "Open Sheet"); 
       }
       ImGui.SameLine();
       if (ImGui.Button("Open World", size))
       { 
-        _imgui.FilePicker.Open(path=>
-            Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), Serializer.LoadContent<World>(path))))), "Open World"); 
+        _imgui.FilePicker.Open(path=>TryLoad(new WorldView(), path), "Open World"); 
       }
  
       var i = 0;

@@ -14,36 +14,48 @@ namespace Raven
     SpritePicker _spritePicker { get => _viewImGui.SpritePicker; }
     List<LevelInspector> _levelInspectors { get => _viewImGui.LevelInspectors;}
 
-    public WorldInspector(WorldViewImGui imgui) => _viewImGui = imgui;
+    public WorldInspector(WorldViewImGui imgui) 
+    {
+      _viewImGui = imgui;
+      OnAddSheet += (sheet) => World.AddSheet(sheet);
+    }
 
-    public event Action<string> OnAddSheet;
+    public event Action<Sheet> OnAddSheet;
     public event Action<Level> OnRemoveLevel;
 
     bool _isOpenSheetHeaderPopup = false;
-    public override void Render(ImGuiWinManager imgui)
-    {
-      base.Render(imgui);
 
+    Widget.PopupDelegate _dialog = new Widget.PopupDelegate("dialog");
+    public override void OutRender(ImGuiWinManager imgui)
+    {
       if (_isOpenSheetHeaderPopup)
       {
         _isOpenSheetHeaderPopup = false;
         ImGui.OpenPopup("sheet-header-options-popup");
+        Console.WriteLine("Opneed");
       }
-      if (ImGui.BeginPopupContextItem("sheet-header-options-popup"))
+      if (ImGui.BeginPopup("sheet-header-options-popup"))
       {
         if (ImGui.MenuItem("Add Sheet"))
         {
           void AddSheet(string file)
           {
-            if (Serializer.SheetStdExtensions.Contains(Path.GetExtension(file)) && OnAddSheet != null)
+            var content = Serializer.LoadContent<Sheet>(file);
+            if (Serializer.SheetStdExtensions.Contains(Path.GetExtension(file)))
             {
-              OnAddSheet(file);
+              if (content == null)
+              {
+                _dialog.Open(im=>ImGuiUtils.TextMiddle("File is currupt."));
+                return;
+              }
+              OnAddSheet(content);
             }
           }
           imgui.FilePicker.Open(AddSheet, "Open Sheet");
         }
         ImGui.EndPopup();
       }
+      _dialog.Render(imgui);
     }    
     protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
@@ -102,9 +114,10 @@ namespace Raven
       SheetPickerData removeSheet = null;
 
       // Spritesheet listings
-      if (ImGui.CollapsingHeader(IconFonts.FontAwesome5.BorderAll + "   SpriteSheets", ImGuiTreeNodeFlags.DefaultOpen))
+      var node = ImGui.CollapsingHeader(IconFonts.FontAwesome5.BorderAll + "   SpriteSheets", ImGuiTreeNodeFlags.DefaultOpen);
+      if (ImGui.IsItemClicked(ImGuiMouseButton.Right)) _isOpenSheetHeaderPopup = true;
+      if (node)
       {
-        if (ImGui.IsItemClicked(ImGuiMouseButton.Right) && ImGui.IsWindowHovered()) _isOpenSheetHeaderPopup = true;
         var size = 140;
         stack.Y += size;
         ImGui.BeginChild("spritesheets-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
