@@ -1,5 +1,6 @@
 using ImGuiNET;
 using Icon = IconFonts.FontAwesome5;
+using Nez;
 
 namespace Raven
 {
@@ -22,6 +23,7 @@ namespace Raven
     {
       base.Initialize(editor, content);
       AnnotatorPane = new Widget.AnnotatorPane(Settings.Colors);
+      OnConvertToScene += scene => Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddSpriteSceneCommand(_sheet, scene));
     }
     void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)
     {

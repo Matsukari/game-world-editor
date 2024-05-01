@@ -8,7 +8,6 @@ namespace Raven
   /// </summary> 
   public abstract class Command
   {
-    public bool IsReversed = false; 
     internal Action OnUndo;
     internal Action OnRedo;
     internal abstract void Redo();

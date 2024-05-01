@@ -119,7 +119,7 @@ namespace Raven
       {
         if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {
-          _lastPropertied.Properties.Remove(_propOnOptions.Item1);
+          RemoveProperty(_lastPropertied, _propOnOptions.Item1, _propOnOptions.Item2);
         }
         if (ImGui.MenuItem(Icon.Copy + "  Copy"))
         {
@@ -129,7 +129,7 @@ namespace Raven
         if (ImGui.MenuItem(Icon.Cut + "  Cut"))
         {
           _cutProperty = _propOnOptions;
-          _lastPropertied.Properties.Remove(_cutProperty.Item1);
+          RemoveProperty(_lastPropertied, _cutProperty.Item1, _cutProperty.Item2);
           _copiedProperty = null;
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
@@ -280,6 +280,12 @@ namespace Raven
     {
       propertied.Properties.Add(value, name);
       Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddPropertiedCommand(propertied, new KeyValuePair<string, object>(name, value)));
+    }
+    static void RemoveProperty(IPropertied propertied, string name, object value) 
+    {
+      propertied.Properties.Remove(name);
+      Core.GetGlobalManager<CommandManagerHead>().Current.Record(
+          new ReversedCommand(new AddPropertiedCommand(propertied, new KeyValuePair<string, object>(name, value))));
     }
 
     static void NameProperty(IPropertied propertied, Type pickedType, string name)

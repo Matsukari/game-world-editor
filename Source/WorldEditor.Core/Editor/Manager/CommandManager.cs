@@ -104,6 +104,17 @@ namespace Raven
       _prop.Properties.Set(item.Key, item.Value);
     }
   }
+  sealed class ReversedCommand : Command
+  {
+    readonly public Command Command;
+
+    public ReversedCommand(Command command) => Command = command;
+
+    internal override void Undo() => Command.Redo();
+
+    internal override void Redo() => Command.Undo();
+  }
+
   class AddPropertiedCommand : Command
   {
     IPropertied _prop;
@@ -151,7 +162,7 @@ namespace Raven
     public AddSpriteSceneCommand(Sheet sheet, SpriteScene scene)
     {
       _sheet = sheet;
-      _scene = scene.Copy();
+      _scene = scene;
     }
     internal override void Redo()
     {
@@ -251,7 +262,7 @@ namespace Raven
     /// <summary>
     /// Upon modifying, adding, removing, or any changes done in the editor, create a command and record it.
     /// </summary> 
-    public Command Record(Command command, bool isReversed=false)
+    public Command Record(Command command)
     {
       var next = _current + 1;
       if (next < _commands.Count())
@@ -259,7 +270,6 @@ namespace Raven
         Console.WriteLine($"Removing {next} - {_commands.Count() - next}");
         _commands.RemoveRange(next, _commands.Count() - next);
       }
-      command.IsReversed = isReversed;
       _commands.Add(command);
       _current++;
       Console.WriteLine($"Recording {command.GetType().Name}, stack: {_commands.Count}");

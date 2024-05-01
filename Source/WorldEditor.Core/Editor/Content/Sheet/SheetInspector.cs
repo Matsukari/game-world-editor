@@ -124,6 +124,7 @@ namespace Raven
           Sheet.Animations.RemoveAll((item)=>item.Name == _animOnOption.Name);
           if (Sheet.SpriteScenees.Count() == 0 && OnDeleteAnimation != null) 
             OnDeleteAnimation(_animOnOption);
+          
         }
         if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
         {
@@ -168,12 +169,13 @@ namespace Raven
           Sheet.SpriteScenees.RemoveAll((spriteScene)=>spriteScene.Name == _spriteSceneOnOption.Name);
           if (Sheet.SpriteScenees.Count() == 0 && OnDeleteScene != null) 
             OnDeleteScene(_spriteSceneOnOption);
-          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddSpriteSceneCommand(Sheet, _spriteSceneOnOption), true);
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ReversedCommand(new AddSpriteSceneCommand(Sheet, _spriteSceneOnOption)));
         }
         if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
         {
-          Sheet.AddScene(_spriteSceneOnOption.Copy());
-          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddSpriteSceneCommand(Sheet, _spriteSceneOnOption));
+          var scene = _spriteSceneOnOption.Copy();
+          Sheet.AddScene(scene);
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddSpriteSceneCommand(Sheet, scene));
         }
         ImGui.EndPopup();
       }
