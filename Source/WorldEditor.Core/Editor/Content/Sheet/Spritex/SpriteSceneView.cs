@@ -19,9 +19,10 @@ namespace Raven
 
     public AnimationEditor _animationEditor = new AnimationEditor();
     readonly SheetView _sheetView;
+    public bool IsEditing;
     SpriteSceneInspector _sceneInspector;
     SpriteSceneRenderer _renderer;
-    public bool IsEditing;
+    CommandManager _commandManager;
 
     public event Action OnEdit;
     public event Action OnUnEdit;
@@ -37,6 +38,7 @@ namespace Raven
       AnnotatorPane = new Widget.AnnotatorPane(editor.Settings.Colors);
       _animationEditor.Initialize(editor, content);
       _animationEditor.OnClose += () => Selection.End();
+      _commandManager = new CommandManager();
     }
     // Go to canvas and close spritesheet view
     public void Edit(SpriteScene spriteScene)
@@ -66,6 +68,8 @@ namespace Raven
       _renderer = new SpriteSceneRenderer(spriteScene);
       _renderer.Entity = Entity;
       ContentData.PropertiedContext = spriteScene;
+
+      Core.GetGlobalManager<CommandManagerHead>().Current = _commandManager;
       if (OnEdit != null) OnEdit();
     }
 
@@ -151,13 +155,12 @@ namespace Raven
           {
             _startTransform.Add(sels[i].Transform.Duplicate());
           }
-          // Console.WriteLine("Got " + _startTransform.Count());
         }
         if (Input.LeftMouseButtonReleased && _startTransform.Count() == sels.Count()) 
         {
           var command = new SceneSpriteListTransformModifyCommand(sels, _startTransform);
-          Core.GetGlobalManager<CommandManager>().Record(command, 
-              ()=>Selection.ContentBounds=command._sprites.EnclosedBounds());
+          _commandManager.Record(command, ()=>Selection.Re(command._sprites.EnclosedBounds(), command._sprites, ()=>StartTransform(command._sprites)));
+          _startTransform.Clear();
         }
       }
       if (Mover.Capture is List<ISceneSprite> moving)
@@ -265,16 +268,19 @@ namespace Raven
         {
           return false;
         }
-
-        _initialTransform.Clear();
-        foreach (var i in _multiSels)
-          _initialTransform.Add(i.Transform.Duplicate());
+        StartTransform(_multiSels);
 
         if (Operator == EditorOperator.Select) Selection.Begin(_multiSels.EnclosedBounds(), _multiSels);
       }
 
 
       return false;
+    }
+    void StartTransform(List<ISceneSprite> sels)
+    {
+      _initialTransform.Clear();
+      foreach (var i in sels)
+        _initialTransform.Add(i.Transform.Duplicate());
     }
   }
 }

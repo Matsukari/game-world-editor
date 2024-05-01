@@ -27,6 +27,18 @@ namespace Raven
       ContentBounds.Width = MathF.Floor(ContentBounds.Width / w) * w;
       ContentBounds.Height = MathF.Floor(ContentBounds.Height / w) * w;
     }
+    public void Re(RectangleF area, object capture=null)
+    {
+      if (HasBegun()) Begin(area, capture);
+    }
+    public void Re(RectangleF area, object capture, Action callback)
+    {
+      if (HasBegun()) 
+      {
+        Begin(area, capture);
+        callback.Invoke();
+      }
+    }
     public void Begin(RectangleF area, object capture=null)
     {
       Core.GetGlobalManager<InputManager>().IsDragFirst = true;
@@ -64,17 +76,18 @@ namespace Raven
       delta /= Entity.Scene.Camera.RawZoom;
 
       // start whatever selection
-      if (input.IsDragFirst)
+      if (Nez.Input.LeftMouseButtonPressed)
       {
         _selectionInitial = ContentBounds;
 
         // mouse is also inside the selection area; can insead be moved
         if (_bounds.Width != 0 && _bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
         {
+          Console.WriteLine("Drag inside...");
           _isDragInsideArea = true;
         }
       } 
-      else if (input.IsDragLast) 
+      else if (Nez.Input.LeftMouseButtonReleased) 
       {
         _isDragInsideArea = false;
         Mouse.SetCursor(MouseCursor.Arrow);
@@ -137,7 +150,7 @@ namespace Raven
       {
         _bounds.Location = _selectionInitial.Location + delta;
         ContentBounds = _bounds;
-        // Console.WriteLine("Inside draggin");
+        Console.WriteLine("Inside draggin..");
         return true;
       }
 

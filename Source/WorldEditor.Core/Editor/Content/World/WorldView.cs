@@ -15,6 +15,8 @@ namespace Raven
     WorldViewInputHandler _input;
     WorldViewImGui _imgui;
 
+    CommandManager _commandManager;
+
     World _world;
 
     // Settings
@@ -31,6 +33,8 @@ namespace Raven
     public override void Initialize(Editor editor, EditorContent content)
     {
       base.Initialize(editor, content);
+
+      _commandManager = new CommandManager();
 
       _input = new WorldViewInputHandler(this);
       _input.OnLeftClickScene += OnLeftClickScene;
@@ -61,6 +65,7 @@ namespace Raven
     public override void OnContentOpen(IPropertied content)
     {
       _world = content as World; 
+      Core.GetGlobalManager<CommandManagerHead>().Current = _commandManager;
     }  
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
@@ -145,7 +150,7 @@ namespace Raven
         if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking) 
         {
           var command = new LevelMoveCommand(lev, _startLevel); 
-          Core.GetGlobalManager<CommandManager>().Record(command, ()=>Selection.ContentBounds.Location = command._level.LocalOffset);
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(command._level.Bounds, command._level));
         }
       }
       else if (Selection.Capture is ShapeModel model)

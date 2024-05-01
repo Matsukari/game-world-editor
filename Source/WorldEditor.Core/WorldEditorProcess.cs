@@ -10,7 +10,7 @@ public class WorldEditorProcess : Core
   {
     base.Initialize();
     RegisterGlobalManager(new Raven.InputManager());
-    RegisterGlobalManager(new Raven.CommandManager());
+    RegisterGlobalManager(new Raven.CommandManagerHead());
 
     Content.RootDirectory = "Assets";
     Window.IsBorderless = true;

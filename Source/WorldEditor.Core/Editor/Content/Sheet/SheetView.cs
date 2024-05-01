@@ -13,6 +13,7 @@ namespace Raven
  
     SheetViewImGui _imgui;
     SheetViewInputHandler _input;
+    CommandManager _commandManager;
 
     Sheet _sheet;
     SpriteRenderer _image;
@@ -30,10 +31,15 @@ namespace Raven
     {
       base.Initialize(editor, content);
 
+      _commandManager = new CommandManager();
+
       _scene = new SpriteSceneView(this);
       _scene.Initialize(editor, content);
       _scene.OnEdit += () => Inspector.ShowPicker = true;
       _scene.OnEdit += () => _imgui.SpriteAnimEditor.Close();
+
+      _scene.OnUnEdit += () => Core.GetGlobalManager<CommandManagerHead>().Current = _commandManager;
+
       _scene.OnUnEdit += () => Inspector.ShowPicker = false;
       _scene.OnUnEdit += () => _imgui.SpriteAnimEditor.Close();
       _scene.OnUnEdit += () => ContentData.PropertiedContext = _sheet;
@@ -57,11 +63,10 @@ namespace Raven
 
       Inspector.OnClickScene += scene => _scene.Edit(scene);
       Inspector.OnDeleteScene += scene => _scene.UnEdit();
-
-
     }
     public override void OnContentOpen(IPropertied content)
     {
+      Core.GetGlobalManager<CommandManagerHead>().Current = _commandManager;
       TileInMouse = Rectangle.Empty;
       _sheet = content as Sheet;
       _image = new SpriteRenderer(_sheet.Texture);

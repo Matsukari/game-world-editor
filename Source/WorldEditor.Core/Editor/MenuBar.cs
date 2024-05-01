@@ -140,11 +140,11 @@ namespace Raven
         ImGuiUtils.SpanX(40);
         if (ImGui.Button(Icon.Undo) || _editor.Settings.Hotkeys.Undo.IsPressed())
         {
-          Core.GetGlobalManager<CommandManager>().Undo();
+          Core.GetGlobalManager<CommandManagerHead>().Current.Undo();
         }
         if (ImGui.Button(Icon.Redo) || _editor.Settings.Hotkeys.Redo.IsPressed())
         {
-          Core.GetGlobalManager<CommandManager>().Redo();
+          Core.GetGlobalManager<CommandManagerHead>().Current.Redo();
         }
 
         ImGui.EndMainMenuBar();

@@ -10,12 +10,7 @@ namespace Raven
 
     public SceneSpriteListTransformModifyCommand(List<ISceneSprite> sprites, List<Transform> start)
     {
-
-      _sprites = new List<ISceneSprite>();
-      foreach (var sprite in sprites)
-      {
-        _sprites.Add(sprite);
-      }
+      _sprites = sprites.Copy();
       _last = new List<Transform>();
       foreach (var s in sprites)
       {
@@ -61,30 +56,8 @@ namespace Raven
     {
       _transform = _start.Duplicate();
     }
-
   }
-  class TransformMoveCommand : Command
-  {
-    Transform _transform;
-    Vector2 _position;
-    Vector2 _lastPosition;
 
-    public TransformMoveCommand(Transform transform)
-    {
-      _transform = transform;
-      _lastPosition = transform.Position;
-    }
-
-    internal override void Redo()
-    {
-      _transform.Position = _position;
-    }
-    internal override void Undo()
-    {
-      _transform.Position = _lastPosition;
-    }
-
-  }
   class LevelMoveCommand : Command
   {
     internal readonly Level _level;
@@ -108,7 +81,12 @@ namespace Raven
     }
 
   }
-  public class CommandManager : Nez.GlobalManager
+  public class CommandManagerHead : Nez.GlobalManager
+  {
+    public CommandManager Current;
+  }
+
+  public class CommandManager
   {
     List<Command> _commands = new List<Command>();
     Command _node { get => _commands[_current]; }
@@ -117,7 +95,7 @@ namespace Raven
     public int Current { get => _current; }
     public List<Command> Commands { get => _commands; }
     public event Action<Command> OnRecord;
-    
+   
     public void Undo()
     {
       if (_current >= 0)
