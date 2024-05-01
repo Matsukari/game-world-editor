@@ -1,4 +1,5 @@
 using ImGuiNET;
+using Nez;
 
 namespace Raven
 {
@@ -15,12 +16,20 @@ namespace Raven
     }
     protected override void OnChangeName(string prev, string curr)
     {
-      if (Tile._sheet.CreateTile(Tile)) Console.WriteLine("Created tile");
+      if (Tile._sheet.CreateTile(Tile)) 
+      {
+        Console.WriteLine("Created tile");
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddTileCommand(Tile._sheet, Tile));
+      }
       Tile._sheet.GetCreatedTile(Tile.Id).Name = curr;
     }        
     protected override void OnChangeProperty(string name)
     {
-      if (Tile._sheet.CreateTile(Tile)) Console.WriteLine("Created tile");
+      if (Tile._sheet.CreateTile(Tile)) 
+      {
+        Console.WriteLine("Created tile");
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddTileCommand(Tile._sheet, Tile));
+      }
     }
     protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {

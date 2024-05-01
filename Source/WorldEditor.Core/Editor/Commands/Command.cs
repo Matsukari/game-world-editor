@@ -4,10 +4,11 @@ namespace Raven
 {
   
   /// <summary>
-  /// Commands are actions in the editor that does something that can be undone and redone. A command does not describe what a change does but what changes it could do to redo and undo the said change. 
+  /// Commands are actions in the editor that describes changes on something that can be undone and redone. Commands does not do something; something must be already done and changed and that change is the data this command holds, to which the command can read either to undo or redo.
   /// </summary> 
   public abstract class Command
   {
+    public bool IsReversed = false; 
     internal Action OnUndo;
     internal Action OnRedo;
     internal abstract void Redo();

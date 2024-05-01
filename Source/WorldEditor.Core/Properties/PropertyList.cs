@@ -40,6 +40,13 @@ namespace Raven
       if (Contains(name)) Set(name, obj);
       else Add(obj, name);
     }
+    public static KeyValuePair<string, object> GetCopy(KeyValuePair<string, object> obj) 
+    {
+      if (obj.Value.GetType().IsValueType) return obj;
+      else if (obj.Value is ICloneable cloner) return new KeyValuePair<string, object>(obj.Key, cloner.Clone());
+      throw new TypeAccessException();
+    }
+    public static KeyValuePair<string, object> Pair(string name, object o) => new KeyValuePair<string, object>(name, o);
 
     public PropertyList Copy() 
     {

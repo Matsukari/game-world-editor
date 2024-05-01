@@ -98,7 +98,7 @@ namespace Raven
             gotProperty = new Tuple<string, object>(_copiedProperty.Item1, _copiedProperty.Item2.AttemptCopy());
           }
 
-          _lastPropertied.Properties.Add(gotProperty.Item2, gotProperty.Item1);
+          AddProperty(_lastPropertied, gotProperty.Item1, gotProperty.Item2);
         }
         if (ImGui.BeginMenu(IconFonts.FontAwesome5.Plus + "  New Property"))
         {
@@ -134,10 +134,11 @@ namespace Raven
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
+
           if (_propOnOptions.Item2.GetType().IsValueType)
-            _lastPropertied.Properties.Add(_propOnOptions.Item2, _propOnOptions.Item1);
+            AddProperty(_lastPropertied, _propOnOptions.Item1, _propOnOptions.Item2);
           else if (_propOnOptions.Item2 is ICloneable cloner)
-            _lastPropertied.Properties.Add(cloner.Clone(), _propOnOptions.Item1);
+            AddProperty(_lastPropertied, _propOnOptions.Item1, _propOnOptions.Item2);
         }
 
         ImGui.EndPopup();
@@ -146,7 +147,7 @@ namespace Raven
       if (_pickedPropertyType != null)
       {
         var lastPick = _pickedPropertyType;
-        manager.NameModal.Open((name)=>{NameProperty(_lastPropertied, lastPick, name); if (_lastCreator != null) _lastCreator.Invoke("");});
+        manager.NameModal.Open((name)=>{NameProperty(_lastPropertied, lastPick, name); if (_lastCreator != null) _lastCreator.Invoke(name);});
         _pickedPropertyType = null;
       }
 
@@ -199,9 +200,11 @@ namespace Raven
           {
             var nameHolder = property;
             changedNameOfProperty = property;
-            if (
-                ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue)) pObject.Key = nameHolder;
-                ImGui.LabelText("Type", propertyData.GetType().Name);
+            if (ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue)) 
+            {
+              pObject.Key = nameHolder;
+            }
+            ImGui.LabelText("Type", propertyData.GetType().Name);
 
             changedProperty = RenderBestMatch(propertyData, ref anyOtherChanges);
             ImGui.TreePop();
@@ -213,7 +216,10 @@ namespace Raven
       }
       if (changedProperty != null)
       {
-        propertied.Properties.AddOrSet(changedProperty, changedNameOfProperty);
+        var pair = new KeyValuePair<string, object>(changedNameOfProperty, changedProperty);
+        var previous = new KeyValuePair<string, object>(changedNameOfProperty, propertied.Properties.Get<object>(changedNameOfProperty));
+        propertied.Properties.Set(changedNameOfProperty, changedProperty);
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifyPropertiedCommand(propertied, pair, previous));
         return true;
       }
       return anyOtherChanges;
@@ -270,13 +276,19 @@ namespace Raven
     static Tuple<string, object> _cutProperty;
     static Tuple<string, object> _copiedProperty;
 
+    static void AddProperty(IPropertied propertied, string name, object value) 
+    {
+      propertied.Properties.Add(value, name);
+      Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddPropertiedCommand(propertied, new KeyValuePair<string, object>(name, value)));
+    }
+
     static void NameProperty(IPropertied propertied, Type pickedType, string name)
     {
       // String doesnt have a parameterless constructor
-      if (pickedType == typeof(string)) propertied.Properties.AddOrSet("", name);
+      if (pickedType == typeof(string)) AddProperty(propertied, name, "");
       else 
       {
-        propertied.Properties.AddOrSet(System.Convert.ChangeType(System.Activator.CreateInstance(pickedType), pickedType), name); 
+        AddProperty(propertied, name, System.Convert.ChangeType(System.Activator.CreateInstance(pickedType), pickedType)); 
       }
       _propCreated = true;
     }

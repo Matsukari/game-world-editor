@@ -159,17 +159,21 @@ namespace Raven
       {
         if (ImGui.MenuItem(Icon.Pen + "   Rename"))
         {
+          var previous = _spriteSceneOnOption.Copy();
           imgui.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifySpriteSceneCommand(_spriteSceneOnOption, previous));
         }
         if (ImGui.MenuItem(Icon.Trash + "   Delete"))
         {
           Sheet.SpriteScenees.RemoveAll((spriteScene)=>spriteScene.Name == _spriteSceneOnOption.Name);
           if (Sheet.SpriteScenees.Count() == 0 && OnDeleteScene != null) 
             OnDeleteScene(_spriteSceneOnOption);
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddSpriteSceneCommand(Sheet, _spriteSceneOnOption), true);
         }
         if (ImGui.MenuItem(Icon.Clone + "   Duplicate"))
         {
           Sheet.AddScene(_spriteSceneOnOption.Copy());
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddSpriteSceneCommand(Sheet, _spriteSceneOnOption));
         }
         ImGui.EndPopup();
       }

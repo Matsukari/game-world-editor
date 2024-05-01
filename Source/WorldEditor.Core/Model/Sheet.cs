@@ -165,6 +165,10 @@ namespace Raven
       Animations.Add(animation);
       Animations = Animations.EnsureNoRepeatNameField();
     }
+    public void RemoveScene(SpriteScene scene)
+    {
+      SpriteScenees.RemoveAll(item => item.Name == scene.Name);
+    }
 
 
     public void ReplaceScene(string name, SpriteScene scene)

@@ -30,6 +30,7 @@ namespace Raven
 
       Inspector.OnClickAnimation += anim => SpriteAnimEditor.Open(anim);
       Inspector.OnDeleteAnimation += anim => SpriteAnimEditor.Close();
+      // Inspector.OnDeleteAnimation += anim => ;
     }
     public override void Initialize(Editor editor, EditorContent content)
     {

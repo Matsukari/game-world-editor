@@ -19,6 +19,8 @@ namespace Raven
     public Entity Entity { get; private set; }
     Editor _editor { get => Entity as Editor; }
 
+    public void NotifyContentChanged() => ContentData.HasChanges = true;
+
     public virtual void Initialize(Editor editor, EditorContent content)
     {
       Entity = editor;

@@ -7,6 +7,7 @@ namespace Raven
   public interface IPropertied
   {
     public string Name { get; set; }
+
     public PropertyList Properties { get; }
   }
 }

@@ -60,7 +60,6 @@ namespace Raven
         if (ContentData.SelectionList.Last() is Sprite) _imgui.Popups.OpenSpriteOptions(); 
         else _imgui.Popups.OpenTileOptions(); 
       };
-
       Inspector.OnClickScene += scene => _scene.Edit(scene);
       Inspector.OnDeleteScene += scene => _scene.UnEdit();
     }

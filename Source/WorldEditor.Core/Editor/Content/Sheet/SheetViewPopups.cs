@@ -13,6 +13,7 @@ namespace Raven
     public Widget.AnnotatorPane AnnotatorPane;
 
     public event Action<SpriteScene> OnConvertToScene;
+    public event Action<AnimatedSprite> OnCreateAnimation;
 
     public void OpenSpriteOptions() => _isOpenSpriteOptions = true;
     public void OpenTileOptions() => _isOpenTileOptions = true;
