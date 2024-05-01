@@ -18,6 +18,10 @@ namespace Raven
     public RectangleF InitialBounds = new RectangleF();
     public float SelectedSelectionPointSizeFactor = 1.5f;
     public object Capture = null;
+    public event Action OnMoveEnd;
+    public event Action OnMoveStart;
+    public event Action OnScaleStart;
+    public event Action OnScaleEnd;
     bool _started = false;
 
     public event Action OnBegin;
@@ -67,6 +71,7 @@ namespace Raven
 
     int IInputHandler.Priority() => 9;
 
+    bool _scaleOnce = true;
     bool IInputHandler.OnHandleInput(InputManager input)   
     {
       // The distance between the movement of the mouse
@@ -83,16 +88,22 @@ namespace Raven
         // mouse is also inside the selection area; can insead be moved
         if (_bounds.Width != 0 && _bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
         {
-          Console.WriteLine("Drag inside...");
+          // Console.WriteLine("Drag inside...");
           _isDragInsideArea = true;
+          if (OnMoveStart != null) OnMoveStart();
         }
       } 
       else if (Nez.Input.LeftMouseButtonReleased) 
       {
+        if (_isDragInsideArea && OnMoveEnd != null) OnMoveEnd();
+
         _isDragInsideArea = false;
+
         Mouse.SetCursor(MouseCursor.Arrow);
         if (IsEditingPoint)
         {
+          if (OnScaleEnd != null) OnScaleEnd();
+          _scaleOnce = true;
           SelAxis = SelectionAxis.None;
         }
       }
@@ -100,6 +111,11 @@ namespace Raven
       // draggin point
       if (IsEditingPoint)
       {
+        if (_scaleOnce && OnScaleStart != null)
+        {
+          OnScaleStart();
+          _scaleOnce = false;
+        }
         // SetMouseCursor(SelAxis);
         switch (SelAxis)
         {
@@ -150,7 +166,7 @@ namespace Raven
       {
         _bounds.Location = _selectionInitial.Location + delta;
         ContentBounds = _bounds;
-        Console.WriteLine("Inside draggin..");
+        // Console.WriteLine("Inside draggin..");
         return true;
       }
 

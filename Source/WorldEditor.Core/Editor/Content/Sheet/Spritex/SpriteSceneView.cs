@@ -5,6 +5,11 @@ using Microsoft.Xna.Framework;
 
 namespace Raven
 {
+
+  public class TransformList : List<Transform>
+  {
+    
+  }
   // <summary>
   // Handles state changes between sheet and spriteScene 
   // </summary>
@@ -38,6 +43,10 @@ namespace Raven
       AnnotatorPane = new Widget.AnnotatorPane(editor.Settings.Colors);
       _animationEditor.Initialize(editor, content);
       _animationEditor.OnClose += () => Selection.End();
+      Selection.OnMoveStart += SelectionDragStart;
+      Selection.OnMoveEnd += SelectionDragEnd;
+      Selection.OnScaleStart += SelectionDragStart;
+      Selection.OnScaleEnd += SelectionDragEnd;
       _commandManager = new CommandManager();
     }
     // Go to canvas and close spritesheet view
@@ -99,6 +108,21 @@ namespace Raven
       _initialTransform.Clear();
       _initialTransform.Add(part.Transform.Duplicate());
     }
+    void SelectionDragStart()
+    {
+      _startTransform.Clear();
+      for (int i = 0; i < _multiSels.Count(); i++)
+      {
+        _startTransform.Add(_multiSels[i].Transform.Duplicate());
+      }
+    }
+    void SelectionDragEnd()
+    {
+      if (_multiSels.Count() != _startTransform.Count()) return;
+      var command = new SceneSpriteListTransformModifyCommand(_multiSels, _startTransform);
+      _commandManager.Record(command, ()=>Selection.Re(command._sprites.EnclosedBounds(), command._sprites, ()=>StartTransform(command._sprites)));
+      _startTransform.Clear();
+    }
     public void Render(Batcher batcher, Camera camera)
     {
       if (!IsEditing) return;
@@ -147,20 +171,6 @@ namespace Raven
             + (sels[i].Origin * contentScale)
             + (contentScale * (_initialTransform[i].Position - Selection.InitialBounds.Location));
 
-        }
-        if (Input.LeftMouseButtonPressed && !InputManager.IsImGuiBlocking) 
-        {
-          _startTransform.Clear();
-          for (int i = 0; i < sels.Count(); i++)
-          {
-            _startTransform.Add(sels[i].Transform.Duplicate());
-          }
-        }
-        if (Input.LeftMouseButtonReleased && _startTransform.Count() == sels.Count()) 
-        {
-          var command = new SceneSpriteListTransformModifyCommand(sels, _startTransform);
-          _commandManager.Record(command, ()=>Selection.Re(command._sprites.EnclosedBounds(), command._sprites, ()=>StartTransform(command._sprites)));
-          _startTransform.Clear();
         }
       }
       if (Mover.Capture is List<ISceneSprite> moving)
@@ -216,6 +226,7 @@ namespace Raven
 
       if (Nez.Input.LeftMouseButtonPressed)
       {
+
         if (_multiSels.Count > 0 && Operator == EditorOperator.MoveOnly) 
         {
           Mover.TryBegin(_multiSels.EnclosedBounds().Center, Camera, _multiSels);
