@@ -25,6 +25,7 @@ namespace Raven
       {
         source.SpriteScene = SceneView.LastSprite.SpriteScene;
         SceneView.LastSprite.SpriteScene.AddSprite(source);
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddScenePartCommand(source.SpriteScene, source));
       };
       Popups = new SheetViewPopup();
 

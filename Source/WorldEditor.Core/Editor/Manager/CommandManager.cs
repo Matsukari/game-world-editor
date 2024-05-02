@@ -79,6 +79,31 @@ namespace Raven
       _tile = _start.Copy();
     }
   }
+  class RenamePropertiedCommand : Command
+  {
+    IPropertied _prop;
+    string _item;
+    string _start;
+    string _last;
+
+    public RenamePropertiedCommand(IPropertied prop, string item, string start)
+    {
+      _prop = prop;
+      _item = item;
+      _start = start;
+      _last= item;
+    }
+    internal override void Redo()
+    {
+      _prop.Properties.Rename(_item, _last);
+      _item = _last;
+    }
+    internal override void Undo()
+    {
+      _prop.Properties.Rename(_item, _start);
+      _item = _start;
+    }
+  }
   class ModifyPropertiedCommand : Command
   {
     IPropertied _prop;
@@ -104,17 +129,6 @@ namespace Raven
       _prop.Properties.Set(item.Key, item.Value);
     }
   }
-  sealed class ReversedCommand : Command
-  {
-    readonly public Command Command;
-
-    public ReversedCommand(Command command) => Command = command;
-
-    internal override void Undo() => Command.Redo();
-
-    internal override void Redo() => Command.Undo();
-  }
-
   class AddPropertiedCommand : Command
   {
     IPropertied _prop;
@@ -143,7 +157,7 @@ namespace Raven
     public AddTileCommand(Sheet sheet, Tile tile)
     {
       _sheet = sheet;
-      _tile = tile.Copy();
+      _tile = tile;
     }
     internal override void Redo()
     {
@@ -173,25 +187,72 @@ namespace Raven
       _sheet.RemoveScene(_scene);
     }
   }
-  class ModifySpriteSceneCommand : Command
+  class RenameSpriteSceneCommand : Command
   {
     SpriteScene _scene;
-    SpriteScene _last;
-    SpriteScene _start;
+    string _last;
+    string _start;
 
-    public ModifySpriteSceneCommand(SpriteScene scene, SpriteScene start)
+    public RenameSpriteSceneCommand(SpriteScene scene, string start)
     {
-      _scene = scene.Copy();
-      _start = _start.Copy();
-      _last = scene.Copy();
+      _scene = scene;
+      _start = start;
+      _last = scene.Name;
     }
     internal override void Redo()
     {
-      _scene = _last.Copy();
+      _scene.Name = _last;
     }
     internal override void Undo()
     {
-      _scene = _start.Copy(); 
+      _scene.Name = _start;
+    }
+  }
+  // There SHOULD be no need to worry about parts that are removed later in the process
+  // because, before this command is undone, the removed part will be undone first (as you cannot jump in the command history) and the whole state will 
+  // be exactly the same before this command is called
+  class ModifyScenePartCommand : Command
+  {
+    SpriteScene _scene;
+    string _name;
+    ISceneSprite _last;
+    ISceneSprite _start;
+
+    public ModifyScenePartCommand(SpriteScene scene, ISceneSprite sprite, ISceneSprite start)
+    {
+      _scene = scene;
+      _name = sprite.Name;
+      _start = start.Copy();
+      _last = sprite.Copy();
+    }
+    internal override void Redo()
+    {
+      _scene.ReplaceSprite(_name, _last.Copy());
+      _name = _last.Name;
+    }
+    internal override void Undo()
+    {
+      _scene.ReplaceSprite(_name, _start.Copy());
+      _name = _start.Name;
+    }
+  }
+  class AddScenePartCommand : Command
+  {
+    internal readonly SpriteScene _scene;
+    ISceneSprite _sprite;
+
+    public AddScenePartCommand(SpriteScene scene, ISceneSprite sprite)
+    {
+      _sprite = sprite;
+      _scene = scene;
+    }
+    internal override void Redo()
+    {
+      _scene.AddSprite(_sprite);
+    }
+    internal override void Undo()
+    {
+      _scene.RemoveSprite(_sprite.Name);
     }
   }
 
@@ -283,6 +344,20 @@ namespace Raven
       command.OnUndo = onUndoRedo;
       command.OnRedo = onUndoRedo;
       Record(command);
+      return command;
+    }
+    public Command MergeCurrent(Command command) 
+    {
+      if (_current >= 0) 
+      {
+        var last = _commands[_current];
+        _commands.RemoveAt(_current);
+        _commands.Insert(_current, new CommandGroup(last, command));
+        Console.WriteLine($"Merged {last} and {command}");
+      }
+      else
+        Record(command);
+
       return command;
     }
   }

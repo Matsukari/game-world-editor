@@ -202,6 +202,7 @@ namespace Raven
             changedNameOfProperty = property;
             if (ImGui.InputText("Name", ref nameHolder, 25, ImGuiInputTextFlags.EnterReturnsTrue)) 
             {
+              Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RenamePropertiedCommand(propertied, nameHolder, property));
               pObject.Key = nameHolder;
             }
             ImGui.LabelText("Type", propertyData.GetType().Name);

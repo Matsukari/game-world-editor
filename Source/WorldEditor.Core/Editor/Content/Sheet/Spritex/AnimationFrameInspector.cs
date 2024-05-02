@@ -23,7 +23,7 @@ namespace Raven
       ImGui.LabelText("Frame", Animator.CurrentIndex.ToString());
       ImGui.InputFloat("Duration", ref Frame.Duration);
       // FramePart.Transform.RenderImGui();
-      SpriteSceneInspector.RenderSprite(imgui, FramePart, false);
+      SpritePartInspector.RenderSprite(imgui, FramePart, false);
     }
   }
 }

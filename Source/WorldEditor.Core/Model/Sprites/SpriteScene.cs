@@ -160,6 +160,18 @@ namespace Raven
       return sprite;
     }
     public ISceneSprite AddSprite(ISceneSprite sprite) => AddSprite((sprite.Name != string.Empty) ? sprite.Name : "Component", sprite);
+    public ISceneSprite ReplaceSprite(string name, ISceneSprite sprite) 
+    {
+      try 
+      {
+        Parts[Parts.FindIndex(item => item.Name == name)] = sprite;
+      }
+      catch (Exception) 
+      { 
+        AddSprite(sprite);
+      }
+      return sprite;
+    }
 
     /// <summary>
     /// Pushes the given sprite at the given index

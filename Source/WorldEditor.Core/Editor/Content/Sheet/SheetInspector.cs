@@ -135,7 +135,7 @@ namespace Raven
       if (ImGui.CollapsingHeader($"{Icon.Users}   SpriteScenes ({Sheet.SpriteScenees.Count})", ImGuiTreeNodeFlags.DefaultOpen))
       {
         var size = ImGui.GetContentRegionAvail();
-        ImGui.BeginChild("spriteScenees", new System.Numerics.Vector2(size.X, Math.Min(200, size.Y)));
+        ImGui.BeginChild("spriteScenees", new System.Numerics.Vector2(size.X, Math.Max(200, size.Y)));
         ImGui.Indent();
 
         if (Sheet.SpriteScenees.Count == 0) ImGuiUtils.TextMiddle("No Scenes yet.");
@@ -160,9 +160,9 @@ namespace Raven
       {
         if (ImGui.MenuItem(Icon.Pen + "   Rename"))
         {
-          var previous = _spriteSceneOnOption.Copy();
+          var previousName = _spriteSceneOnOption.Name;
           imgui.NameModal.Open((name)=>{Sheet.GetSpriteScene(_spriteSceneOnOption.Name).Name = name;});
-          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifySpriteSceneCommand(_spriteSceneOnOption, previous));
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RenameSpriteSceneCommand(_spriteSceneOnOption, previousName));
         }
         if (ImGui.MenuItem(Icon.Trash + "   Delete"))
         {

@@ -25,6 +25,14 @@ namespace Raven
 
     public T Get<T>(string name) => (T)(Data.Find(item => item.Key == name).Value);
     public void Set(string name, object obj) => Data.Find(item => item.Key == name).Value = obj;
+    public void Rename(string old, string name) 
+    {
+      try 
+      {
+        Data[Data.FindIndex(item => item.Name == old)].Name = name;
+      }
+      catch (Exception) {}
+    }
 
     public bool Contains(string name) => Data.Find(item => item.Key == name) != null;
 

@@ -6,11 +6,19 @@ namespace Raven
 {
   public static class ListExt
   {
-
-    public static void Deconstruct<TKey,TValue>( this string[] pair, out string a, out string b) 
+    public static bool RemoveFirst<T>(this List<T> list, Predicate<T> match) 
     {
-      a = pair[0];
-      b = pair[1];
+      var i = 0;
+      foreach (var item in list)
+      {
+        if (match(item))  
+        {
+          list.RemoveAt(i);
+          return true;
+        }
+        i++;
+      }
+      return false;
     }
     /// <summary>
     /// Gets an item or null if not present
@@ -113,14 +121,14 @@ namespace Raven
         var field = item.GetType().GetField("Name");
         if (field != null && field.GetValue(item) is string nameString)
         {
-          Console.WriteLine("Trying out: " + nameString);
+          // Console.WriteLine("Trying out: " + nameString);
           for (int j = 0; j < list.Count; j++)
           {
-            Console.Write("..." + list[j]);
+            // Console.Write("..." + list[j]);
             if (i != j && nameString == GetNameField(list[j])) 
             {
               field.SetValue(item, nameString.EnsureNoRepeat());
-              Console.Write("...=> new " + nameString.EnsureNoRepeat());
+              // Console.Write("...=> new " + nameString.EnsureNoRepeat());
               return EnsureNoRepeatNameField(list);
             }
           }

@@ -1,5 +1,4 @@
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using ImGuiNET;
 using Icon = IconFonts.FontAwesome5;
 
@@ -13,77 +12,40 @@ namespace Raven
     public override string Name { get => SpriteScene.Name; set => SpriteScene.Name = value; }
     public override PropertyList Properties { get => SpriteScene.Properties; set => SpriteScene.Properties = value; }
     public override bool CanOpen => SpriteScene != null;
-
-    public ISceneSprite ChangePart = null;
-    ISceneSprite  _spriteScenePart;
-    // Gui state data
     public SpriteScene SpriteScene;
+
     public Vector2 GuiPosition = new Vector2();
     public float GuiZoom = 0.5f;
 
     public event Action<SpriteScene, Animation> OnOpenAnimation;
     public event Action<ISceneSprite> OnAddPart;
     public event Action<ISceneSprite> OnDelPart;
+    public event Action<ISceneSprite> OnCutPart;
     public event Action<ISceneSprite> OnModifiedPart;
     public event Action<ISceneSprite> OnEmbedShape;
-
-    static string[] _originTypes = new string[] { "Center", "Topleft", "Custom" };
 
     public SpriteSceneInspector(SpriteScene spriteScene) 
     {
       SpriteScene = spriteScene;
+
+      OnAddPart += part => Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(
+          new AddScenePartCommand(spriteScene, part));
+
+      OnDelPart += part => Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(
+          new ReversedCommand(new AddScenePartCommand(spriteScene, part)));
+
+      OnCutPart += part => Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(
+          new ReversedCommand(new AddScenePartCommand(spriteScene, part)), ()=>_cutSprite = null);
+
+      OnModifiedPart += part => Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(
+          new ModifyScenePartCommand(SpriteScene, part, SpritePartInspector.SpriteBeforeMod));
     }
     public override void OutRender(ImGuiWinManager imgui)
     {
       DrawOptions();
       DrawAnimationOptionPopup();  
     }
-        
-    public static bool RenderSprite(ImGuiWinManager imgui, ISceneSprite sprite, bool drawName = true)
-    {
-      string name = sprite.Name;
-      bool mod = false;
-      if (drawName && ImGui.InputText("Name", ref name, 20, ImGuiInputTextFlags.EnterReturnsTrue)) 
-      {
-        sprite.Name = name;
-        mod = true;
-      }
-      ImGui.BeginDisabled();
-        if (sprite.SourceSprite.Name != "") ImGui.LabelText("Source", sprite.SourceSprite.Name);
-        ImGui.LabelText("Region", sprite.SourceSprite.Region.RenderStringFormat());
-      ImGui.EndDisabled();
 
-
-      mod = mod || sprite.Transform.RenderImGui();
-      var origin = sprite.Origin.ToNumerics();
-
-      var originType = sprite.DeterminePreset();
-      // Preset origin
-      if (ImGui.Combo("Origin", ref originType, _originTypes, _originTypes.Count()))
-      {
-        if (originType == 0) sprite.Origin = sprite.SourceSprite.Region.Size.ToVector2()/2f;
-        else if (originType == 1) sprite.Origin = new Vector2();
-        mod = true;
-      }
-      if (ImGui.InputFloat2("Origin", ref origin)) 
-      {
-        mod = true;
-        sprite.Origin = origin;
-      }
-      var color = sprite.Color.ToNumerics();
-      if (ImGui.ColorEdit4("Tint", ref color)) sprite.Color = color;
-
-      var flipBoth = sprite.SpriteEffects == (SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally);
-      var flipH = sprite.SpriteEffects == SpriteEffects.FlipHorizontally || flipBoth;
-      var flipV = sprite.SpriteEffects == SpriteEffects.FlipVertically || flipBoth;
-      if (ImGui.Checkbox("Flip X", ref flipH)) sprite.SpriteEffects ^= SpriteEffects.FlipHorizontally;
-      ImGui.SameLine();
-      if (ImGui.Checkbox("Flip Y", ref flipV)) sprite.SpriteEffects ^= SpriteEffects.FlipVertically;
-
-      PropertiesRenderer.Render(imgui, sprite, tree: true);
-
-      return mod;
-    }
     internal bool _isOpenComponentOptionPopup = false;
     internal bool _isOpenSceneOnSpritePopup = false;
     internal ISceneSprite _compOnOptions = null;
@@ -162,12 +124,14 @@ namespace Raven
         {
           _cutSprite = _compOnOptions;
           _cutSprite.DetachFromSpriteScene();
-          if (OnDelPart != null) OnDelPart(_cutSprite);
+          if (OnCutPart != null) OnCutPart(_cutSprite);
           _copiedSprite = null;
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
-          var sprite = _compOnOptions.SpriteScene.AddSprite(_compOnOptions.Copy());
+          var sprite = _compOnOptions.Copy();
+          _compOnOptions.SpriteScene.AddSprite(sprite);
+          if (OnAddPart != null) OnAddPart(sprite);
           sprite.Transform.Position.X += 100;
         }
 
@@ -188,27 +152,14 @@ namespace Raven
             gotSprite = _copiedSprite.Copy();
 
           var sprite = gotSprite.SpriteScene.AddSprite(gotSprite);
+          if (OnAddPart != null) OnAddPart(sprite);
+
+          var previous = sprite.Copy();
           sprite.Transform.Position = _posOnOpenCanvas;
+          Nez.Core.GetGlobalManager<CommandManagerHead>().Current.MergeCurrent(new ModifyScenePartCommand(SpriteScene, sprite, previous));
         }
         ImGui.EndPopup();
       }
-
-    }
-    void DrawComponentOptions(ISceneSprite sprite, ref ISceneSprite removeSprite)
-    {
-      // Options next to name
-      var visibState = (!sprite.IsVisible) ? Icon.EyeSlash : Icon.Eye;
-      var lockState = (!sprite.IsLocked) ? Icon.LockOpen: Icon.Lock;
-      var deleteState = Icon.Times;
-      ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(sprite.Name).X - 140));
-
-      ImGui.PushID($"spriteScene-component-{sprite.Name}-options");
-      if (ImGui.SmallButton(visibState)) sprite.IsVisible = !sprite.IsVisible;
-      ImGui.SameLine();
-      if (ImGui.SmallButton(lockState)) sprite.IsLocked = !sprite.IsLocked;
-      ImGui.SameLine();
-      if (ImGui.SmallButton(deleteState)) removeSprite = sprite;
-      ImGui.PopID();
 
     }
     void DrawAnimationOptionPopup()
@@ -323,12 +274,16 @@ namespace Raven
             _compOnOptions = part;
           }
 
-          DrawComponentOptions(part, ref removeSprite);
+          if (SpritePartInspector.DrawComponentOptions(part, ref removeSprite))
+            OnModifiedPart(part);
 
           if (spriteNode)
           {
             ImGui.PushID("spriteScene-component-content-" + part.Name);
-            if (RenderSprite(imgui, part)) OnModifiedPart(part);
+            if (SpritePartInspector.RenderSprite(imgui, part)) 
+            {
+              OnModifiedPart(part);
+            }
             ImGui.PopID();
 
             ImGui.TreePop();
@@ -345,6 +300,8 @@ namespace Raven
     }
     protected override void OnChangeName(string old, string now)
     {
+      SpriteScene.Name = now;
+      Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RenameSpriteSceneCommand(SpriteScene, old));
     } 
   }
 }

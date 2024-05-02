@@ -26,6 +26,8 @@ namespace Raven
         ImGui.EndTabItem();
       }
     }
+    public static bool MenuItem(string icon, string label) => ImGui.MenuItem(icon + "   " + label);
+
 
     public static void SpanX(float x)
     {

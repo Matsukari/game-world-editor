@@ -19,7 +19,7 @@ namespace Raven
       if (Tile._sheet.CreateTile(Tile)) 
       {
         Console.WriteLine("Created tile");
-        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddTileCommand(Tile._sheet, Tile));
+        AddTile();
       }
       Tile._sheet.GetCreatedTile(Tile.Id).Name = curr;
     }        
@@ -28,9 +28,14 @@ namespace Raven
       if (Tile._sheet.CreateTile(Tile)) 
       {
         Console.WriteLine("Created tile");
-        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddTileCommand(Tile._sheet, Tile));
+        AddTile();
       }
     }
+    void AddTile()
+    {
+      Core.GetGlobalManager<CommandManagerHead>().Current.MergeCurrent(new AddTileCommand(Tile._sheet, Tile));
+    }
+
     protected override void OnRenderAfterName(ImGuiWinManager imgui)
     {
       ImGui.BeginDisabled();
