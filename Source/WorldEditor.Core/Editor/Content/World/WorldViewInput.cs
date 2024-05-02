@@ -36,7 +36,10 @@ namespace Raven
 
         foreach (var shape in level.Properties)
         {
-          if (Nez.Input.LeftMouseButtonPressed && shape.Value is ShapeModel model && model.CollidesWith(Camera.MouseToWorldPoint()-level.Bounds.Location))
+          if (Nez.Input.LeftMouseButtonPressed 
+              && shape.Value is ShapeModel model 
+              && !_view.CanPaint
+              && model.CollidesWith(Camera.MouseToWorldPoint()-level.Bounds.Location))
           {
             Selection.Begin(model.Bounds, model.Icon);
             return true;

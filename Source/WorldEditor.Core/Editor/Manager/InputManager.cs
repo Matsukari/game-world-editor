@@ -98,7 +98,7 @@ namespace Raven
             pos.X - MouseDragArea.X, 
             pos.Y - MouseDragArea.Y);
       }
-      if (!IsDrag && (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed || Nez.Input.MiddleMouseButtonPressed))
+      if (Nez.Input.LeftMouseButtonPressed || Nez.Input.RightMouseButtonPressed || Nez.Input.MiddleMouseButtonPressed)
       {
         IsDrag = true;
         IsDragFirst = true;
@@ -111,7 +111,7 @@ namespace Raven
         MouseDragStart.Y = pos.Y;
       }
       IsDragLast = false;
-      if (IsDrag && (Nez.Input.LeftMouseButtonReleased || Nez.Input.RightMouseButtonReleased || Nez.Input.MiddleMouseButtonReleased))
+      if (Nez.Input.LeftMouseButtonReleased || Nez.Input.RightMouseButtonReleased || Nez.Input.MiddleMouseButtonReleased)
       {
         IsDrag = false;
         IsDragLast = true;

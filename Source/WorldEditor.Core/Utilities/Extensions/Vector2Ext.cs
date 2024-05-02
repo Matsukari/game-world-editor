@@ -35,6 +35,20 @@ namespace Raven
     {
       return new Point(vec.X/x, vec.Y/y);
     }
+    public static Vector2 MathMax(this Vector2 a, Vector2 b)
+    {
+      var result = new Vector2();
+      result.X = Math.Max(a.X, b.X);
+      result.Y = Math.Max(a.Y, b.Y);
+      return result;
+    }
+    public static Vector2 MathMin(this Vector2 a, Vector2 b)
+    {
+      var result = new Vector2();
+      result.X = Math.Min(a.X, b.X);
+      result.Y = Math.Min(a.Y, b.Y);
+      return result;
+    }
     public static Vector2 Clamp(this Vector2 vec, Vector2 min, Vector2 max)
     {
       return new Vector2(Math.Clamp(vec.X, min.X, max.X), Math.Clamp(vec.Y, min.Y, max.Y));

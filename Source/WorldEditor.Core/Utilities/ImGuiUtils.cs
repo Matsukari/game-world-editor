@@ -73,9 +73,9 @@ namespace Raven
       ImGui.Text(hint);
     }
 
-    public static void DrawRect(ImDrawListPtr drawList, Mono.Rectangle region, uint color)
+    public static void DrawRect(ImDrawListPtr drawList, RectangleF region, Mono.Color color)
     {
-
+      ImGui.GetBackgroundDrawList().AddRectFilled(region.Location.ToNumerics(), region.Max.ToNumerics(), color.ToImColor()); 
     }
 
     public static void DrawEllipse(ImDrawListPtr drawList, RectangleF bounds, uint color)

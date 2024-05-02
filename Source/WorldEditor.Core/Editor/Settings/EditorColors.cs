@@ -31,6 +31,20 @@ namespace Raven
     public Vector4 PickHover = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
     public Vector4 PickFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
 
+    public Vector4 LayerDim = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+
+    public Vector4 HoverTile = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+
+    public Vector4 PaintDefaultFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+    public Vector4 PaintDefaultOutline = new Vector4(0.7f, 0.7f, 0.7f, 1f);
+    public Vector4 PaintBadFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+    public Vector4 PaintBadOutline = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+
+    public Vector4 PaintEraseOutline = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+    public Vector4 PaintEraseFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+
+    public Vector4 PaintModeLevelBorder = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+
     // Selection
     public Vector4 SelectionOutline = new Vector4(0.85f, 0.85f, 0.85f, 1f);
     public Vector4 SelectionFill = new Vector4(0.2f, 0.2f, 0.2f, 0.04f);

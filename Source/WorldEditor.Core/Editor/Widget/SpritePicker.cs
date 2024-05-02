@@ -36,12 +36,18 @@ namespace Raven
     public virtual void OnHandleSelectedSprite()
     {
     }
+    public virtual void OutRender()
+    {
+
+    }
     public void Draw(RectangleF preBounds, EditorColors colors)
     {
       var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
 
       if (SelectedSprite != null && Nez.Input.RightMouseButtonReleased && !InputManager.IsImGuiBlocking) SelectedSprite = null;
+
+      OutRender();
 
       if (OpenSheet == null) 
       {
@@ -284,6 +290,7 @@ namespace Raven
         _tiles.Clear();
       }
       ImGui.End(); 
+
     }
     void RebuildTiles()
     {

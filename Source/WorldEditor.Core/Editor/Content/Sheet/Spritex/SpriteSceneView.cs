@@ -13,7 +13,7 @@ namespace Raven
   // <summary>
   // Handles state changes between sheet and spriteScene 
   // </summary>
-  public class SpriteSceneView : EditorInterface
+  public class SpriteSceneView : EditorInterface, IInputHandler
   {
     public SpriteSceneInspector SceneInspector { get => _sceneInspector; }
     public SpriteSceneInspector LastSprite { get => _sceneInspector; }
@@ -193,7 +193,12 @@ namespace Raven
     List<ISceneSprite> _multiSels = new List<ISceneSprite>();
     RectangleF _multiSelection = new RectangleF();
 
-    public bool HandleInput(InputManager input)
+    void IInputHandler.OnInputBlocked(Raven.InputManager input)
+    {
+      Selection.End();
+    }
+
+    bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
       if (!IsEditing) return false;
 

@@ -26,14 +26,19 @@ namespace Raven
 
     void IInputHandler.OnInputBlocked(Raven.InputManager input)
     {
-      IsBlocked = true;
+      if (_view.ImGuiHandler is SheetViewImGui imgui && imgui.SceneView.IsEditing && imgui.SceneView is IInputHandler sceneInput)
+      {
+        sceneInput.OnInputBlocked(input);
+      }
+      else
+        IsBlocked = true;
     }
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
       IsBlocked = false;
-      if (_view.ImGuiHandler is SheetViewImGui imgui && imgui.SceneView.IsEditing)
+      if (_view.ImGuiHandler is SheetViewImGui imgui && imgui.SceneView.IsEditing && imgui.SceneView is IInputHandler sceneInput)
       {
-        return imgui.SceneView.HandleInput(input);
+        return sceneInput.OnHandleInput(input);
       }
 
       // right-click; open options

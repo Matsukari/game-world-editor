@@ -23,10 +23,11 @@ namespace Raven
     public bool IsRandomPaint = false;
     public PaintMode PaintMode = PaintMode.Pen;
     public PaintType PaintType = PaintType.Single;
+
     Vector2 _initialScale = new Vector2();
     Vector2 _initialPos = new Vector2();
 
-    public bool CanPaint { get => _imgui.SpritePicker.SelectedSprite != null; }
+    public bool CanPaint { get => _imgui.SpritePicker.SelectedSprite != null || PaintMode == PaintMode.Eraser; }
 
     public override bool CanDealWithType(object content) => content is World;
 
@@ -69,6 +70,7 @@ namespace Raven
     }  
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
+      if (CanPaint) return;
       Selection.Begin(instance.ContentBounds.AddPosition(layer.Bounds.Location), instance);
       _initialScale = instance.Props.Transform.Scale;
       _initialPos = instance.Props.Transform.Position;
@@ -113,10 +115,11 @@ namespace Raven
               && _imgui.SelectedLevelInspector.CurrentLayer != null 
               && _imgui.SelectedLevelInspector.CurrentLayer.Name != layer.Name)
           {
-            color = Color.Gray;
+            color = settings.Colors.LayerDim.ToColor();
           }
           WorldRenderer.RenderLayer(batcher, camera, layer, color);
 
+          if (mouseInLayer && CanPaint) Selection.End();
           if (mouseInLayer && !Selection.HasBegun() && Nez.Input.LeftMouseButtonReleased)
           {
             enterLayer = true;
@@ -128,11 +131,15 @@ namespace Raven
               && _imgui.SelectedLevelInspector.Level.Name == level.Name
               && _imgui.SelectedLevelInspector.CurrentLayer != null 
               && _imgui.SelectedLevelInspector.CurrentLayer.Name == layer.Name
-              && layer.IsVisible 
-              && Settings.Graphics.DrawLayerGrid)
+              && layer.IsVisible )
           {
-            Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
-              tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
+            if (CanPaint)
+            {
+              batcher.DrawRectOutline(camera, layer.Bounds, settings.Colors.PaintModeLevelBorder.ToColor(), 4);
+            }
+            if (Settings.Graphics.DrawLayerGrid)
+              Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
+                  tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
           }
         }
       }

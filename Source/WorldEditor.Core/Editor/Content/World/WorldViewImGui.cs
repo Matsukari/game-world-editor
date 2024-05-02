@@ -105,6 +105,7 @@ namespace Raven
 
       RenderAnnotations(_world);
       if (SelectedLevelInspector != null) RenderAnnotations(SelectedLevelInspector.Level);
+
     }
   }
 }
