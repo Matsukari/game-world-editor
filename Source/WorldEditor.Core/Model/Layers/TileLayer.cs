@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Nez.Persistence;
+using Nez;
 
 namespace Raven
 {
@@ -26,6 +27,7 @@ namespace Raven
     /// </summary> 
     public Point TilesQuantity { get => new Point(Level.ContentSize.X/TileWidth, Level.ContentSize.Y/TileHeight); }
 
+
     /// <summary>
     // The list of all painted Tiles
     /// </summary> 
@@ -50,7 +52,14 @@ namespace Raven
 
     public Point GetTile(int coord) => new Point(coord % TilesQuantity.X, coord / TilesQuantity.X); 
 
-    public TileInstance GetTile(Point point) => Tiles[point]; 
+    public TileInstance GetTile(Point point) => Tiles[point];
+
+    public TileInstance TryGetTile(Point point) 
+    {
+      if (Tiles.ContainsKey(point))
+        return Tiles[point]; 
+      return null;
+    }
 
     /// <summary>
     // Checks if the layer contains the given corrdinate 
@@ -69,13 +78,17 @@ namespace Raven
     public void ReplaceTile(Point coord, Tile tile)
     {
       if (!IsTileValid(coord.X, coord.Y)) return;
-      Tiles[coord] = new TileInstance(tile, null);
+      if (tile != null)
+        Tiles[coord] = new TileInstance(tile, null);
+      else Tiles.Remove(coord);
     }
 
     public void ReplaceTile(Point coord, TileInstance instance)
     {
       if (!IsTileValid(coord.X, coord.Y)) return;
-      Tiles[coord] = instance;
+      if (instance != null)
+        Tiles[coord] = instance;
+      else Tiles.Remove(coord);
     }
 
     /// <summary>

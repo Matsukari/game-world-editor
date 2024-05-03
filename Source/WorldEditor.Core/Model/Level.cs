@@ -19,7 +19,21 @@ namespace Raven
     /// <summary>
     /// The size of the Level, inherited by all owned Layers
     /// </summary>
-    public Point ContentSize = new Point(Screen.Width, Screen.Height);
+    public Point ContentSize 
+    {
+      get => _contentSize;
+      set 
+      {
+        var old = _contentSize;
+        _contentSize = value;
+        foreach (var layer in Layers) 
+        {
+          layer.OnLevelResized(old);
+        }
+      }
+    }
+
+    Point _contentSize = new Point(Screen.Width, Screen.Height); 
 
     /// <summary>
     /// World where this Level is attached

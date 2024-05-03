@@ -22,6 +22,9 @@ namespace Raven
     public event Action OnMoveStart;
     public event Action OnScaleStart;
     public event Action OnScaleEnd;
+
+    public event Action<SelectionAxis> OnScaled;
+
     bool _started = false;
 
     public event Action OnBegin;
@@ -159,7 +162,10 @@ namespace Raven
             _bounds.Height = _selectionInitial.Height + delta.Y; 
             break;
         }
+        
         ContentBounds = _bounds;
+
+        if (OnScaled != null) OnScaled(SelAxis);
       }
       // move selection
       else if (input.IsDrag && _isDragInsideArea && Nez.Input.LeftMouseButtonDown)

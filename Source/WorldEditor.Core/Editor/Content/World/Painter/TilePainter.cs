@@ -30,6 +30,11 @@ namespace Raven
       if (Nez.Input.LeftMouseButtonPressed) 
         _mouseStart = InputManager.GetWorldMousePosition(Camera);
 
+      if (Nez.Input.LeftMouseButtonReleased) 
+      {
+        RecordTiles();
+      }
+
       var mouseDrag = new RectangleF(_mouseStart, InputManager.GetWorldMousePosition(Camera) - _mouseStart).AlwaysPositive();
 
       _currentLayer = layer;
@@ -67,21 +72,22 @@ namespace Raven
             Rectangle(tileLayer, mouseDrag, sprite.Region.Size, (coord)=>PaintAtLayer(tilesToPaint, tileLayer, coord));
             return true;
           }
-          else if (_view.PaintType == PaintType.Fill && Fill(tileLayer, sprite, tilesToPaint)) 
+          else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Fill && Fill(tileLayer, sprite, tilesToPaint)) 
             return true;
         }
         else if (_view.PaintMode == PaintMode.Eraser)
         {
           if (Nez.Input.LeftMouseButtonDown && _view.PaintType == PaintType.Single)
           {
-            tileLayer.RemoveTile(tileLayer.GetTileCoordFromWorld(InputManager.GetWorldMousePosition(Camera)));
+            RemoveAtLayer(tileLayer, tileLayer.GetTileCoordFromWorld(InputManager.GetWorldMousePosition(Camera)));
             return true;
           }
           else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Rectangle)
           {
-            Rectangle(tileLayer, mouseDrag, tileLayer.TileSize, (coord)=>tileLayer.RemoveTile(coord));
+            Rectangle(tileLayer, mouseDrag, tileLayer.TileSize, (coord)=>RemoveAtLayer(tileLayer, coord));
             return true;
           }
+
         }
       }
       return false;
@@ -95,6 +101,7 @@ namespace Raven
           callback.Invoke(tileLayer.GetTileCoordFromWorld(rect.Location + new Vector2(x, y)));
         }
       }
+      RecordTiles();
     }
     bool Fill(TileLayer tileLayer, Sprite sprite, List<Tile> tilesToPaint)
     {
@@ -103,19 +110,38 @@ namespace Raven
       var tileStart = tilesToPaint[tilesToPaint.Count/2];
       if (tileStart == null) return false;
       _canFillTiles = _tileFiller.Update(tileLayer, tileInLayer, sprite.Region.Size/sprite.TileSize);
-      if (Nez.Input.LeftMouseButtonPressed) 
+
+      void FloodFill(List<Point> fill)
       {
-        void FloodFill(List<Point> fill)
+        foreach (var tile in _canFillTiles) 
         {
-          foreach (var tile in _canFillTiles) 
-          {
-            PaintAtLayer(tilesToPaint, tileLayer, tile);
-          }
+          PaintAtLayer(tilesToPaint, tileLayer, tile);
         }
-        _tileFiller.Start(FloodFill);
-        return true;
+        RecordTiles();
       }
+
+      _tileFiller.Start(FloodFill);
       return false;
+    }
+    Dictionary<Point, Command> _commandGroup = new Dictionary<Point, Command>();
+
+    void RecordTiles()
+    {
+      if (_commandGroup.Count() == 0) return;
+      Core.GetGlobalManager<CommandManagerHead>().Current.Record(new CommandGroup(_commandGroup.Values.ToList()));
+      _commandGroup.Clear();
+    }
+
+    void RemoveAtLayer(TileLayer tileLayer, Point tileInLayer)
+    {
+      var previous = tileLayer.TryGetTile(tileInLayer);
+      tileLayer.RemoveTile(tileInLayer);
+      if (_commandGroup.ContainsKey(tileInLayer) && _commandGroup[tileInLayer] is RemovePaintTileCommand paint)
+      {
+        previous = paint._last;
+        Console.WriteLine($"Delegated to{previous == null}");
+      }
+      _commandGroup[tileInLayer] = new RemovePaintTileCommand(tileLayer, previous, tileInLayer);
     }
     void PaintAtLayer(List<Tile> tilesToPaint, TileLayer tileLayer, Point tileInLayer)
     {
@@ -125,8 +151,18 @@ namespace Raven
       {
         var delta = tilesToPaint[i].Coordinates - tileStart.Coordinates;
         var tile = (_view.IsRandomPaint) ? tilesToPaint.RandomItem() : tilesToPaint[i];
-        if (_view.PaintMode == PaintMode.Pen) tileLayer.ReplaceTile(tileInLayer + delta, tile);
-        else if (_view.PaintMode == PaintMode.Eraser) tileLayer.RemoveTile(tileInLayer + delta);
+
+        var coord = tileInLayer + delta;
+        var previous = tileLayer.TryGetTile(coord);
+        tileLayer.ReplaceTile(coord, tile);
+        if (_commandGroup.ContainsKey(coord) && _commandGroup[coord] is PaintTileCommand paint)
+        {
+          previous = paint._start;
+          // Console.WriteLine($"Delegated to{previous == null}");
+        }
+        // Console.WriteLine($"start is null? {previous == null}");
+        _commandGroup[coord] = new PaintTileCommand(tileLayer, tileLayer.TryGetTile(coord), previous, coord);
+
       }
     }
     void PaintSpriteScene(FreeformLayer freeformLayer, SpriteScene scene)

@@ -34,6 +34,9 @@ namespace Raven
         return null;
       }
     }
+    /// <summary>
+    /// Copies each item into a new list
+    /// </summary> 
     public static List<T> Copy<T>(this List<T> list) 
     {
       List<T> newList = new List<T>();

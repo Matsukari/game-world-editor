@@ -30,6 +30,10 @@ namespace Raven
     {
       Commands = commands.ToList();
     }
+    public CommandGroup(List<Command> commands)
+    {
+      Commands = commands.Copy();
+    }
     internal override void Redo() 
     {
       foreach (var c in Commands) c.Redo();

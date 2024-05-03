@@ -67,6 +67,12 @@ namespace Raven
       _input.OnRightClickLevel += (level, i) => _imgui.SceneInstanceInspector.Scene = null;
       _input.OnRightClickWorld += (position) => _imgui.SceneInstanceInspector.Scene = null;
 
+      Selection.OnScaled += HandleTileLayerResize;
+      Selection.OnMoveStart += SelectionDragStart;
+      Selection.OnMoveEnd += SelectionDragEnd;
+      Selection.OnScaleStart += SelectionDragStart;
+      Selection.OnScaleEnd += SelectionDragEnd;
+
       _imgui = new WorldViewImGui(_input.Painter); 
       _imgui.Initialize(editor, content);
       _imgui.Popups.Initialize(editor, content);
@@ -87,6 +93,34 @@ namespace Raven
       _world = content as World; 
       Core.GetGlobalManager<CommandManagerHead>().Current = _commandManager;
     }  
+    void HandleTileLayerResize(SelectionAxis axis)
+    {
+      if (Selection.Capture is not Level) return;
+      var level = Selection.Capture as Level;
+      foreach (var layer in level.Layers)
+      {
+        if (layer is TileLayer tileLayer)
+        {
+          if (axis == SelectionAxis.TopLeft)
+          {
+             
+          }
+        }
+      }
+    }
+    void SelectionDragStart()
+    {
+      if (Selection.Capture is Level lev)
+        _startLevel = lev.LocalOffset;
+    }
+    void SelectionDragEnd()
+    {
+      if (Selection.Capture is Level lev)
+      {
+        var command = new LevelMoveCommand(lev, _startLevel); 
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(command._level.Bounds, command._level));
+      }
+    }
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
       if (CanPaint || PaintMode != PaintMode.Inspector) return;
@@ -177,12 +211,6 @@ namespace Raven
       {
         lev.LocalOffset = Selection.ContentBounds.Location;
         lev.ContentSize = Selection.ContentBounds.Size.ToPoint();
-        if (Input.LeftMouseButtonPressed && !InputManager.IsImGuiBlocking) _startLevel = lev.LocalOffset;
-        if (Input.LeftMouseButtonReleased && !InputManager.IsImGuiBlocking) 
-        {
-          var command = new LevelMoveCommand(lev, _startLevel); 
-          Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(command._level.Bounds, command._level));
-        }
       }
       else if (Selection.Capture is ShapeModel model)
       {

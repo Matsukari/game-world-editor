@@ -69,6 +69,8 @@ namespace Raven
     /// </summary>
     public void DetachFromLevel() => Level.RemoveLayer(Name);
 
+    public virtual void OnLevelResized(Point old) {}
+
     /// <summary>
     /// Creates a full copy of this Layer
     /// </summary>
