@@ -25,6 +25,8 @@ namespace Raven
       var layer = level.CurrentLayer; 
       if (layer == null) return false;
 
+      _currentLayer = layer;
+
       if (_view.PaintMode == PaintMode.None || _view.PaintMode == PaintMode.Inspector) return false;
 
       if (Nez.Input.LeftMouseButtonPressed) 
@@ -37,7 +39,6 @@ namespace Raven
 
       var mouseDrag = new RectangleF(_mouseStart, InputManager.GetWorldMousePosition(Camera) - _mouseStart).AlwaysPositive();
 
-      _currentLayer = layer;
 
       // Handles spriteScene
       if (Nez.Input.LeftMouseButtonPressed && layer is FreeformLayer freeformLayer)
@@ -182,11 +183,19 @@ namespace Raven
       if (_view.PaintMode == PaintMode.Pen)
       {
         var paint = freeformLayer.PaintSpriteScene(scene);
-        paint.Transform.Position = pos - freeformLayer.Bounds.Location;
+        var previous = paint.Props.Transform.Copy();
+        paint.Props.Transform.Position = pos - freeformLayer.Bounds.Location;
+
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(
+            new CommandGroup(new PaintSceneCommand(freeformLayer, paint), 
+            new RenderPropTransformModifyCommand(paint.Props, previous)));
       }
       else if (_view.PaintMode == PaintMode.Eraser)
       {
-        freeformLayer.RemoveSpriteSceneAt(InputManager.GetWorldMousePosition(Camera));
+        var instance = freeformLayer.RemoveSpriteSceneAt(InputManager.GetWorldMousePosition(Camera));
+        if (instance != null)
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveSceneCommand(freeformLayer, instance));
+
       }
     }
     public override void OnHandleSelectedSprite()

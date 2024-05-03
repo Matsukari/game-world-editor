@@ -68,6 +68,8 @@ namespace Raven
       // if (ImGui.InputFloat2("Skew", ref skew)) transform.loca = skew.ToVector2();
 
     }
+    public Transform Copy() => Duplicate();
+
     public Transform Duplicate()
     {
       Transform transform = new Transform();

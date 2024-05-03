@@ -8,12 +8,19 @@ namespace Raven
   /// </summary> 
   public abstract class Command
   {
+    public object Context;
+
     internal Action OnUndo;
+
     internal Action OnRedo;
+
     internal abstract void Redo();
+
     internal abstract void Undo();
+
+    public virtual string GetName() => GetType().Name;
   }
-  sealed class ReversedCommand : Command
+  public class ReversedCommand : Command
   {
     readonly public Command Command;
 

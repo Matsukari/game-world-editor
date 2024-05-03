@@ -131,7 +131,7 @@ namespace Raven
           {
             flags |= ImGuiTreeNodeFlags.Selected;
           }
-          var sheetNode = ImGui.TreeNodeEx(sheet.Sheet.Name.BestWrap(), flags); 
+          var sheetNode = ImGui.TreeNodeEx(sheet.Sheet.Name.BestWrap(20), flags); 
 
           if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen())
           {
@@ -143,7 +143,7 @@ namespace Raven
             sheet.Selected = true;
           }
 
-          ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(sheet.Sheet.Name.BestWrap()).X - 100));
+          ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(sheet.Sheet.Name.BestWrap(20)).X - 100));
           if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
           {
             removeSheet = sheet;

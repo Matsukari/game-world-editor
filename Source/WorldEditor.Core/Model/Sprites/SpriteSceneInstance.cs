@@ -23,6 +23,11 @@ namespace Raven
     public RenderProperties Props;
 
     /// <summary>
+    /// Lyer this instance is attached on
+    /// </summary> 
+    public FreeformLayer Layer;
+
+    /// <summary>
     /// This is the bounds of the actual content (sprite parts) 
     /// </summary> 
     public RectangleF ContentBounds { get => Scene.Bounds.AddTransform(Props.Transform).AddPosition(-Scene.MaxOrigin * (Props.Transform.Scale - Vector2.One)); }

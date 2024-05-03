@@ -23,6 +23,7 @@ namespace Raven.Serializers
           {
             foreach (var instance in freeform.SpriteScenees)
             {
+              instance.Layer = freeform;
               var sourceData = instance.Scene.Name.Split(',');
               var sheetName = sourceData[1];
               var sceneName = sourceData[0];

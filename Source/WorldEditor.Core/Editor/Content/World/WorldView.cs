@@ -112,6 +112,8 @@ namespace Raven
     {
       if (Selection.Capture is Level lev)
         _startLevel = lev.LocalOffset;
+      else if (Selection.Capture is SpriteSceneInstance scene)
+        _startScene = scene.Props.Transform.Copy();
     }
     void SelectionDragEnd()
     {
@@ -119,6 +121,13 @@ namespace Raven
       {
         var command = new LevelMoveCommand(lev, _startLevel); 
         Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(command._level.Bounds, command._level));
+      }
+      else if (Selection.Capture is SpriteSceneInstance scene)
+      {
+        var command = new RenderPropTransformModifyCommand(scene.Props, _startScene);
+        command.Context = scene;
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, 
+            ()=>Selection.Re((command.Context as SpriteSceneInstance).ContentBounds.AddPosition((command.Context as SpriteSceneInstance).Layer.Bounds.Location), command.Context));
       }
     }
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
@@ -228,6 +237,6 @@ namespace Raven
       }
     }
     Vector2 _startLevel = Vector2.Zero;
-    Vector2 _startScene = Vector2.Zero;
+    Transform _startScene = Transform.Default;
   }
 }

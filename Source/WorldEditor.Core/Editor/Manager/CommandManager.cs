@@ -35,7 +35,29 @@ namespace Raven
     }
 
   }
+  
+  class RenderPropTransformModifyCommand : Command
+  {
+    internal RenderProperties _props;
+    Transform _last;
+    Transform _start;
 
+    public RenderPropTransformModifyCommand(RenderProperties props, Transform start)
+    {
+      _props = props;
+      _last = props.Transform.Copy();
+      _start = start.Copy(); 
+    }
+
+    internal override void Redo()
+    {
+      _props.Transform = _last.Copy();
+    }
+    internal override void Undo()
+    {
+      _props.Transform = _start.Copy();
+    }
+  }
   class TransformModifyCommand : Command
   {
     Transform _transform;
@@ -78,6 +100,30 @@ namespace Raven
     {
       _layer.ReplaceTile(_coord, _last);
     }
+  }
+  class PaintSceneCommand : Command
+  {
+    FreeformLayer _layer;
+    internal SpriteSceneInstance _scene;
+    Point _coord;
+
+    public PaintSceneCommand(FreeformLayer layer, SpriteSceneInstance scene)
+    {
+      _layer = layer;
+      _scene = scene;
+    }
+    internal override void Redo()
+    {
+      _layer.SpriteScenees.Add(_scene);
+    }
+    internal override void Undo()
+    {
+      _layer.SpriteScenees.Remove(_scene);
+    }
+  }
+  class RemoveSceneCommand : ReversedCommand
+  {
+    public RemoveSceneCommand(FreeformLayer layer, SpriteSceneInstance scene) : base(new PaintSceneCommand(layer, scene)) {} 
   }
   class PaintTileCommand : Command
   {

@@ -20,17 +20,26 @@ namespace Raven
 
     public FreeformLayer(Level level) : base(level) {}
 
-    public RenderProperties PaintSpriteScene(SpriteScene spriteScene)
+    public SpriteSceneInstance PaintSpriteScene(SpriteScene spriteScene)
     {
       var instance = new SpriteSceneInstance(spriteScene, new RenderProperties());
+      instance.Layer = this;
       SpriteScenees.Add(instance);
-      return instance.Props;
+      return instance;
     }
     public int GetSceneAt(Vector2 position) => SpriteScenees.FindLastIndex(scene => scene.ContentBounds.AddPosition(Bounds.Location).Contains(position));
-    public void RemoveSpriteSceneAt(Vector2 position)
+
+    public SpriteSceneInstance RemoveSpriteSceneAt(Vector2 position)
     {
       var index = GetSceneAt(position);
-      if (index != -1) SpriteScenees.RemoveAt(index);
+      if (index != -1) 
+      {
+        var instance = SpriteScenees[index];
+        instance.Layer = null;
+        SpriteScenees.RemoveAt(index);
+        return instance;
+      }
+      return null;
     }
     public bool GetSceneAt(Vector2 position, out SpriteSceneInstance instance) 
     {

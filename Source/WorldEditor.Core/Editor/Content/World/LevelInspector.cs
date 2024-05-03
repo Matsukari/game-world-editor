@@ -19,6 +19,7 @@ namespace Raven
 
     public void SetCurrentLayer(int index) 
     {
+      SyncLayersGui();
       _currentLayer = index;
       _layerSelected.FalseAll();
       _layerSelected[index] = true;
@@ -47,11 +48,13 @@ namespace Raven
           {
             var layer = new TileLayer(Level, 16, 16);
             Level.AddLayer(layer);
+            SetCurrentLayer(_currentLayer + 1);
           }
           if (ImGui.MenuItem(Icon.ArrowsAlt + "  Freeform"))
           {  
             var layer = new FreeformLayer(Level);
             Level.AddLayer(layer);
+            SetCurrentLayer(_currentLayer + 1);
           }
           ImGui.EndMenu();
         }
