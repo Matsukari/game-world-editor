@@ -256,13 +256,14 @@ namespace Raven
       {
         ImGuiUtils.SpanX(20);
         Widget.ImGuiWidget.ToggleButtonGroup(
-            ids: new []{Icon.PaintBrush, Icon.Eraser},
+            ids: new []{Icon.PaintBrush, Icon.Eraser, Icon.Glasses},
             toggles: ref _paintModeToggled,
             actions: new []{
               ()=>{worldView.PaintMode = PaintMode.Pen; }, 
               ()=>{worldView.PaintMode = PaintMode.Eraser; }, 
+              ()=>{worldView.PaintMode = PaintMode.Inspector; }, 
             },
-            fallback: null,
+            fallback: ()=>worldView.PaintMode = PaintMode.None,
             color: EditorColors.Get(ImGuiCol.ButtonActive));
 
 
@@ -302,7 +303,7 @@ namespace Raven
     ShapeModel[] _shapeModels = new ShapeModel[]{new RectangleModel(), new EllipseModel(), new PointModel(), new PolygonModel()};
     bool[] _editorOpToggled = new []{true, false, false, false, false};
     bool[] _selTypeToggled = new []{false, false};
-    bool[] _paintModeToggled = new []{true, false};
+    bool[] _paintModeToggled = new []{false, false, false};
     bool[] _paintTypeToggled = new []{false, false, false};
     bool _isRandomPaint = false;
   }

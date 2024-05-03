@@ -18,6 +18,8 @@ namespace Raven
           from.X + ease * (to.X - from.X),
           from.Y + ease * (to.Y - from.Y)
           );
+    public static bool EitherIsNegative(this Vector2 vector) => vector.X < 0 || vector.Y < 0;
+    public static Vector2 Negate(this Vector2 vector) => new Vector2(-vector.X, -vector.Y);
 
     public static Vector2 ToVector2(this Num.Vector2 numeric)
     {

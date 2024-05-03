@@ -35,6 +35,9 @@ namespace Raven
 
     public Vector4 HoverTile = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
 
+    public Vector4 InspectSpriteFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+    public Vector4 InspectSpriteOutline = new Vector4(0.7f, 0.7f, 0.7f, 1f);
+
     public Vector4 PaintDefaultFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
     public Vector4 PaintDefaultOutline = new Vector4(0.7f, 0.7f, 0.7f, 1f);
     public Vector4 PaintBadFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);

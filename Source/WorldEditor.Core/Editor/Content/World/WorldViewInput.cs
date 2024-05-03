@@ -9,6 +9,7 @@ namespace Raven
     public event Action<Level, int> OnLeftClickLevel;
     public event Action<Level, int> OnRightClickLevel;
     public event Action<Vector2> OnRightClickWorld;
+    public event Action<Layer, SpriteSceneInstance> OnHoverScene;
     public event Action<Layer, SpriteSceneInstance> OnLeftClickScene;
     public event Action OnMissScene;
     public readonly TilePainter Painter;

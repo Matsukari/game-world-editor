@@ -21,13 +21,32 @@ namespace Raven
 
     // Settings
     public bool IsRandomPaint = false;
-    public PaintMode PaintMode = PaintMode.Pen;
-    public PaintType PaintType = PaintType.Single;
+    public PaintMode PaintMode 
+    {
+      get => _paintMode;
+      set
+      {
+        _paintMode = value;
+        Selection.End();
+      }
+    }
+    public PaintType PaintType 
+    {
+      get => _paintType;
+      set
+      {
+        _paintType = value;
+        Selection.End();
+      }
+    }
+
+    PaintMode _paintMode = PaintMode.None;
+    PaintType _paintType = PaintType.Single;
 
     Vector2 _initialScale = new Vector2();
     Vector2 _initialPos = new Vector2();
 
-    public bool CanPaint { get => _imgui.SpritePicker.SelectedSprite != null || PaintMode == PaintMode.Eraser; }
+    public bool CanPaint { get => _paintMode == PaintMode.Pen || _imgui.SpritePicker.SelectedSprite != null || PaintMode == PaintMode.Eraser; }
 
     public override bool CanDealWithType(object content) => content is World;
 
@@ -70,7 +89,7 @@ namespace Raven
     }  
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
-      if (CanPaint) return;
+      if (CanPaint || PaintMode != PaintMode.Inspector) return;
       Selection.Begin(instance.ContentBounds.AddPosition(layer.Bounds.Location), instance);
       _initialScale = instance.Props.Transform.Scale;
       _initialPos = instance.Props.Transform.Position;
@@ -80,7 +99,8 @@ namespace Raven
     }
     void OnLeftClickLevel(Level level, int i)
     {
-      if (!CanPaint) Selection.Begin(level.Bounds, level);
+      if (!CanPaint && PaintMode == PaintMode.None) 
+        Selection.Begin(level.Bounds, level);
       _imgui.SelectedLevel = i;
       if (Settings.Graphics.FocusOnOneLevel)
       {
@@ -96,6 +116,11 @@ namespace Raven
       Guidelines.OriginLinesRenderable.Render(batcher, camera, settings.Colors.OriginLineX.ToColor(), settings.Colors.OriginLineY.ToColor());
 
       var enterLayer = false;
+
+      if (_imgui.SelectedLevel != -1)
+      {
+        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds, settings.Colors.LevelSelOutline.ToColor());
+      }
       for (var i = 0; i < _world.Levels.Count(); i++)
       {
         var level = _world.Levels[i];
@@ -119,7 +144,6 @@ namespace Raven
           }
           WorldRenderer.RenderLayer(batcher, camera, layer, color);
 
-          if (mouseInLayer && CanPaint) Selection.End();
           if (mouseInLayer && !Selection.HasBegun() && Nez.Input.LeftMouseButtonReleased)
           {
             enterLayer = true;
@@ -173,10 +197,6 @@ namespace Raven
         instance.Props.Transform.Position = _initialPos + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) 
           + instance.Scene.MaxOrigin * scaleDelta;
         instance.Props.Transform.Scale = _initialScale + scaleDelta;
-      }
-      if (_imgui.SelectedLevel != -1)
-      {
-        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds, settings.Colors.LevelSelOutline.ToColor());
       }
     }
     Vector2 _startLevel = Vector2.Zero;

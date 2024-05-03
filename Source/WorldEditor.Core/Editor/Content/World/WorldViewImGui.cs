@@ -2,7 +2,7 @@
 namespace Raven
 {
   public enum PaintType { Single, Rectangle, Line, Fill }
-  public enum PaintMode { Pen, Eraser }
+  public enum PaintMode { Pen, Eraser, Inspector, None }
 
   public class WorldViewImGui : EditorInterface, IImGuiRenderable
   {
