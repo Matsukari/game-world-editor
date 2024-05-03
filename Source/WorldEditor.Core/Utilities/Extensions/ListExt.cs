@@ -100,6 +100,11 @@ namespace Raven
       }
       return list;
     }
+    public static List<bool> FalseAll(this List<bool> list)
+    {
+      for (int i = 0; i < list.Count(); i++) list[i] = false;
+      return list;
+    }
     public static List<bool> FalseRange(this List<bool> list, int count)
     {
       list.Clear();

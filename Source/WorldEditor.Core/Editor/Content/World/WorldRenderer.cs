@@ -29,7 +29,8 @@ namespace Raven
       {
         foreach (var layer in level.Layers)
         {
-          RenderLayer(batcher, camera, layer);
+          if (layer.IsVisible)
+            RenderLayer(batcher, camera, layer);
         }
       }
     }

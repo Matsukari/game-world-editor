@@ -49,6 +49,11 @@ namespace Raven
       }
     }
 
+    public override bool IsVisibleFromCamera(Camera camera)
+    {
+      return base.IsVisibleFromCamera(camera) && Layer.IsVisible;
+    }
+        
     public override void Render(Batcher batcher, Camera camera)
     {
       Console.WriteLine("Rendering TileLayer...");

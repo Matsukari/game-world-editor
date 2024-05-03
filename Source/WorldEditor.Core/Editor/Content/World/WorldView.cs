@@ -153,7 +153,7 @@ namespace Raven
 
       if (_imgui.SelectedLevel != -1)
       {
-        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds, settings.Colors.LevelSelOutline.ToColor());
+        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds.ExpandFromCenter(new Vector2(2, 2)), settings.Colors.LevelSelOutline.ToColor(), 2);
       }
       for (var i = 0; i < _world.Levels.Count(); i++)
       {
@@ -193,7 +193,7 @@ namespace Raven
           {
             if (CanPaint)
             {
-              batcher.DrawRectOutline(camera, layer.Bounds, settings.Colors.PaintModeLevelBorder.ToColor(), 4);
+              batcher.DrawRectOutline(camera, layer.Bounds.ExpandFromCenter(new Vector2(5)), settings.Colors.PaintModeLevelBorder.ToColor(), 4);
             }
             if (Settings.Graphics.DrawLayerGrid)
               Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 

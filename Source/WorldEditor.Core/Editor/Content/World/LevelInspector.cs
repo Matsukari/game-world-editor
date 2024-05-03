@@ -17,6 +17,13 @@ namespace Raven
 
     public LevelInspector(Level level) => Level = level;
 
+    public void SetCurrentLayer(int index) 
+    {
+      _currentLayer = index;
+      _layerSelected.FalseAll();
+      _layerSelected[index] = true;
+    }
+
     public override string GetIcon() => Icon.ObjectGroup;
     public override string GetName() => "Level";   
 

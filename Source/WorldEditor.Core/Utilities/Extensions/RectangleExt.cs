@@ -12,6 +12,12 @@ namespace Raven
       vec.Y = (int)(vec.Y / point.Y) * point.Y;
       return vec;
     }
+    public static RectangleF ExpandFromCenter(this RectangleF rect, Vector2 delta)
+    {
+      rect.Size += delta;
+      rect.Location -= delta / 2;
+      return rect;
+    }
     public static Vector2 LeftCenter(this RectangleF rect)
     {
       rect.Y = rect.Center.Y;

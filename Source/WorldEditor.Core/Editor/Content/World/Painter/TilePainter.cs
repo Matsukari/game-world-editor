@@ -72,7 +72,7 @@ namespace Raven
             Rectangle(tileLayer, mouseDrag, sprite.Region.Size, (coord)=>PaintAtLayer(tilesToPaint, tileLayer, coord));
             return true;
           }
-          else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Fill && Fill(tileLayer, sprite, tilesToPaint)) 
+          else if (_view.PaintType == PaintType.Fill && Fill(tileLayer, sprite, tilesToPaint)) 
             return true;
         }
         else if (_view.PaintMode == PaintMode.Eraser)
@@ -87,7 +87,8 @@ namespace Raven
             Rectangle(tileLayer, mouseDrag, tileLayer.TileSize, (coord)=>RemoveAtLayer(tileLayer, coord));
             return true;
           }
-
+          else if (_view.PaintType == PaintType.Fill && Fill(tileLayer, null, null)) 
+            return true;      
         }
       }
       return false;
@@ -105,22 +106,32 @@ namespace Raven
     }
     bool Fill(TileLayer tileLayer, Sprite sprite, List<Tile> tilesToPaint)
     {
-      var spriteCenter = InputManager.GetWorldMousePosition(Camera) - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
-      var tileInLayer = tileLayer.GetTileCoordFromWorld(spriteCenter); 
-      var tileStart = tilesToPaint[tilesToPaint.Count/2];
-      if (tileStart == null) return false;
-      _canFillTiles = _tileFiller.Update(tileLayer, tileInLayer, sprite.Region.Size/sprite.TileSize);
-
-      void FloodFill(List<Point> fill)
+      Point tileInLayer = tileLayer.GetTileCoordFromWorld(InputManager.GetWorldMousePosition(Camera));
+      Point agentSize = new Point(1, 1);
+      if (sprite != null)
       {
-        foreach (var tile in _canFillTiles) 
-        {
-          PaintAtLayer(tilesToPaint, tileLayer, tile);
-        }
-        RecordTiles();
+        var spriteCenter = InputManager.GetWorldMousePosition(Camera) - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
+        tileInLayer = tileLayer.GetTileCoordFromWorld(spriteCenter); 
+        agentSize = sprite.Region.Size/sprite.TileSize;
+        var tileStart = tilesToPaint[tilesToPaint.Count/2];
+        if (tileStart == null) return false;
       }
+      _canFillTiles = _tileFiller.Update(tileLayer, tileInLayer, agentSize);
 
-      _tileFiller.Start(FloodFill);
+      if (Nez.Input.LeftMouseButtonReleased)
+      {
+        void FloodFill(List<Point> fill)
+        {
+          foreach (var tile in _canFillTiles) 
+          {
+            if (_view.PaintMode == PaintMode.Pen) PaintAtLayer(tilesToPaint, tileLayer, tile);
+            else if (_view.PaintMode == PaintMode.Eraser) RemoveAtLayer(tileLayer, tile);
+          }
+          RecordTiles();
+        }
+
+        _tileFiller.Start(FloodFill);
+      }
       return false;
     }
     Dictionary<Point, Command> _commandGroup = new Dictionary<Point, Command>();
@@ -139,7 +150,7 @@ namespace Raven
       if (_commandGroup.ContainsKey(tileInLayer) && _commandGroup[tileInLayer] is RemovePaintTileCommand paint)
       {
         previous = paint._last;
-        Console.WriteLine($"Delegated to{previous == null}");
+        // Console.WriteLine($"Delegated to{previous == null}");
       }
       _commandGroup[tileInLayer] = new RemovePaintTileCommand(tileLayer, previous, tileInLayer);
     }
@@ -255,19 +266,21 @@ namespace Raven
     }
     Vector2 _mouseStartPaint = Vector2.Zero;
     Vector2 _mouseStartErase = Vector2.Zero;
+    bool _isModifying = false;
     public override void OutRender()
     {
       var rawMouse = InputManager.ScreenMousePosition.ToNumerics();
       var mouse = InputManager.GetWorldMousePosition(Camera);
       SpriteSceneInstance scene;
-      if (_currentLayer is TileLayer tileLayer && _currentLayer.Bounds.Contains(mouse) && (_view.PaintMode == PaintMode.Pen || _view.PaintMode == PaintMode.Eraser))
+      if (Nez.Input.LeftMouseButtonPressed)
+        _mouseStartErase = InputManager.GetWorldMousePosition(Camera);
+
+      if (_currentLayer is TileLayer tileLayer 
+          && (_currentLayer.Bounds.Contains(mouse) || _isModifying) && (_view.PaintMode != PaintMode.None))
       {
         var pos = Camera.WorldToScreenPoint(PosToTiled(mouse));
         var colorA = _view.Settings.Colors.PaintDefaultFill;
         var colorB = _view.Settings.Colors.PaintDefaultOutline;
-
-        if (Nez.Input.LeftMouseButtonPressed)
-          _mouseStartErase = InputManager.GetWorldMousePosition(Camera);
 
         if (_view.PaintMode == PaintMode.Eraser)
         {
@@ -280,6 +293,7 @@ namespace Raven
           var drag = new RectangleF(_mouseStartErase, mouse - _mouseStartErase).AlwaysPositive();
           var rect = RectangleF.FromMinMax(PosToTiled(drag.Location), PosToTiled(drag.Max));
           rect.Size = rect.Size.MathMax(tileLayer.TileSize.ToVector2() * Camera.RawZoom);
+          _isModifying = true;
 
           Console.WriteLine(rect.RenderStringFormat());
 
@@ -310,6 +324,7 @@ namespace Raven
       { 
       }
 
+      if (Input.LeftMouseButtonReleased) _isModifying = false;
 
     }
 

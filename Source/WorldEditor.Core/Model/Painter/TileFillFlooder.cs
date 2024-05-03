@@ -52,8 +52,8 @@ namespace Raven
         foreach (var dir in _dirs) 
         {
           var next = current;
-          next.X += dir.Item1;
-          next.Y += dir.Item2;
+          next.X += dir.Item1 * size.X;
+          next.Y += dir.Item2 * size.Y;
           if (_layer.IsTileValid(next.X, next.Y) 
               && (!_layer.Tiles.ContainsKey(next) || (_flood != null && _layer.Tiles[next].Tile.Id == _flood.Id))
               && !_visited.ContainsKey(next))
