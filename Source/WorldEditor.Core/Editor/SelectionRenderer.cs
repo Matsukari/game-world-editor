@@ -20,7 +20,6 @@ namespace Raven
     {
       if (Nez.Input.LeftMouseButtonPressed && _selection.HasBegun()) 
       {
-        Console.WriteLine("Tangina idos");
         _selected = true;
       }
 
@@ -73,10 +72,8 @@ namespace Raven
       {
         // Parent.SetMouseCursor(selectionPoint);
       }
-      Console.WriteLine("Nandito na");
       if (_selected)
       {
-        Console.WriteLine("Tangina ano na");
         if (selectionPoint != SelectionAxis.None && !_selection.IsEditingPoint)
         {
           _selection.SelAxis = selectionPoint;

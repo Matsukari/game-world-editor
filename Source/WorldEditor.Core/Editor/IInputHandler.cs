@@ -11,14 +11,17 @@ namespace Raven
 
     public bool CanHandleInput() => true;
 
-    public bool CanPassImGui() => false;
-
     public bool OnHandleInput(InputManager input) => false;
 
     /// <summary>
-    /// Called when some IInputHandler returns true and cannot handle any further events
+    /// Called when first-came or higher ordered IInputHandler returns true and cannot handle any further events
     /// </summary> 
     public void OnInputBlocked(InputManager input) {}
+
+    /// <summary>
+    /// Called when ImGUi blocked the input
+    /// </summary> 
+    public void OnGuiIntercept(InputManager input) {}
 
   }
 }

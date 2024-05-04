@@ -64,13 +64,7 @@ namespace Raven
       {
         for (int i = 0; i < _inputHandlers.Count; i++)
         {
-          if (_inputHandlers[i].CanHandleInput() && _inputHandlers[i].CanPassImGui() && _inputHandlers[i].OnHandleInput(this)) 
-          {
-            for (int j = 0; j < _inputHandlers.Count; j++)
-            {
-              if (i != j && _inputHandlers[j].CanPassImGui()) _inputHandlers[j].OnInputBlocked(this);
-            }
-          }
+          _inputHandlers[i].OnGuiIntercept(this);
         }
         return;
       }

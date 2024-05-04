@@ -91,7 +91,7 @@ namespace Raven
         // mouse is also inside the selection area; can insead be moved
         if (_bounds.Width != 0 && _bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
         {
-          // Console.WriteLine("Drag inside...");
+          // Console.WriteLine("Started moving selection...");
           _isDragInsideArea = true;
           if (OnMoveStart != null) OnMoveStart();
         }
@@ -99,6 +99,7 @@ namespace Raven
       else if (Nez.Input.LeftMouseButtonReleased) 
       {
         if (_isDragInsideArea && OnMoveEnd != null) OnMoveEnd();
+        // Console.WriteLine("Ended moving selection...");
 
         _isDragInsideArea = false;
 
@@ -168,7 +169,7 @@ namespace Raven
         if (OnScaled != null) OnScaled(SelAxis);
       }
       // move selection
-      else if (input.IsDrag && _isDragInsideArea && Nez.Input.LeftMouseButtonDown)
+      else if (_isDragInsideArea && Nez.Input.LeftMouseButtonDown)
       {
         _bounds.Location = _selectionInitial.Location + delta;
         ContentBounds = _bounds;

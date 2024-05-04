@@ -193,7 +193,7 @@ namespace Raven
     List<ISceneSprite> _multiSels = new List<ISceneSprite>();
     RectangleF _multiSelection = new RectangleF();
 
-    void IInputHandler.OnInputBlocked(Raven.InputManager input)
+    void IInputHandler.OnGuiIntercept(Raven.InputManager input)
     {
       Selection.End();
     }
