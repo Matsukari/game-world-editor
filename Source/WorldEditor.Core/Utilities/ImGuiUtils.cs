@@ -18,6 +18,29 @@ namespace Raven
       }
       return size;
     }
+    public static bool DisabledButtonIf(bool condition, string label)
+    {
+      if (condition)
+        ImGui.BeginDisabled();
+
+      var result = false;
+      if (ImGui.Button(label)) result = true;
+
+      if (condition)
+        ImGui.EndDisabled();
+
+      return result;
+    }
+    public static void DisableIf(bool condition, Action content)
+    {
+      if (condition)
+        ImGui.BeginDisabled();
+
+      content.Invoke();
+
+      if (condition)
+        ImGui.EndDisabled();
+    }
     public static void TabItem(string label, Action content)
     {
       if (ImGui.BeginTabItem(label))

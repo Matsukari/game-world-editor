@@ -17,5 +17,7 @@ namespace Raven
 
     public bool FocusOnOneLevel = true;
 
+    public bool AdvancedMode = false;
+
   } 
 }

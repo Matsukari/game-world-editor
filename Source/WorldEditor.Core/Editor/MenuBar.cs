@@ -32,7 +32,7 @@ namespace Raven
     {
       if (ImGui.MenuItem("New World")) _editor.ContentManager.AddTab(new WorldView(), new World());
       if (ImGui.MenuItem("Open World")) 
-        _editor.WindowManager.FilePicker.Open(path=>_editor.ContentManager.AddTab(new WorldView(), Serializer.LoadContent<World>(path)), "Open Sheet"); 
+        _editor.WindowManager.FilePicker.Open(path=>_editor.ContentManager.AddTab(new WorldView(), Serializer.LoadContent<World>(path)), "Open World"); 
       if (ImGui.BeginMenu("Worlds"))
       {
         foreach (var content in _editor.ContentManager._tabs)
@@ -50,7 +50,7 @@ namespace Raven
       if (ImGui.MenuItem("New Sheet")) 
         _editor.WindowManager.FilePicker.Open((filename)=> _editor.ContentManager.AddTab(new SheetView(), new Sheet(filename)), "Open Sheet"); 
 
-      if (ImGui.MenuItem("Open World")) 
+      if (ImGui.MenuItem("Open Shee")) 
         _editor.WindowManager.FilePicker.Open(path=>_editor.ContentManager.AddTab(new SheetView(), Serializer.LoadContent<Sheet>(path)), "Open Sheet"); 
 
       if (ImGui.BeginMenu("Sheets"))
@@ -138,11 +138,12 @@ namespace Raven
           }
         }
         ImGuiUtils.SpanX(40);
-        if (ImGui.Button(Icon.Undo) || _editor.Settings.Hotkeys.Undo.IsPressed())
+        var cm = Core.GetGlobalManager<CommandManagerHead>().Current;
+        if (ImGuiUtils.DisabledButtonIf(!cm.CanUndo(), Icon.Undo) || _editor.Settings.Hotkeys.Undo.IsPressed())
         {
           Core.GetGlobalManager<CommandManagerHead>().Current.Undo();
         }
-        if (ImGui.Button(Icon.Redo) || _editor.Settings.Hotkeys.Redo.IsPressed())
+        if (ImGuiUtils.DisabledButtonIf(!cm.CanRedo(), Icon.Redo) || _editor.Settings.Hotkeys.Redo.IsPressed())
         {
           Core.GetGlobalManager<CommandManagerHead>().Current.Redo();
         }
@@ -201,6 +202,8 @@ namespace Raven
       ImGui.PopStyleColor();
 
       ImGuiUtils.SpanX(270);
+
+      if (_editor.ContentManager.View is SheetView s && !s.SceneView.IsEditing) ImGui.BeginDisabled();
       Widget.ImGuiWidget.ToggleButtonGroup(
           ids: new []{Icon.MousePointer, Icon.ArrowsAlt, Icon.HandSpock, Icon.Expand, Icon.SyncAlt},
           toggles: ref _editorOpToggled,
@@ -213,6 +216,7 @@ namespace Raven
           },
           fallback: null,
           color: EditorColors.Get(ImGuiCol.ButtonActive));
+      if (_editor.ContentManager.View is SheetView s2 && !s2.SceneView.IsEditing) ImGui.EndDisabled();
 
       ImGuiUtils.SpanX(10);
       var gridToggle = (_editor.ContentManager.View is WorldView world) ? _editor.Settings.Graphics.DrawLayerGrid : _editor.Settings.Graphics.DrawSheetGrid; 

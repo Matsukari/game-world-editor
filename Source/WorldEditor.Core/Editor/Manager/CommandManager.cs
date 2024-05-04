@@ -383,6 +383,10 @@ namespace Raven
     public int Current { get => _current; }
     public List<Command> Commands { get => _commands; }
     public event Action<Command> OnRecord;
+
+    public bool CanUndo() => _current >= 0;
+
+    public bool CanRedo() => _commands.Count() > _current + 1;
    
     public void Undo()
     {

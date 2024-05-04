@@ -24,6 +24,8 @@ namespace Raven
     public KeyCombination Copy = new KeyCombination(Keys.RightControl, Keys.C);
     public KeyCombination Paste = new KeyCombination(Keys.RightControl, Keys.V);
 
+    public KeyCombination AdvancedMode = new KeyCombination(Keys.F11);
+
 
   } 
 }

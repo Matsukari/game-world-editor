@@ -8,7 +8,7 @@ namespace Raven
   {
     public override IImGuiRenderable ImGuiHandler => _imgui;
     public override IInputHandler InputHandler => _input;
-    public SpritePicker SpritePicker { get => _imgui.SpritePicker; }
+    public TilePainter SpritePicker { get => _imgui.SpritePicker; }
     public WorldViewImGui Window { get => _imgui; }
     public World World { get => _world; }
  
@@ -146,71 +146,87 @@ namespace Raven
       _imgui.Popups.OpenLevelOptions(level);
     }
 
+    void DrawLayers(int index, Batcher batcher, Camera camera)
+    {
+      var level = World.Levels[index]; 
+      foreach (var layer in level.Layers)
+      {
+        if (!layer.IsVisible) continue;
+
+        bool mouseInLayer = layer.Bounds.Contains(Camera.MouseToWorldPoint());
+        bool isSameLevel = _imgui.SelectedLevelInspector != null && _imgui.SelectedLevelInspector.Level.Name == level.Name;
+        bool isSameLayer = isSameLevel && _imgui.SelectedLevelInspector.CurrentLayer != null && _imgui.SelectedLevelInspector.CurrentLayer.Name == layer.Name;
+
+        Color color = default;
+        if (Settings.Graphics.HighlightCurrentLayer 
+            && level.Bounds.Contains(Camera.MouseToWorldPoint())
+            && (mouseInLayer || SpritePicker.IsDoingWork)
+            && PaintMode != PaintMode.None
+            && !isSameLayer
+            && !InputManager.IsImGuiBlocking)
+        {
+          color = Settings.Colors.LayerDim.ToColor();
+        }
+
+        Color outlineColor = default;
+        if (isSameLayer)
+        {
+          if (PaintMode == PaintMode.Pen) outlineColor = Settings.Colors.PaintModeLevelBorder.ToColor();
+          else if (PaintMode == PaintMode.Eraser) outlineColor = Settings.Colors.EraserModeLevelBorder.ToColor();
+          else if (PaintMode == PaintMode.Inspector) outlineColor = Settings.Colors.InspectorModeLevelBorder.ToColor();
+          if (outlineColor != default)
+            batcher.DrawRectOutline(camera, layer.Bounds.ExpandFromCenter(new Vector2(7)), outlineColor, 4);
+        }
+
+        WorldRenderer.RenderLayer(batcher, camera, layer, color);
+
+        if (mouseInLayer 
+            && !Selection.HasBegun() 
+            && Nez.Input.LeftMouseButtonReleased)
+        {
+          _imgui.SelectedLevel = index;
+        }
+
+        if (Settings.Graphics.DrawLayerGrid 
+            && layer is TileLayer tileLayer 
+            && isSameLayer)
+          Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, Settings.Colors.LevelGrid.ToColor(), 
+              tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
+      }
+    }
+    void DrawLevel(int index, Batcher batcher, Camera camera)
+    {
+      var level = World.Levels[index];
+      batcher.DrawRect(level.Bounds, Settings.Colors.LevelSheet.ToColor());
+
+      if (level.Bounds.Contains(Camera.MouseToWorldPoint()) && _imgui.SelectedLevel != index)
+      {
+        batcher.DrawRectOutline(camera, level.Bounds.ExpandFromCenter(new Vector2(7)), Settings.Colors.SelectionOutline.ToColor(), 4);
+      }
+      DrawLayers(index, batcher, camera);
+    }
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
       Guidelines.OriginLinesRenderable.Render(batcher, camera, settings.Colors.OriginLineX.ToColor(), settings.Colors.OriginLineY.ToColor());
 
-      var enterLayer = false;
-
       if (_imgui.SelectedLevel != -1)
       {
-        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds.ExpandFromCenter(new Vector2(2, 2)), settings.Colors.LevelSelOutline.ToColor(), 2);
+        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds.ExpandFromCenter(new Vector2(2, 2)), 
+            settings.Colors.LevelSelOutline.ToColor(), 2);
       }
-      for (var i = 0; i < _world.Levels.Count(); i++)
+
+      if (settings.Graphics.FocusOnOneLevel && PaintMode != PaintMode.None && _imgui.SelectedLevel != -1)
       {
-        var level = _world.Levels[i];
-        if (!level.IsVisible) continue;
-
-        batcher.DrawRect(level.Bounds, settings.Colors.LevelSheet.ToColor());
-
-        if (level.Bounds.Contains(Camera.MouseToWorldPoint()) && _imgui.SelectedLevel != i)
-        {
-          batcher.DrawRectOutline(camera, level.Bounds.ExpandFromCenter(new Vector2(7)), settings.Colors.SelectionOutline.ToColor(), 4);
-        }
-
-        foreach (var layer in level.Layers)
-        {
-          bool mouseInLayer = layer.Bounds.Contains(Camera.MouseToWorldPoint());
-          Color color = default;
-          if (settings.Graphics.HighlightCurrentLayer 
-              && mouseInLayer
-              && CanPaint
-              && !InputManager.IsImGuiBlocking
-              && _imgui.SelectedLevelInspector != null
-              && _imgui.SelectedLevelInspector.Level.Name == level.Name
-              && _imgui.SelectedLevelInspector.CurrentLayer != null 
-              && _imgui.SelectedLevelInspector.CurrentLayer.Name != layer.Name)
-          {
-            color = settings.Colors.LayerDim.ToColor();
-          }
-          if (layer.IsVisible)
-            WorldRenderer.RenderLayer(batcher, camera, layer, color);
-
-          if (mouseInLayer && !Selection.HasBegun() && Nez.Input.LeftMouseButtonReleased)
-          {
-            enterLayer = true;
-            _imgui.SelectedLevel = i;
-          }
-
-          if (_imgui.SelectedLevelInspector != null
-              && _imgui.SelectedLevelInspector.Level.Name == level.Name
-              && _imgui.SelectedLevelInspector.CurrentLayer != null 
-              && _imgui.SelectedLevelInspector.CurrentLayer.Name == layer.Name
-              && layer.IsVisible )
-          {
-            if (CanPaint)
-              batcher.DrawRectOutline(camera, layer.Bounds.ExpandFromCenter(new Vector2(7)), settings.Colors.PaintModeLevelBorder.ToColor(), 4);
-            else if (PaintMode == PaintMode.Inspector)
-              batcher.DrawRectOutline(camera, layer.Bounds.ExpandFromCenter(new Vector2(7)), settings.Colors.InspectorModeLevelBorder.ToColor(), 4);
-
-            if (Settings.Graphics.DrawLayerGrid && layer is TileLayer tileLayer)
-              Guidelines.GridLines.RenderGridLines(batcher, camera, tileLayer.Bounds.Location, settings.Colors.LevelGrid.ToColor(), 
-                  tileLayer.TilesQuantity, tileLayer.TileSize.ToVector2());
-          }
-        }
+        DrawLevel(_imgui.SelectedLevel, batcher, camera);
       }
-      if (!enterLayer)
+      else
       {
+        for (var i = 0; i < _world.Levels.Count(); i++)
+        {
+          var level = _world.Levels[i];
+          if (!level.IsVisible) continue;
+          DrawLevel(i, batcher, camera);
+        }
       }
 
       // if (_imgui.SelectedLevelInspector != null && _imgui.SelectedLevelInspector.CurrentLayer is TileLayer tileLayer)

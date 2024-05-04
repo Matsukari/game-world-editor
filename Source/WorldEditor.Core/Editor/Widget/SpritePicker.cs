@@ -36,6 +36,9 @@ namespace Raven
     public virtual void OnHandleSelectedSprite()
     {
     }
+    public virtual void OnHandleSelectedSpriteInside()
+    {
+    }
     public virtual void OutRender()
     {
 
@@ -44,8 +47,6 @@ namespace Raven
     {
       var input = Core.GetGlobalManager<InputManager>();
       var rawMouse = Nez.Input.RawMousePosition.ToVector2().ToNumerics();
-
-      if (SelectedSprite != null && Nez.Input.RightMouseButtonReleased && !InputManager.IsImGuiBlocking) SelectedSprite = null;
 
       OutRender();
 
@@ -279,7 +280,7 @@ namespace Raven
         }
       }
       if (SelectedSprite != null && _initialMouseOnDrag == Vector2.Zero)
-          OnHandleSelectedSprite();
+          OnHandleSelectedSpriteInside();
 
       // Mouse is outside the enlargened picker
       if (!totalBounds.Contains(ImGui.GetMousePos()) && !input.IsDrag) 

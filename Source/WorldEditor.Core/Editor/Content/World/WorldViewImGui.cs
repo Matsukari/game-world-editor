@@ -1,3 +1,4 @@
+using ImGuiNET;
 
 namespace Raven
 {
@@ -6,7 +7,7 @@ namespace Raven
 
   public class WorldViewImGui : EditorInterface, IImGuiRenderable
   {
-    public SpritePicker SpritePicker { get => _spritePicker; }
+    public TilePainter SpritePicker { get => _spritePicker; }
     public List<LevelInspector> LevelInspectors { get => _levelInspectors; }
     public WorldViewPopup Popups { get => _popups;  }
     public readonly SceneInstanceInspector SceneInstanceInspector = new SceneInstanceInspector();
@@ -19,6 +20,16 @@ namespace Raven
 
     World _world;
     int _selectedLevel = -1;
+
+    public Layer CurrentLayer 
+    {
+      get 
+      {
+        var level = SelectedLevelInspector; 
+        if (level == null) return null;
+        return level.CurrentLayer; 
+      }
+    }
 
     public WorldViewImGui(TilePainter painter)
     {
@@ -34,6 +45,12 @@ namespace Raven
     {
       base.Initialize(editor, content);
       _world = Content as World;
+      _popups.OnAnyPopupRender += OnAnyPopupRender;
+    }
+    void OnAnyPopupRender(ImGuiWinManager imgui)
+    {
+      if (_spritePicker.SelectedSprite is Sprite && ImGui.MenuItem("Remove Selected Tile")) _spritePicker.SelectedSprite = null;
+      if (_spritePicker.SelectedSprite is SpriteScene && ImGui.MenuItem("Remove Selected Scene")) _spritePicker.SelectedSprite = null;
     }
 
     public LevelInspector SelectedLevelInspector { get => _levelInspectors.GetAtOrNull(SelectedLevel); }

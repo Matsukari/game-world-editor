@@ -20,6 +20,7 @@ namespace Raven
     Vector2 _mouseWhenLevelAdd = Vector2.Zero;
     public Widget.PopupDelegate<(IPropertied, string, ShapeModel)> ShapePopup = new Widget.PopupDelegate<(IPropertied, string, ShapeModel)>("shape-popup");
 
+    public event Action<ImGuiWinManager> OnAnyPopupRender;
     public event Action<Level> OnDeleteLevel;
     public event Action<Level> OnCutLevel;
     public event Action<Level> OnCopyLevel;
@@ -70,6 +71,8 @@ namespace Raven
       // Popups
       if (ImGui.BeginPopup("level-options-popup"))
       {
+        if (OnAnyPopupRender != null) OnAnyPopupRender(imgui);
+
         if (ImGui.MenuItem(Icon.Copy + "  Copy")) 
         {
           _copiedLevel = _levelOnOpt;
@@ -90,6 +93,8 @@ namespace Raven
       }
       if (ImGui.BeginPopup("world-options-popup"))
       {
+        if (OnAnyPopupRender != null) OnAnyPopupRender(imgui);
+
         if (ImGui.MenuItem(Icon.ArrowDown + "  Add level here"))
         {
           _mouseWhenLevelAdd = Camera.MouseToWorldPoint();

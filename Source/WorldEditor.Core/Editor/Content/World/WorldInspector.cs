@@ -77,7 +77,7 @@ namespace Raven
       {
         var size = 200;
         stack.Y += size;
-        ImGui.BeginChild("levels-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
+        ImGui.BeginChild("levels-content", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, size));
         for (int i = 0; i < _levelInspectors.Count(); i++)
         {
           var level = _levelInspectors[i];
@@ -93,7 +93,7 @@ namespace Raven
             }
             level.Selected = true;
           }
-          ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(level.Name).X - 100));
+          ImGuiUtils.SpanX((ImGui.GetContentRegionAvail().X - ImGuiUtils.CalcTextSizeHorizontal(level.Name).X - 100));
           ImGui.PushID($"level-{level.Name}-id");
           var visibState = (!level.Level.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
           if (ImGui.SmallButton(visibState))
@@ -120,7 +120,7 @@ namespace Raven
       {
         var size = 140;
         stack.Y += size;
-        ImGui.BeginChild("spritesheets-content", new System.Numerics.Vector2(ImGui.GetWindowWidth(), size));
+        ImGui.BeginChild("spritesheets-content", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, size));
         for (int i = 0; i < _spritePicker.Sheets.Count(); i++)
         {
           var sheet = _spritePicker.Sheets[i];

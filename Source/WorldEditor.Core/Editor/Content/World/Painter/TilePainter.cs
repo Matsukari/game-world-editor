@@ -19,15 +19,11 @@ namespace Raven
     }
     bool IInputHandler.OnHandleInput(Raven.InputManager input)
     {
-      var level = _view.Window.SelectedLevelInspector; 
-      if (level == null) return false;
-
-      var layer = level.CurrentLayer; 
+      var layer = _view.Window.CurrentLayer;
       if (layer == null) return false;
-
       _currentLayer = layer;
 
-      if (_view.PaintMode == PaintMode.None || _view.PaintMode == PaintMode.Inspector) return false;
+      if (_view.PaintMode == PaintMode.None || _view.PaintMode == PaintMode.Inspector || layer.IsLocked || !layer.IsVisible) return false;
 
       if (Nez.Input.LeftMouseButtonPressed) 
         _mouseStart = InputManager.GetWorldMousePosition(Camera);
@@ -198,6 +194,19 @@ namespace Raven
 
       }
     }
+    public override void OnHandleSelectedSpriteInside()
+    {
+      if (_view.PaintMode == PaintMode.Pen && _view.PaintType == PaintType.Single && SelectedSprite is Sprite sprite && _currentLayer is TileLayer)
+      {
+        var pos = InputManager.ScreenMousePosition.ToNumerics();
+        ImGui.GetForegroundDrawList().AddImage(
+            Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
+            pos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom, 
+            pos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom + sprite.Region.Size.ToVector2().ToNumerics() * Camera.RawZoom,
+            sprite.MinUv.ToNumerics(), sprite.MaxUv.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor()); 
+      }
+    }
+
     public override void OnHandleSelectedSprite()
     {
       var input = Core.GetGlobalManager<InputManager>();
@@ -205,19 +214,15 @@ namespace Raven
 
       if (_view.PaintMode != PaintMode.Pen) return;
 
-      if (_view.SpritePicker.SelectedSprite is Sprite sprite && _currentLayer is TileLayer tileLayer)
+      if (SelectedSprite is Sprite sprite && _currentLayer is TileLayer tileLayer)
       {
-        var min = sprite.Region.Location.ToVector2() / sprite.Texture.GetSize();
-        var max = (sprite.Region.Location + sprite.Region.Size).ToVector2() / sprite.Texture.GetSize();
-        var tilePos = rawMouse; 
-
         void PaintPreviewAt(System.Numerics.Vector2 screenPos)
         { 
-          ImGui.GetForegroundDrawList().AddImage(
+          ImGui.GetBackgroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
               screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom, 
               screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom + sprite.Region.Size.ToVector2().ToNumerics() * Camera.RawZoom,
-              min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+              sprite.MinUv.ToNumerics(), sprite.MaxUv.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
         }
 
         // Show paint previews
@@ -250,7 +255,7 @@ namespace Raven
                       Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
                       Camera.WorldToScreenPoint(bounds.Location).ToNumerics(), 
                       Camera.WorldToScreenPoint(bounds.Max).ToNumerics(),
-                      min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+                      sprite.MinUv.ToNumerics(), sprite.MaxUv.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
                 }
               }
             }
@@ -272,16 +277,25 @@ namespace Raven
               min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
         }
       }
-      else if (_view.SpritePicker.SelectedSprite is SpriteScene && _currentLayer is TileLayer)
+      else if (SelectedSprite is SpriteScene && _currentLayer is TileLayer)
       {
         ImGui.BeginTooltip();
-        ImGui.TextDisabled("Cannot put a scene on TileLayer.");
+        ImGui.TextDisabled("Please select a tile to paint on this layer.");
+        ImGui.EndTooltip();
+      }
+      else if (_currentLayer is FreeformLayer && _view.PaintMode == PaintMode.Pen && SelectedSprite is not SpriteScene)
+      {
+        ImGui.BeginTooltip();
+        ImGui.TextDisabled("Please select a SpriteScene to paint anything in this layer.");
         ImGui.EndTooltip();
       }
     }
     Vector2 _mouseStartPaint = Vector2.Zero;
     Vector2 _mouseStartErase = Vector2.Zero;
     bool _isModifying = false;
+
+    public bool IsDoingWork { get => _isModifying; }
+
     public override void OutRender()
     {
       var rawMouse = InputManager.ScreenMousePosition.ToNumerics();
@@ -294,7 +308,7 @@ namespace Raven
       var colorA = _view.Settings.Colors.PaintDefaultFill;
       var colorB = _view.Settings.Colors.PaintDefaultOutline;
 
-      if (_view.PaintMode == PaintMode.None) return;
+      if (_view.PaintMode == PaintMode.None || InputManager.IsImGuiBlocking) return;
       else if (_view.PaintMode == PaintMode.Eraser)
       {
         colorA = _view.Settings.Colors.PaintEraseFill;
@@ -306,19 +320,25 @@ namespace Raven
         colorB = _view.Settings.Colors.InspectSpriteOutline;
       }
 
+      if ((!_currentLayer.IsVisible || _currentLayer.IsLocked) && _view.PaintMode != PaintMode.Inspector)
+      {
+        ImGui.BeginTooltip();
+        ImGui.TextDisabled("You cannot paint on this layer.");
+        ImGui.EndTooltip();
+      }
+
       if (_currentLayer is TileLayer tileLayer && (_currentLayer.Bounds.Contains(mouse) || _isModifying))
       {
         var pos = Camera.WorldToScreenPoint(PosToTiled(mouse));
 
+
+        if (Nez.Input.LeftMouseButtonPressed) _isModifying = true;
 
         if (Nez.Input.LeftMouseButtonDown && _view.PaintType == PaintType.Rectangle)
         {
           var drag = new RectangleF(_mouseStartErase, mouse - _mouseStartErase).AlwaysPositive();
           var rect = RectangleF.FromMinMax(PosToTiled(drag.Location), PosToTiled(drag.Max));
           rect.Size = rect.Size.MathMax(tileLayer.TileSize.ToVector2() * Camera.RawZoom);
-          _isModifying = true;
-
-          Console.WriteLine(rect.RenderStringFormat());
 
           ImGui.GetBackgroundDrawList().AddRectFilled(
               Camera.WorldToScreenPoint(rect.Location).ToNumerics(), 
@@ -349,9 +369,7 @@ namespace Raven
         }
 
       }
-      else if (_currentLayer is FreeformLayer freeform  
-          && _view.PaintMode == PaintMode.Inspector 
-          && !_view.Selection.HasBegun())
+      else if (_currentLayer is FreeformLayer freeform && !_view.Selection.HasBegun())
       {
         var sceneIndex = freeform.GetSceneAt(mouse, out scene);
         if (sceneIndex == -1) return;
@@ -359,16 +377,19 @@ namespace Raven
         var pos = Camera.WorldToScreenPoint(scene.ContentBounds.Location + scene.Layer.Bounds.Location);
         var size = scene.ContentBounds.Size;
 
-        ImGui.GetBackgroundDrawList().AddRectFilled(
-            pos.ToNumerics(), (pos + size * Camera.RawZoom).ToNumerics(), colorA.ToColor().ToImColor());
-        ImGui.GetBackgroundDrawList().AddRect(
-            pos.ToNumerics(), (pos + size * Camera.RawZoom).ToNumerics(), colorB.ToImColor()); 
+        if (_view.PaintMode != PaintMode.Pen)
+        {
+          ImGui.GetBackgroundDrawList().AddRectFilled( pos.ToNumerics(), (pos + size * Camera.RawZoom).ToNumerics(), colorA.ToColor().ToImColor());
+          ImGui.GetBackgroundDrawList().AddRect( pos.ToNumerics(), (pos + size * Camera.RawZoom).ToNumerics(), colorB.ToImColor()); 
+        }
 
-        ImGui.BeginTooltip();
-
-        ImGui.Text($"{scene.Scene.Name} - {sceneIndex}");
-
-        ImGui.EndTooltip();
+        if (_view.PaintMode == PaintMode.Inspector)
+        {
+          ImGui.BeginTooltip();
+          ImGui.Text($"{scene.Scene.Name} - {sceneIndex}");
+          ImGui.EndTooltip();
+        }
+        
 
       }
 

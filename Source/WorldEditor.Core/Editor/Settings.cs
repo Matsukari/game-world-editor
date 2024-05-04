@@ -57,10 +57,13 @@ namespace Raven
       ImGui.Checkbox("Highlight Current Layer", ref _settings.Graphics.HighlightCurrentLayer);
       ImGui.Checkbox("Draw Grid on Sheets", ref _settings.Graphics.DrawSheetGrid);
       ImGui.Checkbox("Draw Grid on Levels", ref _settings.Graphics.DrawLayerGrid);
+      ImGui.Checkbox("Focus on One Level", ref _settings.Graphics.FocusOnOneLevel);
+      ImGui.Checkbox("Skip Popup on New Objects", ref _settings.ShowPopupOnLevelCreate);
 
       ImGui.NewLine();
       ImGui.Checkbox("Right Click To Remove Brush", ref _settings.RightClickRemoveBrush);
       ImGui.Checkbox("Right Click To Erase", ref _settings.RightClickErase);
+
 
     }
     public void Shortcuts()
