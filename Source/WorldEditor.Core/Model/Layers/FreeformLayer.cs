@@ -41,17 +41,17 @@ namespace Raven
       }
       return null;
     }
-    public bool GetSceneAt(Vector2 position, out SpriteSceneInstance instance) 
+    public int GetSceneAt(Vector2 position, out SpriteSceneInstance instance) 
     {
       var index = GetSceneAt(position);
       
       if (index != -1) 
       {
         instance = SpriteScenees[index];
-        return true;
+        return index;
       }
       instance = null;
-      return false;
+      return -1;
     }
     public void SortScenes()
     {

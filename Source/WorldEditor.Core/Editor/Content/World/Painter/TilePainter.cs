@@ -257,7 +257,7 @@ namespace Raven
             break;
         }
       }
-      else if (SelectedSprite is SpriteScene spriteScene)
+      else if (SelectedSprite is SpriteScene spriteScene && _currentLayer is FreeformLayer)
       {
         foreach (var part in spriteScene.Parts)
         {
@@ -272,6 +272,12 @@ namespace Raven
               min.ToNumerics(), max.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
         }
       }
+      else if (_view.SpritePicker.SelectedSprite is SpriteScene && _currentLayer is TileLayer)
+      {
+        ImGui.BeginTooltip();
+        ImGui.TextDisabled("Cannot put a scene on TileLayer.");
+        ImGui.EndTooltip();
+      }
     }
     Vector2 _mouseStartPaint = Vector2.Zero;
     Vector2 _mouseStartErase = Vector2.Zero;
@@ -281,21 +287,29 @@ namespace Raven
       var rawMouse = InputManager.ScreenMousePosition.ToNumerics();
       var mouse = InputManager.GetWorldMousePosition(Camera);
       SpriteSceneInstance scene;
+
       if (Nez.Input.LeftMouseButtonPressed)
         _mouseStartErase = InputManager.GetWorldMousePosition(Camera);
 
-      if (_currentLayer is TileLayer tileLayer 
-          && (_currentLayer.Bounds.Contains(mouse) || _isModifying) && (_view.PaintMode != PaintMode.None))
+      var colorA = _view.Settings.Colors.PaintDefaultFill;
+      var colorB = _view.Settings.Colors.PaintDefaultOutline;
+
+      if (_view.PaintMode == PaintMode.None) return;
+      else if (_view.PaintMode == PaintMode.Eraser)
+      {
+        colorA = _view.Settings.Colors.PaintEraseFill;
+        colorB = _view.Settings.Colors.PaintEraseOutline;
+      }
+      else if (_view.PaintMode == PaintMode.Inspector)
+      {
+        colorA = _view.Settings.Colors.InspectSpriteFill;
+        colorB = _view.Settings.Colors.InspectSpriteOutline;
+      }
+
+      if (_currentLayer is TileLayer tileLayer && (_currentLayer.Bounds.Contains(mouse) || _isModifying))
       {
         var pos = Camera.WorldToScreenPoint(PosToTiled(mouse));
-        var colorA = _view.Settings.Colors.PaintDefaultFill;
-        var colorB = _view.Settings.Colors.PaintDefaultOutline;
 
-        if (_view.PaintMode == PaintMode.Eraser)
-        {
-          colorA = _view.Settings.Colors.PaintEraseFill;
-          colorB = _view.Settings.Colors.PaintEraseOutline;
-        }
 
         if (Nez.Input.LeftMouseButtonDown && _view.PaintType == PaintType.Rectangle)
         {
@@ -313,29 +327,57 @@ namespace Raven
               Camera.WorldToScreenPoint(rect.Location).ToNumerics(), 
               Camera.WorldToScreenPoint(rect.Max).ToNumerics(), colorB.ToColor().ToImColor());
         } 
-
-        if (_view.PaintMode == PaintMode.Inspector)
-        {
-          colorA = _view.Settings.Colors.InspectSpriteFill;
-          colorB = _view.Settings.Colors.InspectSpriteOutline;
-        }
-          
+ 
         if (_view.PaintType == PaintType.Single || (_view.PaintMode == PaintMode.Inspector))
         {
           ImGui.GetBackgroundDrawList().AddRectFilled(
               pos.ToNumerics(), (pos + tileLayer.TileSize.ToVector2() * Camera.RawZoom).ToNumerics(), colorA.ToColor().ToImColor());
           ImGui.GetBackgroundDrawList().AddRect(
               pos.ToNumerics(), (pos + tileLayer.TileSize.ToVector2() * Camera.RawZoom).ToNumerics(), colorB.ToImColor()); 
+
+
+          if (_view.PaintMode == PaintMode.Inspector)
+          {
+            var tileCoord = tileLayer.GetTileCoordFromWorld(mouse); 
+            var tile = tileLayer.TryGetTile(tileCoord);
+            var tileName = "Empty";
+            if (tile != null)  tileName = (tile.Tile.Name != string.Empty) ? tile.Tile.Name : "No name";
+            ImGui.BeginTooltip();
+            ImGui.Text($"{tileName} in ({tileCoord.X}, {tileCoord.Y}");
+            ImGui.EndTooltip();
+          }
         }
 
       }
-      else if (_view.PaintMode == PaintMode.Inspector && _currentLayer is FreeformLayer freeform && freeform.GetSceneAt(mouse, out scene))
-      { 
+      else if (_currentLayer is FreeformLayer freeform  
+          && _view.PaintMode == PaintMode.Inspector 
+          && !_view.Selection.HasBegun())
+      {
+        var sceneIndex = freeform.GetSceneAt(mouse, out scene);
+        if (sceneIndex == -1) return;
+
+        var pos = Camera.WorldToScreenPoint(scene.ContentBounds.Location + scene.Layer.Bounds.Location);
+        var size = scene.ContentBounds.Size;
+
+        ImGui.GetBackgroundDrawList().AddRectFilled(
+            pos.ToNumerics(), (pos + size * Camera.RawZoom).ToNumerics(), colorA.ToColor().ToImColor());
+        ImGui.GetBackgroundDrawList().AddRect(
+            pos.ToNumerics(), (pos + size * Camera.RawZoom).ToNumerics(), colorB.ToImColor()); 
+
+        ImGui.BeginTooltip();
+
+        ImGui.Text($"{scene.Scene.Name} - {sceneIndex}");
+
+        ImGui.EndTooltip();
+
       }
 
       if (Input.LeftMouseButtonReleased) _isModifying = false;
 
+
+
     }
+    Utils.TimeDelay _tooltipTimer = new Utils.TimeDelay(2);
 
     Vector2 PosToTiled(Vector2 pos)
     {

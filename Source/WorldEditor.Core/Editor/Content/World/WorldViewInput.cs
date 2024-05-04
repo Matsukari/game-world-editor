@@ -51,7 +51,7 @@ namespace Raven
         {
           SpriteSceneInstance scene;
           if (layer is FreeformLayer freeform 
-              && freeform.GetSceneAt(Camera.MouseToWorldPoint(), out scene)
+              && freeform.GetSceneAt(Camera.MouseToWorldPoint(), out scene) != -1
               && Nez.Input.LeftMouseButtonReleased 
               && OnLeftClickScene != null)
           {

@@ -47,6 +47,7 @@ namespace Raven
     public Vector4 PaintEraseFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
 
     public Vector4 PaintModeLevelBorder = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
+    public Vector4 InspectorModeLevelBorder = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
 
     // Selection
     public Vector4 SelectionOutline = new Vector4(0.85f, 0.85f, 0.85f, 1f);
