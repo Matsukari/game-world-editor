@@ -43,9 +43,6 @@ namespace Raven
     PaintMode _paintMode = PaintMode.None;
     PaintType _paintType = PaintType.Single;
 
-    Vector2 _initialScale = new Vector2();
-    Vector2 _initialPos = new Vector2();
-
     public bool CanPaint { get => _paintMode == PaintMode.Pen || _imgui.SpritePicker.SelectedSprite != null || PaintMode == PaintMode.Eraser; }
 
     public override bool CanDealWithType(object content) => content is World;
@@ -110,10 +107,6 @@ namespace Raven
     }
     void SelectionDragStart()
     {
-      if (Selection.Capture is Level lev)
-        _startLevel = lev.LocalOffset;
-      else if (Selection.Capture is SpriteSceneInstance scene)
-        _startScene = scene.Props.Transform.Copy();
     }
     void SelectionDragEnd()
     {
@@ -126,16 +119,14 @@ namespace Raven
       {
         var command = new RenderPropTransformModifyCommand(scene.Props, _startScene);
         command.Context = scene;
-        Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, 
-            ()=>Selection.Re((command.Context as SpriteSceneInstance).ContentBounds.AddPosition((command.Context as SpriteSceneInstance).Layer.Bounds.Location), command.Context));
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(scene.ContentBounds.AddPosition(scene.Layer.Bounds.Location), command.Context, ()=>_startScene=scene.Props.Transform.Copy()));
       }
     }
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
       if (CanPaint || PaintMode != PaintMode.Inspector) return;
       Selection.Begin(instance.ContentBounds.AddPosition(layer.Bounds.Location), instance);
-      _initialScale = instance.Props.Transform.Scale;
-      _initialPos = instance.Props.Transform.Position;
+      _startScene = instance.Props.Transform.Copy();
       _imgui.SceneInstanceInspector.Scene = instance;
       _imgui.SceneInstanceInspector.Layer = layer as FreeformLayer;
       _imgui._objHolder.Content = _imgui.SceneInstanceInspector;
@@ -145,6 +136,7 @@ namespace Raven
       if (!CanPaint && PaintMode == PaintMode.None) 
         Selection.Begin(level.Bounds, level);
       _imgui.SelectedLevel = i;
+      _startLevel = level.LocalOffset;
       if (Settings.Graphics.FocusOnOneLevel)
       {
       }
@@ -231,9 +223,9 @@ namespace Raven
       else if (Selection.Capture is SpriteSceneInstance instance)
       {
         var scaleDelta = (Selection.ContentBounds.Size - Selection.InitialBounds.Size) / (instance.Scene.Bounds.Size);
-        instance.Props.Transform.Position = _initialPos + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) 
+        instance.Props.Transform.Position = _startScene.Position + (Selection.ContentBounds.Location - Selection.InitialBounds.Location) 
           + instance.Scene.MaxOrigin * scaleDelta;
-        instance.Props.Transform.Scale = _initialScale + scaleDelta;
+        instance.Props.Transform.Scale = _startScene.Scale + scaleDelta;
       }
     }
     Vector2 _startLevel = Vector2.Zero;
