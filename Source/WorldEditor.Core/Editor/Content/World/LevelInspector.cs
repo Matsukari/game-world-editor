@@ -1,5 +1,6 @@
 using ImGuiNET;
 using Icon = IconFonts.FontAwesome5;
+using Nez;
 
 namespace Raven
 {
@@ -47,19 +48,24 @@ namespace Raven
           if (ImGui.MenuItem(Icon.ThLarge + "  Tiled")) 
           {
             var layer = new TileLayer(Level, 16, 16);
-            Level.AddLayer(layer);
+            AddLayer(layer);
             SetCurrentLayer(_currentLayer + 1);
           }
           if (ImGui.MenuItem(Icon.ArrowsAlt + "  Freeform"))
           {  
             var layer = new FreeformLayer(Level);
-            Level.AddLayer(layer);
+            AddLayer(layer);
             SetCurrentLayer(_currentLayer + 1);
           }
           ImGui.EndMenu();
         }
         ImGui.EndPopup();
       }
+    }
+    void AddLayer(Layer layer)
+    {
+      Level.AddLayer(layer);
+      Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddLayerCommand(Level, layer));
     }
     void DrawLayerOptionsPopup()
     {
@@ -82,7 +88,7 @@ namespace Raven
           else 
             gotLayer = _copiedLayer.Copy();
 
-          gotLayer.Level.AddLayer(gotLayer);
+          AddLayer(gotLayer); 
           gotLayer.Level.OrderAt(gotLayer, gotLayer.Level.Layers.FindIndex(item => item.Name == _layerOnOptions.Name));
         }
 
@@ -111,11 +117,13 @@ namespace Raven
         if (ImGui.MenuItem(lockState))
         {
           _layerOnOptions.IsLocked = !_layerOnOptions.IsLocked;
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifyClassFieldCommand(_layerOnOptions, "IsLocked", !_layerOnOptions.IsLocked));
         }
         var visib = (_layerOnOptions.IsVisible) ? Icon.EyeSlash + "  Hide" : Icon.Eye + "  Show";
         if (ImGui.MenuItem(visib))
         {
           _layerOnOptions.IsVisible = !_layerOnOptions.IsVisible;
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifyClassFieldCommand(_layerOnOptions, "IsVisible", !_layerOnOptions.IsVisible));
         }
 
         ImGui.Separator();
@@ -123,6 +131,7 @@ namespace Raven
         if (ImGui.MenuItem(Icon.Trash + "  Delete"))
         {
           Level.Layers.Remove(_layerOnOptions);  
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveLayerCommand(Level, _layerOnOptions));
         }
         if (ImGui.MenuItem(Icon.Copy + "  Copy"))
         {
@@ -134,12 +143,14 @@ namespace Raven
           _cutLayer = _layerOnOptions;
           _cutLayer.DetachFromLevel();
           _copiedLayer = null;
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveLayerCommand(Level, _cutLayer), ()=>_cutLayer = null);
         }
         if (ImGui.MenuItem(Icon.Clone + "  Duplicate"))
         {
           var layer = _layerOnOptions.Copy();
           layer.Offset.X += 200;
           _layerOnOptions.Level.AddLayer(layer);
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddLayerCommand(Level, layer));
         }
 
         ImGui.EndPopup();
@@ -156,10 +167,16 @@ namespace Raven
       ImGuiUtils.SpanX((ImGui.GetContentRegionMax().X - ImGuiUtils.CalcTextSizeHorizontal(layer.Name).X - 140));
       ImGui.PushID($"level-{layer.Name}-id");
       if (ImGui.SmallButton(visibState))
+      {
         layer.IsVisible = !layer.IsVisible;
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifyClassFieldCommand(layer, "IsVisible", !layer.IsLocked));
+      }
       ImGui.SameLine();
       if (ImGui.SmallButton(lockState))
+      {
         layer.IsLocked = !layer.IsLocked;
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifyClassFieldCommand(layer, "IsLocked", !layer.IsLocked));
+      }
       ImGui.SameLine();
       if (ImGui.SmallButton(Icon.Times))
         removeLayer = layer;
@@ -265,6 +282,7 @@ namespace Raven
         if (removeLayer != null)
         {
           Level.Layers.Remove(removeLayer);
+          Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveLayerCommand(Level, removeLayer));
         }
         ImGui.EndChild();
       }

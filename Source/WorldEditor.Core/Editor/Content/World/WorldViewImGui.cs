@@ -37,6 +37,7 @@ namespace Raven
       _inspector = new WorldInspector(this);
       // _inspector.OnAddSheet += file => _world.AddSheet(Serializer.LoadContent<Sheet>(file));
       _inspector.OnRemoveLevel += level => Selection.End();
+      _inspector.OnRemoveLevel += level => SelectedLevel--;
      
       _spritePicker = painter;
     }

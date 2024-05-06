@@ -38,7 +38,7 @@ namespace Raven
     /// <summary>
     /// World where this Level is attached
     /// </summary>
-    public readonly World World;
+    public World World;
 
     /// <summary>
     /// Actual content
@@ -87,6 +87,11 @@ namespace Raven
     /// Remoes the layer with the given name
     /// </summary>
     public void RemoveLayer(string name) => Layers.Remove(Layers.Find(item => item.Name == name));
+
+    /// <summary>
+    /// Remoes the layer 
+    /// </summary>
+    public void RemoveLayer(Layer layer) => RemoveLayer(layer.Name);
 
 
     /// <summary>

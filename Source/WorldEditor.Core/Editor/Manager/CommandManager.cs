@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using System.Reflection;
 
 namespace Raven 
 {
@@ -256,6 +257,102 @@ namespace Raven
     internal override void Undo()
     {
       _sheet.TileMap.Remove(_tile.Id);
+    }
+  }
+  class ModifyClassFieldCommand : Command
+  {
+    internal readonly object _obj;
+
+    string _fieldName;
+    object _start;
+    object _last;
+
+    public ModifyClassFieldCommand(object obj, string fieldName, object start)
+    {
+      _obj = obj;
+      _fieldName = fieldName;
+      _last = GetField().GetValue(obj);
+      _start = start;
+    }
+
+    FieldInfo GetField() => _obj.GetType().GetField(_fieldName);
+
+    internal override void Redo()
+    {
+      GetField().SetValue(_obj, _last);
+    }
+    internal override void Undo()
+    {
+      GetField().SetValue(_obj, _start);
+    }
+  }
+  class AddLayerCommand : Command
+  {
+    internal readonly Level _level;
+    Layer _layer;
+
+    public AddLayerCommand(Level level, Layer layer)
+    {
+      _level = level;
+      _layer = layer;
+    }
+    internal override void Redo()
+    {
+      _level.AddLayer(_layer);
+    }
+    internal override void Undo()
+    {
+      _level.RemoveLayer(_layer);
+    }
+  }
+  class AddSheetCommand : Command
+  {
+    internal readonly World _world;
+    Sheet _sheet;
+
+    public AddSheetCommand(World world, Sheet sheet)
+    {
+      _world = world;
+      _sheet = sheet;
+    }
+    internal override void Redo()
+    {
+      _world.AddSheet(_sheet);
+    }
+    internal override void Undo()
+    {
+      _world.RemoveSheet(_sheet);
+    }
+  }
+  class RemoveSheetCommand : ReversedCommand
+  {
+    public RemoveSheetCommand(World world, Sheet sheet) : base(new AddSheetCommand(world, sheet)) {} 
+  }
+  class RemoveLevelCommand : ReversedCommand
+  {
+    public RemoveLevelCommand(World world, Level level) : base(new AddLevelCommand(world, level)) {} 
+  }
+  class RemoveLayerCommand : ReversedCommand
+  {
+    public RemoveLayerCommand(Level level, Layer layer) : base(new AddLayerCommand(level, layer)) {} 
+  }
+  class AddLevelCommand : Command
+  {
+    internal readonly World _world;
+    Level _level;
+
+    public AddLevelCommand(World world, Level level)
+    {
+      _world = world;
+      _level = level;
+    }
+    internal override void Redo()
+    {
+      _world.AddLevel(_level);
+    }
+    internal override void Undo()
+    {
+      _world.RemoveLevel(_level);
     }
   }
   class AddSpriteSceneCommand : Command

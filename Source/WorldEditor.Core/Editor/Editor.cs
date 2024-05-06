@@ -3,6 +3,20 @@ using Microsoft.Xna.Framework;
 
 namespace Raven
 {
+  internal static class EventHelpers
+  {
+    internal static void Raise<TEventArgs>(object sender, EventHandler<TEventArgs> handler, TEventArgs e)
+    {
+      if (handler != null)
+        handler(sender, e);
+    }
+    internal static void Raise(object sender, EventHandler handler, EventArgs e)
+    {
+      if (handler != null)
+        handler(sender, e);
+    }
+  }
+
   public enum EditorOperator { Select, MoveOnly, HandPanner, Scaler, Rotator }
 
 	public class Editor : Nez.Entity

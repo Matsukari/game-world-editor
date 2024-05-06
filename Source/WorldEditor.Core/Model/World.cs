@@ -69,7 +69,21 @@ namespace Raven
     /// <summary>
     /// Removes the given level contained in this World
     /// </summary>
-    public void RemoveLevel(Level level) => Levels.Remove(level);
+    public void RemoveLevel(Level level) 
+    {
+      Levels.Remove(level);
+      level.World = null;
+    }
+
+    /// <summary>
+    /// Adds the given level to this world
+    /// </summary>
+    public void AddLevel(Level level) 
+    {
+      Levels.Add(level);
+      Levels = Levels.EnsureNoRepeatNameField();
+      level.World = this;
+    }
 
     /// <summary>
     /// Creates a blank Level with the given name
@@ -83,8 +97,7 @@ namespace Raven
       Layer layer = new TileLayer(level, 16, 16);
       level.Name = name;
       level.Layers.Add(layer);
-      Levels.Add(level);
-      Levels = Levels.EnsureNoRepeatNameField();
+      AddLevel(level);
       return level;
     }
 
@@ -104,6 +117,11 @@ namespace Raven
     /// Adds a Sheet resource
     /// </summary>
     public void AddSheet(Sheet sheet) => Sheets.Add(sheet); 
+
+    /// <summary>
+    /// Adds a Sheet resource
+    /// </summary>
+    public void RemoveSheet(Sheet sheet) => Sheets.RemoveAll(item => item.Name == sheet.Name); 
   }
 }
 

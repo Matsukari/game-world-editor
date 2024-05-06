@@ -18,10 +18,20 @@ namespace Raven
     {
       _viewImGui = imgui;
       OnAddSheet += (sheet) => World.AddSheet(sheet);
+      OnAddSheet += (sheet) => 
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddSheetCommand(World, sheet));
+
+      OnRemoveSheet += sheet => 
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveSheetCommand(World, sheet));
+
+      OnRemoveLevel += level => 
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveLevelCommand(World, level));
+
     }
 
     public event Action<Sheet> OnAddSheet;
     public event Action<Level> OnRemoveLevel;
+    public event Action<Sheet> OnRemoveSheet;
 
     bool _isOpenSheetHeaderPopup = false;
 
@@ -98,13 +108,16 @@ namespace Raven
           var visibState = (!level.Level.IsVisible) ? IconFonts.FontAwesome5.EyeSlash : IconFonts.FontAwesome5.Eye;
           if (ImGui.SmallButton(visibState))
           {
+            var previous = level.Level.IsVisible;
             level.Level.IsVisible = !level.Level.IsVisible;
+            Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifyClassFieldCommand(level.Level, "IsVisible", previous));
           }
           ImGui.SameLine();
           if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
           {
             World.RemoveLevel(level.Level);
-            OnRemoveLevel(level.Level);
+            if (OnRemoveLevel != null)
+              OnRemoveLevel(level.Level);
           }
           ImGui.PopID();
           stack.Y += ImGui.GetItemRectSize().Y;
@@ -173,6 +186,8 @@ namespace Raven
       {
         _spritePicker.Sheets.Remove(removeSheet);
         World.Sheets.Remove(removeSheet.Sheet);
+        if (OnRemoveSheet != null)
+          OnRemoveSheet(removeSheet.Sheet);
       }
 
       _spritePicker.Draw(new Nez.RectangleF(0f, Screen.Height-450-28, 450, 450), _viewImGui.Settings.Colors);
