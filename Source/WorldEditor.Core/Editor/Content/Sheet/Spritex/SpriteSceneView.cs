@@ -85,6 +85,8 @@ namespace Raven
     // back to spritesheet view
     public void UnEdit()
     {
+      if (!IsEditing) return;
+
       Clean();
       if (OnUnEdit != null) OnUnEdit();
 
