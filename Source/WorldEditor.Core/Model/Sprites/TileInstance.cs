@@ -10,7 +10,7 @@ namespace Raven
     [JsonInclude]
     public PropertyList Properties { get; set; } = new PropertyList();
 
-    public RenderProperties Props { get; private set; }
+    public RenderProperties Props { get; set; }
 
     [JsonInclude]
     public Tile Tile { get; private set; }

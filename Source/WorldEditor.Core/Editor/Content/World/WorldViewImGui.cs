@@ -11,6 +11,7 @@ namespace Raven
     public List<LevelInspector> LevelInspectors { get => _levelInspectors; }
     public WorldViewPopup Popups { get => _popups;  }
     public readonly SceneInstanceInspector SceneInstanceInspector = new SceneInstanceInspector();
+    public readonly TileInstanceInspector TileInstanceInspector = new TileInstanceInspector();
     internal WindowHolder _objHolder;
 
     readonly List<LevelInspector> _levelInspectors = new List<LevelInspector>();
@@ -69,7 +70,7 @@ namespace Raven
         _selectedLevel = value; 
         _levelInspectors[_selectedLevel].Selected = true;
 
-        if (_objHolder != null && SelectedLevelInspector != _objHolder.Content)
+        if (_objHolder != null && _objHolder.Content == null)
           _objHolder.Content = SelectedLevelInspector;
       }
     }
@@ -116,7 +117,10 @@ namespace Raven
       _objHolder = imgui.GetRenderable<WindowHolder>("sub");
 
       // Render window of current level
-      if (SelectedLevel != -1 && _objHolder.Content == null) _objHolder.Content = SelectedLevelInspector;
+      if (SelectedLevel != -1 && _objHolder.Content == null) 
+      {
+        _objHolder.Content = SelectedLevelInspector;
+      }
 
       _popups.Update(SelectedLevelInspector?.CurrentLayer);
       (_popups as IImGuiRenderable).Render(imgui);

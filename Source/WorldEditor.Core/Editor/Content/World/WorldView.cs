@@ -78,6 +78,14 @@ namespace Raven
       _imgui.Popups.OnCutLevel += level => Selection.End();
       _imgui.SpritePicker.OnLeave += () => { if (CanPaint) Selection.End(); };
       _imgui.SceneInstanceInspector.OnSceneModified += ReSelect;
+      _imgui.SpritePicker.OnSelectTileInstance += SelectTileInstance; 
+    }
+    void SelectTileInstance(TileInstance tile, TileLayer layer)
+    {
+      Console.WriteLine("Selected tile e " );
+      _imgui.TileInstanceInspector.Tile = tile;
+      _imgui.TileInstanceInspector.Layer = layer;
+      _imgui._objHolder.Content = _imgui.TileInstanceInspector; 
     }
     public void ReSelect(SpriteSceneInstance instance, FreeformLayer layer)
     {
@@ -135,7 +143,10 @@ namespace Raven
     {
       if (!CanPaint && PaintMode == PaintMode.None) 
         Selection.Begin(level.Bounds, level);
+      
+      Console.WriteLine("Selected level " + level.Name);
       _imgui.SelectedLevel = i;
+      _imgui._objHolder.Content = _imgui.SelectedLevelInspector;
       _startLevel = level.LocalOffset;
       if (Settings.Graphics.FocusOnOneLevel)
       {
@@ -148,6 +159,7 @@ namespace Raven
 
     void DrawLayers(int index, Batcher batcher, Camera camera)
     {
+      var input = Core.GetGlobalManager<InputManager>();
       var level = World.Levels[index]; 
       foreach (var layer in level.Layers)
       {

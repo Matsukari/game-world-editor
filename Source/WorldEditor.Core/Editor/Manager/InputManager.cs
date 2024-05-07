@@ -5,7 +5,6 @@ using Num = System.Numerics;
 
 namespace Raven
 {
-  
   public class InputManager : GlobalManager
   {
     public bool IsDrag = false;
@@ -33,6 +32,8 @@ namespace Raven
       }
       return pos;
     }
+    public bool LeftMouseButtonReleased { get; private set; }
+
     public static bool IsImGuiBlocking 
     { get => ImGui.IsWindowHovered(ImGuiHoveredFlags.AnyWindow) || ImGui.GetIO().WantTextInput || ImGui.GetIO().WantCaptureMouse; }
 
@@ -54,11 +55,23 @@ namespace Raven
       _inputHandlers = _inputHandlers.OrderByDescending(item => item.Priority()).ToList();
     }
 
+    bool _blockNextMouseRelease = false;
+    public void BlockNextMouseRelease()
+    {
+      _blockNextMouseRelease = true;
+    }
+
     public override void Update()
     {
       HandleGuiDrags();
 
       if (Core.Scene is not EditorScene) return;
+
+      if (Input.LeftMouseButtonReleased && _blockNextMouseRelease)
+      {
+        LeftMouseButtonReleased = false;
+        _blockNextMouseRelease = false;
+      }
 
       if (IsImGuiBlocking)
       {
@@ -78,9 +91,17 @@ namespace Raven
           {
             if (i != j) _inputHandlers[j].OnInputBlocked(this);
           }
+          Clean();
           break;
         }
       }
+      Clean();
+    }
+    void Clean()
+    {
+      LeftMouseButtonReleased = false;
+      if (Input.LeftMouseButtonReleased)
+        LeftMouseButtonReleased = true;
     }
     void HandleGuiDrags() 
     {

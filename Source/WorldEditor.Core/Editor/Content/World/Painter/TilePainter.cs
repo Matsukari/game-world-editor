@@ -23,6 +23,18 @@ namespace Raven
       if (layer == null) return false;
       _currentLayer = layer;
 
+      if (_view.PaintMode == PaintMode.Inspector && layer is TileLayer tileLayer1)
+      {
+        var mouse = InputManager.GetWorldMousePosition(input.Camera);
+        var tileCoord = tileLayer1.GetTileCoordFromWorld(mouse); 
+        var tile = tileLayer1.TryGetTile(tileCoord);
+        if (tile != null && Nez.Input.LeftMouseButtonReleased && OnSelectTileInstance != null) 
+        {
+          OnSelectTileInstance(tile, tileLayer1);
+          return true;
+        }
+      }
+
       if (_view.PaintMode == PaintMode.None || _view.PaintMode == PaintMode.Inspector || layer.IsLocked || !layer.IsVisible) return false;
 
       if (Nez.Input.LeftMouseButtonPressed) 
@@ -293,6 +305,8 @@ namespace Raven
     Vector2 _mouseStartPaint = Vector2.Zero;
     Vector2 _mouseStartErase = Vector2.Zero;
     bool _isModifying = false;
+
+    public event Action<TileInstance, TileLayer> OnSelectTileInstance;
 
     public bool IsDoingWork { get => _isModifying; }
 
