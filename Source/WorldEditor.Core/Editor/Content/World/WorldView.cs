@@ -142,8 +142,11 @@ namespace Raven
     void OnLeftClickLevel(Level level, int i)
     {
       if (!CanPaint && PaintMode == PaintMode.None) 
+      {
         Selection.Begin(level.Bounds, level);
-      
+      }
+      else if (Settings.Graphics.FocusOnOneLevel) return;
+
       Console.WriteLine("Selected level " + level.Name);
       _imgui.SelectedLevel = i;
       _imgui._objHolder.Content = _imgui.SelectedLevelInspector;
@@ -192,6 +195,7 @@ namespace Raven
 
         WorldRenderer.RenderLayer(batcher, camera, layer, color);
 
+
         if (mouseInLayer 
             && !Selection.HasBegun() 
             && Nez.Input.LeftMouseButtonReleased)
@@ -216,6 +220,10 @@ namespace Raven
         batcher.DrawRectOutline(camera, level.Bounds.ExpandFromCenter(new Vector2(7)), Settings.Colors.SelectionOutline.ToColor(), 4);
       }
       DrawLayers(index, batcher, camera);
+
+      if (_imgui._objHolder != null && _imgui._objHolder.Content == _imgui.TileInstanceInspector)
+        batcher.DrawRectOutline(camera, _imgui.SpritePicker._selectedBounds, Settings.Colors.InspectSpriteFill.ToColor());
+        
     }
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
@@ -229,6 +237,7 @@ namespace Raven
 
       if (settings.Graphics.FocusOnOneLevel && PaintMode != PaintMode.None && _imgui.SelectedLevel != -1)
       {
+
         DrawLevel(_imgui.SelectedLevel, batcher, camera);
       }
       else

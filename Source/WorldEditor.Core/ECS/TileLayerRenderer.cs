@@ -6,8 +6,10 @@ namespace Raven
 {
   public class TileLayerRenderer : LayerRenderer<TileLayer>
   { 
-    public static void Render(Batcher batcher, Camera camera, TileLayer layer, Transform parent, Color color=default)
+    public static void Render(Batcher batcher, Camera camera, TileLayer layer, Transform parent, Color globalColor=default)
     {
+      if (globalColor == default) globalColor = Color.White;
+
       foreach (var (tilePosition, tileInstance) in layer.Tiles)
       {
         var tile = tileInstance.Tile;
@@ -25,7 +27,7 @@ namespace Raven
 
         var rot = parent.Rotation;
         var eff = SpriteEffects.None;
-        if (color == default) color = Color.White;
+        var color = globalColor;
 
         RenderProperties renderProp;
         if (tileInstance.Props != null) 
@@ -33,9 +35,15 @@ namespace Raven
           renderProp = tileInstance.Props;
           rot *= renderProp.Transform.Rotation;
           eff = renderProp.SpriteEffects;
-          color = renderProp.Color.ToColor();
+          color = color.Average(renderProp.Color.ToColor());
         }
 
+        if (tileInstance.Props != null)
+        {
+          dest.Location += tileInstance.Props.Transform.Position;
+          rot += tileInstance.Props.Transform.Rotation;
+          scale *= tileInstance.Props.Transform.Scale;
+        }
         batcher.Draw(
             texture: tile.Texture,
             position: dest.Location + parent.Position,

@@ -118,4 +118,30 @@ namespace Raven
       return _mod;
     }
   }
+  public struct SpriteEffectsImGui : IImGuiRenderable
+  {
+    public event Action OnModified;
+    public SpriteEffects Effects;
+    public SpriteEffectsImGui(SpriteEffects effects) => Effects = effects;
+
+    public void Render(ImGuiWinManager imgui)
+    {
+      var flipBoth = Effects == (SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally);
+      var flipH = Effects == SpriteEffects.FlipHorizontally || flipBoth;
+      var flipV = Effects == SpriteEffects.FlipVertically || flipBoth;
+      if (ImGui.Checkbox("Flip X", ref flipH)) 
+      {
+        Effects ^= SpriteEffects.FlipHorizontally;
+        if (OnModified != null) OnModified();
+      }
+      ImGui.SameLine();
+      if (ImGui.Checkbox("Flip Y", ref flipV)) 
+      {
+        Effects ^= SpriteEffects.FlipVertically;
+        if (OnModified != null) OnModified();
+      }
+
+
+    }
+  }
 }

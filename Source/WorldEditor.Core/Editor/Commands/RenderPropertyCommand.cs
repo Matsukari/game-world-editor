@@ -2,6 +2,15 @@
 
 namespace Raven
 {
+  class RenderPropModifyCommand : ModifyClassMemberCommand
+  {
+    internal RenderProperties _props;
+    Transform _last;
+    Transform _start;
+
+    public RenderPropModifyCommand(object obj, string propName, RenderProperties last, RenderProperties start) 
+      : base(obj, propName, (last != null) ? last.Copy() : null, (start != null) ? start.Copy(): null) {}
+  }
   class RenderPropTransformModifyCommand : Command
   {
     internal RenderProperties _props;

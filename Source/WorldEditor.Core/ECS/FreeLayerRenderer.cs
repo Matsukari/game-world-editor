@@ -48,8 +48,9 @@ namespace Raven
         RenderScene(Layer.SpriteScenees[i], Transform.Position + LocalOffset + Layer.Bounds.Location, batcher, camera);
       }
     }
-    public static void RenderScene(SpriteSceneInstance instance, Vector2 position, Batcher batcher, Camera camera, Color color=default)
+    public static void RenderScene(SpriteSceneInstance instance, Vector2 position, Batcher batcher, Camera camera, Color baseColor=default)
     {
+      if (baseColor == default) baseColor = Color.White;
       foreach (var sprite in instance.Scene.Parts)
       {
         if (!sprite.IsVisible) return;
@@ -57,7 +58,7 @@ namespace Raven
             texture: sprite.SourceSprite.Texture,
             position: position + sprite.PlainBounds.AddPosition(sprite.SpriteScene.Transform.Position).Location + instance.Props.Transform.Position,
             sourceRectangle: sprite.SourceSprite.Region,
-            color: (color == default) ? sprite.Color.ToColor() : color,
+            color: baseColor.Average(sprite.Color.ToColor()).Average(instance.Props.Color.ToColor()),
             rotation: instance.Props.Transform.Rotation + instance.Scene.Transform.Rotation + sprite.Transform.Rotation,
             origin: sprite.Origin,
             scale: instance.Props.Transform.Scale * instance.Scene.Transform.Scale * sprite.Transform.Scale,

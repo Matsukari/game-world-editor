@@ -369,7 +369,6 @@ namespace Raven
           ImGui.GetBackgroundDrawList().AddRect(
               pos.ToNumerics(), (pos + tileLayer.TileSize.ToVector2() * Camera.RawZoom).ToNumerics(), colorB.ToImColor()); 
 
-
           if (_view.PaintMode == PaintMode.Inspector)
           {
             var tileCoord = tileLayer.GetTileCoordFromWorld(mouse); 
@@ -379,6 +378,11 @@ namespace Raven
             ImGui.BeginTooltip();
             ImGui.Text($"{tileName} in ({tileCoord.X}, {tileCoord.Y}");
             ImGui.EndTooltip();
+
+            if (Nez.Input.LeftMouseButtonPressed)
+            {
+              _selectedBounds = new RectangleF(tileCoord.ToVector2() * tileLayer.TileSize.ToVector2() + tileLayer.Bounds.Location, tileLayer.TileSize.ToVector2());
+            }
           }
         }
 
@@ -402,16 +406,19 @@ namespace Raven
           ImGui.BeginTooltip();
           ImGui.Text($"{scene.Scene.Name} - {sceneIndex}");
           ImGui.EndTooltip();
+          if (Nez.Input.LeftMouseButtonPressed)
+          {
+            _selectedBounds = scene.ContentBounds;
+          }
+
         }
         
 
       }
 
       if (Input.LeftMouseButtonReleased) _isModifying = false;
-
-
-
     }
+    internal RectangleF _selectedBounds = RectangleF.Empty;
     Utils.TimeDelay _tooltipTimer = new Utils.TimeDelay(2);
 
     Vector2 PosToTiled(Vector2 pos)
