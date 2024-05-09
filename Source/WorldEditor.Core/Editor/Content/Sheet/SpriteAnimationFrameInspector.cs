@@ -1,7 +1,26 @@
 using ImGuiNET;
+using Nez.Tweens;
 
 namespace Raven
 {
+  public static class EaseTypePicker
+  {
+    static List<string> _types = new List<string>();
+
+    public static void Picker(ref EaseType ease)
+    {
+      if (_types.Count() == 0)
+      {
+        foreach (var type in Enum.GetNames<EaseType>())
+        {
+          _types.Add(type);
+        }
+      }
+      var e = ease;
+      var i = _types.FindIndex(item => item == Enum.GetName<EaseType>(e));
+      if (ImGui.Combo("Ease Type", ref i, _types.ToArray(), _types.Count())) ease = Enum.GetValues<EaseType>()[i];
+    }
+  }
   public class SpriteAnimationFrameInspector : Widget.PropertiedWindow
   {
     public override string Name { get => Frame.Name; set => Frame.Name = value;}
@@ -21,7 +40,7 @@ namespace Raven
     {
       ImGui.LabelText("Frame", Animator.CurrentIndex.ToString());
       ImGui.InputFloat("Duration", ref Frame.Duration);
-      // FramePart.Transform.RenderImGui();
+      EaseTypePicker.Picker(ref Frame.EaseType);
     }
   }
 }

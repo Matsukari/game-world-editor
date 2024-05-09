@@ -22,8 +22,8 @@ namespace Raven
     {
       ImGui.LabelText("Frame", Animator.CurrentIndex.ToString());
       ImGui.InputFloat("Duration", ref Frame.Duration);
-      // FramePart.Transform.RenderImGui();
       SpritePartInspector.RenderSprite(imgui, FramePart, false);
+      EaseTypePicker.Picker(ref Frame.EaseType);
     }
   }
 }
