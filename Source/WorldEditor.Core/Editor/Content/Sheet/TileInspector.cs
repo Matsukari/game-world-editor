@@ -42,6 +42,8 @@ namespace Raven
       ImGui.LabelText("Id", Tile.Id.ToString());
       ImGui.LabelText("Tile", $"{Tile.Coordinates.X}x, {Tile.Coordinates.Y}y");
       ImGui.EndDisabled();
+
+      ImGuiUtils.DrawImage(Tile.Sprite, new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X));
     }
   }   
 }

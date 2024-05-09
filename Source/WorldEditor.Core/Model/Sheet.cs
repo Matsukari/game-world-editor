@@ -183,6 +183,12 @@ namespace Raven
       _tiles.TryGetValue(GetTileId(x, y), out tile);
       return tile;
     }
+    public Tile CustomTileExists(Point point) 
+    {
+      Tile tile = null;
+      _tiles.TryGetValue(GetTileId(point.X, point.Y), out tile);
+      return tile;
+    }
     public bool CreateTile(Tile tile) 
     { 
       return _tiles.TryAdd(tile.Id, tile);

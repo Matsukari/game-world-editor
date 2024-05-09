@@ -42,6 +42,11 @@ namespace Raven
     /// </summary>
     public Texture2D Texture { get => _sheet.Texture; }
 
+    /// <summary>
+    /// Converts to Sprite containing this exact Tile
+    /// </summary>
+    public Sprite Sprite { get => new Sprite(Region, _sheet); }
+
     internal Sheet _sheet;
 
     private Tile() 

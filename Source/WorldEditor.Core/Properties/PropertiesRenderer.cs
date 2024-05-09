@@ -42,6 +42,11 @@ namespace Raven
       }
       return null;
     }
+    public static object RenderBestMatch(object propertyData)
+    {
+      bool changes = true;
+      return RenderBestMatch(propertyData, ref changes);
+    }
     public static object RenderBestMatch(object propertyData, ref bool anyOtherChanges)
     {
       // Property value itself is the data

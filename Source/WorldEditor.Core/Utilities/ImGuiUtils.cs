@@ -141,6 +141,18 @@ namespace Raven
         prev_point = point;
       }
     }
+    public static void DrawImageContained(Texture2D texture, float height)
+    {
+      var imageSize = ImGuiUtils.ContainSize(texture.GetSize().ToNumerics(), new Vector2(ImGui.GetContentRegionAvail().X, height));
+      var textureId = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(texture);
+      ImGui.Image(textureId, new System.Numerics.Vector2(imageSize.X, imageSize.Y));
+    }
+    public static void DrawImageContained(Texture2D texture, Vector2 intendedSize)
+    {
+      var imageSize = ImGuiUtils.ContainSize(texture.GetSize().ToNumerics(), intendedSize);
+      var textureId = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(texture);
+      ImGui.Image(textureId, new System.Numerics.Vector2(imageSize.X, imageSize.Y));
+    }
     public static void DrawImage(Sprite sprite, Vector2 size)
     {
       nint texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture);

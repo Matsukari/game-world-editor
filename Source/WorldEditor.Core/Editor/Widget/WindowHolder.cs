@@ -1,5 +1,4 @@
 
-
 namespace Raven
 {
   public class WindowHolder : Widget.PropertiedWindow
