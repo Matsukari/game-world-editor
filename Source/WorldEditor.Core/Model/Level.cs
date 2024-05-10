@@ -33,6 +33,7 @@ namespace Raven
       }
     }
 
+    [JsonInclude]
     Point _contentSize = new Point(Screen.Width, Screen.Height); 
 
     /// <summary>
