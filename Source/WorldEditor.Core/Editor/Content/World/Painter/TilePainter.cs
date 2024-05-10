@@ -73,13 +73,15 @@ namespace Raven
           // Single painting
           if (Nez.Input.LeftMouseButtonDown && _view.PaintType == PaintType.Single)
           {
+            var center = (Vector2 pos) => pos - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
             var tiles = tileLayer.FindTilesIntersectLine(
-                Camera.ScreenToWorldPoint(InputManager.PreviousScreenMousePosition)-layer.Position, 
-                Camera.ScreenToWorldPoint(InputManager.ScreenMousePosition)-layer.Position);
+                center(Camera.ScreenToWorldPoint(InputManager.PreviousScreenMousePosition))-layer.Position, 
+                center(Camera.ScreenToWorldPoint(InputManager.ScreenMousePosition))-layer.Position);
             foreach (var cell in tiles)
             {
               PaintAtLayer(tilesToPaint, tileLayer, cell);
             }
+            
             return true;
           }
           else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Line)
@@ -94,7 +96,9 @@ namespace Raven
           }
           else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Rectangle)
           {
-            Rectangle(tileLayer, mouseDrag, sprite.Region.Size, (coord)=>PaintAtLayer(tilesToPaint, tileLayer, coord));
+            var stepSize = sprite.Region.Size;
+            if (_view.IsRandomPaint) stepSize = sprite.TileSize;
+            Rectangle(tileLayer, mouseDrag, stepSize, (coord)=>PaintOneAtLayer(tilesToPaint, tileLayer, coord));
             return true;
           }
           else if (_view.PaintType == PaintType.Fill && Fill(tileLayer, sprite, tilesToPaint)) 
@@ -149,21 +153,27 @@ namespace Raven
     {
       Point tileInLayer = tileLayer.GetTileCoordFromWorld(InputManager.GetWorldMousePosition(Camera));
       Point agentSize = new Point(1, 1);
-      if (sprite != null)
-      {
-        var spriteCenter = InputManager.GetWorldMousePosition(Camera) - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
-        tileInLayer = tileLayer.GetTileCoordFromWorld(spriteCenter); 
-        agentSize = sprite.Region.Size/sprite.TileSize;
-        var tileStart = tilesToPaint[tilesToPaint.Count/2];
-        if (tileStart == null) return false;
-      }
       if (Nez.Input.LeftMouseButtonReleased)
       {
         void FloodFill(List<Point> fill)
         {
+          if (_canFillTiles.Count() == 0) return;
+
+          _canFillTiles.Sort((p1, p2)=> p1.CompareInGridSpace(p2));
+          var start = _canFillTiles.First();
           foreach (var tile in _canFillTiles) 
           {
-            if (_view.PaintMode == PaintMode.Pen) PaintAtLayer(tilesToPaint, tileLayer, tile);
+            if (_view.PaintMode == PaintMode.Pen) 
+            {
+              var delta = tile - start;
+              delta.X %= sprite.TileCount.X;
+              delta.Y %= sprite.TileCount.Y;
+
+              // Console.WriteLine($"Trying: delta: {delta.SimpleStringFormat()}, sprite tiles: {sprite.TileCount.ToString()}");
+              var coord = (delta.Y * sprite.TileCount.X) + delta.X;
+              Console.WriteLine($"Painting: {coord}, to {tile}");
+              PaintAtLayer(tilesToPaint[coord], tileLayer, tile);
+            }
             else if (_view.PaintMode == PaintMode.Eraser) RemoveAtLayer(tileLayer, tile);
           }
           RecordTiles();
@@ -193,6 +203,41 @@ namespace Raven
         // Console.WriteLine($"Delegated to{previous == null}");
       }
       _commandGroup[tileInLayer] = new RemovePaintTileCommand(tileLayer, previous, tileInLayer);
+    }
+    void PaintAtLayer(Tile tile, TileLayer tileLayer, Point tileInLayer)
+    {
+      var coord = tileInLayer;
+      var previous = tileLayer.TryGetTile(coord);
+      tileLayer.ReplaceTile(coord, tile);
+
+      if (_commandGroup.ContainsKey(coord) && _commandGroup[coord] is PaintTileCommand paint)
+      {
+        previous = paint._start;
+      }
+      _commandGroup[coord] = new PaintTileCommand(tileLayer, tileLayer.TryGetTile(coord), previous, coord);
+    }
+    void PaintOneAtLayer(List<Tile> tilesToPaint, TileLayer tileLayer, Point tileInLayer)
+    {
+      if (_view.IsRandomPaint)
+      {
+        if (tilesToPaint.Count() == 0) return;
+        var coord = tileInLayer;
+        for (int i = 0; i < tilesToPaint.Count(); i++)
+        {
+          var previous = tileLayer.TryGetTile(coord);
+          tileLayer.ReplaceTile(coord, tilesToPaint.RandomItem());
+
+          if (_commandGroup.ContainsKey(coord) && _commandGroup[coord] is PaintTileCommand paint)
+          {
+            previous = paint._start;
+          }
+          _commandGroup[coord] = new PaintTileCommand(tileLayer, tileLayer.TryGetTile(coord), previous, coord);
+        }
+      }
+      else
+      {
+        PaintAtLayer(tilesToPaint, tileLayer, tileInLayer);
+      }
     }
     void PaintAtLayer(List<Tile> tilesToPaint, TileLayer tileLayer, Point tileInLayer)
     {
@@ -259,7 +304,7 @@ namespace Raven
       if (SelectedSprite is Sprite sprite && _currentLayer is TileLayer tileLayer)
       {
         void PaintPreviewAt(System.Numerics.Vector2 screenPos)
-        { 
+        {
           ImGui.GetBackgroundDrawList().AddImage(
               Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
               screenPos - sprite.Region.GetHalfSize().ToNumerics() * Camera.RawZoom, 
@@ -270,7 +315,10 @@ namespace Raven
         // Show paint previews
         switch (_view.PaintType)
         {
-          case PaintType.Single: PaintPreviewAt(Camera.WorldToScreenPoint(PosToTiled(InputManager.GetWorldMousePosition(Camera))).ToNumerics()); break;
+          case PaintType.Single: 
+            var p = PosToTiled(InputManager.GetWorldMousePosition(Camera)) + sprite.TileSize.Divide(2, 2).ToVector2();
+            PaintPreviewAt(Camera.WorldToScreenPoint(p).ToNumerics()); 
+            break;
           case PaintType.Rectangle:
             if (Nez.Input.LeftMouseButtonPressed) _mouseStartPaint = InputManager.GetWorldMousePosition(Camera);
             if (Nez.Input.LeftMouseButtonDown)
@@ -282,23 +330,29 @@ namespace Raven
               // absoluteArea.Size /= Camera.RawZoom;
               absoluteArea.Size = absoluteArea.Size.MathMax(sprite.Region.Size.ToVector2());
 
-              for (float x = 0; x < absoluteArea.Size.X; x+=sprite.Region.Size.X)
+              if (!_view.IsRandomPaint)
               {
-                for (float y = 0; y < absoluteArea.Size.Y; y+=sprite.Region.Size.Y)
+                for (float x = 0; x < absoluteArea.Size.X; x+=sprite.Region.Size.X)
                 {
-                  var delta = new Vector2(x, y);
-                  // if ((InputManager.GetWorldMousePosition(Camera) - _mouseStartPaint).EitherIsNegative()) delta = delta.Negate();
+                  for (float y = 0; y < absoluteArea.Size.Y; y+=sprite.Region.Size.Y)
+                  {
+                    var delta = new Vector2(x, y);
+                    // if ((InputManager.GetWorldMousePosition(Camera) - _mouseStartPaint).EitherIsNegative()) delta = delta.Negate();
 
-                  var bounds = RectangleF.FromMinMax(
-                      absoluteArea.Location + delta, 
-                      absoluteArea.Location + delta + sprite.Region.Size.ToVector2()).AlwaysPositive();
+                    var bounds = RectangleF.FromMinMax(
+                        absoluteArea.Location + delta, 
+                        absoluteArea.Location + delta + sprite.Region.Size.ToVector2()).AlwaysPositive();
 
-                  ImGui.GetBackgroundDrawList().AddImage(
-                      Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
-                      Camera.WorldToScreenPoint(bounds.Location).ToNumerics(), 
-                      Camera.WorldToScreenPoint(bounds.Max).ToNumerics(),
-                      sprite.MinUv.ToNumerics(), sprite.MaxUv.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+                    ImGui.GetBackgroundDrawList().AddImage(
+                        Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(sprite.Texture),
+                        Camera.WorldToScreenPoint(bounds.Location).ToNumerics(), 
+                        Camera.WorldToScreenPoint(bounds.Max).ToNumerics(),
+                        sprite.MinUv.ToNumerics(), sprite.MaxUv.ToNumerics(), new Color(0.8f, 0.8f, 1f, 0.5f).ToImColor());
+                  }
                 }
+              }
+              else
+              {
               }
             }
             break;

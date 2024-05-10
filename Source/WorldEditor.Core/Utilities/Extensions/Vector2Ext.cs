@@ -13,6 +13,12 @@ namespace Raven
     {
       return $"{vec.X}, {vec.Y}";
     }
+    public static int CompareInGridSpace(this Point p1, Point p2)
+    {
+      if (p1.Y != p2.Y)
+        return p1.Y.CompareTo(p2.Y);
+      return p1.X.CompareTo(p2.X);
+    }
     public static Vector2 EaseTo(Vector2 from, Vector2 to, float ease) => 
       new Vector2(
           from.X + ease * (to.X - from.X),

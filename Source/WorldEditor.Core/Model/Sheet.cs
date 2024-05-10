@@ -215,9 +215,9 @@ namespace Raven
     public List<int> GetTiles(RectangleF container)
     {
       var tiles = new List<int>();
-      for (int x = 0; x < Tiles.X; x++)
+      for (int y = 0; y < Tiles.Y; y++)
       {
-        for (int y = 0; y < Tiles.Y; y++)
+        for (int x = 0; x < Tiles.X; x++)
         {
           var tile = GetTile(x, y).ToRectangleF();
           if (container.Intersects(tile) || container.Contains(tile))

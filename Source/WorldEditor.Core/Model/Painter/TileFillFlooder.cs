@@ -22,7 +22,7 @@ namespace Raven
     /// <summary>
     /// Number of times Update will fill a tile
     /// </summary>
-    public int MaxIterations = 200;
+    public int MaxIterations = 300;
 
     public void Start(Action<List<Point>> callback) 
     {

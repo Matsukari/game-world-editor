@@ -66,15 +66,21 @@ namespace Raven
     public void FindTilesIntersectLine(Vector2 start, Vector2 end, Action<Point> onIntersect) 
     {
       var angle = Mathf.Atan2(end.Y-start.Y, end.X-start.X);
-     
+
+      var coord = new Point((int)(start.X/TileWidth), (int)(start.Y/TileHeight)); 
+      if (start.ToPoint() == end.ToPoint() && IsTileValid(coord)) 
+      {
+        onIntersect.Invoke(coord);
+        return;
+      }
+
       // Console.WriteLine("Distance: " + Vector2.Distance(start, end));
       for (int i = 0; i < Vector2.Distance(start, end); i++)
       {
         var x = start.X + Mathf.Cos(angle) * i;
         var y = start.Y + Mathf.Sin(angle) * i; 
-        var coord = new Point((int)(x / TileWidth), (int)(y / TileHeight)); 
-        var tile = TryGetTile(coord);
-        if (tile != null) 
+        coord = new Point((int)(x / TileWidth), (int)(y / TileHeight)); 
+        if (IsTileValid(coord)) 
         {
           onIntersect.Invoke(coord);
           i += (TileSize.X + TileSize.Y) / 2 - 1;
@@ -85,15 +91,20 @@ namespace Raven
     public IEnumerable<Point> FindTilesIntersectLine(Vector2 start, Vector2 end) 
     {
       var angle = Mathf.Atan2(end.Y-start.Y, end.X-start.X);
+
+      var coord = new Point((int)(start.X/TileWidth), (int)(start.Y/TileHeight)); 
+      if (start.ToPoint() == end.ToPoint() && IsTileValid(coord)) 
+      {
+        yield return coord;
+      }
      
       // Console.WriteLine("Distance: " + Vector2.Distance(start, end));
       for (int i = 0; i < Vector2.Distance(start, end); i++)
       {
         var x = start.X + Mathf.Cos(angle) * i;
         var y = start.Y + Mathf.Sin(angle) * i; 
-        var coord = new Point((int)(x / TileWidth), (int)(y / TileHeight)); 
-        var tile = TryGetTile(coord);
-        if (tile != null) 
+        coord = new Point((int)(x / TileWidth), (int)(y / TileHeight)); 
+        if (IsTileValid(coord)) 
         {
           yield return coord;
           i += (TileSize.X + TileSize.Y) / 2 - 1;
@@ -107,6 +118,8 @@ namespace Raven
     // Checks if the layer contains the given corrdinate 
     /// </summary> 
     public bool IsTileValid(int x, int y) => !(x < 0 || x >= TilesQuantity.X || y < 0 || y >= TilesQuantity.Y); 
+
+    public bool IsTileValid(Point point) => IsTileValid(point.X, point.Y);
 
 
     /// <summary>
