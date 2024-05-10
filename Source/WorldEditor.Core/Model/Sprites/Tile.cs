@@ -42,6 +42,12 @@ namespace Raven
     /// </summary>
     public Texture2D Texture { get => _sheet.Texture; }
 
+
+    /// <summary>
+    /// Tilesize 
+    /// </summary>
+    public Point Size { get => _sheet.TileSize; }
+
     /// <summary>
     /// Converts to Sprite containing this exact Tile
     /// </summary>

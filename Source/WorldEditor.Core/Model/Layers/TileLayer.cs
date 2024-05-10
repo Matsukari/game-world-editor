@@ -54,12 +54,54 @@ namespace Raven
 
     public TileInstance GetTile(Point point) => Tiles[point];
 
+    public TileInstance TryGetTile(int x, int y) => TryGetTile(new Point(x, y)) ;
+
     public TileInstance TryGetTile(Point point) 
     {
       if (Tiles.ContainsKey(point))
         return Tiles[point]; 
       return null;
     }
+
+    public void FindTilesIntersectLine(Vector2 start, Vector2 end, Action<Point> onIntersect) 
+    {
+      var angle = Mathf.Atan2(end.Y-start.Y, end.X-start.X);
+     
+      // Console.WriteLine("Distance: " + Vector2.Distance(start, end));
+      for (int i = 0; i < Vector2.Distance(start, end); i++)
+      {
+        var x = start.X + Mathf.Cos(angle) * i;
+        var y = start.Y + Mathf.Sin(angle) * i; 
+        var coord = new Point((int)(x / TileWidth), (int)(y / TileHeight)); 
+        var tile = TryGetTile(coord);
+        if (tile != null) 
+        {
+          onIntersect.Invoke(coord);
+          i += (TileSize.X + TileSize.Y) / 2 - 1;
+        }
+        // Console.WriteLine($"Vertex: {coord.X}, {coord.Y}");
+      }
+    }
+    public IEnumerable<Point> FindTilesIntersectLine(Vector2 start, Vector2 end) 
+    {
+      var angle = Mathf.Atan2(end.Y-start.Y, end.X-start.X);
+     
+      // Console.WriteLine("Distance: " + Vector2.Distance(start, end));
+      for (int i = 0; i < Vector2.Distance(start, end); i++)
+      {
+        var x = start.X + Mathf.Cos(angle) * i;
+        var y = start.Y + Mathf.Sin(angle) * i; 
+        var coord = new Point((int)(x / TileWidth), (int)(y / TileHeight)); 
+        var tile = TryGetTile(coord);
+        if (tile != null) 
+        {
+          yield return coord;
+          i += (TileSize.X + TileSize.Y) / 2 - 1;
+        }
+        // Console.WriteLine($"Vertex: {coord.X}, {coord.Y}");
+      }
+    }
+
 
     /// <summary>
     // Checks if the layer contains the given corrdinate 

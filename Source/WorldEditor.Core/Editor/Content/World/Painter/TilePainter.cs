@@ -47,7 +47,6 @@ namespace Raven
 
       var mouseDrag = new RectangleF(_mouseStart, InputManager.GetWorldMousePosition(Camera) - _mouseStart).AlwaysPositive();
 
-
       // Handles spriteScene
       if (Nez.Input.LeftMouseButtonPressed && layer is FreeformLayer freeformLayer)
       {
@@ -65,6 +64,7 @@ namespace Raven
       // Handles tile and sprites
       else if (layer is TileLayer tileLayer)
       {
+        var mouse = InputManager.GetWorldMousePosition(input.Camera);
         if (_view.SpritePicker.SelectedSprite is Sprite sprite && _view.PaintMode == PaintMode.Pen)
         {
           var spriteCenter = InputManager.GetWorldMousePosition(Camera) - sprite.Region.GetHalfSize() + sprite.TileSize.Divide(2, 2).ToVector2();
@@ -73,7 +73,23 @@ namespace Raven
           // Single painting
           if (Nez.Input.LeftMouseButtonDown && _view.PaintType == PaintType.Single)
           {
-            PaintAtLayer(tilesToPaint, tileLayer, tileLayer.GetTileCoordFromWorld(spriteCenter));
+            var tiles = tileLayer.FindTilesIntersectLine(
+                Camera.ScreenToWorldPoint(InputManager.PreviousScreenMousePosition)-layer.Position, 
+                Camera.ScreenToWorldPoint(InputManager.ScreenMousePosition)-layer.Position);
+            foreach (var cell in tiles)
+            {
+              PaintAtLayer(tilesToPaint, tileLayer, cell);
+            }
+            return true;
+          }
+          else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Line)
+          {
+            var tiles = tileLayer.FindTilesIntersectLine(_mouseStart-layer.Position, mouse-layer.Position);
+            foreach (var cell in tiles)
+            {
+              PaintAtLayer(tilesToPaint, tileLayer, cell);
+            }
+            RecordTiles();
             return true;
           }
           else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Rectangle)
@@ -88,7 +104,23 @@ namespace Raven
         {
           if (Nez.Input.LeftMouseButtonDown && _view.PaintType == PaintType.Single)
           {
-            RemoveAtLayer(tileLayer, tileLayer.GetTileCoordFromWorld(InputManager.GetWorldMousePosition(Camera)));
+            var tiles = tileLayer.FindTilesIntersectLine(
+                Camera.ScreenToWorldPoint(InputManager.PreviousScreenMousePosition)-layer.Position, 
+                Camera.ScreenToWorldPoint(InputManager.ScreenMousePosition)-layer.Position);
+            foreach (var cell in tiles)
+            {
+              RemoveAtLayer(tileLayer, cell);
+            }
+            return true;
+          }
+          else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Line)
+          {
+            var tiles = tileLayer.FindTilesIntersectLine(_mouseStart-layer.Position, mouse-layer.Position);
+            foreach (var cell in tiles)
+            {
+              RemoveAtLayer(tileLayer, cell);
+            }
+            RecordTiles();
             return true;
           }
           else if (Nez.Input.LeftMouseButtonReleased && _view.PaintType == PaintType.Rectangle)
@@ -174,12 +206,11 @@ namespace Raven
         var coord = tileInLayer + delta;
         var previous = tileLayer.TryGetTile(coord);
         tileLayer.ReplaceTile(coord, tile);
+
         if (_commandGroup.ContainsKey(coord) && _commandGroup[coord] is PaintTileCommand paint)
         {
           previous = paint._start;
-          // Console.WriteLine($"Delegated to{previous == null}");
         }
-        // Console.WriteLine($"start is null? {previous == null}");
         _commandGroup[coord] = new PaintTileCommand(tileLayer, tileLayer.TryGetTile(coord), previous, coord);
 
       }
@@ -308,6 +339,7 @@ namespace Raven
     public event Action<TileInstance, TileLayer> OnSelectTileInstance;
 
     public bool IsDoingWork { get => _isModifying; }
+    IEnumerable<Point> _lineFill;
 
     public override void OutRender()
     {
@@ -321,7 +353,8 @@ namespace Raven
       var colorA = _view.Settings.Colors.PaintDefaultFill;
       var colorB = _view.Settings.Colors.PaintDefaultOutline;
 
-      if (_view.PaintMode == PaintMode.None || InputManager.IsImGuiBlocking) return;
+      if (_view.PaintMode == PaintMode.None || InputManager.IsImGuiBlocking || _currentLayer == null) return;
+
       else if (_view.PaintMode == PaintMode.Eraser)
       {
         colorA = _view.Settings.Colors.PaintEraseFill;
@@ -359,7 +392,34 @@ namespace Raven
           ImGui.GetBackgroundDrawList().AddRect(
               Camera.WorldToScreenPoint(rect.Location).ToNumerics(), 
               Camera.WorldToScreenPoint(rect.Max).ToNumerics(), colorB.ToColor().ToImColor());
+        }
+        else if (Nez.Input.LeftMouseButtonDown && _view.PaintType == PaintType.Line)
+        {
+          var start = _mouseStartErase - tileLayer.Position;
+          var end = mouse - tileLayer.Position;
+
+          void Draw(Point coord)
+          {
+            var pos  = tileLayer.Position + (coord * tileLayer.TileSize).ToVector2();
+            var size = tileLayer.TileSize.ToVector2();
+            var tile = tileLayer.GetTile(coord).Props; 
+            if (tile != null)
+            {
+              pos += tile.Transform.Position;
+              size *= tile.Transform.Scale;
+            }
+            ImGui.GetBackgroundDrawList().AddRectFilled(
+                Camera.WorldToScreenPoint(pos).ToNumerics(), 
+                Camera.WorldToScreenPoint(pos + size).ToNumerics(), colorA.ToColor().ToImColor());
+            ImGui.GetBackgroundDrawList().AddRect(
+                Camera.WorldToScreenPoint(pos).ToNumerics(), 
+                Camera.WorldToScreenPoint(pos + size).ToNumerics(), colorB.ToColor().ToImColor());
+          }
+          _lineFill = tileLayer.FindTilesIntersectLine(start, end);
+
+          foreach (var point in _lineFill) Draw(point);
         } 
+
  
         if (_view.PaintType == PaintType.Single || (_view.PaintMode == PaintMode.Inspector) && tileLayer.Bounds.Contains(mouse))
         {

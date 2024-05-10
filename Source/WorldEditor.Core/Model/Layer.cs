@@ -49,6 +49,11 @@ namespace Raven
     public RectangleF Bounds { get => Level.Bounds.AddPosition(Offset); }
 
     /// <summary>
+    /// Position of thie layer in world 
+    /// </summary>
+    public Vector2 Position { get => Level.Bounds.Location + Offset; }
+
+    /// <summary>
     /// Same as Level's size
     /// </summary>
     public Point Size { get => Level.ContentSize; }
