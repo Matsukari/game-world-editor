@@ -22,6 +22,7 @@ namespace Raven
     public int CurrentIndex { get => _currentTab; }
 
     public EditorSettings Settings;
+    readonly ImGuiWinManager _imgui;
     public event Action<EditorContent, ContentView> OnCloseContent;
     public event Action<EditorContent, ContentView> OnOpenContent;
     public event Action<EditorContent, ContentView> OnAddContent;
@@ -31,7 +32,11 @@ namespace Raven
     internal List<ContentView> _views = new List<ContentView>();
     int _currentTab = 0;
 
-    public ContentManager(EditorSettings settings) => Settings = settings;
+    public ContentManager(EditorSettings settings, ImGuiWinManager imgui) 
+    {
+      Settings = settings;
+      _imgui = imgui;
+    }
 
     public void Update()
     {
@@ -47,8 +52,10 @@ namespace Raven
 
       OnCloseContent(_tabs[_currentTab], _views[_currentTab]);
       View.OnContentClose();
+      View.OnContentClose(_imgui);
       _currentTab = Math.Clamp(index, 0, _tabs.Count()-1);
       View.OnContentOpen(Content);
+      View.OnContentOpen(_imgui);
       OnOpenContent(_tabs[_currentTab], _views[_currentTab]);
 
     }
@@ -57,6 +64,7 @@ namespace Raven
       if (index < 0 || index >= _tabs.Count()) return;
       // Console.WriteLine("Opened " + index);
       _views[index].OnContentOpen(_views[index].Content);
+      _views[index].OnContentOpen(_imgui);
       OnOpenContent(_tabs[index], _views[index]);
       Settings.LastFile = index;
       _currentTab = index;
@@ -67,6 +75,7 @@ namespace Raven
       // Console.WriteLine("Closed " + index);
       OnCloseContent(_tabs[index], _views[index]);
       _views[index].OnContentClose();
+      _views[index].OnContentClose(_imgui);
     }
     public EditorContent GetContent() => _tabs[_currentTab];
 

@@ -69,6 +69,8 @@ namespace Raven
     /// </summary>
     public void DetachFromLevel() => Level.RemoveLayer(Name);
 
+    public bool CanBeEdited() => !IsLocked && IsVisible;
+
     public virtual void OnLevelResized(Point old) {}
 
     /// <summary>

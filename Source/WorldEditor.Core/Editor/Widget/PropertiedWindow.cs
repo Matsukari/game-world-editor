@@ -11,20 +11,23 @@ namespace Raven.Widget
 
     public override void OnRender(ImGuiWinManager imgui) 
     {
-      var name = Name;
-
       OnRenderBeforeName(imgui);
-      if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
-      {
-        OnChangeName(Name, name);
-        Name = name;
-      }
+      NameInput();
       OnRenderAfterName(imgui);
 
       PropertiesRenderer.Render(imgui, this, OnChangeProperty);
     }
     public bool HasName() => Name != null && Name != string.Empty;
 
+    protected void NameInput()
+    {
+      var name = Name;
+      if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
+      {
+        OnChangeName(Name, name);
+        Name = name;
+      }
+    }
     protected virtual void OnChangeProperty(string name) 
     {
     }

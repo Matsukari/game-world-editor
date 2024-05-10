@@ -83,7 +83,8 @@ namespace Raven
 
       Operator = EditorOperator.Select;
 
-      ContentManager = new ContentManager(Settings);
+      WindowManager = new ImGuiWinManager();
+      ContentManager = new ContentManager(Settings, WindowManager);
       ContentManager.OnCloseContent += OnCloseContent;
       ContentManager.OnOpenContent += OnOpenContent;
       ContentManager.OnAddContent += OnAddContent;
@@ -97,7 +98,6 @@ namespace Raven
       Rotator = AddComponent(new Rotator());
       Rotator.RenderLayer = -1;
 
-      WindowManager = new ImGuiWinManager();
       WindowManager.AddImmediate(new Settings(Settings));
       WindowManager.AddImmediate(new StatusBar(this));
       WindowManager.AddImmediate(new Menubar(this));

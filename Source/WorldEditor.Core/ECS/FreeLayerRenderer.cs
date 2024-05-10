@@ -58,7 +58,7 @@ namespace Raven
             texture: sprite.SourceSprite.Texture,
             position: position + sprite.PlainBounds.AddPosition(sprite.SpriteScene.Transform.Position).Location + instance.Props.Transform.Position,
             sourceRectangle: sprite.SourceSprite.Region,
-            color: baseColor.Average(sprite.Color.ToColor()).Average(instance.Props.Color.ToColor()),
+            color: baseColor.Average(sprite.Color.ToColor(), instance.Props.Color.ToColor()),
             rotation: instance.Props.Transform.Rotation + instance.Scene.Transform.Rotation + sprite.Transform.Rotation,
             origin: sprite.Origin,
             scale: instance.Props.Transform.Scale * instance.Scene.Transform.Scale * sprite.Transform.Scale,

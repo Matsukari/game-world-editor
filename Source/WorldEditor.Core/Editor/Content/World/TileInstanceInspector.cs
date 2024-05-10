@@ -72,55 +72,59 @@ namespace Raven
       Console.WriteLine("Null :" + sprite.Props == null);
     }
     bool _onRelease = false;
-    protected override void OnRenderAfterName(ImGuiWinManager imgui)
+    public override void OnRender(ImGuiWinManager imgui)
     {
-      ImGui.BeginDisabled();
-      ImGui.LabelText("Id", Tile.Tile.Id.ToString());
-      ImGui.LabelText("Tile", $"{Tile.Tile.Coordinates.X}x, {Tile.Tile.Coordinates.Y}y");
-      ImGui.EndDisabled();
-      if (Tile.Props == null)
+      if (ImGui.CollapsingHeader("TileInstance", ImGuiTreeNodeFlags.DefaultOpen)) 
       {
-        if (ImGui.Button(IconFonts.FontAwesome5.Plus + "   Add Custom Render Attributes"))
+        ImGui.BeginDisabled();
+        ImGui.LabelText("Id", Tile.Tile.Id.ToString());
+        ImGui.LabelText("Tile", $"{Tile.Tile.Coordinates.X}x, {Tile.Tile.Coordinates.Y}y");
+        ImGui.EndDisabled();
+        if (Tile.Props == null)
         {
-          StartProps(Tile);
-          Tile.Props = new RenderProperties();
+          if (ImGui.Button(IconFonts.FontAwesome5.Plus + "   Add Custom Render Attributes"))
+          {
+            StartProps(Tile);
+            Tile.Props = new RenderProperties();
+          }
         }
-      }
-      else 
-      {
-        if (Tile.Props.Transform.RenderImGui() && OnTileModified != null) OnTileModified(Tile, Layer);
+        else 
+        {
+          if (Tile.Props.Transform.RenderImGui() && OnTileModified != null) OnTileModified(Tile, Layer);
 
-        var color = Tile.Props.Color.ToNumerics();
-        
-        if (ImGui.ColorEdit4("Tint", ref color)) 
-        {
-          _onRelease = true;
-          StartProps(Tile);
-          Tile.Props.Color = color;
-        }
+          var color = Tile.Props.Color.ToNumerics();
 
-        var flipBoth = Tile.Props.SpriteEffects == (SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally);
-        var flipH = Tile.Props.SpriteEffects == SpriteEffects.FlipHorizontally || flipBoth;
-        var flipV = Tile.Props.SpriteEffects == SpriteEffects.FlipVertically || flipBoth;
-        if (ImGui.Checkbox("Flip X", ref flipH)) 
+          if (ImGui.ColorEdit4("Tint", ref color)) 
+          {
+            _onRelease = true;
+            StartProps(Tile);
+            Tile.Props.Color = color;
+          }
+
+          var flipBoth = Tile.Props.SpriteEffects == (SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally);
+          var flipH = Tile.Props.SpriteEffects == SpriteEffects.FlipHorizontally || flipBoth;
+          var flipV = Tile.Props.SpriteEffects == SpriteEffects.FlipVertically || flipBoth;
+          if (ImGui.Checkbox("Flip X", ref flipH)) 
+          {
+            StartProps(Tile);
+            Tile.Props.SpriteEffects ^= SpriteEffects.FlipHorizontally;
+          }
+          ImGui.SameLine();
+          if (ImGui.Checkbox("Flip Y", ref flipV)) 
+          {
+            StartProps(Tile);
+            Tile.Props.SpriteEffects ^= SpriteEffects.FlipVertically;
+          }
+        } 
+        if (_mod && (!_onRelease || Nez.Input.LeftMouseButtonReleased))
         {
-          StartProps(Tile);
-          Tile.Props.SpriteEffects ^= SpriteEffects.FlipHorizontally;
-        }
-        ImGui.SameLine();
-        if (ImGui.Checkbox("Flip Y", ref flipV)) 
-        {
-          StartProps(Tile);
-          Tile.Props.SpriteEffects ^= SpriteEffects.FlipVertically;
+          _onRelease = false;
+          Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RenderPropModifyCommand(Tile, "Props", Tile.Props, _startProps));
+          _mod = false;
         }
       } 
-      if (_mod && (!_onRelease || Nez.Input.LeftMouseButtonReleased))
-      {
-        _onRelease = false;
-        Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RenderPropModifyCommand(Tile, "Props", Tile.Props, _startProps));
-        _mod = false;
-      }
-    } 
+      PropertiesRenderer.Render(imgui, this, OnChangeProperty);
+    }
   }
 }
 

@@ -49,6 +49,20 @@ namespace Raven
       _world = Content as World;
       _popups.OnAnyPopupRender += OnAnyPopupRender;
     }
+
+    public void SelectOtherLevel()
+    {
+      if (_world.Levels.Count() > 1 && SelectedLevelInspector != null)
+      {
+        var i = 0;
+        foreach (var level in _world.Levels)
+        {
+          if (level.Name != SelectedLevelInspector.Level.Name) SelectedLevel = i;
+          i++;
+        }
+      }
+      else SelectedLevel = -1;
+    }
     void OnAnyPopupRender(ImGuiWinManager imgui)
     {
       if (_spritePicker.SelectedSprite is Sprite && ImGui.MenuItem("Remove Selected Tile")) _spritePicker.SelectedSprite = null;

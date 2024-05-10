@@ -91,6 +91,9 @@ namespace Raven
         for (int i = 0; i < _levelInspectors.Count(); i++)
         {
           var level = _levelInspectors[i];
+
+          if (!level.Level.IsVisible)
+            ImGui.PushStyleColor(ImGuiCol.Text, EditorColors.Get(ImGuiCol.Text));
           if (ImGui.Selectable($"{i+1}. {level.Name}", ref level.Selected, ImGuiSelectableFlags.AllowItemOverlap))
           {
             // Clear selection if not held with CTRL
@@ -110,15 +113,19 @@ namespace Raven
           {
             var previous = level.Level.IsVisible;
             level.Level.IsVisible = !level.Level.IsVisible;
+            _viewImGui.SelectOtherLevel();
             Core.GetGlobalManager<CommandManagerHead>().Current.Record(new ModifyClassFieldCommand(level.Level, "IsVisible", previous));
           }
           ImGui.SameLine();
-          if (ImGui.SmallButton(IconFonts.FontAwesome5.Times))
+          if (ImGui.SmallButton(IconFonts.FontAwesome5.Times) && level.Level.IsVisible)
           {
             World.RemoveLevel(level.Level);
             if (OnRemoveLevel != null)
               OnRemoveLevel(level.Level);
           }
+          if (!level.Level.IsVisible)
+            ImGui.PopStyleColor();
+
           ImGui.PopID();
           stack.Y += ImGui.GetItemRectSize().Y;
         }

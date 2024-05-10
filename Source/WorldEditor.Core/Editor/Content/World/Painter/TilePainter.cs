@@ -125,8 +125,6 @@ namespace Raven
         var tileStart = tilesToPaint[tilesToPaint.Count/2];
         if (tileStart == null) return false;
       }
-      _canFillTiles = _tileFiller.Update(tileLayer, tileInLayer, agentSize);
-
       if (Nez.Input.LeftMouseButtonReleased)
       {
         void FloodFill(List<Point> fill)
@@ -141,6 +139,7 @@ namespace Raven
 
         _tileFiller.Start(FloodFill);
       }
+      _canFillTiles = _tileFiller.Update(tileLayer, tileInLayer, agentSize);
       return false;
     }
     Dictionary<Point, Command> _commandGroup = new Dictionary<Point, Command>();
@@ -341,7 +340,7 @@ namespace Raven
         ImGui.EndTooltip();
       }
 
-      if (_currentLayer is TileLayer tileLayer && (_currentLayer.Bounds.Contains(mouse) || _isModifying))
+      if (_currentLayer is TileLayer tileLayer)
       {
         var pos = Camera.WorldToScreenPoint(PosToTiled(mouse));
 
@@ -362,7 +361,7 @@ namespace Raven
               Camera.WorldToScreenPoint(rect.Max).ToNumerics(), colorB.ToColor().ToImColor());
         } 
  
-        if (_view.PaintType == PaintType.Single || (_view.PaintMode == PaintMode.Inspector))
+        if (_view.PaintType == PaintType.Single || (_view.PaintMode == PaintMode.Inspector) && tileLayer.Bounds.Contains(mouse))
         {
           ImGui.GetBackgroundDrawList().AddRectFilled(
               pos.ToNumerics(), (pos + tileLayer.TileSize.ToVector2() * Camera.RawZoom).ToNumerics(), colorA.ToColor().ToImColor());

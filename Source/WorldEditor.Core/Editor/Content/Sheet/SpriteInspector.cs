@@ -23,6 +23,7 @@ namespace Raven
     {
       foreach (var tile in Sprite._tiles)
       {
+        Console.WriteLine("Changing properties of sprite");
          var existingTile = Sprite._sheet.GetTileData(tile);
         // If not created yet
         Sprite._sheet.CreateTile(existingTile);
@@ -39,12 +40,16 @@ namespace Raven
         existingTile.Name = curr;
       }
     } 
-    protected override void OnRenderAfterName(ImGuiWinManager imgui)
+    public override void OnRender(ImGuiWinManager imgui)
     {
-      ImGui.BeginDisabled();
-      ImGui.LabelText("Tiles", Sprite._tiles.Count.ToString());
-      ImGui.LabelText("Region", Sprite.Region.RenderStringFormat());
-      ImGui.EndDisabled();
+      if (ImGui.CollapsingHeader("Sprite", ImGuiTreeNodeFlags.DefaultOpen)) 
+      {
+        NameInput();
+        ImGui.BeginDisabled();
+        ImGui.LabelText("Tiles", Sprite._tiles.Count.ToString());
+        ImGui.LabelText("Region", Sprite.Region.RenderStringFormat());
+        ImGui.EndDisabled();
+      }
 
       if (ImGui.CollapsingHeader("Tiles", ImGuiTreeNodeFlags.DefaultOpen))
       {
@@ -105,8 +110,7 @@ namespace Raven
           ImGui.PopID();
         }
       }
-
+      PropertiesRenderer.Render(imgui, this, OnChangeProperty);
     }
-
   }
 }

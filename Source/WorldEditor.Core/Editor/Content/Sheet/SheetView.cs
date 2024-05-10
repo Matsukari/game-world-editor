@@ -43,6 +43,7 @@ namespace Raven
       _scene.OnUnEdit += () => Inspector.ShowPicker = false;
       _scene.OnUnEdit += () => _imgui.SpriteAnimEditor.Close();
       _scene.OnUnEdit += () => ContentData.PropertiedContext = _sheet;
+      _scene.OnUnEdit += () => Selection.End();
 
       _imgui = new SheetViewImGui(Settings, Camera);
       _imgui.Initialize(editor, content);
@@ -63,6 +64,14 @@ namespace Raven
       Inspector.OnClickScene += scene => _scene.Edit(scene);
       Inspector.OnDeleteScene += scene => _scene.UnEdit();
     }
+    public override void OnContentOpen(ImGuiWinManager imgui)
+    {
+      try 
+      {
+        imgui.GetRenderable<WindowHolder>("sub").Content = null;
+      }
+      catch (Exception) {}
+    }
     public override void OnContentOpen(IPropertied content)
     {
       Core.GetGlobalManager<CommandManagerHead>().Current = _commandManager;
@@ -70,9 +79,6 @@ namespace Raven
       _sheet = content as Sheet;
       _image = new SpriteRenderer(_sheet.Texture);
       _image.Entity = Entity;
-    }
-    public override void OnContentClose()
-    {
       Selection.End();
     }
         

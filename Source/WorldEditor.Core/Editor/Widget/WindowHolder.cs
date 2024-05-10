@@ -27,7 +27,9 @@ namespace Raven
     public override void OnRender(ImGuiWinManager imgui)
     {
       if (Content != null && Content.CanOpen && Content.IsOpen)
+      {
         Content.OnRender(imgui);
+      }
       else 
       {
         ImGuiUtils.TextMiddle("No object selected");

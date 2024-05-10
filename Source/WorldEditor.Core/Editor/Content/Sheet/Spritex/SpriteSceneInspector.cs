@@ -203,12 +203,16 @@ namespace Raven
     bool _isOpenAnimationOperations = false;
     Animation _onOpenAnimtaionOperations;
 
-    protected override void OnRenderAfterName(ImGuiWinManager imgui)
+    public override void OnRender(ImGuiWinManager imgui)
     {
       _selectedSprites.EqualFalseRange(SpriteScene.Parts.Count());      
       _selectedAnims.EqualFalseRange(SpriteScene.Animations.Count());
 
-      SpriteScene.Transform.RenderImGui();
+      if (ImGui.CollapsingHeader("Scene", ImGuiTreeNodeFlags.DefaultOpen)) 
+      {
+        NameInput();
+        SpriteScene.Transform.RenderImGui();
+      }
       var animheader = ImGui.CollapsingHeader("Animations", ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.AllowItemOverlap);
       if (ImGui.IsItemClicked(ImGuiMouseButton.Right))
       {
@@ -217,7 +221,7 @@ namespace Raven
       if (animheader)
       {
 
-        ImGui.BeginChild($"spriteScene-anim-child", new System.Numerics.Vector2(ImGui.GetWindowWidth(), 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        ImGui.BeginChild($"spriteScene-anim-child", new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X, 200), false, ImGuiWindowFlags.AlwaysVerticalScrollbar);
 
         if (SpriteScene.Animations.Count == 0)
           ImGuiUtils.TextMiddle("No animations yet.");
@@ -293,6 +297,8 @@ namespace Raven
         ImGui.EndChild();
       }
       if (removeSprite != null) removeSprite.DetachFromSpriteScene();
+
+      PropertiesRenderer.Render(imgui, this, OnChangeProperty); 
     }
     public override string GetIcon()
     {

@@ -77,6 +77,11 @@ namespace Raven
       if (ImGui.BeginPopupContextItem("layer-options-popup") && _layerOnOptions != null)
       {
 
+        if (!_layerOnOptions.CanBeEdited())
+        {
+          ImGui.Text("Cannot modify this layer");
+          return;
+        }
         if ((_cutLayer != null || _copiedLayer != null) && ImGui.MenuItem(Icon.Paste + "  Paste Layer"))
         {
           Layer gotLayer;
@@ -196,13 +201,23 @@ namespace Raven
       ImGui.InputFloat("Opacity", ref layer.Opacity);
       if (ImGui.InputFloat2("Offset", ref offset)) layer.Offset = offset.ToVector2();
       if (!layer.IsVisible || layer.IsLocked) ImGui.EndDisabled();
+
+      // if (layer is FreeformLayer freeform)
+      // {
+      //
+      // }
+      // else if (layer is )
     }
     void DrawLevelContent()
     {
-      ImGui.LabelText("Width", $"{Level.ContentSize.X} px");
-      ImGui.LabelText("Height", $"{Level.ContentSize.Y} px");
-      var levelOffset = Level.LocalOffset.ToNumerics();
-      if (ImGui.InputFloat2("Position", ref levelOffset)) Level.LocalOffset = levelOffset;
+      if (ImGui.CollapsingHeader("Level", ImGuiTreeNodeFlags.DefaultOpen))
+      {
+        NameInput();
+        ImGui.LabelText("Width", $"{Level.ContentSize.X} px");
+        ImGui.LabelText("Height", $"{Level.ContentSize.Y} px");
+        var levelOffset = Level.LocalOffset.ToNumerics();
+        if (ImGui.InputFloat2("Position", ref levelOffset)) Level.LocalOffset = levelOffset;
+      }
     }
     void SyncLayersGui()
     {
@@ -224,7 +239,7 @@ namespace Raven
     Layer _layerOnOptions = null;
     bool _isOpenLayerHeaderPopup = false;
     bool _isOpenLayerOptionPopup = false;
-    protected override void OnRenderAfterName(ImGuiWinManager imgui)
+    public override void OnRender(ImGuiWinManager imgui)
     {
       SyncLayersGui();
       DrawLevelContent();
@@ -248,7 +263,11 @@ namespace Raven
 
           if (_layerSelected[i]) flags |= ImGuiTreeNodeFlags.Selected;
 
+          if (!layer.CanBeEdited()) ImGui.PushStyleColor(ImGuiCol.Text, EditorColors.Get(ImGuiCol.TextDisabled));
+
           var layerNode = (ImGui.TreeNodeEx(layer.Name, flags));
+
+          if (!layer.CanBeEdited()) ImGui.PopStyleColor();
 
           // Multiple select
           if (ImGui.IsItemClicked() && !ImGui.IsItemToggledOpen())
@@ -286,6 +305,7 @@ namespace Raven
         }
         ImGui.EndChild();
       }
+      PropertiesRenderer.Render(imgui, this, OnChangeProperty); 
     }
   }
 }

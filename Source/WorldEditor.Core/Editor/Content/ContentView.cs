@@ -11,7 +11,9 @@ namespace Raven
 
     public virtual void OnInitialize(EditorSettings settings) {}
     public virtual void OnContentOpen(IPropertied content) {}
+    public virtual void OnContentOpen(ImGuiWinManager imgui) {}
     public virtual void OnContentClose() {}
+    public virtual void OnContentClose(ImGuiWinManager imgui) {}
 
     public virtual void Render(Batcher batcher, Camera camera, EditorSettings settings) {}
 

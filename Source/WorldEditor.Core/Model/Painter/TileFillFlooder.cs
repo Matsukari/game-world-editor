@@ -34,7 +34,7 @@ namespace Raven
     public List<Point> Update(TileLayer layer, Point point, Point size)
     {
       _layer = layer;
-      if (!_frontier.Contains(point) && _isCleared) 
+      if (_isCleared) 
       {
         _frontier.Enqueue(point);
         if (layer.Tiles.ContainsKey(point)) _flood = layer.Tiles[point].Tile;
@@ -52,10 +52,12 @@ namespace Raven
         foreach (var dir in _dirs) 
         {
           var next = current;
-          next.X += dir.Item1 * size.X;
-          next.Y += dir.Item2 * size.Y;
+          next.X += dir.Item1 ;
+          next.Y += dir.Item2;
+
+          var sameTile = () => _flood != null && _layer.Tiles[next].Tile.Id == _flood.Id; 
           if (_layer.IsTileValid(next.X, next.Y) 
-              && (!_layer.Tiles.ContainsKey(next) || (_flood != null && _layer.Tiles[next].Tile.Id == _flood.Id))
+              && ((!_layer.Tiles.ContainsKey(next)) || sameTile())
               && !_visited.ContainsKey(next))
           {
             _frontier.Enqueue(next);
@@ -67,7 +69,7 @@ namespace Raven
       if (_callback != null && IsFloodComplete())
       {
         _callback.Invoke(_fill);
-        Console.WriteLine("Incoke");
+        Console.WriteLine("Finished fill flood");
         Clear();
       }
       return _fill;
@@ -79,6 +81,7 @@ namespace Raven
       _frontier.Clear();
       _visited.Clear();
       _isCleared = true;
+      _flood = null;
     }
   }
 

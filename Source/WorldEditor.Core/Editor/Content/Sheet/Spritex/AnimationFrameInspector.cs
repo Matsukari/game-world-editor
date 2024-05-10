@@ -18,12 +18,17 @@ namespace Raven
       _animEditor = animEditor;
       NoClose = false;
     } 
-    protected override void OnRenderAfterName(ImGuiWinManager imgui)
+    public override void OnRender(ImGuiWinManager imgui)
     {
-      ImGui.LabelText("Frame", Animator.CurrentIndex.ToString());
-      ImGui.InputFloat("Duration", ref Frame.Duration);
-      SpritePartInspector.RenderSprite(imgui, FramePart, false);
-      EaseTypePicker.Picker(ref Frame.EaseType);
+      if (ImGui.CollapsingHeader("AnimationFrame", ImGuiTreeNodeFlags.DefaultOpen))
+      {
+        NameInput();
+        ImGui.LabelText("Frame", Animator.CurrentIndex.ToString());
+        ImGui.InputFloat("Duration", ref Frame.Duration);
+        SpritePartInspector.RenderSprite(imgui, FramePart, false);
+        EaseTypePicker.Picker(ref Frame.EaseType);
+      }
+      PropertiesRenderer.Render(imgui, this, OnChangeProperty);
     }
   }
 }

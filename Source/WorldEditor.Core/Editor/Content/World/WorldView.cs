@@ -27,7 +27,7 @@ namespace Raven
       set
       {
         _paintMode = value;
-        Selection.End();
+        ClearEditTraces();
       }
     }
     public PaintType PaintType 
@@ -36,7 +36,7 @@ namespace Raven
       set
       {
         _paintType = value;
-        Selection.End();
+        ClearEditTraces();
       }
     }
 
@@ -46,6 +46,14 @@ namespace Raven
     public bool CanPaint { get => _paintMode == PaintMode.Pen || PaintMode == PaintMode.Eraser; }
 
     public override bool CanDealWithType(object content) => content is World;
+
+    void ClearEditTraces()
+    {
+      Selection.End();  
+      SpritePicker._selectedBounds = RectangleF.Empty;
+      if (_imgui._objHolder != null)
+        _imgui._objHolder.Content = _imgui.SelectedLevelInspector;
+    }
 
     public override void Initialize(Editor editor, EditorContent content)
     {
@@ -92,11 +100,19 @@ namespace Raven
       if (Selection.Capture is SpriteSceneInstance scene && scene.Name == instance.Name)
         OnLeftClickScene(layer, instance);
     }
-
+    public override void OnContentOpen(ImGuiWinManager imgui)
+    {
+      try 
+      {
+        imgui.GetRenderable<WindowHolder>("sub").Content = null;
+      }
+      catch (Exception) {}
+    }
     public override void OnContentOpen(IPropertied content)
     {
       _world = content as World; 
       Core.GetGlobalManager<CommandManagerHead>().Current = _commandManager;
+      Selection.End();
     }  
     void HandleTileLayerResize(SelectionAxis axis)
     {
@@ -132,7 +148,7 @@ namespace Raven
     }
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
     {
-      if (CanPaint || PaintMode != PaintMode.Inspector) return;
+      if (_imgui.CurrentLayer is not FreeformLayer || CanPaint || PaintMode != PaintMode.Inspector) return;
       Selection.Begin(instance.ContentBounds.AddPosition(layer.Bounds.Location), instance);
       _startScene = instance.Props.Transform.Copy();
       _imgui.SceneInstanceInspector.Scene = instance;
@@ -174,7 +190,8 @@ namespace Raven
 
         Color color = default;
         if (Settings.Graphics.HighlightCurrentLayer 
-            && level.Bounds.Contains(Camera.MouseToWorldPoint())
+            && isSameLevel
+            && (layer.Bounds.Contains(Camera.MouseToWorldPoint()))
             && (mouseInLayer || SpritePicker.IsDoingWork)
             && PaintMode != PaintMode.None
             && !isSameLayer

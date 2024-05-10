@@ -36,14 +36,19 @@ namespace Raven
       Core.GetGlobalManager<CommandManagerHead>().Current.MergeCurrent(new AddTileCommand(Tile._sheet, Tile));
     }
 
-    protected override void OnRenderAfterName(ImGuiWinManager imgui)
+    public override void OnRender(ImGuiWinManager imgui)
     {
-      ImGui.BeginDisabled();
-      ImGui.LabelText("Id", Tile.Id.ToString());
-      ImGui.LabelText("Tile", $"{Tile.Coordinates.X}x, {Tile.Coordinates.Y}y");
-      ImGui.EndDisabled();
+      if (ImGui.CollapsingHeader("Tile", ImGuiTreeNodeFlags.DefaultOpen)) 
+      {
+        NameInput();
+        ImGui.BeginDisabled();
+        ImGui.LabelText("Id", Tile.Id.ToString());
+        ImGui.LabelText("Tile", $"{Tile.Coordinates.X}x, {Tile.Coordinates.Y}y");
+        ImGui.EndDisabled();
 
-      ImGuiUtils.DrawImage(Tile.Sprite, new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X));
+        ImGuiUtils.DrawImage(Tile.Sprite, new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X));
+      }
+      PropertiesRenderer.Render(imgui, this, OnChangeProperty); 
     }
   }   
 }

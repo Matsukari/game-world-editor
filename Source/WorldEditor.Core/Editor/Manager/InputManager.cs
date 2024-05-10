@@ -11,6 +11,18 @@ namespace Raven
     public bool IsDragFirst = false;
     public bool IsDragLast = false; 
     public static Point MouseSnapSize = Point.Zero;
+    public static Vector2 PreviousScreenMousePosition 
+    {
+      get 
+      {
+        var pos = Nez.Input.PreviousMouseState.Position.ToVector2();
+        if (MouseSnapSize != Point.Zero)
+        {
+          pos = pos.RoundToPoint().ToVector2().RoundFloor(MouseSnapSize);
+        }
+        return pos;
+      }
+    }
     public static Vector2 ScreenMousePosition 
     {
       get 
@@ -25,12 +37,11 @@ namespace Raven
     }
     public static Vector2 GetWorldMousePosition(Camera camera)
     {
-      var pos = camera.MouseToWorldPoint();
-      if (MouseSnapSize != Point.Zero)
-      {
-        pos = pos.RoundToPoint().ToVector2().RoundFloor(MouseSnapSize);
-      }
-      return pos;
+      return camera.ScreenToWorldPoint(ScreenMousePosition);
+    }
+    public Vector2 GetWorldMousePosition()
+    {
+      return Camera.ScreenToWorldPoint(ScreenMousePosition);
     }
     public bool LeftMouseButtonReleased { get; private set; }
 

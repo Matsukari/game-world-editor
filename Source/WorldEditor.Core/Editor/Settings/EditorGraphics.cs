@@ -17,6 +17,8 @@ namespace Raven
 
     public bool FocusOnOneLevel = true;
 
+    public bool HighlightLayerOnlyIfMouseIsInside = false;
+
     public bool AdvancedMode = false;
 
   } 
