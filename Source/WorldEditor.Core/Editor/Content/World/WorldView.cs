@@ -191,8 +191,7 @@ namespace Raven
         Color color = default;
         if (Settings.Graphics.HighlightCurrentLayer 
             && isSameLevel
-            && (layer.Bounds.Contains(Camera.MouseToWorldPoint()))
-            && (mouseInLayer || SpritePicker.IsDoingWork)
+            && (!Settings.Graphics.HighlightLayerOnlyIfMouseIsInside || mouseInLayer || SpritePicker.IsDoingWork)
             && PaintMode != PaintMode.None
             && !isSameLayer
             && !InputManager.IsImGuiBlocking)
