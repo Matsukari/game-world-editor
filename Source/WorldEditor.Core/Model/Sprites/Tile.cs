@@ -53,6 +53,12 @@ namespace Raven
     /// </summary>
     public Sprite Sprite { get => new Sprite(Region, _sheet); }
 
+    /// <summary>
+    /// Converts to Sprite containing this exact Tile
+    /// </summary>
+    public Vector2 MinUv { get => Region.Location.ToVector2() / _sheet.Size; }
+    public Vector2 MaxUv { get => (Region.Location + Region.Size).ToVector2() / _sheet.Size; }
+
     internal Sheet _sheet;
 
     private Tile() 
