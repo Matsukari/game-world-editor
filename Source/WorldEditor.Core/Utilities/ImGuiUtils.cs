@@ -163,7 +163,30 @@ namespace Raven
       if (color == default) color = Mono.Color.White;
       DrawImage(drawList, sprite.Texture, sprite.Region, pos, size, Vector2.Zero, 0f, color.ToImColor());
     }
-
+    public static void DrawImage(ImDrawListPtr drawList, Texture2D texture, Vector2 pos, Vector2 size, Mono.Color color = default)
+    {
+      if (color == default) color = Mono.Color.White;
+      DrawImage(drawList, texture, new Mono.Rectangle(0, 0, texture.Width, texture.Height), pos, size, Vector2.Zero, 0f, color.ToImColor());
+    }
+    public static void DrawImageCentered(ImDrawListPtr drawList, Texture2D tx2, Vector2 center, Vector2 size)
+    {
+      Vector2[] pos = 
+      {
+        center + new Vector2(-size.X * 0.5f, -size.Y * 0.5f),
+        center + new Vector2(+size.X * 0.5f, -size.Y * 0.5f),
+        center + new Vector2(+size.X * 0.5f, +size.Y * 0.5f),
+        center + new Vector2(-size.X * 0.5f, +size.Y * 0.5f)
+      };
+      Vector2[] uvs = 
+      { 
+        new Vector2(0.0f, 0.0f), 
+        new Vector2(1.0f, 0.0f), 
+        new Vector2(1.0f, 1.0f), 
+        new Vector2(0.0f, 1.0f) 
+      };
+      nint texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(tx2);
+      drawList.AddImageQuad(texture, pos[0], pos[1], pos[2], pos[3], uvs[0], uvs[1], uvs[2], uvs[3], ImGui.ColorConvertFloat4ToU32(new Vector4(1, 1, 1, 1)));
+    }
     public static void DrawImage(ImDrawListPtr drawList, Texture2D tx2, Mono.Rectangle region, Vector2 position, 
         Vector2 size, Vector2 origin, float angle, uint color)
     {

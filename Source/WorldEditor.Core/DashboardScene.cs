@@ -11,10 +11,8 @@ namespace Raven
     ImGuiWinManager _imgui = new ImGuiWinManager();
     Widget.PopupDelegate _dialog = new Widget.PopupDelegate("dialog");
     Texture2D _appLogo;
-    Settings _settingsWindow;
     public DashboardScene()
     {
-      ClearColor = Color.Black;
       Content.RootDirectory = "Assets";
     }
     public override void OnStart()
@@ -26,57 +24,63 @@ namespace Raven
       else
         _settings = Serializer.LoadSettings();
 
-      _appLogo = Content.LoadTexture(WorldEditor.Assets.Images.App_logo);
-      _settingsWindow = new Settings(_settings);
-      _settingsWindow.IsOpen = true;
-      _imgui.AddImmediate(_settingsWindow);
+      ClearColor = _settings.Colors.WorldBackground.ToColor();
+      _appLogo = Content.LoadTexture(WorldEditor.Assets.Images.Icon);
 
       _settings.ApplyImGui();
-    }    
-    void RenderImGui()
+    }   
+    void TryLoad(ContentView view, string path)
     {
-      RenderDockSpace();
-
-      _dialog.Render(_imgui);
-
-      ImGui.Begin("Updates");
-      ImGuiUtils.TextMiddle("This is the latest version. Debug 1.");
-      ImGui.End();
-
-      ImGui.Begin("File Manager");
-
-      var size = new System.Numerics.Vector2(ImGui.GetContentRegionAvail().X * 0.5f - ImGui.GetStyle().ItemSpacing.X, 20);
-      if (ImGui.Button("New Sheet", size))
+      var content = Serializer.LoadContent<Sheet>(path);
+      if (content == null)
       {
-        _imgui.FilePicker.Open(path => 
-            Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new SheetView(), new Sheet(path))))), "New Sheet");
+        _dialog.Open(imgui => ImGuiUtils.TextMiddle("Oops! Cannot open file. An error occured.")); 
+        return;
       }
-      ImGui.SameLine();
-      if (ImGui.Button("New World", size))
-      { 
-        Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), new World()))));
-      }
-
-      void TryLoad(ContentView view, string path)
+      Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(view, content)))); 
+    }
+    void RenderMenubar()
+    {
+      if (ImGui.BeginMainMenuBar())
       {
-        var content = Serializer.LoadContent<Sheet>(path);
-        if (content == null)
+        if (ImGui.BeginMenu("File"))
         {
-          _dialog.Open(imgui => ImGuiUtils.TextMiddle("Oops! Cannot open file. An error occured.")); 
-          return;
+          if (ImGui.BeginMenu("Open Content"))
+          {
+            if (ImGui.MenuItem("Open Sheet"))
+            { 
+              _imgui.FilePicker.Open(path=>TryLoad(new SheetView(), path), "Open Sheet"); 
+            }
+            if (ImGui.MenuItem("Open World"))
+            { 
+              _imgui.FilePicker.Open(path=>TryLoad(new WorldView(), path), "Open World"); 
+            }
+            ImGui.EndMenu();
+          }
+          if (ImGui.BeginMenu("New Content"))
+          {
+            if (ImGui.MenuItem("New Sheet"))
+            {
+              _imgui.FilePicker.Open(path => 
+                  Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new SheetView(), new Sheet(path))))), "New Sheet");
+            }
+            if (ImGui.MenuItem("New World"))
+            { 
+              Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(new WorldView(), new World()))));
+            }
+            ImGui.EndMenu();
+          }
+          if (ImGui.MenuItem("Close"))
+          {
+            Core.Exit(); 
+          }
+          ImGui.EndMenu();
         }
-        Core.StartSceneTransition(new FadeTransition(()=>new EditorScene(new Editor(view, content)))); 
+        ImGui.EndMainMenuBar();
       }
-      if (ImGui.Button("Open Sheet", size))
-      { 
-        _imgui.FilePicker.Open(path=>TryLoad(new SheetView(), path), "Open Sheet"); 
-      }
-      ImGui.SameLine();
-      if (ImGui.Button("Open World", size))
-      { 
-        _imgui.FilePicker.Open(path=>TryLoad(new WorldView(), path), "Open World"); 
-      }
- 
+    }
+    void RenderFiles()
+    {
       var i = 0;
       List<int> invalidFiles = new List<int>(); 
       foreach (var recent in _settings.FileHistory)
@@ -117,47 +121,33 @@ namespace Raven
       }
       new Serializers.SettingsSerializer().Save(Serializer.ApplicationSavePath, _settings);
 
-      ImGui.End();
+    }
+    void RenderImGui()
+    {
+      _dialog.Render(_imgui);
+      RenderMenubar();
 
-      RenderContentArea();
+      ImGui.Begin("File Manager", ImGuiWindowFlags.NoTitleBar);
+
+
+      RenderIcon();
+
+      RenderFiles();
+     
+      ImGui.End();
 
       _imgui.Render();
     }
-    void RenderContentArea()
+    void RenderIcon()
     {
-      ImGui.Begin("ContentArea", ImGuiWindowFlags.NoDecoration);
-
       var texture = Core.GetGlobalManager<Nez.ImGuiTools.ImGuiManager>().BindTexture(_appLogo);
-      var imageSize = ImGuiUtils.ContainSize(_appLogo.GetSize().ToNumerics(), ImGui.GetContentRegionAvail());
+      var size = ImGui.GetContentRegionAvail();
+      size.Y *= 0.2f;
+      var imageSize = ImGuiUtils.ContainSize(_appLogo.GetSize().ToNumerics(), size);
       ImGui.Image(texture, imageSize, new System.Numerics.Vector2(0, 0), new System.Numerics.Vector2(1, 1), 
-          tint_col: new System.Numerics.Vector4(0.5f, 0.5f, 0.5f, 0.5f));
-      ImGui.End();
+          tint_col: new System.Numerics.Vector4(0.7f, 0.7f, 0.7f, 0.7f));
     }
-    void RenderDockSpace()
-    {
-      ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags.None;
 
-      ImGuiWindowFlags window_flags = ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoDocking;
-
-      var viewport = ImGui.GetMainViewport();
-      ImGui.SetNextWindowPos(viewport.WorkPos);
-      ImGui.SetNextWindowSize(viewport.WorkSize);
-      ImGui.SetNextWindowViewport(viewport.ID);
-      ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0.0f);
-      ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 0.0f);
-      window_flags |= ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove;
-      window_flags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoNavFocus;
-
-      ImGui.PushStyleVar(ImGuiStyleVar.WindowPadding, 0);
-      ImGui.Begin("DockSpace", window_flags);
-      uint dockspace_id = ImGui.GetID("MyDockSpace");
-      ImGui.DockSpace(dockspace_id, new System.Numerics.Vector2(), dockspace_flags);
-
-      ImGui.PopStyleVar();
-      ImGui.PopStyleVar();
-      ImGui.PopStyleVar();
-      ImGui.End();
-    }
     public override void Update()
     {
       base.Update();
