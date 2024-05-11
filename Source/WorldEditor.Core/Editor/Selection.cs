@@ -81,9 +81,8 @@ namespace Raven
     {
       // The distance between the movement of the mouse
       var _bounds = ContentBounds;
-      var mouse = InputManager.ScreenMousePosition;
-      var delta = mouse - input.MouseDragStart;
-      delta /= Entity.Scene.Camera.RawZoom;
+      var mouse = input.GetWorldMousePosition();
+      var delta = mouse - input.MouseDragStartInWorld;
 
       // start whatever selection
       if (Nez.Input.LeftMouseButtonPressed)
@@ -98,14 +97,14 @@ namespace Raven
           centerPoint.Size /= input.Camera.RawZoom;
           centerPoint = centerPoint.GetCenterToStart();
 
-          if (centerPoint.Contains(input.Camera.MouseToWorldPoint())) 
+          if (centerPoint.Contains(input.GetWorldMousePosition())) 
           {
             SelAxis = (SelectionAxis)i;
           }
           i++;
         }
         // mouse is also inside the selection area; can insead be moved
-        if (_bounds.Width != 0 && _bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
+        if (_bounds.Width != 0 && _bounds.Contains(input.GetWorldMousePosition()))
         {
           // Console.WriteLine("Started moving selection...");
           _isDragInsideArea = true;

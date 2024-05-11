@@ -135,6 +135,10 @@ namespace Raven
         MouseDragArea.Y = pos.Y;
         MouseDragStart.X = pos.X;
         MouseDragStart.Y = pos.Y;
+        if (Core.Scene != null)
+        {
+          MouseDragStartInWorld = Camera.MouseToWorldPoint().ToNumerics();
+        }
       }
       IsDragLast = false;
       if (Nez.Input.LeftMouseButtonReleased || Nez.Input.RightMouseButtonReleased || Nez.Input.MiddleMouseButtonReleased)
