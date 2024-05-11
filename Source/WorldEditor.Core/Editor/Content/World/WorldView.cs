@@ -77,6 +77,8 @@ namespace Raven
       Selection.OnMoveEnd += SelectionDragEnd;
       Selection.OnScaleStart += SelectionDragStart;
       Selection.OnScaleEnd += SelectionDragEnd;
+      Selection.OnEditPoint += LevelResize;
+
 
       _imgui = new WorldViewImGui(_input.Painter); 
       _imgui.Initialize(editor, content);
@@ -144,7 +146,15 @@ namespace Raven
       {
         var command = new RenderPropTransformModifyCommand(scene.Props, _startScene);
         command.Context = scene;
-        Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(scene.ContentBounds.AddPosition(scene.Layer.Bounds.Location), command.Context, ()=>_startScene=scene.Props.Transform.Copy()));
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(scene.ContentBounds.AddPosition(scene.Layer.Bounds.Location), 
+              command.Context, ()=>_startScene=scene.Props.Transform.Copy()));
+      }
+    }
+    void LevelResize(SelectionAxis axis, Vector2 delta)
+    {
+      if (Selection.Capture is Level level)
+      {
+        level.ReBounds(Selection.ContentBounds, axis, delta);
       }
     }
     void OnLeftClickScene(Layer layer, SpriteSceneInstance instance)
@@ -281,10 +291,9 @@ namespace Raven
 
       // if (_imgui.SelectedLevelInspector != null && _imgui.SelectedLevelInspector.CurrentLayer is TileLayer tileLayer)
       
-      if (Selection.Capture is Level lev)
+      if (Selection.Capture is Level lev && !Selection.IsEditingPoint)
       {
         lev.LocalOffset = Selection.ContentBounds.Location;
-        lev.ContentSize = Selection.ContentBounds.Size.ToPoint();
       }
       else if (Selection.Capture is ShapeModel model)
       {

@@ -5,6 +5,33 @@ namespace Raven
 {
   public static class Vector2Ext 
   {
+    public static bool IsDoubleDirection(this SelectionAxis axis)
+      => axis == SelectionAxis.TopRight || axis == SelectionAxis.TopLeft || axis == SelectionAxis.BottomLeft || axis == SelectionAxis.BottomRight;
+
+    public static (SelectionAxis, SelectionAxis) SeparateDouble(this SelectionAxis axis)
+    {
+      if (axis == SelectionAxis.TopRight) return (SelectionAxis.Top, SelectionAxis.Right);
+      else if (axis == SelectionAxis.TopLeft) return (SelectionAxis.Top, SelectionAxis.Left);
+      else if (axis == SelectionAxis.BottomLeft) return (SelectionAxis.Bottom, SelectionAxis.Left);
+      else if (axis == SelectionAxis.BottomRight) return (SelectionAxis.Bottom, SelectionAxis.Right);
+
+      return (SelectionAxis.None, SelectionAxis.None);
+    }
+
+    public static Point DirectionFactor(this SelectionAxis axis)
+    {
+      if (axis.IsDoubleDirection() || axis == SelectionAxis.None) throw new Exception();
+      if (axis == SelectionAxis.Left ||axis == SelectionAxis.Right) return new Point(1, 0);
+      return new Point(0, 1);
+    }
+
+    public static bool IsXAxis(this SelectionAxis axis)
+    {
+      if (axis.IsDoubleDirection()) throw new Exception();
+      if (axis == SelectionAxis.Left || axis == SelectionAxis.Right) return true;
+      return false;
+    }
+
     public static string SimpleStringFormat(this Vector2 vec)
     {
       return $"{vec.X}, {vec.Y}";

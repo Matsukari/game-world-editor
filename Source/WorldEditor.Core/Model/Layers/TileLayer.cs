@@ -39,13 +39,56 @@ namespace Raven
     {
     }
 
-
+  
+    Point _deltaAccum = Point.Zero;
     public TileLayer(Level level, int w, int h) : base(level) 
     {
       TileWidth = w;
       TileHeight = h;
     }
-    
+
+    public override void OnLevelPushed(RectangleF old)
+    {
+      _deltaAccum += Level.ContentSize - old.Size.ToPoint();
+      var delta = _deltaAccum;
+      var tileDelta = delta / TileSize;
+      var tiles = Tiles.Keys.ToList();
+      if (delta != Point.Zero)
+      {
+        Console.WriteLine($"Delta: {delta}");
+      }
+      if (tileDelta != Point.Zero)
+      {
+        _deltaAccum = Point.Zero;
+        Console.WriteLine($"Tile pushed: {tileDelta}");
+      }
+      tiles.Sort((a, b) => b.CompareInGridSpace(a));
+      foreach (var tile in tiles)
+      {
+        Tiles.ChangeKey(tile, tile + tileDelta);
+      }
+    }
+    public override void OnLevelCutoff(SelectionAxis axis, Vector2 delta)
+    {
+      if (axis.IsDoubleDirection()) throw new Exception("Cannot handle two directions at once or void");
+      if (axis == SelectionAxis.None) return;
+      if (axis == SelectionAxis.Left) delta.X *= -1;
+      if (axis == SelectionAxis.Top) delta.Y *= -1; 
+
+      Console.WriteLine($"Delta: {delta}"); 
+
+      var tileDelta = delta.ToPoint() / TileSize;
+      var tiles = Tiles.Keys.ToList();
+
+      Console.WriteLine($"Tile cuttted: {tileDelta}"); 
+
+      foreach (var tile in tiles)
+      {
+        if (!IsTileValid(tile + tileDelta))
+          Tiles.Remove(tile);
+      }
+
+    }
     public void SetTileSize(Point size)
     {
       TileWidth = size.X;

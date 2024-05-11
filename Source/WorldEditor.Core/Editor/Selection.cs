@@ -1,4 +1,5 @@
 using Nez;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 namespace Raven 
@@ -16,6 +17,7 @@ namespace Raven
     public SelectionPoints Points = new SelectionPoints();
     public SelectionAxis SelAxis = SelectionAxis.None;
     public RectangleF ContentBounds = new RectangleF();
+    public Vector2 ContentTopLeftDelta = new Vector2();
     public RectangleF InitialBounds = new RectangleF();
     public float SelectedSelectionPointSizeFactor = 2f;
     public object Capture = null;
@@ -23,6 +25,8 @@ namespace Raven
     public event Action OnMoveStart;
     public event Action OnScaleStart;
     public event Action OnScaleEnd;
+
+    public event Action<SelectionAxis, Vector2> OnEditPoint;
 
     public event Action<SelectionAxis> OnScaled;
 
@@ -65,6 +69,7 @@ namespace Raven
       Capture = null;
       SelAxis = SelectionAxis.None;
       ContentBounds = new RectangleF();
+      ContentTopLeftDelta = Vector2.Zero;
       _started = false;
       _isDragInsideArea = false;
     }
@@ -136,6 +141,8 @@ namespace Raven
           OnScaleStart();
           _scaleOnce = false;
         }
+        ContentTopLeftDelta = _selectionInitial.Location + delta;
+        var pointDelta = Vector2.Zero;
         // SetMouseCursor(SelAxis);
         switch (SelAxis)
         {
@@ -178,8 +185,9 @@ namespace Raven
           case SelectionAxis.Bottom: 
             _bounds.Height = _selectionInitial.Height + delta.Y; 
             break;
-        }
-        
+        } 
+        if (OnEditPoint != null)
+          OnEditPoint(SelAxis, delta);
         ContentBounds = _bounds;
 
         if (OnScaled != null) OnScaled(SelAxis);

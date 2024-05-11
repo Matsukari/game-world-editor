@@ -76,7 +76,9 @@ namespace Raven
 
     public bool CanBeEdited() => !IsLocked && IsVisible;
 
-    public virtual void OnLevelResized(Point old) {}
+    public virtual void OnLevelPushed(RectangleF old) {}
+
+    public virtual void OnLevelCutoff(SelectionAxis axis, Vector2 delta) {}
 
     /// <summary>
     /// Creates a full copy of this Layer

@@ -26,10 +26,6 @@ namespace Raven
       {
         var old = _contentSize;
         _contentSize = value;
-        foreach (var layer in Layers) 
-        {
-          layer.OnLevelResized(old);
-        }
       }
     }
 
@@ -52,6 +48,11 @@ namespace Raven
     public Vector2 LocalOffset = Vector2.Zero;
 
     /// <summary>
+    /// World position plus LocalOffset
+    /// </summary>
+    public Vector2 Position { get => World.Position + LocalOffset; }
+
+    /// <summary>
     /// Determines whether to draw this Level or not
     /// </summary>
     public bool IsVisible = true;
@@ -60,8 +61,8 @@ namespace Raven
     /// Absolute bounds of the Level
     /// </summary>
     public RectangleF Bounds { get => new RectangleF(
-        World.Position.X + LocalOffset.X, 
-        World.Position.Y + LocalOffset.Y,
+        Position.X,
+        Position.Y,
         ContentSize.X,
         ContentSize.Y);
     }
@@ -73,6 +74,52 @@ namespace Raven
     public Level(World world)
     {
       World = world;
+    }
+
+    public void ReBounds(RectangleF bounds, SelectionAxis axis, Vector2 delta)
+    {
+      var oldBounds = Bounds;
+      LocalOffset = bounds.Location;
+      ContentSize = bounds.Size.ToPoint();
+
+      if (axis == SelectionAxis.None) return;
+      foreach (var layer in Layers)
+      {
+        if ((axis == SelectionAxis.TopLeft 
+            || axis == SelectionAxis.Top 
+            || axis == SelectionAxis.Left) 
+            && delta.EitherIsNegative())
+        {
+          Console.WriteLine("Pushed");
+          layer.OnLevelPushed(oldBounds);
+        }
+        else if (axis == SelectionAxis.TopLeft
+              || axis == SelectionAxis.Top
+              || axis == SelectionAxis.Left
+              || (axis == SelectionAxis.BottomLeft && delta.EitherIsNegative()) 
+              || (axis == SelectionAxis.TopRight && delta.EitherIsNegative())
+              || (axis == SelectionAxis.BottomRight && delta.EitherIsNegative())
+              || (axis == SelectionAxis.Right && delta.X < 0)
+              || (axis == SelectionAxis.Bottom && delta.Y < 0) )
+              {
+                Console.WriteLine("Cutoff");
+                if (axis.IsDoubleDirection())
+                {
+                  var (a, b) = axis.SeparateDouble();
+
+                  layer.OnLevelCutoff(a, a.DirectionFactor().ToVector2() * delta);
+                  layer.OnLevelCutoff(b, b.DirectionFactor().ToVector2() * delta);
+                }
+                else 
+                {
+                  delta.X = Math.Abs(delta.X);
+                  delta.Y = Math.Abs(delta.Y);
+                  layer.OnLevelCutoff(axis, delta);
+                }
+              }
+
+      }
+
     }
 
     /// <summary>
