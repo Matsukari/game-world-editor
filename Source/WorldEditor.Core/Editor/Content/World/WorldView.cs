@@ -102,6 +102,7 @@ namespace Raven
     }
     public override void OnContentOpen(ImGuiWinManager imgui)
     {
+      Graphics.Instance.Batcher.ShouldRoundDestinations = false;
       try 
       {
         imgui.GetRenderable<WindowHolder>("sub").Content = _imgui.SelectedLevelInspector;

@@ -11,12 +11,13 @@ namespace Raven
   // </summary>
   public class Selection : Component, IInputHandler 
   {
+    internal SelectionAxis _nextEdit = SelectionAxis.None;
     public bool IsEditingPoint { get => SelAxis != SelectionAxis.None; }
     public SelectionPoints Points = new SelectionPoints();
     public SelectionAxis SelAxis = SelectionAxis.None;
     public RectangleF ContentBounds = new RectangleF();
     public RectangleF InitialBounds = new RectangleF();
-    public float SelectedSelectionPointSizeFactor = 1.5f;
+    public float SelectedSelectionPointSizeFactor = 2f;
     public object Capture = null;
     public event Action OnMoveEnd;
     public event Action OnMoveStart;
@@ -75,6 +76,7 @@ namespace Raven
     int IInputHandler.Priority() => 9;
 
     bool _scaleOnce = true;
+
     bool IInputHandler.OnHandleInput(InputManager input)   
     {
       // The distance between the movement of the mouse
@@ -88,6 +90,20 @@ namespace Raven
       {
         _selectionInitial = ContentBounds;
 
+        var i = 0;
+        foreach (var point in Points.Points)
+        {
+          var centerPoint = point;
+          centerPoint.Size *= SelectedSelectionPointSizeFactor;
+          centerPoint.Size /= input.Camera.RawZoom;
+          centerPoint = centerPoint.GetCenterToStart();
+
+          if (centerPoint.Contains(input.Camera.MouseToWorldPoint())) 
+          {
+            SelAxis = (SelectionAxis)i;
+          }
+          i++;
+        }
         // mouse is also inside the selection area; can insead be moved
         if (_bounds.Width != 0 && _bounds.Contains(Entity.Scene.Camera.MouseToWorldPoint()))
         {
@@ -95,6 +111,7 @@ namespace Raven
           _isDragInsideArea = true;
           if (OnMoveStart != null) OnMoveStart();
         }
+
       } 
       else if (Nez.Input.LeftMouseButtonReleased) 
       {

@@ -42,43 +42,44 @@ namespace Raven
       {
         var centerPoint = point;
         centerPoint.Size *= _selection.SelectedSelectionPointSizeFactor;
-        if (camera.RawZoom < 1) centerPoint.Size /= camera.RawZoom;
+        centerPoint.Size /= camera.RawZoom;
         centerPoint = centerPoint.GetCenterToStart();
+
         if (centerPoint.Contains(camera.MouseToWorldPoint())) 
         {
           axis = i;
         }
+
         centerPoint = point;
-        if (camera.RawZoom < 1) centerPoint.Size /= camera.RawZoom;
+        centerPoint.Size /= camera.RawZoom;
         centerPoint = centerPoint.GetCenterToStart();
         batcher.DrawRect(centerPoint, _colors.SelectionPoint.ToColor());
         i++;
       }
       // Enlargen the resizing point currently on hover
-      if (axis >= 0 && axis < (int)SelectionAxis.None) 
+      if (_selection.IsEditingPoint || axis != -1) 
       {
-        var point = _selection.Points.Points[axis];
-        var centerPoint = point;
+        var centerPoint = new RectangleF();
+        if (axis != -1)
+          centerPoint = _selection.Points.Points[axis];
+        else 
+          centerPoint = _selection.Points.Points[(int)_selection.SelAxis];
+
         centerPoint.Size *= _selection.SelectedSelectionPointSizeFactor;
-        if (camera.RawZoom < 1) centerPoint.Size /= camera.RawZoom;
+        centerPoint.Size /= camera.RawZoom;
         centerPoint = centerPoint.GetCenterToStart();
         batcher.DrawRect(centerPoint, _colors.SelectionPoint.ToColor());
       }
-
 
       var selectionPoint = axis != -1 ? (SelectionAxis)axis : SelectionAxis.None;
 
       if (selectionPoint != SelectionAxis.None)
       {
-        // Parent.SetMouseCursor(selectionPoint);
+        _selection._nextEdit = selectionPoint;
       }
       if (_selected)
       {
-        if (selectionPoint != SelectionAxis.None && !_selection.IsEditingPoint)
-        {
-          _selection.SelAxis = selectionPoint;
-        }
-        else if (!_selection.ContentBounds.Contains(camera.MouseToWorldPoint()))
+        if (!_selection.ContentBounds.Contains(camera.MouseToWorldPoint()))
         {
           _selection.End();
         }
