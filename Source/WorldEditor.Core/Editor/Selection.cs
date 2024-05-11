@@ -97,14 +97,14 @@ namespace Raven
           centerPoint.Size /= input.Camera.RawZoom;
           centerPoint = centerPoint.GetCenterToStart();
 
-          if (centerPoint.Contains(input.GetWorldMousePosition())) 
+          if (centerPoint.Contains(input.GetRawWorldMousePosition())) 
           {
             SelAxis = (SelectionAxis)i;
           }
           i++;
         }
         // mouse is also inside the selection area; can insead be moved
-        if (_bounds.Width != 0 && _bounds.Contains(input.GetWorldMousePosition()))
+        if (_bounds.Width != 0 && _bounds.Contains(input.GetRawWorldMousePosition()))
         {
           // Console.WriteLine("Started moving selection...");
           _isDragInsideArea = true;

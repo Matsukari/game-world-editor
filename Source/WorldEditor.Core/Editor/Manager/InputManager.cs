@@ -43,6 +43,10 @@ namespace Raven
     {
       return Camera.ScreenToWorldPoint(ScreenMousePosition);
     }
+    public Vector2 GetRawWorldMousePosition()
+    {
+      return Camera.MouseToWorldPoint();
+    }
     public bool LeftMouseButtonReleased { get; private set; }
 
     public static bool IsImGuiBlocking 
