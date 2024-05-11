@@ -31,6 +31,10 @@ namespace Raven
 
       return result;
     }
+    public static bool MiddleButtonX(string name)
+    {
+      return ImGui.Button(name);
+    }
     public static void DisableIf(bool condition, Action content)
     {
       if (condition)

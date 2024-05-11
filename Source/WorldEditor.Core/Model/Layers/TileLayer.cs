@@ -45,6 +45,12 @@ namespace Raven
       TileWidth = w;
       TileHeight = h;
     }
+    
+    public void SetTileSize(Point size)
+    {
+      TileWidth = size.X;
+      TileHeight = size.Y;
+    }
 
     public Point GetTileCoordFromWorld(Vector2 point) => new Point(
         (int)(point.X - Bounds.Location.X) / TileWidth, 

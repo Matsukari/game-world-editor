@@ -33,6 +33,7 @@ namespace Raven
     {
       DrawLayerOptionsPopup();
       DrawLayerHeaderPopup();
+      _tilelayerSlicer.Draw();
     }
     void DrawLayerHeaderPopup()
     {
@@ -202,12 +203,22 @@ namespace Raven
       if (ImGui.InputFloat2("Offset", ref offset)) layer.Offset = offset.ToVector2();
       if (!layer.IsVisible || layer.IsLocked) ImGui.EndDisabled();
 
-      // if (layer is FreeformLayer freeform)
-      // {
-      //
-      // }
-      // else if (layer is )
+      if (layer is FreeformLayer freeform)
+      {
+        ImGui.Checkbox("Y Sorted", ref freeform.IsYSorted);
+      }
+      else if (layer is TileLayer tileLayer)
+      {
+        ImGui.LabelText("Rows", tileLayer.TilesQuantity.X.ToString());
+        ImGui.LabelText("Columns", tileLayer.TilesQuantity.Y.ToString());
+        ImGui.LabelText("Tile Width", tileLayer.TileSize.X.ToString());
+        ImGui.LabelText("Tile Height", tileLayer.TileSize.Y.ToString()); 
+        if (ImGui.MenuItem(Icon.Th + "   Edit Tile Size")) _tilelayerSlicer.Open(tileLayer.Size, ()=>tileLayer.SetTileSize(_tilelayerSlicer.SplitSize));
+
+      }
     }
+    Widget.TileSlicer _tilelayerSlicer = new Widget.TileSlicer();
+
     void DrawLevelContent()
     {
       if (ImGui.CollapsingHeader("Level", ImGuiTreeNodeFlags.DefaultOpen))

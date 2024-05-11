@@ -5,10 +5,11 @@ namespace Raven
 {
   public class EditorColors
   {
-    // Important
+
     public Vector4 Accent = new Vector4(0.561f, 0.386f, 0.712f, 1f); 
     public Vector4 Background = new Vector4(0.15f, 0.15f, 0.15f, 1f);
     public Vector4 WorldBackground = new Vector4(0.15f, 0.15f, 0.15f, 1f);
+
 
     public Vector4 ToolbarBg = new Vector4(0.561f, 0.386f, 0.712f, 1f); 
 
@@ -24,6 +25,7 @@ namespace Raven
     public Vector4 OriginLineY = new Vector4(0.5f, 0.5f, 0.5f, 1f);
     public Vector4 LevelGrid = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
     public Vector4 LevelSelOutline = new Vector4(0.85f, 0.85f, 0.85f, 1f);    
+    public Vector4 WorldName = new Vector4(0.5f, 0.5f, 0.7f, 1f);
 
     // Sprite picker
     public Vector4 PickHoverOutline = new Vector4(0.5f, 0.5f, 0.5f, 1f);
@@ -35,6 +37,7 @@ namespace Raven
 
     public Vector4 HoverTile = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
 
+    // Painting
     public Vector4 InspectSpriteFill = new Vector4(0.5f, 0.5f, 0.5f, 0.5f);
     public Vector4 InspectSpriteOutline = new Vector4(0.7f, 0.7f, 0.7f, 1f);
 
@@ -61,7 +64,6 @@ namespace Raven
     public Vector4 ShapeInactive = new Vector4(0.3f, 0.3f, 0.3f, 0.1f);
     public Vector4 ShapeName = new Vector4(0.5f, 0.5f, 0.7f, 1f);
 
-    // Pads
     public Vector4 LevelSheet = new Vector4(0.20f, 0.2f, 0.2f, 2f);
     public Vector4 SheetSheet = new Vector4(0.20f, 0.2f, 0.2f, 2f);
 
