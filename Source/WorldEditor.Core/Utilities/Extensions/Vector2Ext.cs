@@ -8,6 +8,13 @@ namespace Raven
     public static bool IsDoubleDirection(this SelectionAxis axis)
       => axis == SelectionAxis.TopRight || axis == SelectionAxis.TopLeft || axis == SelectionAxis.BottomLeft || axis == SelectionAxis.BottomRight;
 
+    public static bool HasTopOrLeft(this SelectionAxis axis) 
+      => axis == SelectionAxis.Left 
+      || axis == SelectionAxis.Top 
+      || axis == SelectionAxis.TopLeft 
+      || axis == SelectionAxis.TopRight 
+      || axis == SelectionAxis.BottomLeft;
+
     public static (SelectionAxis, SelectionAxis) SeparateDouble(this SelectionAxis axis)
     {
       if (axis == SelectionAxis.TopRight) return (SelectionAxis.Top, SelectionAxis.Right);
@@ -52,6 +59,8 @@ namespace Raven
           from.Y + ease * (to.Y - from.Y)
           );
     public static bool EitherIsNegative(this Vector2 vector) => vector.X < 0 || vector.Y < 0;
+    public static bool EitherIsNegative(this Point point) => point.X < 0 || point.Y < 0;
+
     public static Vector2 Negate(this Vector2 vector) => new Vector2(-vector.X, -vector.Y);
 
     public static Vector2 ToVector2(this Num.Vector2 numeric)

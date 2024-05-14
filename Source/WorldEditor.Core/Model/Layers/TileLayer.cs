@@ -40,7 +40,7 @@ namespace Raven
     }
 
   
-    Point _deltaAccum = Point.Zero;
+    Vector2 _deltaAccum = Vector2.Zero;
     public TileLayer(Level level, int w, int h) : base(level) 
     {
       TileWidth = w;
@@ -49,45 +49,59 @@ namespace Raven
 
     public override void OnLevelPushed(RectangleF old)
     {
-      _deltaAccum += Level.ContentSize - old.Size.ToPoint();
+      _deltaAccum += old.Location - Bounds.Location;
       var delta = _deltaAccum;
-      var tileDelta = delta / TileSize;
+      var tileDelta = new Point((int)(delta.X / TileSize.X), (int)(delta.Y / TileSize.Y));
       var tiles = Tiles.Keys.ToList();
-      if (delta != Point.Zero)
+      if (delta != Vector2.Zero)
       {
         Console.WriteLine($"Delta: {delta}");
       }
-      if (tileDelta != Point.Zero)
-      {
-        _deltaAccum = Point.Zero;
+
+      // Check if the accumulated delta passed more than one tile. 
+      // Then Try to get the remainder value for the next accumulation for better prevision
+      if (tileDelta.X != 0)
+      { 
+        _deltaAccum.X = delta.X % TileSize.X;;
         Console.WriteLine($"Tile pushed: {tileDelta}");
       }
-      tiles.Sort((a, b) => b.CompareInGridSpace(a));
-      foreach (var tile in tiles)
+      if (tileDelta.Y != 0)
       {
-        Tiles.ChangeKey(tile, tile + tileDelta);
+        _deltaAccum.Y = delta.Y % TileSize.Y;;
+        Console.WriteLine($"Tile pushed: {tileDelta}");
       }
+
+      if (tileDelta.X != 0)
+      {
+        tiles.Sort((tileDelta.X < 0) ? (a, b) => a.CompareInGridSpace(b) : (a, b) => b.CompareInGridSpace(a));
+        foreach (var tile in tiles)
+        {
+          Tiles.ChangeKey(tile, tile + new Point(tileDelta.X, 0));
+        } 
+      }
+      if (tileDelta.Y != 0)
+      {
+        tiles = Tiles.Keys.ToList();
+        tiles.Sort((tileDelta.Y < 0) ? (a, b) => a.CompareInGridSpace(b) : (a, b) => b.CompareInGridSpace(a));
+        foreach (var tile in tiles)
+        {
+          Tiles.ChangeKey(tile, tile + new Point(0, tileDelta.Y));
+        }
+      }
+      RemoveInvalidTiles();
     }
     public override void OnLevelCutoff(SelectionAxis axis, Vector2 delta)
     {
-      if (axis.IsDoubleDirection()) throw new Exception("Cannot handle two directions at once or void");
-      if (axis == SelectionAxis.None) return;
-      if (axis == SelectionAxis.Left) delta.X *= -1;
-      if (axis == SelectionAxis.Top) delta.Y *= -1; 
-
-      Console.WriteLine($"Delta: {delta}"); 
-
-      var tileDelta = delta.ToPoint() / TileSize;
+      RemoveInvalidTiles();
+    }
+    public void RemoveInvalidTiles()
+    {
       var tiles = Tiles.Keys.ToList();
-
-      Console.WriteLine($"Tile cuttted: {tileDelta}"); 
-
       foreach (var tile in tiles)
       {
-        if (!IsTileValid(tile + tileDelta))
+        if (!IsTileValid(tile))
           Tiles.Remove(tile);
       }
-
     }
     public void SetTileSize(Point size)
     {

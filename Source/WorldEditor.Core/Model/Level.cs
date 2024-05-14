@@ -103,10 +103,12 @@ namespace Raven
               || (axis == SelectionAxis.Bottom && delta.Y < 0) )
               {
                 Console.WriteLine("Cutoff");
+                if (axis.HasTopOrLeft())
+                  layer.OnLevelPushed(oldBounds);
+
                 if (axis.IsDoubleDirection())
                 {
                   var (a, b) = axis.SeparateDouble();
-
                   layer.OnLevelCutoff(a, a.DirectionFactor().ToVector2() * delta);
                   layer.OnLevelCutoff(b, b.DirectionFactor().ToVector2() * delta);
                 }
