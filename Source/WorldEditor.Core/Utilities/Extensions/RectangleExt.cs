@@ -28,6 +28,11 @@ namespace Raven
       rect.X = rect.Right;
       return rect.Location;
     }
+    public static Vector2 TopCenter(this RectangleF rect)
+    {
+      rect.X = rect.Center.X;
+      return rect.Location;
+    }
     public static Vector2 BottomRight(this RectangleF rect)
     {
       rect.X = rect.Right;

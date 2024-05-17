@@ -11,42 +11,8 @@ namespace Raven
     public bool IsDragFirst = false;
     public bool IsDragLast = false; 
     public static Point MouseSnapSize = Point.Zero;
-    public static Vector2 PreviousScreenMousePosition 
-    {
-      get 
-      {
-        var pos = Nez.Input.PreviousMouseState.Position.ToVector2();
-        if (MouseSnapSize != Point.Zero)
-        {
-          pos = pos.RoundToPoint().ToVector2().RoundFloor(MouseSnapSize);
-        }
-        return pos;
-      }
-    }
-    public static Vector2 ScreenMousePosition 
-    {
-      get 
-      {
-        var pos = Nez.Input.MousePosition;
-        if (MouseSnapSize != Point.Zero)
-        {
-          pos = pos.RoundToPoint().ToVector2().RoundFloor(MouseSnapSize);
-        }
-        return pos;
-      }
-    }
-    public static Vector2 GetWorldMousePosition(Camera camera)
-    {
-      return camera.ScreenToWorldPoint(ScreenMousePosition);
-    }
-    public Vector2 GetWorldMousePosition()
-    {
-      return Camera.ScreenToWorldPoint(ScreenMousePosition);
-    }
-    public Vector2 GetRawWorldMousePosition()
-    {
-      return Camera.MouseToWorldPoint();
-    }
+    public static Vector2 PreviousScreenMousePosition { get => Snap(Nez.Input.PreviousMouseState.Position.ToVector2()); }
+    public static Vector2 ScreenMousePosition { get => Snap(Nez.Input.MousePosition); }
     public bool LeftMouseButtonReleased { get; private set; }
 
     public static bool IsImGuiBlocking 
@@ -64,6 +30,17 @@ namespace Raven
 
     List<IInputHandler> _inputHandlers = new List<IInputHandler>();
 
+    public static Vector2 GetWorldMousePosition(Camera camera) => Snap(camera.MouseToWorldPoint());
+    public Vector2 GetWorldMousePosition() => Snap(Camera.MouseToWorldPoint());
+    public Vector2 GetRawWorldMousePosition()
+    {
+      return Camera.MouseToWorldPoint();
+    }
+    public static Vector2 Snap(Vector2 pos)
+    {
+      if (MouseSnapSize != Point.Zero) pos = pos.RoundToPoint().ToVector2().RoundFloor(MouseSnapSize);
+      return pos;
+    }
     public void RegisterInputHandler(IInputHandler handler)
     {
       _inputHandlers.Add(handler);

@@ -34,7 +34,7 @@ namespace Raven
     [JsonInclude]
     public Dictionary<Point, TileInstance> Tiles { get; private set;} = new Dictionary<Point, TileInstance>();
 
-    public override Vector2 Position { get => Level.Bounds.Location + Offset ; }
+    public override Vector2 Position { get => Level.Bounds.Location + Offset; }
 
 
     internal TileLayer()

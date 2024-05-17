@@ -26,6 +26,7 @@ namespace Raven
     public Vector4 LevelGrid = new Vector4(0.0f, 0.0f, 0.0f, 0.5f);
     public Vector4 LevelSelOutline = new Vector4(0.85f, 0.85f, 0.85f, 1f);    
     public Vector4 WorldName = new Vector4(0.5f, 0.5f, 0.7f, 1f);
+    public Vector4 WorldSize = new Vector4(0.5f, 0.5f, 0.7f, 1f);
 
     // Sprite picker
     public Vector4 PickHoverOutline = new Vector4(0.5f, 0.5f, 0.5f, 1f);

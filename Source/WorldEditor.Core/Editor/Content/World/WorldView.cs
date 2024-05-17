@@ -255,29 +255,26 @@ namespace Raven
     void DrawLevel(int index, Batcher batcher, Camera camera)
     {
       var level = World.Levels[index];
+      var hover = level.Bounds.Contains(Camera.MouseToWorldPoint()) && _imgui.SelectedLevel != index;
       batcher.DrawRect(level.Bounds, Settings.Colors.LevelSheet.ToColor());
 
       // Hover level
-      if (level.Bounds.Contains(Camera.MouseToWorldPoint()) && _imgui.SelectedLevel != index)
+      if (hover)
       {
         batcher.DrawRectOutline(camera, level.Bounds.ExpandFromCenter(new Vector2(7)), Settings.Colors.SelectionOutline.ToColor(), 4);
       }
-      batcher.DrawString(
-          Graphics.Instance.BitmapFont, 
-          level.Name,
-          level.Bounds.BottomLeft(),
-          color: Settings.Colors.ShapeName.ToColor(), 
-          rotation: 0f, 
-          origin: Vector2.Zero, 
-          scale: Math.Clamp(2f/camera.RawZoom, 2f, 10f), 
-          effects: Microsoft.Xna.Framework.Graphics.SpriteEffects.None, 
-          layerDepth: 0f);
-
       DrawLayers(index, batcher, camera);
 
       if (_imgui._objHolder != null && _imgui._objHolder.Content == _imgui.TileInstanceInspector)
         batcher.DrawRectOutline(camera, _imgui.SpritePicker._selectedBounds, Settings.Colors.InspectSpriteFill.ToColor());
-        
+
+      if (hover)
+      {
+        batcher.DrawStringCentered(camera, $"{level.ContentSize.X}x{level.ContentSize.Y}", 
+            level.Bounds.TopCenter(), Settings.Colors.WorldSize.ToColor(), new Vector2(2, 40), true, false);
+      }
+      batcher.DrawString(camera, level.Name, level.Bounds.BottomLeft(), Settings.Colors.WorldName.ToColor(), new Vector2(2, 10));
+
     }
     public override void Render(Batcher batcher, Camera camera, EditorSettings settings)
     {
@@ -286,7 +283,7 @@ namespace Raven
       // Selected level outline
       if (_imgui.SelectedLevel != -1 && !Selection.HasBegun())
       {
-        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds, settings.Colors.LevelSelOutline.ToColor(), 1);
+        batcher.DrawRectOutline(camera, _imgui.SelectedLevelInspector.Level.Bounds.ExpandFromCenter(new Vector2(6)), settings.Colors.LevelSelOutline.ToColor(), 1);
       }
 
       if (settings.Graphics.FocusOnOneLevel && PaintMode != PaintMode.None && _imgui.SelectedLevel != -1)
