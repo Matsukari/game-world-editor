@@ -135,7 +135,6 @@ namespace Raven
       if (Selection.Capture is Level lev)
       {
         var command = new LevelResizeCommand(lev, _startLevelInstance); 
-        var group = new CommandGroup(command, new LevelMoveCommand(lev, _startLevel));
         void OnUndoRedo()
         {
           Selection.Re(command._level.Bounds, command._level);
@@ -144,7 +143,7 @@ namespace Raven
           _imgui._objHolder.Content = _imgui.SelectedLevelInspector;
 
         }
-        Core.GetGlobalManager<CommandManagerHead>().Current.Record(group, OnUndoRedo);
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, OnUndoRedo);
       }
     }
     void SelectionDragEnd()

@@ -25,7 +25,7 @@ namespace Raven
     /// <summary>
     // The number of all Tiles horizontally and vertically
     /// </summary> 
-    public Point TilesQuantity { get => new Point(Level.ContentSize.X/TileWidth, Level.ContentSize.Y/TileHeight); }
+    public Point TilesQuantity { get => new Point(Size.X/TileWidth, Size.Y/TileHeight); }
 
 
     /// <summary>
@@ -33,6 +33,8 @@ namespace Raven
     /// </summary> 
     [JsonInclude]
     public Dictionary<Point, TileInstance> Tiles { get; private set;} = new Dictionary<Point, TileInstance>();
+
+    public override Vector2 Position { get => Level.Bounds.Location + Offset ; }
 
 
     internal TileLayer()

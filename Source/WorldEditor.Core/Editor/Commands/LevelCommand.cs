@@ -44,13 +44,19 @@ namespace Raven
     {
       var last = _last.Copy();
       _level.Layers = last.Layers;
+      foreach (var layer in _level.Layers)
+        layer.Level = _level;
       _level.ContentSize = last.ContentSize;
+      _level.LocalOffset = last.LocalOffset;
     }
     internal override void Undo()
     {
       var start = _start.Copy();
       _level.Layers = start.Layers;
+      foreach (var layer in _level.Layers)
+        layer.Level = _level;
       _level.ContentSize = start.ContentSize;
+      _level.LocalOffset = start.LocalOffset;
     }
   }
   class LevelMoveCommand : Command

@@ -63,6 +63,10 @@ namespace Raven
 
     public static Vector2 Negate(this Vector2 vector) => new Vector2(-vector.X, -vector.Y);
 
+    public static Point Modulo(this Point a, Point b)
+    {
+      return new Point(a.X % b.X, a.Y % b.Y);
+    }
     public static Vector2 ToVector2(this Num.Vector2 numeric)
     {
       return new Vector2(numeric.X, numeric.Y);

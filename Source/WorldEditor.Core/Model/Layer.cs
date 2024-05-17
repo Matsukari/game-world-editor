@@ -46,17 +46,17 @@ namespace Raven
     /// <summary>
     /// Boudns soly of this layer with an offset
     /// </summary>
-    public RectangleF Bounds { get => Level.Bounds.AddPosition(Offset); }
+    public virtual RectangleF Bounds { get => new RectangleF(Position, Size.ToVector2()); }
 
     /// <summary>
     /// Position of thie layer in world 
     /// </summary>
-    public Vector2 Position { get => Level.Bounds.Location + Offset; }
+    public virtual Vector2 Position { get => Level.Bounds.Location + Offset; }
 
     /// <summary>
     /// Same as Level's size
     /// </summary>
-    public Point Size { get => Level.ContentSize; }
+    public virtual Point Size { get => Level.ContentSize; }
 
     internal Layer()
     {
