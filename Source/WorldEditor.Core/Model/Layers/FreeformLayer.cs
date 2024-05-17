@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Nez.Persistence;
+using Nez;
 
 namespace Raven
 {
@@ -56,6 +57,15 @@ namespace Raven
     public void SortScenes()
     {
       SpriteScenees.Sort(new SceneYComparer());
+    }
+    public override void OnLevelPushed(RectangleF old)
+    {
+      var delta = old.Location - Bounds.Location;
+
+      foreach (var scene in SpriteScenees)
+      {
+        scene.Props.Transform.Position += delta;
+      } 
     }
     public override Layer Copy()
     {
