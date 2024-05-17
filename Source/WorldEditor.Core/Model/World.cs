@@ -69,6 +69,14 @@ namespace Raven
     /// <summary>
     /// Removes the given level contained in this World
     /// </summary>
+    public void RemoveLevel(string level) 
+    {
+      
+      Levels.RemoveAll(item => item.Name == level);
+    }
+    /// <summary>
+    /// Removes the given level contained in this World
+    /// </summary>
     public void RemoveLevel(Level level) 
     {
       Levels.Remove(level);
@@ -113,6 +121,7 @@ namespace Raven
       Levels = Levels.EnsureNoRepeatNameField();
 
     }
+
     /// <summary>
     /// Adds a Sheet resource
     /// </summary>

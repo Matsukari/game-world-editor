@@ -73,12 +73,10 @@ namespace Raven
       _input.OnRightClickWorld += (position) => _imgui.SceneInstanceInspector.Scene = null;
 
       Selection.OnScaled += HandleTileLayerResize;
-      Selection.OnMoveStart += SelectionDragStart;
       Selection.OnMoveEnd += SelectionDragEnd;
-      Selection.OnScaleStart += SelectionDragStart;
-      Selection.OnScaleEnd += SelectionDragEnd;
+      Selection.OnMoveEnd += SelectionDragEnd2;
+      Selection.OnScaleEnd += SelectionResizeEnd;
       Selection.OnEditPoint += LevelResize;
-
 
       _imgui = new WorldViewImGui(_input.Painter); 
       _imgui.Initialize(editor, content);
@@ -132,8 +130,22 @@ namespace Raven
         }
       }
     }
-    void SelectionDragStart()
+    void SelectionResizeEnd()
     {
+      if (Selection.Capture is Level lev)
+      {
+        var command = new LevelResizeCommand(lev, _startLevelInstance); 
+        var group = new CommandGroup(command, new LevelMoveCommand(lev, _startLevel));
+        void OnUndoRedo()
+        {
+          Selection.Re(command._level.Bounds, command._level);
+          _imgui.SelectedLevel = _world.Levels.FindIndex(item => item.Name == command._level.Name);
+          _imgui.SelectedLevelInspector.SetCurrentLayer(0);
+          _imgui._objHolder.Content = _imgui.SelectedLevelInspector;
+
+        }
+        Core.GetGlobalManager<CommandManagerHead>().Current.Record(group, OnUndoRedo);
+      }
     }
     void SelectionDragEnd()
     {
@@ -142,7 +154,10 @@ namespace Raven
         var command = new LevelMoveCommand(lev, _startLevel); 
         Core.GetGlobalManager<CommandManagerHead>().Current.Record(command, ()=>Selection.Re(command._level.Bounds, command._level));
       }
-      else if (Selection.Capture is SpriteSceneInstance scene)
+    }
+    void SelectionDragEnd2()
+    {
+      if (Selection.Capture is SpriteSceneInstance scene && Selection.HasChanged)
       {
         var command = new RenderPropTransformModifyCommand(scene.Props, _startScene);
         command.Context = scene;
@@ -178,6 +193,7 @@ namespace Raven
       _imgui.SelectedLevel = i;
       _imgui._objHolder.Content = _imgui.SelectedLevelInspector;
       _startLevel = level.LocalOffset;
+      _startLevelInstance = level.Copy();
       if (Settings.Graphics.FocusOnOneLevel)
       {
       }
@@ -294,6 +310,7 @@ namespace Raven
       if (Selection.Capture is Level lev && !Selection.IsEditingPoint)
       {
         lev.LocalOffset = Selection.ContentBounds.Location;
+        // Console.WriteLine("Moving at " + lev.Bounds.RenderStringFormat());
       }
       else if (Selection.Capture is ShapeModel model)
       {
@@ -311,6 +328,7 @@ namespace Raven
       }
     }
     Vector2 _startLevel = Vector2.Zero;
+    Level _startLevelInstance = null;
     Transform _startScene = Transform.Default;
   }
 }

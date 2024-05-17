@@ -21,6 +21,9 @@ namespace Raven
     public RectangleF InitialBounds = new RectangleF();
     public float SelectedSelectionPointSizeFactor = 2f;
     public object Capture = null;
+    public bool HasMoved = false;
+    public bool HasScaled = false;
+    public bool HasChanged { get => HasMoved || HasScaled; }
     public event Action OnMoveEnd;
     public event Action OnMoveStart;
     public event Action OnScaleStart;
@@ -119,7 +122,7 @@ namespace Raven
       } 
       else if (Nez.Input.LeftMouseButtonReleased) 
       {
-        if (_isDragInsideArea && OnMoveEnd != null) OnMoveEnd();
+        if (_isDragInsideArea && OnMoveEnd != null && HasMoved) OnMoveEnd();
         // Console.WriteLine("Ended moving selection...");
 
         _isDragInsideArea = false;
@@ -127,10 +130,12 @@ namespace Raven
         Mouse.SetCursor(MouseCursor.Arrow);
         if (IsEditingPoint)
         {
-          if (OnScaleEnd != null) OnScaleEnd();
+          if (OnScaleEnd != null && HasScaled) OnScaleEnd();
           _scaleOnce = true;
           SelAxis = SelectionAxis.None;
         }
+        HasMoved = false;
+        HasScaled = false;
       }
 
       // draggin point
@@ -190,6 +195,9 @@ namespace Raven
           OnEditPoint(SelAxis, delta);
         ContentBounds = _bounds;
 
+        if (delta != Vector2.Zero)
+          HasScaled = true;
+
         if (OnScaled != null) OnScaled(SelAxis);
       }
       // move selection
@@ -197,6 +205,8 @@ namespace Raven
       {
         _bounds.Location = _selectionInitial.Location + delta;
         ContentBounds = _bounds;
+        if (delta != Vector2.Zero)
+          HasMoved = true;
         // Console.WriteLine("Inside draggin..");
         return true;
       }
