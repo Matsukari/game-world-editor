@@ -81,7 +81,9 @@ namespace Raven
             ("View", ViewOptions),
         },
       };
-
+      _tempEnabled = _editor.Settings.Graphics.EnableLevelMagnetting;
+      _tempInScreen= _editor.Settings.Graphics.LevelsMagnetInScreenSpace;
+      _tempOffset = _editor.Settings.Graphics.LevelsMagnetOffset;
     }
     bool _isDrawSnappingPopup = false;
     void DrawSnappingPopup()
@@ -93,23 +95,43 @@ namespace Raven
       }
       if (ImGui.BeginPopupContextItem("snap-options-popup"))
       {
-        if (ImGui.MenuItem("Snap to grid"))
+        if (ImGui.MenuItem("Snap Mouse to grid"))
         {
         }
-        if (ImGui.BeginMenu("Snap to custom size"))
+        if (ImGui.BeginMenu("Snap Mouse to custom size"))
         {
           ImGui.InputInt("Width", ref _snapWidth);
           ImGui.InputInt("Height", ref _snapHeight); 
-          if (ImGuiUtils.FillButtonX("Ok")) 
+          if (ImGuiUtils.FillButtonX("Apply")) 
           {
             InputManager.MouseSnapSize.X = _snapWidth;
             InputManager.MouseSnapSize.Y = _snapHeight;
             ImGui.CloseCurrentPopup();
           }
+          ImGui.EndMenu();
+        }
+        if (ImGui.BeginMenu("Magnet Neighbor Levels"))
+        {
+          ImGui.Checkbox("Enable", ref _tempEnabled); 
+          ImGui.SameLine();
+          ImGui.Checkbox("In Screen Space", ref _tempInScreen); 
+
+          ImGui.InputInt("Magnet Offset", ref _tempOffset);
+          if (ImGuiUtils.FillButtonX("Apply")) 
+          {
+            _editor.Settings.Graphics.LevelsMagnetOffset = _tempOffset;
+            _editor.Settings.Graphics.LevelsMagnetInScreenSpace = _tempInScreen;
+            _editor.Settings.Graphics.EnableLevelMagnetting = _tempEnabled;
+            ImGui.CloseCurrentPopup();
+          }
+          ImGui.EndMenu();
         }
         ImGui.EndPopup();
       }
     }
+    int _tempOffset;
+    bool _tempInScreen;
+    bool _tempEnabled;
     int _snapWidth = 1;
     int _snapHeight = 1;
     void IImGuiRenderable.Render(Raven.ImGuiWinManager imgui)

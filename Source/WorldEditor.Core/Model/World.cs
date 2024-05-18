@@ -117,9 +117,7 @@ namespace Raven
     public void PutLevel(Level level)
     {
       level.DetachFromWorld();
-      Levels.Add(level);
-      Levels = Levels.EnsureNoRepeatNameField();
-
+      AddLevel(level);       
     }
 
     /// <summary>

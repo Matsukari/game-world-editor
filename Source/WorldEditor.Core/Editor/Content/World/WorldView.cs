@@ -306,7 +306,8 @@ namespace Raven
       if (Selection.Capture is Level lev && !Selection.IsEditingPoint)
       {
         lev.LocalOffset = Selection.ContentBounds.Location;
-        // Console.WriteLine("Moving at " + lev.Bounds.RenderStringFormat());
+
+        if (Settings.Graphics.EnableLevelMagnetting) MagnetNearestLevel(lev);
       }
       else if (Selection.Capture is ShapeModel model)
       {
@@ -322,6 +323,52 @@ namespace Raven
           + instance.Scene.MaxOrigin * scaleDelta;
         instance.Props.Transform.Scale = _startScene.Scale + scaleDelta;
       }
+    }
+    void MagnetNearestLevel(Level lev)
+    {
+      var target = lev.Bounds;
+      var targetEdges = new []{target.Left, target.Right, target.Top, target.Bottom};
+
+      float magnetOffset = Settings.Graphics.LevelsMagnetOffset; 
+      if (Settings.Graphics.LevelsMagnetInScreenSpace)
+        magnetOffset /= Camera.RawZoom;
+
+      var closestEdges = new float[]{0, 0, 0, 0};
+      var magnetEdges = new []{false, false, false, false};
+      var minDistances = new float[]{magnetOffset, magnetOffset, magnetOffset, magnetOffset};
+
+      foreach (var other in World.Levels)
+      {
+        var rect = other.Bounds;
+        var rectEdges = new []{rect.Right, rect.Left, rect.Bottom, rect.Top};
+        for (int edge = 0; edge < 4; edge++)
+        {
+          var distance = Math.Abs(targetEdges[edge] - rectEdges[edge]);
+          if (distance < minDistances[edge])
+          {
+            minDistances[edge] = distance;
+            closestEdges[edge] = rectEdges[edge];
+            magnetEdges[edge] = true;
+          }
+        }
+      }
+      if (magnetEdges[0])
+        target.X = closestEdges[0];
+
+      if (magnetEdges[1])
+        target.X = closestEdges[1] - target.Width;
+
+      if (magnetEdges[2])
+        target.Y = closestEdges[2];
+
+      if (magnetEdges[3])
+        target.Y = closestEdges[3] - target.Height;
+
+      var delta = (target.Location - lev.Bounds.Location); 
+
+      if (Selection.HasBegun()) Selection.ContentBounds.Location += delta;
+      lev.LocalOffset += delta;
+
     }
     Vector2 _startLevel = Vector2.Zero;
     Level _startLevelInstance = null;

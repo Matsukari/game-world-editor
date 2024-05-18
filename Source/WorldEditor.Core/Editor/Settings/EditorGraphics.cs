@@ -13,6 +13,12 @@ namespace Raven
 
     public int InitialInspectorWindowWidth = 260;
 
+    public int LevelsMagnetOffset = 50;
+
+    public bool LevelsMagnetInScreenSpace = false;
+
+    public bool EnableLevelMagnetting = true;
+
     public bool FixedWindowSize = true;
 
     public bool FocusOnOneLevel = true;
