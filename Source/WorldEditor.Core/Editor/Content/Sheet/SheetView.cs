@@ -105,12 +105,34 @@ namespace Raven
         {
           var worldTile = Sheet.GetTile(x, y).ToRectangleF();
           worldTile.Location += _image.Bounds.Location;
+
           if (worldTile.Contains(camera.MouseToWorldPoint()) ) TileInMouse = Sheet.GetTile(x, y);
+
+          // Draw grid
           if (Settings.Graphics.DrawSheetGrid)
           {
             batcher.DrawRectOutline(camera, worldTile, settings.Colors.PickHoverOutline.ToColor());
           }
 
+
+
+        }
+      }
+      for (int x = 0; x < _sheet.Tiles.X; x++)
+      {
+        for (int y = 0; y < _sheet.Tiles.Y; y++)
+        {
+          var worldTile = Sheet.GetTile(x, y).ToRectangleF();
+          worldTile.Location += _image.Bounds.Location;
+
+          var tile = _sheet.CustomTileExists(x, y);
+          // Hightlight tiles with custom properties 
+          if (tile != null && tile.Properties.Count() > 0) 
+            batcher.DrawRectOutline(camera, worldTile, settings.Colors.TileFillWithProperty.ToColor());
+
+          // Draw custom tile's name 
+          if (tile != null && tile.Name != string.Empty) 
+            batcher.DrawStringCentered(camera, tile.Name, worldTile.BottomCenter(), settings.Colors.TileName.ToColor(), new Vector2(0.5f, 2f), true, true);
         }
       }
 

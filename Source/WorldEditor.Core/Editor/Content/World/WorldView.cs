@@ -235,7 +235,7 @@ namespace Raven
             batcher.DrawRectOutline(camera, layer.Bounds.ExpandFromCenter(new Vector2(7)), outlineColor, 4);
         }
 
-        WorldRenderer.RenderLayer(batcher, camera, layer, color);
+        WorldRenderer.RenderLayer(batcher, camera, layer, color, Settings.Colors.SpriteInstanceName.ToColor());
 
 
         if (mouseInLayer 
@@ -255,13 +255,13 @@ namespace Raven
     void DrawLevel(int index, Batcher batcher, Camera camera)
     {
       var level = World.Levels[index];
-      var hover = level.Bounds.Contains(Camera.MouseToWorldPoint()) && _imgui.SelectedLevel != index;
+      var hover = level.Bounds.Contains(Camera.MouseToWorldPoint()) && _imgui.SelectedLevel != index && !InputManager.IsImGuiBlocking;
       batcher.DrawRect(level.Bounds, Settings.Colors.LevelSheet.ToColor());
 
       // Hover level
       if (hover)
       {
-        batcher.DrawRectOutline(camera, level.Bounds.ExpandFromCenter(new Vector2(7)), Settings.Colors.SelectionOutline.ToColor(), 4);
+        batcher.DrawRectOutline(camera, level.Bounds.ExpandFromCenter(new Vector2(10)), Settings.Colors.SelectionOutline.ToColor(), 4);
       }
       DrawLayers(index, batcher, camera);
 

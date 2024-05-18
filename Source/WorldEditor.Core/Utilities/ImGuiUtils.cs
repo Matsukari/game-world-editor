@@ -31,6 +31,11 @@ namespace Raven
 
       return result;
     }
+    public static bool FillButtonX(string label)
+    {
+      var button = ImGui.Button(label, new Vector2(ImGui.GetContentRegionAvail().X, Nez.ImGuiTools.NezImGui.GetDefaultWidgetHeight()));
+      return button;
+    }
     public static bool MiddleButtonX(string name)
     {
       return ImGui.Button(name);

@@ -16,8 +16,8 @@ namespace Raven
     public static void DrawStringCentered(this Batcher batcher, Camera camera, string input, Vector2 position, Color color, Vector2 zoomRange, 
         bool centerX, bool centerY)
     {
-      if (centerX) position.X -= Graphics.Instance.BitmapFont.MeasureString(input).X;
-      if (centerY) position.Y -= Graphics.Instance.BitmapFont.MeasureString(input).Y;
+      if (centerX) position.X -= Graphics.Instance.BitmapFont.MeasureString(input).X / 2;
+      if (centerY) position.Y -= Graphics.Instance.BitmapFont.MeasureString(input).Y / 2;
       batcher.DrawString(camera, input, position, color, zoomRange);
     }
 

@@ -6,9 +6,12 @@ namespace Raven
 {
   public class TileLayerRenderer : LayerRenderer<TileLayer>
   { 
-    public static void Render(Batcher batcher, Camera camera, TileLayer layer, Transform parent, Color globalColor=default)
+    public static void Render(Batcher batcher, Camera camera, TileLayer layer, Transform parent, Color globalColor=default, Color nameColor=default)
     {
       if (globalColor == default) globalColor = Color.White;
+      if (nameColor == default) nameColor = Color.White;
+
+      var names = new List<(Point, TileInstance)>();
 
       foreach (var (tilePosition, tileInstance) in layer.Tiles)
       {
@@ -43,7 +46,10 @@ namespace Raven
           dest.Location += tileInstance.Props.Transform.Position;
           rot += tileInstance.Props.Transform.Rotation;
           scale *= tileInstance.Props.Transform.Scale;
+
         }
+        names.Add((tilePosition, tileInstance));
+
         batcher.Draw(
             texture: tile.Texture,
             position: dest.Location + parent.Position,
@@ -54,6 +60,23 @@ namespace Raven
             scale: scale,
             effects: eff,
             layerDepth: 0);
+      }
+      foreach (var (tilePosition, tileInstance) in names)
+      {
+        var tile = tileInstance.Tile;
+        var dest = new RectangleF(
+            tilePosition.X*layer.TileWidth, 
+            tilePosition.Y*layer.TileHeight, 
+            layer.TileWidth, layer.TileHeight);
+
+        dest.Location += layer.Bounds.Location;
+
+        var scale = parent.Scale;
+        scale.X *= dest.Width / tile.Region.Width;
+        scale.Y *= dest.Height / tile.Region.Height;
+
+        if (tileInstance.Props != null) dest.Location += tileInstance.Props.Transform.Position;
+        batcher.DrawStringCentered(camera, tileInstance.Name, dest.Center+parent.Position, nameColor, new Vector2(1, 5), true, true);
       }
     }
 

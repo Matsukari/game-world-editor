@@ -39,8 +39,17 @@ namespace Raven
       // _inspector.OnAddSheet += file => _world.AddSheet(Serializer.LoadContent<Sheet>(file));
       _inspector.OnRemoveLevel += level => Selection.End();
       _inspector.OnRemoveLevel += level => SelectedLevel--;
+
+      TileInstanceInspector.OnViewParent += ResetObj;
+      SceneInstanceInspector.OnViewParent += ResetObj;
      
       _spritePicker = painter;
+    }
+
+    void ResetObj()
+    {
+      if (_objHolder != null && SelectedLevelInspector != null)
+        _objHolder.Content = SelectedLevelInspector;
     }
 
     public override void Initialize(Editor editor, EditorContent content)
@@ -127,11 +136,13 @@ namespace Raven
       SyncSpritePicker();
       SyncLevelInspectors();
 
+
+
       imgui.GetRenderable<WindowHolder>("main").Content = _inspector;
       _objHolder = imgui.GetRenderable<WindowHolder>("sub");
 
       // Render window of current level
-      if (SelectedLevel != -1 && _objHolder.Content == null) 
+      if ((SelectedLevel != -1 && _objHolder.Content == null) || Nez.Input.IsKeyPressed(Microsoft.Xna.Framework.Input.Keys.Escape)) 
       {
         _objHolder.Content = SelectedLevelInspector;
       }

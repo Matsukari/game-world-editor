@@ -19,39 +19,7 @@ namespace Raven
     }
 
   }
-  // public class TransformImGuiRenderer : ClassMemberChanger, IImGuiRenderable
-  // { 
-  //   Transform _transform;
-  //   public void Render(ImGuiWinManager imgui)
-  //   {
-  //     var mod = false;
-  //     var pos = _transform.Position.ToNumerics();
-  //     var scale = _transform.Scale.ToNumerics();
-  //     var skew = _transform.Skew.ToNumerics();
-  //     var rot = RotationDegrees;
-  //     if (ImGui.InputFloat2("Position", ref pos)) 
-  //     {
-  //       Position = pos.ToVector2();
-  //       mod = true;
-  //     }
-  //     if (ImGui.InputFloat2("Scale", ref scale)) 
-  //     {
-  //       Scale = scale.ToVector2();
-  //       mod = true;
-  //     }
-  //     if (ImGui.InputFloat2("Skew", ref skew)) 
-  //     {
-  //       Skew = skew.ToVector2();
-  //       mod = true;
-  //     }
-  //     if (ImGui.SliderFloat("Rotation", ref rot, 0, 360)) 
-  //     {
-  //       RotationDegrees = rot;
-  //       mod = true;
-  //     }
-  //     return mod;
-  //   }
-  // }
+
   public class TileInstanceInspector : Widget.PropertiedWindow
   {
     public override string Name { get => Tile.Name; set => Tile.Name = value;}
@@ -61,6 +29,7 @@ namespace Raven
     public TileInstance Tile;
     public TileLayer Layer;
     public event Action<TileInstance, TileLayer> OnTileModified;
+    public event Action OnViewParent;
 
     static bool _mod = false;
     static RenderProperties _startProps;
@@ -74,8 +43,20 @@ namespace Raven
     bool _onRelease = false;
     public override void OnRender(ImGuiWinManager imgui)
     {
+      if (ImGui.CollapsingHeader("Parent Layer", ImGuiTreeNodeFlags.DefaultOpen)) 
+      {
+        ImGui.LabelText("Name", Layer.Name);
+        if (ImGui.MenuItem("View Layer") && OnViewParent != null) OnViewParent();
+      }
+
       if (ImGui.CollapsingHeader("TileInstance", ImGuiTreeNodeFlags.DefaultOpen)) 
       {
+        string name = Name;
+        if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
+        {
+          StartProps(Tile);
+          Name = name;
+        }
         ImGui.BeginDisabled();
         ImGui.LabelText("Id", Tile.Tile.Id.ToString());
         ImGui.LabelText("Tile", $"{Tile.Tile.Coordinates.X}x, {Tile.Tile.Coordinates.Y}y");

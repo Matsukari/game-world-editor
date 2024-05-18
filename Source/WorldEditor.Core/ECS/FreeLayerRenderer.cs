@@ -51,6 +51,7 @@ namespace Raven
     public static void RenderScene(SpriteSceneInstance instance, Vector2 position, Batcher batcher, Camera camera, Color baseColor=default)
     {
       if (baseColor == default) baseColor = Color.White;
+
       foreach (var sprite in instance.Scene.Parts)
       {
         if (!sprite.IsVisible) return;
@@ -64,7 +65,6 @@ namespace Raven
             scale: instance.Props.Transform.Scale * instance.Scene.Transform.Scale * sprite.Transform.Scale,
             effects: sprite.SpriteEffects,
             layerDepth: 0);
-
       }
     }    
   }

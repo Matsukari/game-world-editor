@@ -155,7 +155,7 @@ namespace Raven
             Graphics.Instance.BitmapFont, 
             part.Name,
             _renderer.GetPartWorldBounds(part).BottomLeft(),
-            color: Settings.Colors.ShapeName.ToColor(), 
+            color: Settings.Colors.ScenePartName.ToColor(), 
             rotation: 0f, 
             origin: Vector2.Zero, 
             scale: Math.Clamp(1f/camera.RawZoom, 1f, 10f), 

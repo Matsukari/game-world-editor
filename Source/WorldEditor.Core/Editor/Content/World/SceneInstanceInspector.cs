@@ -12,6 +12,7 @@ namespace Raven
     public SpriteSceneInstance Scene;
     public FreeformLayer Layer;
     public event Action<SpriteSceneInstance, FreeformLayer> OnSceneModified;
+    public event Action OnViewParent;
     
     static bool _mod = false;
     static RenderProperties _startProps;
@@ -24,8 +25,19 @@ namespace Raven
     bool _onRelease = false;
     public override void OnRender(ImGuiWinManager imgui)
     {
+      if (ImGui.CollapsingHeader("Parent Layer", ImGuiTreeNodeFlags.DefaultOpen)) 
+      {
+        ImGui.LabelText("Name", Layer.Name);
+        if (ImGui.MenuItem("View Layer") && OnViewParent != null) OnViewParent();
+      }
       if (ImGui.CollapsingHeader("SceneInstance", ImGuiTreeNodeFlags.DefaultOpen)) 
       {
+        string name = Name;
+        if (ImGui.InputText("Name", ref name, 10, ImGuiInputTextFlags.EnterReturnsTrue)) 
+        {
+          StartProps(Scene);
+          Name = name;
+        }
         if (Scene.Props.Transform.RenderImGui()) 
         {
           StartProps(Scene);

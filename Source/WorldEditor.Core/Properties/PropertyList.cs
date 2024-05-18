@@ -23,6 +23,7 @@ namespace Raven
     }
     public List<Property> Data = new List<Property>();
 
+    public int Count() => Data.Count();
     public T Get<T>(string name) => (T)(Data.Find(item => item.Key == name).Value);
     public void Set(string name, object obj) => Data.Find(item => item.Key == name).Value = obj;
     public void Rename(string old, string name) 
