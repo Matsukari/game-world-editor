@@ -75,7 +75,7 @@ namespace Raven
 
         if (ImGui.MenuItem(Icon.Copy + "  Copy")) 
         {
-          _copiedLevel = _levelOnOpt;
+          _copiedLevel = _levelOnOpt.Copy();
           _levelOnOpt = null;
         }
         if (ImGui.MenuItem(Icon.Copy + "  Cut")) 
@@ -102,9 +102,8 @@ namespace Raven
         }
         if ((_copiedLevel != null || _levelOnOpt != null) && ImGui.MenuItem(Icon.Paste + "  Paste"))
         {
-          Level level;
-          if (_copiedLevel != null) level = _copiedLevel.Copy();
-          else 
+          Level level = _copiedLevel;
+          if (_copiedLevel == null) 
           {
             level = _levelOnOpt;
             _levelOnOpt = null;

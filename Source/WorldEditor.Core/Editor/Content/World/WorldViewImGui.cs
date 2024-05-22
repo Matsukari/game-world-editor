@@ -35,6 +35,12 @@ namespace Raven
     public WorldViewImGui(TilePainter painter)
     {
       _popups = new WorldViewPopup();
+      _popups.OnDeleteLevel += level => Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveLevelCommand(_world, level));
+      _popups.OnPasteLevel += level => Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(new AddLevelCommand(_world, level));
+      _popups.OnCutLevel += level => Nez.Core.GetGlobalManager<CommandManagerHead>().Current.Record(new RemoveLevelCommand(_world, level));
+      _popups.OnCutLevel += level => SelectOtherLevel();
+      _popups.OnDeleteLevel += level => SelectOtherLevel();
+
       _inspector = new WorldInspector(this);
       // _inspector.OnAddSheet += file => _world.AddSheet(Serializer.LoadContent<Sheet>(file));
       _inspector.OnRemoveLevel += level => Selection.End();

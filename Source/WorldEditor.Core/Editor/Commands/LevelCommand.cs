@@ -18,7 +18,7 @@ namespace Raven
     }
     internal override void Undo()
     {
-      _world.RemoveLevel(_level);
+      _world.Levels.Remove(_level);
     }
   }
   class RemoveLevelCommand : ReversedCommand

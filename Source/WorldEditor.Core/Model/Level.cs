@@ -168,7 +168,11 @@ namespace Raven
     /// Remoes this layer from its parent World; the World can no longer refenrece this level but 
     /// this level could in reverse
     /// </summary>
-    public void DetachFromWorld() => World.RemoveLevel(this);
+    public void DetachFromWorld() 
+    {
+      if (World != null)
+        World.RemoveLevel(this);
+    }
 
     /// <summary>
     /// Creates a full copy of this Level with each new transform and layers.
