@@ -154,6 +154,86 @@
 				},
 				"Rotation": 0
 			}
+		},
+		{
+			"@id": "23",
+			"Name": "tree-1",
+			"Properties": {
+				"@id": "24",
+				"Data": [
+
+				]
+			},
+			"Parts": [
+				{
+					"@id": "25",
+					"@type": "Raven.SourcedSprite",
+					"Name": "Main component",
+					"Properties": {
+						"@id": "26",
+						"Data": [
+
+						]
+					},
+					"IsVisible": true,
+					"Color": {
+						"@ref": "8"
+					},
+					"Origin": {
+						"@id": "27",
+						"X": 72,
+						"Y": 80
+					},
+					"Transform": {
+						"@id": "28",
+						"Position": {
+							"@ref": "9"
+						},
+						"Scale": {
+							"@ref": "11"
+						},
+						"Skew": {
+							"@ref": "11"
+						},
+						"Rotation": 0
+					},
+					"IsLocked": false,
+					"SpriteEffects": "None",
+					"SourceSprite": {
+						"@id": "29",
+						"Name": "",
+						"Properties": {
+							"@id": "30",
+							"Data": [
+
+							]
+						},
+						"Region": {
+							"@id": "31",
+							"X": 128,
+							"Y": 0,
+							"Width": 144,
+							"Height": 160
+						}
+					}
+				}
+			],
+			"Animations": [
+
+			],
+			"Transform": {
+				"@id": "32",
+				"Position": {
+					"@ref": "9"
+				},
+				"Scale": {
+					"@ref": "11"
+				},
+				"Skew": {
+					"@ref": "11"
+				},
+				"Rotation": 0
+			}
 		}
 	],
 	"TileWidth": 16,
