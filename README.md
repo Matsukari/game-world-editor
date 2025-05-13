@@ -5,9 +5,6 @@ Wored is a 2D level *and* sprite sheet editor for topdown games.
 
 It currently is only applicable for Monogame.
 
-## Development 
-This project is under development and may not be actively maintained or developed anytime soon.
-
 ### Features
 - Spritesheet editor 
 - Level editor
